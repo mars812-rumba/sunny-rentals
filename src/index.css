@@ -1,0 +1,481 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 210 15% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 15% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 15% 20%;
+
+    /* Blue gradient primary */
+    --primary: 210 65% 55%;
+    --primary-dark: 210 50% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Orange accent for CTAs */
+    --accent: 15 100% 60%;
+    --accent-hover: 15 100% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 210 15% 20%;
+
+    --muted: 210 15% 96%;
+    --muted-foreground: 210 10% 50%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 15% 90%;
+    --input: 210 15% 90%;
+    --ring: 210 65% 55%;
+
+    --radius: 0.75rem;
+
+    /* Sunny Rentals specific colors */
+    --ocean-blue: 210 65% 55%;
+    --ocean-blue-dark: 210 50% 35%;
+    --ocean-blue-light: 210 60% 95%;
+    --sunset-orange: 15 100% 60%;
+    --sunset-orange-hover: 15 100% 55%;
+    --tropical-green: 150 80% 45%;
+    --sand-beige: 40 35% 95%;
+
+    /* Gradients */
+    --gradient-ocean: linear-gradient(135deg, hsl(210, 65%, 55%), hsl(210, 50%, 35%));
+    --gradient-sunset: linear-gradient(135deg, hsl(15, 100%, 60%), hsl(25, 100%, 50%));
+    --gradient-hero: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.3));
+
+    /* Shadows */
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-large: 0 8px 32px rgba(0, 0, 0, 0.16);
+    --shadow-cta: 0 4px 20px hsla(15, 100%, 60%, 0.4);
+
+    /* Transitions */
+    --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 20% 10%;
+    --foreground: 220 10% 92%;
+
+    --card: 220 18% 14%;
+    --card-foreground: 220 10% 92%;
+
+    --popover: 220 18% 12%;
+    --popover-foreground: 220 10% 92%;
+
+    --primary: 200 80% 55%;
+    --primary-dark: 200 70% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --accent: 160 70% 45%;
+    --accent-hover: 160 70% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 220 10% 85%;
+
+    --muted: 220 12% 20%;
+    --muted-foreground: 220 8% 55%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 12% 22%;
+    --input: 220 12% 18%;
+    --ring: 200 80% 55%;
+
+    /* Admin panel specific */
+    --admin-surface: 220 18% 16%;
+    --admin-surface-raised: 220 16% 20%;
+    --admin-surface-inset: 220 20% 12%;
+    --admin-accent: 200 80% 55%;
+    --admin-success: 160 70% 45%;
+    --admin-warning: 40 90% 55%;
+    --admin-booking: 180 60% 40%;
+
+    --sidebar-background: 220 20% 8%;
+    --sidebar-foreground: 220 10% 92%;
+    --sidebar-primary: 200 80% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 15%;
+    --sidebar-accent-foreground: 220 10% 92%;
+    --sidebar-border: 220 12% 20%;
+    --sidebar-ring: 200 80% 55%;
+  }
+}
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .gradient-ocean {
+    background: var(--gradient-ocean);
+  }
+
+  .gradient-sunset {
+    background: var(--gradient-sunset);
+  }
+
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+
+  /* Smooth scroll */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Admin dark theme utilities */
+  .admin-surface {
+    background-color: hsl(var(--admin-surface));
+  }
+
+  .admin-surface-raised {
+    background-color: hsl(var(--admin-surface-raised));
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .admin-surface-inset {
+    background-color: hsl(var(--admin-surface-inset));
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .admin-card {
+    @apply rounded-lg border border-border/50;
+    background: linear-gradient(145deg, 
+      hsl(220 18% 16%), 
+      hsl(220 20% 13%));
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(163, 103, 12, 0.04);
+  }
+
+  .admin-input {
+    @apply rounded-md border border-border/60 bg-background/50 text-foreground;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .admin-btn-primary {
+    @apply rounded-md font-medium;
+    background: linear-gradient(145deg, 
+      hsl(200 80% 55%), 
+      hsl(200 70% 45%));
+    box-shadow: 0 2px 8px rgba(56, 189, 248, 0.3),
+                inset 0 1px 0 rgba(4, 96, 194, 0.15)
+  }
+
+  .admin-btn-primary:hover {
+    background: linear-gradient(145deg, 
+      hsl(200 80% 60%), 
+      hsl(200 70% 50%));
+  }
+
+  .admin-btn-success {
+    @apply rounded-md font-medium;
+    background: linear-gradient(145deg, 
+      hsl(160 70% 45%), 
+      hsl(160 60% 38%));
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .booking-bar {
+    @apply rounded;
+    background: linear-gradient(90deg, 
+      hsl(180 60% 40%), 
+      hsl(180 50% 35%));
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .booking-bar-confirmed {
+    background: linear-gradient(90deg, 
+      hsl(160 70% 45%), 
+      hsl(160 60% 38%));
+  }
+
+  .booking-bar-new {
+    background: linear-gradient(90deg, 
+      hsl(40 90% 55%), 
+      hsl(40 80% 45%));
+  }
+
+  .booking-bar-owner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: rgba(255,255,255,0.85);
+    color: #1a2340;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+    margin-right: 2px;
+  }
+
+  /* --- SchedulerCalendar custom styles --- */
+  .calendar-cell {
+    border: 1px dashed rgba(180, 200, 255, 0.13);
+    border-radius: 0.7em;
+    transition: border-color 0.2s;
+  }
+
+  .phantom-range-bar {
+    background: linear-gradient(90deg, rgba(80,180,255,0.10) 0%, rgba(80,180,255,0.18) 100%);
+    border-radius: 0.7em;
+  }
+
+  .hovered-cell {
+    box-shadow: 0 0 0 2px rgba(80,180,255,0.18);
+    border-radius: 0.7em;
+  }
+
+  /* Booking bar details */
+  .booking-bar-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 2px;
+    font-size: 8px;
+    line-height: 1.1;
+    color: #e0e6f0;
+  }
+  .booking-bar-details .booking-bar-time {
+    font-weight: bold;
+    font-size: 10px;
+    color: #fff;
+  }
+  .booking-bar-details .booking-bar-location {
+    opacity: 0.7;
+  }
+  .booking-bar-details .booking-bar-name {
+    opacity: 0.8;
+  }
+  /* --- end SchedulerCalendar custom styles --- */
+}
+
+/* Embla Carousel Styles */
+.embla {
+  position: relative;
+  overflow: hidden;
+}
+
+.embla__viewport {
+  height: 100%;
+}
+
+.embla__container {
+  display: flex;
+  touch-action: pan-y;
+  margin-left: calc(var(--slide-spacing, 1rem) * -1);
+  height: 100%;
+}
+
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding-left: var(--slide-spacing, 1rem);
+  min-width: 0;
+  position: relative;
+}
+
+.embla__slide__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Embla Progress Bar Indicator */
+.embla__progress {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.25rem;
+  height: 4px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.embla__progress__bar {
+  flex-grow: 1;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  transition: background-color 0.3s;
+}
+
+.embla__progress__bar--selected {
+  background-color: white;
+}
+
+/* New overlay for hover triggers */
+.embla__hover-triggers {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  z-index: 2;
+}
+
+.embla__hover-trigger {
+  flex-grow: 1;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dialog Status Styles */
+.badge-new {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: #ef4444;
+  color: white;
+  font-size: 8px;
+  font-weight: 700;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.dialog-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+  padding: 2px 0;
+}
+
+.ai-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 8px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ai-status.on {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.ai-status.off {
+  background: rgba(251, 191, 36, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.last-message {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 8px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.message-count {
+  font-size: 8px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Dialog Filter Buttons */
+.dialog-filter-active {
+  background: hsl(210 65% 55%);
+  color: white;
+  border-color: hsl(210 65% 55%);
+}
+
+.dialog-filter-inactive {
+  background: transparent;
+  color: hsl(210 10% 50%);
+  border-color: hsl(210 15% 90%);
+}
+
+.dialog-filter-inactive:hover {
+  background: hsl(210 15% 96%);
+  color: hsl(210 15% 20%);
+}

@@ -1,0 +1,20 @@
+[0;1;32m●[0m sunny-api.service - Sunny Rentals API
+     Loaded: loaded (]8;;file://ygmnuxaibv/etc/systemd/system/sunny-api.service/etc/systemd/system/sunny-api.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;32mactive (running)[0m since Sat 2026-01-10 23:33:32 UTC; 2s ago
+   Main PID: 2334666 (uvicorn)
+      Tasks: 2 (limit: 7067)
+     Memory: 51.2M (peak: 51.9M)
+        CPU: 1.312s
+     CGroup: /system.slice/sunny-api.service
+             └─[0;38;5;245m2334666 /root/tgbot/webapp/backend/venv/bin/python3 /root/tgbot/webapp/backend/venv/bin/uvicorn web_integration:app --host 0.0.0.0 --port 5000[0m
+
+Jan 10 23:33:33 ygmnuxaibv uvicorn[2334666]: INFO:     Waiting for application startup.
+Jan 10 23:33:33 ygmnuxaibv uvicorn[2334666]: INFO:     Application startup complete.
+Jan 10 23:33:33 ygmnuxaibv uvicorn[2334666]: INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+Jan 10 23:33:34 ygmnuxaibv uvicorn[2334666]: ✅ Loaded CAR_LIST_JSON with 64 cars
+Jan 10 23:33:34 ygmnuxaibv uvicorn[2334666]: ✅ Claude client initialized
+Jan 10 23:33:34 ygmnuxaibv uvicorn[2334666]: ✅ Промпт загружен. Длина: 5049 символов.
+Jan 10 23:33:34 ygmnuxaibv uvicorn[2334666]: ✅ Claude client initialized with model: claude-sonnet-4-20250514
+Jan 10 23:33:34 ygmnuxaibv uvicorn[2334666]: 🚀 Starting CRM auto-archive...
+Jan 10 23:33:34 ygmnuxaibv uvicorn[2334666]: 📊 Found 447 chat messages for user 374897465
+Jan 10 23:33:34 ygmnuxaibv uvicorn[2334666]: INFO:     178.236.16.63:50420 - "GET /api/crm/chats/374897465 HTTP/1.0" 200 OK

@@ -1,0 +1,469 @@
+{
+  "owners": {
+    "NM": {
+      "id": "NM",
+      "name": "Namo",
+      "contact": "234-567857756",
+      "facebook_url": "https://facebook.com/namo_rentals",
+      "car_ids": {
+        "ford_raptor_2024_gray": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T18:53:06.240900"
+        },
+        "toyota_yaris_white_sedan": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T19:11:39.324272"
+        },
+        "namo_vios_white_2022": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T19:12:03.218115"
+        },
+        "namo_suzuki_swift_2020": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T19:12:17.913476"
+        },
+        "namo_city_sedan_white_2018": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T19:12:24.446282"
+        },
+        "jazz_namo_2018": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T19:12:35.976235"
+        },
+        "Nm_city_white_2022": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T19:12:44.325699"
+        },
+        "mitsubishi_xpander_2023_white": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T20:19:23.565593"
+        },
+        "mg_mg5_2024_yellow": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T20:20:18.425709"
+        },
+        "mg_mg5_2024_red": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T20:20:34.592881"
+        },
+        "mg_mg5_2024_green": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T20:20:41.903205"
+        },
+        "toyota_yaris_2022_white": {
+          "notes": [],
+          "status": "rented",
+          "available_until": "2025-12-29",
+          "facebook_url": null,
+          "updated_at": "2025-12-23T00:38:37.958588"
+        },
+        "isuzu_mux_2020_gray": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-23T00:42:38.020290"
+        },
+        "fern_ativ_gray_lt_2023": {
+          "notes": [],
+          "status": "rented",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-23T00:55:22.022409"
+        },
+        "namo_legender_2024": {
+          "notes": [],
+          "status": "rented",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-23T01:31:50.543140"
+        },
+        "namo_veloz_white_2024": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-23T01:34:56.693208"
+        },
+        "toyota_veloz_2024_gray": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-23T02:36:22.274667"
+        },
+        "toyota_yaris_2022_black": {
+          "notes": [],
+          "status": "rented",
+          "available_until": "2025-12-31",
+          "facebook_url": null,
+          "updated_at": "2025-12-23T19:20:34.187947"
+        },
+        "toyota_veloz_2024_white": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-22",
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:01:03.428901"
+        },
+        "namo_alphard_white_2024": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:01:16.143710"
+        },
+        "Namo_h1_blackvagon_2023": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:01:23.846693"
+        },
+        "namo_bmw220_white_2024": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:01:51.072251"
+        },
+        "nm_toyota_ativ_gray_2024": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:02:03.462770"
+        },
+        "nm_byd_seal_2024": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:02:29.027921"
+        },
+        "Mg 5": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2026-01-05T11:35:24.867414"
+        }
+      },
+      "updated_at": "2026-01-05T11:35:24.867419"
+    },
+    "AR": {
+      "id": "AR",
+      "name": "AR Rentals",
+      "contact": "+79219959164",
+      "facebook_url": "https://facebook.com/ar_rentals_phuket",
+      "car_ids": {
+        "toyota_fortuner_2019_white": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2025-12-20",
+          "updated_at": "2025-12-22T19:27:33.117519"
+        },
+        "mazda_cx30_2023_bege": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-29",
+          "updated_at": "2025-12-22T19:28:09.588644"
+        },
+        "toyota_fortuner_2023_gray": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-02-26",
+          "updated_at": "2025-12-22T19:28:55.955858"
+        },
+        "Ar_xpander_hev_white_2024": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-17",
+          "updated_at": "2025-12-22T19:39:02.569562"
+        },
+        "Ar_veloz_gray_2024": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-30",
+          "updated_at": "2025-12-22T19:41:54.762569"
+        },
+        "ar_corolla_cross_blue_2024": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-29",
+          "updated_at": "2025-12-22T19:42:59.736301"
+        },
+        "toyota_corolla_2024_white": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-17",
+          "updated_at": "2025-12-22T19:44:30.357699"
+        },
+        "mazda_cx3_2023_bege": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-14",
+          "updated_at": "2025-12-22T19:44:55.606220"
+        },
+        "honda_hrv_2025_blackv": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-02-09",
+          "updated_at": "2025-12-22T19:51:39.941567"
+        },
+        "mitsubishi_xforce_2025_white": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-19",
+          "updated_at": "2025-12-22T19:54:37.903922"
+        },
+        "Ar_yaris_cross_white_2024": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2025-12-15",
+          "updated_at": "2025-12-22T19:58:47.029025"
+        },
+        "honda_civic_2024_white": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-02-27",
+          "updated_at": "2025-12-22T20:05:24.165394"
+        },
+        "honda_city_2023_gray": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-02-06",
+          "updated_at": "2025-12-22T20:09:21.258859"
+        },
+        "Ar_city_rs_black_2025": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-25",
+          "updated_at": "2025-12-22T20:10:06.356909"
+        },
+        "mazda_mazda2_2024_white": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-02-05",
+          "updated_at": "2025-12-22T20:10:42.885907"
+        },
+        "mazda_mazda2_2023_gray": {
+          "notes": [
+            "Mazda mazda 2"
+          ],
+          "status": "available",
+          "available_until": "2026-01-17",
+          "updated_at": "2025-12-22T20:11:31.394868"
+        },
+        "toyota_ativ_2024_gray": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-28",
+          "updated_at": "2025-12-22T20:12:26.486939"
+        },
+        "toyota_camry_2020_black": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-03-03",
+          "updated_at": "2025-12-22T20:12:56.887624"
+        },
+        "toyota_altis_2023_gray": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-13",
+          "updated_at": "2025-12-22T20:13:22.427354"
+        },
+        "mazda_mazda2_2023_white": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-02-05",
+          "updated_at": "2025-12-22T20:14:02.657487"
+        },
+        "toyota_yaris_2023_blue": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-18",
+          "updated_at": "2025-12-22T20:15:29.795747"
+        },
+        "honda_civic_2024_black": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-19",
+          "updated_at": "2025-12-22T23:42:56.572455"
+        },
+        "honda_civic_2023_white": {
+          "notes": [],
+          "status": "available",
+          "available_until": "2026-01-27",
+          "facebook_url": null,
+          "updated_at": "2025-12-23T00:17:06.569060"
+        },
+        "volvo_v60_2020_white": {
+          "notes": [],
+          "status": "rented",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-23T02:36:11.499513"
+        },
+        "toyota_yaris_2024_gray": {
+          "notes": [
+            "Классная тачка"
+          ],
+          "status": "available",
+          "available_until": "2026-01-22",
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:09:41.065638"
+        },
+        "ar_hrvrs_black_2024": {
+          "notes": [],
+          "status": "rented",
+          "available_until": "2026-01-23",
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:09:54.535997"
+        }
+      },
+      "updated_at": "2025-12-28T20:53:28.824392"
+    },
+    "BB": {
+      "id": "BB",
+      "name": "Bumble bikes",
+      "contact": "+66 94 803 2999",
+      "facebook_url": null,
+      "car_ids": {
+        "Bb_Cbr500r_2023": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T17:16:11.702321"
+        },
+        "Bb_adv_2023": {
+          "notes": [
+            "Освободится но потом занята опять"
+          ],
+          "status": "available",
+          "available_until": "2025-12-26",
+          "updated_at": "2025-12-22T17:21:44.080799"
+        },
+        "Xmax_300_2025(new)": {
+          "notes": [],
+          "status": "rented",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:07:02.781738"
+        },
+        "Fb_bike1_honda_adv350_black_2025": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-28T19:40:01.192500"
+        }
+      },
+      "updated_at": "2026-01-02T20:31:19.275493"
+    },
+    "DEN": {
+      "id": "DEN",
+      "name": "Denis (Way2Ride)",
+      "contact": "@sdenisenko77",
+      "facebook_url": null,
+      "car_ids": {
+        "Nmax_2024_blue_topbox": {
+          "notes": [
+            "Nmax Дениса"
+          ],
+          "status": "available",
+          "available_until": null,
+          "updated_at": "2025-12-22T17:49:53.627278"
+        },
+        "Forza_350_2024_topbox": {
+          "notes": [],
+          "status": "rented",
+          "available_until": "2026-01-15",
+          "facebook_url": null,
+          "updated_at": "2025-12-23T02:45:07.859789"
+        },
+        "nmax155_2019_black": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:05:32.140411"
+        },
+        "pcx160_2023_keyless": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:05:47.921399"
+        },
+        "Den_t-max2024": {
+          "notes": [],
+          "status": "available",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2025-12-30T16:19:43.021707"
+        },
+        "nmax155_2019_white": {
+          "notes": [],
+          "status": "rented",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2026-01-02T20:29:52.808651"
+        },
+        "nmax155_2024_keyless_topbox": {
+          "notes": [],
+          "status": "rented",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2026-01-02T20:31:07.938480"
+        },
+        "adv350_2025_new": {
+          "notes": [],
+          "status": "rented",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2026-01-02T20:31:19.908633"
+        }
+      },
+      "updated_at": "2026-01-02T20:31:19.908637"
+    },
+    "PW": {
+      "id": "PW",
+      "name": "PeeWat Cars",
+      "contact": "+660900725709",
+      "facebook_url": null,
+      "car_ids": {
+        "PW_mazda_cx30_gray_2023": {
+          "notes": [],
+          "status": "rented",
+          "available_until": "2026-01-30",
+          "facebook_url": null,
+          "updated_at": "2025-12-27T08:07:51.007577"
+        }
+      },
+      "updated_at": "2025-12-27T08:07:51.007590"
+    }
+  }
+}

@@ -1,0 +1,3 @@
+saler_model_color_year
+
+cars_to_json.py - put names by model

@@ -1,0 +1,16 @@
+[0;1;32m●[0m sunny-api.service - Sunny Rentals API
+     Loaded: loaded (]8;;file://ygmnuxaibv/etc/systemd/system/sunny-api.service/etc/systemd/system/sunny-api.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;32mactive (running)[0m since Wed 2025-11-05 10:36:07 UTC; 1min 46s ago
+   Main PID: 1499735 (uvicorn)
+      Tasks: 2 (limit: 7067)
+     Memory: 32.9M (peak: 33.1M)
+        CPU: 996ms
+     CGroup: /system.slice/sunny-api.service
+             └─[0;38;5;245m1499735 /root/tgbot/webapp/backend/venv/bin/python3 /root/tgbot/webapp/backend/venv/bin/uvicorn web_integration:app --host 0.0.0.0 --port 5000[0m
+
+Nov 05 10:36:07 ygmnuxaibv systemd[1]: Started sunny-api.service - Sunny Rentals API.
+Nov 05 10:36:08 ygmnuxaibv uvicorn[1499735]: INFO:     Started server process [1499735]
+Nov 05 10:36:08 ygmnuxaibv uvicorn[1499735]: INFO:     Waiting for application startup.
+Nov 05 10:36:08 ygmnuxaibv uvicorn[1499735]: INFO:     Application startup complete.
+Nov 05 10:36:08 ygmnuxaibv uvicorn[1499735]: INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+Nov 05 10:36:15 ygmnuxaibv uvicorn[1499735]: INFO:     178.236.16.63:43966 - "GET /api/admin/cars?key=sunny2025 HTTP/1.0" 200 OK

@@ -1,0 +1,590 @@
+{"timestamp": "2026-01-11T20:22:25.774219", "user_id": 123456789, "action": "test_event", "test_data": "hello"}
+{"timestamp": "2026-01-11T20:22:54.177566", "user_id": 123456789, "action": "message_received", "from_user": "user", "content": "Hello"}
+{"timestamp": "2026-01-11T20:26:17.228927", "user_id": 987654321, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T20:26:49.836643", "user_id": 987654321, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T20:27:12.946393", "user_id": 688205611, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T20:27:20.217074", "user_id": 987654321, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T20:29:34.396838", "user_id": 987654321, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T20:30:15.357674", "user_id": 987654321, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T20:48:50.046486", "user_id": 7926814745, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T20:49:39.996347", "user_id": 432622121, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T20:50:40.815908", "user_id": 488824538, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:04:12.368312", "user_id": 984004038, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:07:28.068457", "user_id": 1369838342, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:07:33.007942", "user_id": 987654321, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:08:01.898318", "user_id": 374897465, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:09:11.987730", "user_id": 696375777, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:09:25.967509", "user_id": 5220028961, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:13:45.341094", "user_id": 984004038, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:20:24.406963", "user_id": 829676558, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:21:00.797972", "user_id": 432622121, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:23:48.547631", "user_id": 501907701, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:24:51.356768", "user_id": 7926814745, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:24:58.204674", "user_id": 2032306428, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:25:33.347613", "user_id": 5220028961, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:27:42.921597", "user_id": 296111862, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:28:03.404196", "user_id": 63273827, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:29:09.409892", "user_id": 488824538, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:29:18.574496", "user_id": 7152873229, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:29:36.032492", "user_id": 144957992, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:42:34.221184", "user_id": 829676558, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:42:53.262723", "user_id": 260546574, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T21:44:32.385117", "user_id": 829676558, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-11T23:07:38.190980", "user_id": 8174446439, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-12T00:44:36.570671", "user_id": 7201972549, "action": "dialog_started", "initiated_by": "user", "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:44:53.971535", "user_id": 7201972549, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-11T17:00:00.000Z", "endDate": "2026-01-13T17:00:00.000Z", "days": 3, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:44:54.085322", "user_id": 7201972549, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-11T17:00:00.000Z", "endDate": "2026-01-13T17:00:00.000Z", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:44:54.335937", "user_id": 7201972549, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-11T17:00:00.000Z", "endDate": "2026-01-13T17:00:00.000Z", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:44:54.460501", "user_id": 7201972549, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-11T17:00:00.000Z", "endDate": "2026-01-13T17:00:00.000Z", "days": 3, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:46:08.030328", "user_id": 7201972549, "action": "booking_submitted", "initiated_by": "user", "booking_id": "f382a40c", "form_data": {"car": {"id": "honda_civic_2023_white", "name": "Honda CIVIC 2023 White", "brand": "Honda", "model": "CIVIC", "year": "2023", "color": "White"}, "dates": {"start": "2026-01-11T17:00:00.000Z", "end": "2026-01-13T17:00:00.000Z", "days": 3}, "locations": {"pickup": "airport", "return": "airport"}, "pricing": {"season": "high_season", "dailyRate": 1627, "totalRental": 4881, "deposit": 5000, "deliveryPickup": 0, "deliveryReturn": 0, "totalDelivery": 0, "grandTotal": 4881}, "contact": {"value": "@massage_phuket1", "type": "telegram"}, "timestamp": "2026-01-12T00:46:07.263Z", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:47:24.396938", "user_id": 7201972549, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-11T17:00:00.000Z", "endDate": "2026-01-13T17:00:00.000Z", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:47:24.503537", "user_id": 7201972549, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-11T17:00:00.000Z", "endDate": "2026-01-13T17:00:00.000Z", "days": 3, "category": "suv", "pickupLocation": "airport", "returnLocation": "airport", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:47:24.761824", "user_id": 7201972549, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-11T17:00:00.000Z", "endDate": "2026-01-13T17:00:00.000Z", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:47:24.878551", "user_id": 7201972549, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-11T17:00:00.000Z", "endDate": "2026-01-13T17:00:00.000Z", "days": 3, "category": "suv", "pickupLocation": "airport", "returnLocation": "airport", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:47:34.924800", "user_id": 7201972549, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-11T17:00:00.000Z", "endDate": "2026-01-13T17:00:00.000Z", "days": 3, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:47:35.058471", "user_id": 7201972549, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-11T17:00:00.000Z", "endDate": "2026-01-13T17:00:00.000Z", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T00:48:01.861230", "user_id": 7201972549, "action": "booking_submitted", "initiated_by": "user", "booking_id": "95b02b6b", "form_data": {"car": {"id": "Ar_city_rs_black_2025", "name": "Honda City RS 2025 Black", "brand": "Honda", "model": "City RS", "year": "2025", "color": "Black"}, "dates": {"start": "2026-01-11T17:00:00.000Z", "end": "2026-01-13T17:00:00.000Z", "days": 3}, "locations": {"pickup": "airport", "return": "airport"}, "pricing": {"season": "high_season", "dailyRate": 1006, "totalRental": 3018, "deposit": 5000, "deliveryPickup": 0, "deliveryReturn": 0, "totalDelivery": 0, "grandTotal": 3018}, "contact": {"value": "@massage_phuket1", "type": "telegram"}, "timestamp": "2026-01-12T00:48:01.573Z", "username": "massage_phuket1"}, "username": "massage_phuket1"}
+{"timestamp": "2026-01-12T01:01:03.039065", "user_id": 1301875217, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-12T02:36:13.172002", "user_id": 725913122, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T03:05:27.810287", "user_id": 7201972549, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T03:07:31.147270", "user_id": 374897465, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T03:08:01.747884", "user_id": 374897465, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T03:56:52.114498", "user_id": 143975517, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T04:03:11.516686", "user_id": 8174446439, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T04:04:09.259888", "user_id": 7201972549, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T04:46:14.478314", "user_id": 882154648, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-12T05:11:19.670985", "user_id": 153970184, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T05:25:48.102893", "user_id": 829676558, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T05:26:47.890378", "user_id": 501907701, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T05:27:19.830698", "user_id": 1112416632, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T05:50:00.512169", "user_id": 432622121, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T05:51:57.690687", "user_id": 7201972549, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T06:17:09.120647", "user_id": 7201972549, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T06:17:15.402003", "user_id": 7201972549, "action": "note_added", "note": "Кошмарный марвин", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T06:20:40.400393", "user_id": 7201972549, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-01-12T06:36:37.582493", "user_id": 432622121, "action": "note_added", "note": "Хуеплет", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T06:40:19.833250", "user_id": 7201972549, "action": "note_added", "note": "Дядяеб", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T06:43:41.721225", "user_id": 152969066, "action": "note_added", "note": "Писянюхатель", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T06:43:51.530573", "user_id": 152969066, "action": "note_added", "note": "Конченная", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T06:52:07.540482", "user_id": 7201972549, "action": "note_added", "note": "Козла ипавший", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T07:14:48.490797", "user_id": 696375777, "action": "note_added", "note": "Привет", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T07:57:30.960184", "user_id": 882154648, "action": "note_added", "note": "Мандер пигдер ин зе скай", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T07:57:44.426062", "user_id": 882154648, "action": "note_added", "note": "Оом", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T07:59:22.820650", "user_id": 1415927896, "action": "dialog_started", "initiated_by": "user", "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:00:05.009598", "user_id": 1415927896, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-15T17:00:00.000Z", "username": "Bashmak56"}, "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:00:05.149225", "user_id": 1415927896, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-15T17:00:00.000Z", "days": 4, "category": "7s", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "Bashmak56"}, "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:00:05.271958", "user_id": 1415927896, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-15T17:00:00.000Z", "days": 4, "category": "7s", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "Bashmak56"}, "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:00:05.403242", "user_id": 1415927896, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-15T17:00:00.000Z", "username": "Bashmak56"}, "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:00:24.163971", "user_id": 1415927896, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-15T17:00:00.000Z", "username": "Bashmak56"}, "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:00:24.935470", "user_id": 1415927896, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-15T17:00:00.000Z", "days": 4, "category": "suv", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "Bashmak56"}, "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:00:53.812236", "user_id": 1415927896, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-15T17:00:00.000Z", "username": "Bashmak56"}, "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:00:54.193814", "user_id": 1415927896, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-15T17:00:00.000Z", "days": 4, "category": "bikes", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "Bashmak56"}, "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:01:26.072537", "user_id": 1415927896, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-15T17:00:00.000Z", "username": "Bashmak56"}, "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:01:26.799579", "user_id": 1415927896, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-15T17:00:00.000Z", "days": 4, "category": "7s", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "Bashmak56"}, "username": "Bashmak56"}
+{"timestamp": "2026-01-12T08:05:25.600973", "user_id": 7926814745, "action": "note_added", "note": "Мандер пындер", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T08:06:59.805229", "user_id": 2027894005, "action": "note_added", "note": "Аривет", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T08:07:03.987928", "user_id": 2027894005, "action": "note_added", "note": "Привет", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T08:29:11.089950", "user_id": 1415927896, "action": "note_added", "note": "Привет", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T08:37:31.261031", "user_id": 407263870, "action": "note_added", "note": "новая", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T08:56:05.148543", "user_id": 591067604, "action": "dialog_started", "initiated_by": "user", "username": "BFM100"}
+{"timestamp": "2026-01-12T08:56:46.361123", "user_id": 591067604, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T19:00:00.000Z", "endDate": "2026-01-16T19:00:00.000Z", "username": "BFM100"}, "username": "BFM100"}
+{"timestamp": "2026-01-12T08:56:46.491874", "user_id": 591067604, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T19:00:00.000Z", "endDate": "2026-01-16T19:00:00.000Z", "days": 1, "category": "compact", "pickupLocation": "airport", "returnLocation": "airport", "username": "BFM100"}, "username": "BFM100"}
+{"timestamp": "2026-01-12T08:56:46.614214", "user_id": 591067604, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T19:00:00.000Z", "endDate": "2026-01-16T19:00:00.000Z", "username": "BFM100"}, "username": "BFM100"}
+{"timestamp": "2026-01-12T08:56:46.793258", "user_id": 591067604, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T19:00:00.000Z", "endDate": "2026-01-16T19:00:00.000Z", "days": 1, "category": "compact", "pickupLocation": "airport", "returnLocation": "airport", "username": "BFM100"}, "username": "BFM100"}
+{"timestamp": "2026-01-12T09:31:55.273016", "user_id": 882154648, "action": "note_added", "note": "Дядя Степа хуй прожженный", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T09:38:09.909209", "user_id": 7201972549, "action": "note_added", "note": "Чебупель всего видавший", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T09:39:51.839080", "user_id": 311380850, "action": "note_added", "note": "Шмурдяк ни чего не значший", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T09:41:48.913793", "user_id": 374897465, "action": "note_added", "note": "Звероферма жеская но прикольная чебулеи ели кли вовоаооаоалвлвов", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T09:41:59.207075", "user_id": 374897465, "action": "note_added", "note": "Звероферма жеская но прикольная", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T10:19:35.944158", "user_id": 374897465, "action": "start", "source": "crm_api"}
+{"timestamp": "2026-01-12T10:58:29.652699", "user_id": 374897465, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T11:00:33.016023", "user_id": 374897465, "action": "pause"}
+{"timestamp": "2026-01-12T11:07:20.147289", "user_id": 1886091146, "action": "user_message_received", "message_length": 254, "username": "evk80"}
+{"timestamp": "2026-01-12T11:07:46.006165", "user_id": 374897465, "action": "claude_paused"}
+{"timestamp": "2026-01-12T11:30:33.951158", "user_id": 374897465, "action": "claude_paused", "source": "crm_api"}
+{"timestamp": "2026-01-12T11:31:11.313638", "user_id": 374897465, "action": "claude_paused", "source": "crm_api"}
+{"timestamp": "2026-01-12T11:31:41.972316", "user_id": 374897465, "action": "claude_stopped", "source": "crm_api"}
+{"timestamp": "2026-01-12T11:32:04.667883", "user_id": 374897465, "action": "claude_stopped", "source": "crm_api"}
+{"timestamp": "2026-01-12T11:32:45.580162", "user_id": 1488464254, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-12T11:33:42.501534", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:33:42.626021", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "days": 9, "category": "sedan", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:33:42.764855", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:33:42.876827", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "days": 9, "category": "sedan", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:34:04.774Z", "user_id": 374897465, "action": "manager_message_sent", "message_length": 15}
+{"timestamp": "2026-01-12T11:34:50.324193", "user_id": 374897465, "action": "note_added", "note": "Папиросы крутим ни чего не мутим", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T11:35:29.027510", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "days": 9, "category": "compact", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:35:29.161910", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:35:48.736985", "user_id": 374897465, "action": "note_added", "note": "Папиросы крутит, запрещенку мутит! Опасный хуй", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T11:36:00.883177", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:36:01.111860", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "days": 9, "category": "suv", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:36:27.467542", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:36:27.653608", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "days": 9, "category": "7s", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:36:53.628799", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:36:53.751594", "user_id": 1488464254, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T20:00:00.000Z", "endDate": "2026-01-24T20:00:00.000Z", "days": 9, "category": "compact", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:37:34.308105", "user_id": 483236785, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T11:38:04.579448", "user_id": 374897465, "action": "claude_stopped", "source": "crm_api"}
+{"timestamp": "2026-01-12T11:38:35.961596", "user_id": 374897465, "action": "note_added", "note": "Мозгоеб дерьма хлебавший", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T11:38:46.980694", "user_id": 1651743709, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T11:38:52.093909", "user_id": 1488464254, "action": "booking_submitted", "initiated_by": "user", "booking_id": "6cc456ab", "form_data": {"car": {"id": "toyota_yaris_2023_blue", "name": "Toyota YARIS Hb 2023 Blue", "brand": "Toyota", "model": "YARIS", "year": "2023", "color": "Blue"}, "dates": {"start": "2026-01-16T20:00:00.000Z", "end": "2026-01-24T20:00:00.000Z", "days": 9}, "locations": {"pickup": "hotel", "return": "hotel"}, "pricing": {"season": "high_season", "dailyRate": 886, "totalRental": 7974, "deposit": 5000, "deliveryPickup": 500, "deliveryReturn": 500, "totalDelivery": 1000, "grandTotal": 8974}, "contact": {"value": "+79371733381", "type": "whatsapp"}, "timestamp": "2026-01-12T11:38:51.249Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T11:39:46.592311", "user_id": 1651743709, "action": "claude_stopped", "source": "crm_api"}
+{"timestamp": "2026-01-12T11:40:55.780219", "user_id": 374897465, "action": "note_added", "note": "Неадекват! Спустить собак!", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T11:42:13.973Z", "user_id": 1488464254, "action": "manager_message_sent", "message_length": 86}
+{"timestamp": "2026-01-12T11:42:54.767049", "user_id": 1488464254, "action": "note_added", "note": "Чубака неплатежеспособная!", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T11:43:13.607523", "user_id": 1488464254, "action": "user_message_received", "message_length": 15, "username": null}
+{"timestamp": "2026-01-12T11:43:16.357189", "user_id": 1488464254, "action": "user_message_received", "message_length": 2, "username": null}
+{"timestamp": "2026-01-12T11:43:20.694951", "user_id": 1488464254, "action": "user_message_received", "message_length": 12, "username": null}
+{"timestamp": "2026-01-12T11:44:24.879Z", "user_id": 1488464254, "action": "manager_message_sent", "message_length": 39}
+{"timestamp": "2026-01-12T11:45:12.942760", "user_id": 1488464254, "action": "note_added", "note": "Включил обояку!", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T12:07:58.500525", "user_id": 374897465, "action": "claude_stopped", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:10:03.473139", "user_id": 1488464254, "action": "user_message_received", "message_length": 12, "username": null}
+{"timestamp": "2026-01-12T12:21:58.955Z", "user_id": 1886091146, "action": "manager_message_sent", "message_length": 26}
+{"timestamp": "2026-01-12T12:22:22.649776", "user_id": 374897465, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:22:34.688709", "user_id": 374897465, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:22:53.382787", "user_id": 374897465, "action": "claude_stopped", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:22:59.327929", "user_id": 374897465, "action": "claude_stopped", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:22:59.475488", "user_id": 374897465, "action": "claude_paused", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:24:42.344155", "user_id": 374897465, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:26:44.468878", "user_id": 374897465, "action": "claude_stopped", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:27:28.786354", "user_id": 374897465, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:27:44.197387", "user_id": 374897465, "action": "claude_paused", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:27:53.528473", "user_id": 374897465, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:28:14.944767", "user_id": 374897465, "action": "claude_stopped", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:29:21.718Z", "user_id": 374897465, "action": "manager_message_sent", "message_length": 6}
+{"timestamp": "2026-01-12T12:29:40.864033", "user_id": 374897465, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:34:05.348Z", "user_id": 1886091146, "action": "manager_message_sent", "message_length": 24}
+{"timestamp": "2026-01-12T12:35:14.036112", "user_id": 374897465, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T12:44:52.792Z", "user_id": 1886091146, "action": "manager_message_sent", "message_length": 25}
+{"timestamp": "2026-01-12T12:45:02.055Z", "user_id": 1886091146, "action": "manager_message_sent", "message_length": 9}
+{"timestamp": "2026-01-12T12:53:20.641931", "user_id": 1886091146, "action": "message_received", "from": "user", "content": "Пока не было времени\nПопозже посмотрю и отпишусь"}
+{"timestamp": "2026-01-12T12:53:20.650224", "user_id": 1886091146, "action": "user_message_received", "message_length": 48, "username": "evk80"}
+{"timestamp": "2026-01-12T13:07:54.615408", "user_id": 374897465, "action": "claude_started", "initiated_by": "manager"}
+{"timestamp": "2026-01-12T13:07:54.622142", "user_id": 374897465, "action": "claude_started", "source": "crm_api"}
+{"timestamp": "2026-01-12T13:16:54.709941", "user_id": 374897465, "action": "dialog_stopped", "reason": "manager_stop"}
+{"timestamp": "2026-01-12T13:16:54.716315", "user_id": 374897465, "action": "claude_stopped", "source": "crm_api"}
+{"timestamp": "2026-01-12T13:18:08.912324", "user_id": 374897465, "action": "claude_started", "initiated_by": "crm_manager"}
+{"timestamp": "2026-01-12T13:19:11.115Z", "user_id": 374897465, "action": "manager_message_sent", "message_length": 9}
+{"timestamp": "2026-01-12T13:19:28.641805", "user_id": 374897465, "action": "message_received", "from": "user", "content": "Ещькерееек"}
+{"timestamp": "2026-01-12T13:19:28.650120", "user_id": 374897465, "action": "user_message_received", "message_length": 10, "username": "Marseloid"}
+{"timestamp": "2026-01-12T13:22:25.713883", "user_id": 374897465, "action": "claude_started", "initiated_by": "crm_manager"}
+{"timestamp": "2026-01-12T13:22:46.152832", "user_id": 374897465, "action": "message_received", "from": "user", "content": "Ещьььткееерреееее"}
+{"timestamp": "2026-01-12T13:22:46.158652", "user_id": 374897465, "action": "user_message_received", "message_length": 17, "username": "Marseloid"}
+{"timestamp": "2026-01-12T13:29:27.144237", "user_id": 374897465, "action": "claude_started", "initiated_by": "crm_manager"}
+{"timestamp": "2026-01-12T13:29:40.994414", "user_id": 374897465, "action": "message_received", "from": "user", "content": "Привет"}
+{"timestamp": "2026-01-12T13:29:41.000345", "user_id": 374897465, "action": "user_message_received", "message_length": 6, "username": "Marseloid"}
+{"timestamp": "2026-01-12T13:39:24.421830", "user_id": 374897465, "action": "claude_started", "initiated_by": "crm_manager"}
+{"timestamp": "2026-01-12T13:39:39.821420", "user_id": 374897465, "action": "message_received", "from": "user", "content": "Привет"}
+{"timestamp": "2026-01-12T13:39:39.828083", "user_id": 374897465, "action": "user_message_received", "message_length": 6, "username": "Marseloid"}
+{"timestamp": "2026-01-12T13:40:16.291351", "user_id": 374897465, "action": "message_received", "from": "user", "content": "Ккак дела"}
+{"timestamp": "2026-01-12T13:40:16.298290", "user_id": 374897465, "action": "user_message_received", "message_length": 9, "username": "Marseloid"}
+{"timestamp": "2026-01-12T13:48:25.520112", "user_id": 374897465, "action": "claude_start", "by": "manager"}
+{"timestamp": "2026-01-12T14:07:38.892999", "user_id": 374897465, "action": "note_added", "note": "Неадекват! Спустить собак!твьвьвьвь", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T14:07:50.476404", "user_id": 374897465, "action": "note_added", "note": "Вовтвтвттв", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T14:17:24.106194", "user_id": 374897465, "action": "note_added", "note": "Яя заебался", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T14:22:39.312775", "user_id": 374897465, "action": "note_added", "note": "Яя заебалсяррр", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T14:35:04.327716", "user_id": 1415927896, "action": "note_added", "note": "Привет чупакабра", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T14:36:59.307955", "user_id": 374897465, "action": "note_added", "note": "Заебало честное слово", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T14:38:47.226743", "user_id": 172077560, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-12T14:44:23.027507", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "days": 25, "category": "sedan", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:44:23.161840", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:44:23.340690", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:44:23.506144", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "days": 25, "category": "sedan", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:45:05.522987", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:45:05.917508", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "days": 25, "category": "suv", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:45:36.682539", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:45:37.075980", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "days": 25, "category": "compact", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:45:43.587895", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:45:43.906724", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "days": 25, "category": "7s", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:46:43.446628", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:46:43.586320", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "days": 25, "category": "suv", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:47:29.579427", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T14:47:29.709632", "user_id": 172077560, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T15:00:00.000Z", "endDate": "2026-02-27T15:00:00.000Z", "days": 25, "category": "sedan", "pickupLocation": "hotel", "returnLocation": "hotel", "username": null}, "username": null}
+{"timestamp": "2026-01-12T15:47:24.780951", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T17:00:00.000Z", "endDate": "2026-02-12T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-12T15:47:24.894569", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T17:00:00.000Z", "endDate": "2026-02-12T17:00:00.000Z", "days": 10, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-12T15:47:25.008767", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T17:00:00.000Z", "endDate": "2026-02-12T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-12T15:47:25.122881", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-03T17:00:00.000Z", "endDate": "2026-02-12T17:00:00.000Z", "days": 10, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-12T15:47:37.907160", "user_id": 374897465, "action": "booking_submitted", "initiated_by": "user", "booking_id": "5112deb8", "form_data": {"car": {"id": "honda_city_2023_gray", "name": "Honda CITY Sedan 2023 Gray", "brand": "Honda", "model": "CITY", "year": "2023", "color": "Gray"}, "dates": {"start": "2026-02-03T17:00:00.000Z", "end": "2026-02-12T17:00:00.000Z", "days": 10}, "locations": {"pickup": "airport", "return": "airport"}, "pricing": {"season": "high_season", "dailyRate": 847, "totalRental": 8470, "deposit": 5000, "deliveryPickup": 0, "deliveryReturn": 0, "totalDelivery": 0, "grandTotal": 8470}, "contact": {"value": "@Marseloid", "type": "telegram"}, "timestamp": "2026-01-12T15:47:36.489Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-12T16:05:47.193668", "user_id": 1147639806, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-12T16:07:00.534634", "user_id": 1147639806, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-28T21:00:00.000Z", "endDate": "2026-02-01T21:00:00.000Z", "days": 5, "category": "7s", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-12T16:07:00.666489", "user_id": 1147639806, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-28T21:00:00.000Z", "endDate": "2026-02-01T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T16:08:24.886811", "user_id": 558326884, "action": "dialog_started", "initiated_by": "user", "username": "M1xgan"}
+{"timestamp": "2026-01-12T16:08:32.847924", "user_id": 1147639806, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-31T21:00:00.000Z", "endDate": "2026-02-03T21:00:00.000Z", "days": 4, "category": "7s", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-12T16:08:32.948218", "user_id": 1147639806, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-31T21:00:00.000Z", "endDate": "2026-02-03T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T16:19:49.363169", "user_id": 1147639806, "action": "booking_submitted", "initiated_by": "user", "booking_id": "8108057f", "form_data": {"car": {"id": "toyota_veloz_2024_gray", "name": "Toyota VELOZ 2024 Gray", "brand": "Toyota", "model": "VELOZ", "year": "2024", "color": "Gray"}, "dates": {"start": "2026-01-31T21:00:00.000Z", "end": "2026-02-03T21:00:00.000Z", "days": 4}, "locations": {"pickup": "airport", "return": "airport"}, "pricing": {"season": "high_season", "dailyRate": 1334, "totalRental": 5336, "deposit": 10000, "deliveryPickup": 0, "deliveryReturn": 0, "totalDelivery": 0, "grandTotal": 5336}, "contact": {"value": "89388006640", "type": "whatsapp"}, "timestamp": "2026-01-12T16:19:48.387Z", "username": null}, "username": null}
+{"timestamp": "2026-01-12T16:23:03.176438", "user_id": 727036252, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-12T16:24:23.216235", "user_id": 1147639806, "action": "note_added", "note": "Обработать позже", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T16:31:29.867953", "user_id": 1488464254, "action": "note_added", "note": "Прилетают 16.01 нужно авто", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T16:34:09.396661", "user_id": 1147639806, "action": "note_added", "note": "От 12.01. Обработать позже", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T16:39:10.631679", "user_id": 1886091146, "action": "note_added", "note": "02-19.03 нужен эконом. Скинул каталог", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T17:48:13.605457", "user_id": 1148362169, "action": "note_added", "note": "25.03-15.04 планирует поездку", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T17:49:42.093408", "user_id": 7201972549, "action": "note_added", "note": "Заяфочки", "added_by": "6451825371"}
+{"timestamp": "2026-01-12T17:54:53.838Z", "user_id": 374897465, "action": "manager_message_sent", "message_length": 7}
+{"timestamp": "2026-01-12T17:55:15.575142", "user_id": 374897465, "action": "user_message_received", "message_length": 18, "username": "Marseloid"}
+{"timestamp": "2026-01-12T19:13:36.072Z", "user_id": 374897465, "action": "manager_message_sent", "message_length": 6}
+{"timestamp": "2026-01-12T19:13:45.765322", "user_id": 374897465, "action": "user_message_received", "message_length": 5, "username": "Marseloid"}
+{"timestamp": "2026-01-12T19:25:12.373858", "user_id": 719766623, "action": "dialog_started", "initiated_by": "user", "username": "Mudriy_KA"}
+{"timestamp": "2026-01-12T19:29:26.489815", "user_id": 374897465, "action": "claude_started"}
+{"timestamp": "2026-01-12T19:31:53.042Z", "user_id": 374897465, "action": "manager_message_sent", "message_length": 5}
+{"timestamp": "2026-01-12T19:32:04.639924", "user_id": 374897465, "action": "message_received", "sender": "user", "content": "Вовоаоао"}
+{"timestamp": "2026-01-12T19:32:04.658016", "user_id": 374897465, "action": "user_message_received", "message_length": 8, "username": "Marseloid"}
+{"timestamp": "2026-01-12T19:32:18.768679", "user_id": 374897465, "action": "claude_started"}
+{"timestamp": "2026-01-12T19:36:31.823155", "user_id": 719766623, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-27T21:00:00.000Z", "endDate": "2026-02-05T21:00:00.000Z", "days": 10, "category": "7s", "pickupLocation": "airport", "returnLocation": "airport", "username": "Mudriy_KA"}, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-12T19:36:31.942942", "user_id": 719766623, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-27T21:00:00.000Z", "endDate": "2026-02-05T21:00:00.000Z", "username": "Mudriy_KA"}, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-12T19:41:33.308700", "user_id": 374897465, "action": "claude_stopped"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T19:57:15.000141"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T20:03:14.381520"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T20:03:24.393543"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T20:03:34.312552"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T20:03:43.906080"}
+{"user_id": 374897465, "action": "message_received", "timestamp": "2026-01-12T20:04:27.063552"}
+{"user_id": 374897465, "action": "message_received", "timestamp": "2026-01-12T20:04:48.159403"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T20:15:33.234783"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T20:15:48.487656"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T20:15:55.023822"}
+{"user_id": 374897465, "action": "message_received", "timestamp": "2026-01-12T20:16:09.042843"}
+{"user_id": 374897465, "action": "receive_message_from_bot", "timestamp": "2026-01-12T20:16:09.058665"}
+{"user_id": 374897465, "action": "message_received", "timestamp": "2026-01-12T20:16:24.469625"}
+{"user_id": 374897465, "action": "receive_message_from_bot", "timestamp": "2026-01-12T20:16:24.486539"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-12T20:16:29.419230"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-12T20:16:46.825906"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T20:17:16.499924"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T20:17:26.223711"}
+{"user_id": 374897465, "action": "message_received", "timestamp": "2026-01-12T20:18:28.277531"}
+{"user_id": 374897465, "action": "receive_message_from_bot", "timestamp": "2026-01-12T20:18:28.295773"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-12T20:19:17.582183"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T20:20:41.520550"}
+{"user_id": 374897465, "action": "message_received", "timestamp": "2026-01-12T20:34:09.212051"}
+{"user_id": 374897465, "action": "receive_message_from_bot", "timestamp": "2026-01-12T20:34:09.246806"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-12T20:42:13.437117"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-12T20:42:38.065021"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T20:45:35.767664"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T20:46:42.844175"}
+{"user_id": 8440575981, "action": "dialog_started", "timestamp": "2026-01-12T21:00:32.218767"}
+{"user_id": 8440575981, "action": "dialog_continued", "timestamp": "2026-01-12T21:00:54.905965"}
+{"user_id": 8440575981, "action": "dialog_continued", "timestamp": "2026-01-12T21:00:55.007932"}
+{"user_id": 8440575981, "action": "dialog_continued", "timestamp": "2026-01-12T21:00:55.114591"}
+{"user_id": 8440575981, "action": "dialog_continued", "timestamp": "2026-01-12T21:00:55.233284"}
+{"user_id": 8440575981, "action": "dialog_continued", "timestamp": "2026-01-12T21:01:20.899150"}
+{"user_id": 8440575981, "action": "dialog_continued", "timestamp": "2026-01-12T21:01:21.008228"}
+{"user_id": 8440575981, "action": "dialog_continued", "timestamp": "2026-01-12T21:01:21.170714"}
+{"user_id": 8440575981, "action": "dialog_continued", "timestamp": "2026-01-12T21:01:21.267285"}
+{"user_id": 8440575981, "action": "booking_submitted", "timestamp": "2026-01-12T21:03:27.528478"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T21:07:58.392933"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T21:47:34.364719"}
+{"user_id": 374897465, "action": "claude_paused", "timestamp": "2026-01-12T21:47:51.264873"}
+{"user_id": 374897465, "action": "claude_paused", "timestamp": "2026-01-12T21:47:51.271899"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T21:48:09.559765"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T21:48:09.561926"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:00:24.325009"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:00:24.329285"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T22:04:27.999919"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T22:04:28.005637"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-12T22:04:42.746929"}
+{"user_id": 374897465, "action": "user_message_received", "timestamp": "2026-01-12T22:04:54.661954"}
+{"user_id": 374897465, "action": "receive_message_from_bot", "timestamp": "2026-01-12T22:04:54.683973"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:10:35.321413"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:10:35.325539"}
+{"user_id": 6451825371, "action": "claude_started", "timestamp": "2026-01-12T22:23:10.438046"}
+{"user_id": 6451825371, "action": "claude_started", "timestamp": "2026-01-12T22:23:10.441466"}
+{"user_id": 6451825371, "action": "claude_paused", "timestamp": "2026-01-12T22:23:34.430590"}
+{"user_id": 6451825371, "action": "claude_paused", "timestamp": "2026-01-12T22:23:34.436592"}
+{"user_id": 6451825371, "action": "claude_stopped", "timestamp": "2026-01-12T22:23:48.783404"}
+{"user_id": 6451825371, "action": "claude_stopped", "timestamp": "2026-01-12T22:23:48.785873"}
+{"user_id": 6451825371, "action": "claude_started", "timestamp": "2026-01-12T22:28:05.524098"}
+{"user_id": 6451825371, "action": "claude_started", "timestamp": "2026-01-12T22:28:05.528094"}
+{"user_id": 6451825371, "action": "claude_paused", "timestamp": "2026-01-12T22:29:14.136549"}
+{"user_id": 6451825371, "action": "claude_paused", "timestamp": "2026-01-12T22:29:14.138981"}
+{"user_id": 6451825371, "action": "claude_started", "timestamp": "2026-01-12T22:29:40.224352"}
+{"user_id": 6451825371, "action": "claude_started", "timestamp": "2026-01-12T22:29:40.227311"}
+{"user_id": 6451825371, "action": "claude_stopped", "timestamp": "2026-01-12T22:29:52.782277"}
+{"user_id": 6451825371, "action": "claude_stopped", "timestamp": "2026-01-12T22:29:52.785519"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:51:35.771866"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:52:06.505545"}
+{"user_id": 374897465, "action": "claude_paused", "timestamp": "2026-01-12T22:52:16.369322"}
+{"user_id": 374897465, "action": "claude_paused", "timestamp": "2026-01-12T22:52:16.374624"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:52:27.446325"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:52:27.449364"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:52:37.582995"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T22:52:38.064978"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T22:52:38.068654"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:52:43.787836"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:52:43.790108"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:52:47.569050"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-12T22:53:02.506935"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T22:53:53.247413"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T22:53:53.250194"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:54:17.977945"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:54:17.980905"}
+{"user_id": 374897465, "action": "claude_paused", "timestamp": "2026-01-12T22:54:19.038564"}
+{"user_id": 374897465, "action": "claude_paused", "timestamp": "2026-01-12T22:54:19.041821"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:55:20.843180"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T22:55:20.845703"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-12T22:55:50.864852"}
+{"user_id": 719766623, "action": "dialog_continued", "timestamp": "2026-01-12T23:11:12.710482"}
+{"user_id": 719766623, "action": "dialog_continued", "timestamp": "2026-01-12T23:11:13.129004"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T23:19:03.465759"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T23:20:00.420736"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T23:20:48.900128"}
+{"user_id": 374897465, "action": "claude_stopped", "timestamp": "2026-01-12T23:20:48.902653"}
+{"user_id": 374897465, "action": "claude_paused", "timestamp": "2026-01-12T23:21:02.712277"}
+{"user_id": 374897465, "action": "claude_paused", "timestamp": "2026-01-12T23:21:02.715048"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T23:21:13.623308"}
+{"user_id": 374897465, "action": "claude_started", "timestamp": "2026-01-12T23:21:13.626159"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-12T23:28:16.162577"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-12T23:28:25.822523"}
+{"user_id": 374897465, "action": "manager_message_sent", "timestamp": "2026-01-13T00:33:31.920291"}
+{"timestamp": "2026-01-13T01:07:36.195066", "user_id": 374897465, "action": "receive_message_from_bot"}
+{"timestamp": "2026-01-13T01:08:23.474860", "user_id": 374897465, "action": "manager_message_sent"}
+{"timestamp": "2026-01-13T01:08:36.644290", "user_id": 374897465, "action": "manager_message_sent"}
+{"timestamp": "2026-01-13T01:08:46.924849", "user_id": 374897465, "action": "claude_started"}
+{"timestamp": "2026-01-13T01:09:08.358115", "user_id": 374897465, "action": "claude_stopped"}
+{"timestamp": "2026-01-13T01:09:08.360699", "user_id": 374897465, "action": "claude_stopped"}
+{"timestamp": "2026-01-13T01:09:09.530342", "user_id": 374897465, "action": "claude_paused"}
+{"timestamp": "2026-01-13T01:09:09.532822", "user_id": 374897465, "action": "claude_paused"}
+{"timestamp": "2026-01-13T01:09:11.040738", "user_id": 374897465, "action": "claude_started"}
+{"timestamp": "2026-01-13T01:09:11.043346", "user_id": 374897465, "action": "claude_started"}
+{"timestamp": "2026-01-13T01:09:13.303657", "user_id": 374897465, "action": "claude_stopped"}
+{"timestamp": "2026-01-13T01:09:13.307991", "user_id": 374897465, "action": "claude_stopped"}
+{"timestamp": "2026-01-13T01:09:21.664712", "user_id": 374897465, "action": "note_added", "note": "Заебало честное словоhshsheh", "added_by": "6451825371"}
+{"timestamp": "2026-01-13T01:09:32.216250", "user_id": 374897465, "action": "note_added", "note": "Честное слово", "added_by": "6451825371"}
+{"timestamp": "2026-01-13T01:09:34.835323", "user_id": 374897465, "action": "claude_started"}
+{"timestamp": "2026-01-13T01:09:34.838076", "user_id": 374897465, "action": "claude_started"}
+{"timestamp": "2026-01-13T01:10:41.129154", "user_id": 374897465, "action": "receive_message_from_bot"}
+{"timestamp": "2026-01-13T01:43:05.537Z", "user_id": 374897465, "action": "manager_message_sent", "message_length": 7}
+{"timestamp": "2026-01-13T01:43:24.962280", "user_id": 374897465, "action": "user_message_received", "message_length": 6, "username": "Marseloid"}
+{"timestamp": "2026-01-13T01:47:08.493889", "user_id": 374897465, "action": "message_received", "content": "Чщащчщчщчщчщч8чзч"}
+{"timestamp": "2026-01-13T01:47:08.501206", "user_id": 374897465, "action": "user_message_received", "message_length": 17, "username": "Marseloid"}
+{"timestamp": "2026-01-13T01:54:27.931245", "user_id": 8440575981, "action": "note_added", "note": "Кпквпн", "added_by": "6451825371"}
+{"timestamp": "2026-01-13T01:58:56.969049", "user_id": 8440575981, "action": "note_added", "note": "кванта коста?", "added_by": "6451825371"}
+{"timestamp": "2026-01-13T03:07:15.482618", "user_id": 280331686, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-19T17:00:00.000Z", "endDate": "2026-01-26T17:00:00.000Z", "days": 8, "category": "sedan", "pickupLocation": "villa", "returnLocation": "villa", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T03:07:15.667500", "user_id": 280331686, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-19T17:00:00.000Z", "endDate": "2026-01-26T17:00:00.000Z", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T03:07:24.618356", "user_id": 280331686, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-30T17:00:00.000Z", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T03:07:24.725339", "user_id": 280331686, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-01-30T17:00:00.000Z", "days": 19, "category": "sedan", "pickupLocation": "villa", "returnLocation": "villa", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T03:07:33.975048", "user_id": 280331686, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-02-04T17:00:00.000Z", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T03:07:34.094667", "user_id": 280331686, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-02-04T17:00:00.000Z", "days": 24, "category": "sedan", "pickupLocation": "villa", "returnLocation": "villa", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T03:08:00.871965", "user_id": 280331686, "action": "booking_submitted", "initiated_by": "user", "booking_id": "6614df5f", "form_data": {"car": {"id": "mazda_mazda2_2024_white", "name": "Mazda MAZDA2 2024 White", "brand": "Mazda", "model": "MAZDA2", "year": "2024", "color": "White"}, "dates": {"start": "2026-01-12T17:00:00.000Z", "end": "2026-02-04T17:00:00.000Z", "days": 24}, "locations": {"pickup": "villa", "return": "villa"}, "pricing": {"season": "high_season", "dailyRate": 855, "totalRental": 20520, "deposit": 5000, "deliveryPickup": 500, "deliveryReturn": 500, "totalDelivery": 1000, "grandTotal": 21520}, "contact": {"value": "@Ratmir_ve", "type": "telegram"}, "timestamp": "2026-01-13T03:07:59.935Z", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T03:26:06.981100", "user_id": 304899616, "action": "dialog_started", "initiated_by": "user", "username": "romansavoskin"}
+{"timestamp": "2026-01-13T03:30:49.303234", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-31T17:00:00.000Z", "endDate": "2026-02-19T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-13T03:30:49.580101", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-31T17:00:00.000Z", "endDate": "2026-02-19T17:00:00.000Z", "days": 20, "category": "compact", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-13T03:30:49.725960", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-31T17:00:00.000Z", "endDate": "2026-02-19T17:00:00.000Z", "days": 20, "category": "compact", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-13T03:30:49.840719", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-31T17:00:00.000Z", "endDate": "2026-02-19T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-13T04:35:42.786966", "user_id": 280331686, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-02-04T17:00:00.000Z", "days": 24, "category": "compact", "pickupLocation": "villa", "returnLocation": "villa", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T04:35:42.895712", "user_id": 280331686, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-02-04T17:00:00.000Z", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T04:35:43.245952", "user_id": 280331686, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-02-04T17:00:00.000Z", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T04:35:43.360936", "user_id": 280331686, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-12T17:00:00.000Z", "endDate": "2026-02-04T17:00:00.000Z", "days": 24, "category": "compact", "pickupLocation": "villa", "returnLocation": "villa", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T04:36:09.890558", "user_id": 280331686, "action": "booking_submitted", "initiated_by": "user", "booking_id": "a1652364", "form_data": {"car": {"id": "Mg 5", "name": "MG5 Mg5  2023 Gray", "brand": "MG5", "model": "Mg5 ", "year": "2023", "color": "Gray"}, "dates": {"start": "2026-01-12T17:00:00.000Z", "end": "2026-02-04T17:00:00.000Z", "days": 24}, "locations": {"pickup": "villa", "return": "villa"}, "pricing": {"season": "high_season", "dailyRate": 700, "totalRental": 16800, "deposit": 5000, "deliveryPickup": 500, "deliveryReturn": 500, "totalDelivery": 1000, "grandTotal": 17800}, "contact": {"value": "@Ratmir_ve", "type": "telegram"}, "timestamp": "2026-01-13T04:36:08.970Z", "username": "Ratmir_ve"}, "username": "Ratmir_ve"}
+{"timestamp": "2026-01-13T05:58:57.546047", "user_id": 489511259, "action": "dialog_started", "initiated_by": "user", "username": "lelu4444"}
+{"timestamp": "2026-01-13T05:59:07.066086", "user_id": 489511259, "action": "message_received", "content": "Добрый день , нужна машина , до 28.02 может чуть больше , бюджет или средний вариант , какие есть свободные ?"}
+{"timestamp": "2026-01-13T05:59:07.070066", "user_id": 489511259, "action": "user_message_received", "message_length": 109, "username": "lelu4444"}
+{"timestamp": "2026-01-13T10:20:12.335245", "user_id": 1488464254, "action": "message_received", "content": "Здравствуйте"}
+{"timestamp": "2026-01-13T10:20:12.343294", "user_id": 1488464254, "action": "user_message_received", "message_length": 12, "username": null}
+{"timestamp": "2026-01-13T10:20:18.541584", "user_id": 1488464254, "action": "message_received", "content": "Есть какие варианты?"}
+{"timestamp": "2026-01-13T10:20:18.545915", "user_id": 1488464254, "action": "user_message_received", "message_length": 20, "username": null}
+{"timestamp": "2026-01-13T10:27:37.739627", "user_id": 5160305684, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-13T13:36:16.191642", "user_id": 489511259, "action": "note_added", "note": "Need car 28.02", "added_by": "6451825371"}
+{"timestamp": "2026-01-13T14:36:11.251399", "user_id": 1147639806, "action": "message_received", "content": "Здравствуйте"}
+{"timestamp": "2026-01-13T14:36:11.259714", "user_id": 1147639806, "action": "user_message_received", "message_length": 12, "username": null}
+{"timestamp": "2026-01-13T14:36:50.128042", "user_id": 1388386877, "action": "dialog_started", "initiated_by": "user", "username": "polinatwntfv"}
+{"timestamp": "2026-01-13T17:01:31.553520", "user_id": 374897465, "action": "message_received", "content": "Овуляо?"}
+{"timestamp": "2026-01-13T17:01:31.561509", "user_id": 374897465, "action": "user_message_received", "message_length": 7, "username": "Marseloid"}
+{"timestamp": "2026-01-14T00:38:59.562481", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-22T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-14T00:38:59.673992", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-22T17:00:00.000Z", "days": 6, "category": "suv", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-14T00:38:59.781431", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-22T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-14T00:38:59.901985", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-22T17:00:00.000Z", "days": 6, "category": "suv", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-14T00:39:10.454609", "user_id": 374897465, "action": "booking_submitted", "initiated_by": "user", "booking_id": "34c17bd0", "form_data": {"car": {"id": "mazda_cx3_2023_bege", "name": "Mazda CX3 2023 Bege", "brand": "Mazda", "model": "CX3", "year": "2023", "color": "Bege"}, "dates": {"start": "2026-01-17T17:00:00.000Z", "end": "2026-01-22T17:00:00.000Z", "days": 6}, "locations": {"pickup": "hotel", "return": "hotel"}, "pricing": {"season": "high_season", "dailyRate": 1571, "totalRental": 9426, "deposit": 8000, "deliveryPickup": 500, "deliveryReturn": 500, "totalDelivery": 1000, "grandTotal": 10426}, "contact": {"value": "@Marseloid", "type": "telegram"}, "timestamp": "2026-01-14T00:39:08.678Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-14T02:40:33.092964", "user_id": 230155309, "action": "dialog_started", "initiated_by": "user", "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:41:13.973451", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-13T17:00:00.000Z", "endDate": "2026-01-27T17:00:00.000Z", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:41:14.088184", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-13T17:00:00.000Z", "endDate": "2026-01-27T17:00:00.000Z", "days": 15, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:41:14.205641", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-13T17:00:00.000Z", "endDate": "2026-01-27T17:00:00.000Z", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:41:14.326053", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-13T17:00:00.000Z", "endDate": "2026-01-27T17:00:00.000Z", "days": 15, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:36.347000", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-13T17:00:00.000Z", "endDate": "2026-01-20T17:00:00.000Z", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:36.457712", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-13T17:00:00.000Z", "endDate": "2026-01-20T17:00:00.000Z", "days": 8, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:37.420993", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-13T17:00:00.000Z", "endDate": "2026-01-14T17:00:00.000Z", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:37.533302", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-13T17:00:00.000Z", "endDate": "2026-01-14T17:00:00.000Z", "days": 2, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:39.302306", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-14T17:00:00.000Z", "endDate": "2026-01-14T17:00:00.000Z", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:42.439506", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-14T17:00:00.000Z", "endDate": "2026-01-14T17:00:00.000Z", "days": 1, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:42.551686", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-14T17:00:00.000Z", "endDate": "2026-01-21T17:00:00.000Z", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:42.661071", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-14T17:00:00.000Z", "endDate": "2026-01-21T17:00:00.000Z", "days": 8, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:42.769601", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-13T17:00:00.000Z", "endDate": "2026-01-21T17:00:00.000Z", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:42.882105", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-13T17:00:00.000Z", "endDate": "2026-01-21T17:00:00.000Z", "days": 9, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:48.237138", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-14T17:00:00.000Z", "endDate": "2026-01-14T17:00:00.000Z", "days": 1, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:48.347594", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-14T17:00:00.000Z", "endDate": "2026-01-14T17:00:00.000Z", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:48.540644", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-14T17:00:00.000Z", "endDate": "2026-01-21T17:00:00.000Z", "days": 8, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:55.784069", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-14T17:00:00.000Z", "endDate": "2026-01-20T17:00:00.000Z", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:42:55.890692", "user_id": 230155309, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-14T17:00:00.000Z", "endDate": "2026-01-20T17:00:00.000Z", "days": 7, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T02:43:34.138617", "user_id": 230155309, "action": "booking_submitted", "initiated_by": "user", "booking_id": "3a414338", "form_data": {"car": {"id": "adv350_2025_new", "name": "Adv350 2025 new", "brand": "Adv350", "model": "2025", "year": "new", "color": ""}, "dates": {"start": "2026-01-14T17:00:00.000Z", "end": "2026-01-20T17:00:00.000Z", "days": 7}, "locations": {"pickup": "airport", "return": "airport"}, "pricing": {"season": "high_season", "dailyRate": 684, "totalRental": 4788, "deposit": 10000, "deliveryPickup": 0, "deliveryReturn": 0, "totalDelivery": 0, "grandTotal": 4788}, "contact": {"value": "@Ddronov", "type": "telegram"}, "timestamp": "2026-01-14T02:43:33.359Z", "username": "Ddronov"}, "username": "Ddronov"}
+{"timestamp": "2026-01-14T07:43:59.903419", "user_id": 771098279, "action": "dialog_started", "initiated_by": "user", "username": "skivichat"}
+{"timestamp": "2026-01-14T09:34:03.846198", "user_id": 1980345301, "action": "dialog_started", "initiated_by": "user", "username": "Georg1607"}
+{"timestamp": "2026-01-14T20:46:50.825541", "user_id": 400112157, "action": "dialog_started", "initiated_by": "user", "username": "vetalzzz"}
+{"timestamp": "2026-01-14T20:47:30.373446", "user_id": 400112157, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-07T18:00:00.000Z", "endDate": "2026-04-06T18:00:00.000Z", "days": 31, "category": "compact", "pickupLocation": "airport", "returnLocation": "airport", "username": "vetalzzz"}, "username": "vetalzzz"}
+{"timestamp": "2026-01-14T20:47:30.493707", "user_id": 400112157, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-07T18:00:00.000Z", "endDate": "2026-04-06T18:00:00.000Z", "username": "vetalzzz"}, "username": "vetalzzz"}
+{"timestamp": "2026-01-14T20:47:30.650946", "user_id": 400112157, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-07T18:00:00.000Z", "endDate": "2026-04-06T18:00:00.000Z", "username": "vetalzzz"}, "username": "vetalzzz"}
+{"timestamp": "2026-01-14T20:47:30.775826", "user_id": 400112157, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-07T18:00:00.000Z", "endDate": "2026-04-06T18:00:00.000Z", "days": 31, "category": "compact", "pickupLocation": "airport", "returnLocation": "airport", "username": "vetalzzz"}, "username": "vetalzzz"}
+{"timestamp": "2026-01-15T00:33:25.568986", "user_id": 984710052, "action": "dialog_started", "initiated_by": "user", "username": "Interventu"}
+{"timestamp": "2026-01-15T00:33:55.205290", "user_id": 984710052, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-02T21:00:00.000Z", "endDate": "2026-02-12T21:00:00.000Z", "username": "Interventu"}, "username": "Interventu"}
+{"timestamp": "2026-01-15T00:33:55.316709", "user_id": 984710052, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-02T21:00:00.000Z", "endDate": "2026-02-12T21:00:00.000Z", "days": 11, "category": "compact", "pickupLocation": "airport", "returnLocation": "airport", "username": "Interventu"}, "username": "Interventu"}
+{"timestamp": "2026-01-15T00:33:55.426827", "user_id": 984710052, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-02T21:00:00.000Z", "endDate": "2026-02-12T21:00:00.000Z", "username": "Interventu"}, "username": "Interventu"}
+{"timestamp": "2026-01-15T00:33:55.537166", "user_id": 984710052, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-02T21:00:00.000Z", "endDate": "2026-02-12T21:00:00.000Z", "days": 11, "category": "compact", "pickupLocation": "airport", "returnLocation": "airport", "username": "Interventu"}, "username": "Interventu"}
+{"timestamp": "2026-01-15T00:36:47.666326", "user_id": 984710052, "action": "booking_submitted", "initiated_by": "user", "booking_id": "5eec018c", "form_data": {"car": {"id": "namo_city_sedan_white_2018", "name": "Honda City 2018 white", "brand": "Honda", "model": "City", "year": "2018", "color": "white"}, "dates": {"start": "2026-02-02T21:00:00.000Z", "end": "2026-02-12T21:00:00.000Z", "days": 11}, "locations": {"pickup": "airport", "return": "airport"}, "pricing": {"season": "high_season", "dailyRate": 817, "totalRental": 8987, "deposit": 5000, "deliveryPickup": 0, "deliveryReturn": 0, "totalDelivery": 0, "grandTotal": 8987}, "contact": {"value": "@Interventu", "type": "telegram"}, "timestamp": "2026-01-15T00:36:47.348Z", "username": "Interventu"}, "username": "Interventu"}
+{"timestamp": "2026-01-15T04:16:45.146870", "user_id": 320757191, "action": "dialog_started", "initiated_by": "user", "username": "artkrd"}
+{"timestamp": "2026-01-15T05:22:28.956070", "user_id": 7678520852, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-15T07:40:34.825542", "user_id": 320757191, "action": "message_received", "content": "добрый день"}
+{"timestamp": "2026-01-15T07:40:34.835222", "user_id": 320757191, "action": "user_message_received", "message_length": 11, "username": "artkrd"}
+{"timestamp": "2026-01-15T08:05:32.724056", "user_id": 984710052, "action": "message_received", "content": "Ту тук"}
+{"timestamp": "2026-01-15T08:05:32.732282", "user_id": 984710052, "action": "user_message_received", "message_length": 6, "username": "Interventu"}
+{"timestamp": "2026-01-15T08:05:44.359618", "user_id": 984710052, "action": "message_received", "content": "Здравствуйте!?"}
+{"timestamp": "2026-01-15T08:05:44.364606", "user_id": 984710052, "action": "user_message_received", "message_length": 14, "username": "Interventu"}
+{"timestamp": "2026-01-15T08:14:51.325945", "user_id": 94391153, "action": "dialog_started", "initiated_by": "user", "username": "relaxhalk"}
+{"timestamp": "2026-01-15T09:55:14.981922", "user_id": 984710052, "action": "message_received", "content": "Тук-тук?"}
+{"timestamp": "2026-01-15T09:55:14.989673", "user_id": 984710052, "action": "user_message_received", "message_length": 8, "username": "Interventu"}
+{"timestamp": "2026-01-15T11:49:52.151923", "user_id": 372716029, "action": "dialog_started", "initiated_by": "user", "username": "Lana1984"}
+{"timestamp": "2026-01-15T13:02:42.078323", "user_id": 7678520852, "action": "message_received", "content": "Здравствуйте нужна машина с 18.01 по 21.01"}
+{"timestamp": "2026-01-15T13:02:42.087013", "user_id": 7678520852, "action": "user_message_received", "message_length": 42, "username": null}
+{"timestamp": "2026-01-15T14:16:51.505676", "user_id": 1489209386, "action": "dialog_started", "initiated_by": "user", "username": "MIKHAIL_SHOP_TRAVEL"}
+{"timestamp": "2026-01-15T18:40:00.088128", "user_id": 8237354983, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-15T19:21:01.242059", "user_id": 1367409954, "action": "dialog_started", "initiated_by": "user", "username": "Marat_Localrent"}
+{"timestamp": "2026-01-15T19:21:26.058863", "user_id": 1367409954, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-19T21:00:00.000Z", "endDate": "2026-01-26T21:00:00.000Z", "days": 8, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "Marat_Localrent"}, "username": "Marat_Localrent"}
+{"timestamp": "2026-01-15T19:21:26.221783", "user_id": 1367409954, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-19T21:00:00.000Z", "endDate": "2026-01-26T21:00:00.000Z", "username": "Marat_Localrent"}, "username": "Marat_Localrent"}
+{"timestamp": "2026-01-15T19:21:44.937320", "user_id": 1367409954, "action": "booking_submitted", "initiated_by": "user", "booking_id": "c41ff2f9", "form_data": {"car": {"id": "toyota_ativ_2024_gray", "name": "Toyota ATIV Dark 2024 Gray", "brand": "Toyota", "model": "ATIV", "year": "2024", "color": "Gray"}, "dates": {"start": "2026-01-19T21:00:00.000Z", "end": "2026-01-26T21:00:00.000Z", "days": 8}, "locations": {"pickup": "airport", "return": "airport"}, "pricing": {"season": "high_season", "dailyRate": 1032, "totalRental": 8256, "deposit": 5000, "deliveryPickup": 0, "deliveryReturn": 0, "totalDelivery": 0, "grandTotal": 8256}, "contact": {"value": "@Marat_Localrent", "type": "telegram"}, "timestamp": "2026-01-15T21:21:40.919Z", "username": "Marat_Localrent"}, "username": "Marat_Localrent"}
+{"timestamp": "2026-01-16T03:56:06.054875", "user_id": 915010425, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-16T04:05:06.926951", "user_id": 915010425, "action": "message_received", "content": "Добрый день. Есть авто с 18 по 23?"}
+{"timestamp": "2026-01-16T04:05:06.939216", "user_id": 915010425, "action": "user_message_received", "message_length": 34, "username": null}
+{"timestamp": "2026-01-16T06:12:35.901655", "user_id": 367905422, "action": "dialog_started", "initiated_by": "user", "username": "langerman_igor"}
+{"timestamp": "2026-01-16T19:57:56.210843", "user_id": 1878859910, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-16T19:58:37.317273", "user_id": 1878859910, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T17:00:00.000Z", "endDate": "2026-01-18T17:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-16T19:58:37.428560", "user_id": 1878859910, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T17:00:00.000Z", "endDate": "2026-01-18T17:00:00.000Z", "days": 3, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-16T19:58:37.547484", "user_id": 1878859910, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T17:00:00.000Z", "endDate": "2026-01-18T17:00:00.000Z", "days": 3, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-16T19:58:37.666956", "user_id": 1878859910, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-16T17:00:00.000Z", "endDate": "2026-01-18T17:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-16T20:00:24.622914", "user_id": 1878859910, "action": "booking_submitted", "initiated_by": "user", "booking_id": "38cfcc78", "form_data": {"car": {"id": "honda_city_2023_gray", "name": "Honda CITY Sedan 2023 Gray", "brand": "Honda", "model": "CITY", "year": "2023", "color": "Gray"}, "dates": {"start": "2026-01-16T17:00:00.000Z", "end": "2026-01-18T17:00:00.000Z", "days": 3}, "locations": {"pickup": "airport", "return": "airport"}, "pricing": {"season": "high_season", "dailyRate": 955, "totalRental": 2865, "deposit": 5000, "deliveryPickup": 0, "deliveryReturn": 0, "totalDelivery": 0, "grandTotal": 2865}, "contact": {"value": "+79778522820", "type": "whatsapp"}, "timestamp": "2026-01-16T20:00:24.243Z", "username": null}, "username": null}
+{"timestamp": "2026-01-17T03:15:24.096Z", "user_id": 1367409954, "action": "manager_message_sent", "message_length": 6}
+{"timestamp": "2026-01-17T03:15:28.155Z", "user_id": 1367409954, "action": "manager_message_sent", "message_length": 172}
+{"timestamp": "2026-01-17T07:45:56.782048", "user_id": 7496794201, "action": "dialog_started", "initiated_by": "user", "username": "mastervenus"}
+{"timestamp": "2026-01-17T07:51:16.892895", "user_id": 7496794201, "action": "message_received", "content": "Здравствуйте"}
+{"timestamp": "2026-01-17T07:51:16.901399", "user_id": 7496794201, "action": "user_message_received", "message_length": 12, "username": "mastervenus"}
+{"timestamp": "2026-01-17T07:51:23.468664", "user_id": 7496794201, "action": "message_received", "content": "Нужна машинка на пару дней"}
+{"timestamp": "2026-01-17T07:51:23.473171", "user_id": 7496794201, "action": "user_message_received", "message_length": 26, "username": "mastervenus"}
+{"timestamp": "2026-01-17T09:26:54.492192", "user_id": 448908425, "action": "dialog_started", "initiated_by": "user", "username": "ekka1337"}
+{"timestamp": "2026-01-17T12:05:28.266065", "user_id": 2091319994, "action": "dialog_started", "initiated_by": "user", "username": "apofis9024"}
+{"timestamp": "2026-01-17T12:54:24.169893", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T12:54:24.293013", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "days": 12, "category": "compact", "pickupLocation": "airport", "returnLocation": "airport", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T12:54:24.417482", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T12:54:24.529690", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "days": 12, "category": "compact", "pickupLocation": "airport", "returnLocation": "airport", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T12:54:31.955393", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "days": 12, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T12:54:32.122942", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T12:54:37.682001", "user_id": 374897465, "action": "booking_submitted", "initiated_by": "user", "booking_id": "7cacb325", "form_data": {"car": {"id": "nmax155_2024_keyless_topbox", "name": "Nmax155 2024 keyless with Top Box", "brand": "Nmax155", "model": "2024", "year": "keyless", "color": ""}, "dates": {"start": "2026-01-17T17:00:00.000Z", "end": "2026-01-28T17:00:00.000Z", "days": 12}, "locations": {"pickup": "airport", "return": "airport"}, "pricing": {"season": "high_season", "dailyRate": 379, "totalRental": 4548, "deposit": 5000, "deliveryPickup": 0, "deliveryReturn": 0, "totalDelivery": 0, "grandTotal": 4548}, "contact": {"value": "@Marseloid", "type": "telegram"}, "timestamp": "2026-01-17T12:54:35.577Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T13:00:13.811Z", "user_id": 984710052, "action": "manager_message_sent", "message_length": 13}
+{"timestamp": "2026-01-17T13:00:38.579Z", "user_id": 984710052, "action": "manager_message_sent", "message_length": 38}
+{"timestamp": "2026-01-17T13:03:26.558064", "user_id": 1367409954, "action": "note_added", "note": "Марат тестирует webapp", "added_by": "6451825371"}
+{"timestamp": "2026-01-17T13:18:12.613248", "user_id": 2091319994, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T13:19:36.936881", "user_id": 2091319994, "action": "claude_paused", "by": "manager"}
+{"timestamp": "2026-01-17T13:20:36.941067", "user_id": 2091319994, "action": "claude_resumed", "by": "manager"}
+{"timestamp": "2026-01-17T13:24:04.885638", "user_id": 2091319994, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T13:25:44.834436", "user_id": 1367409954, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T13:26:19.342Z", "user_id": 1367409954, "action": "manager_message_sent", "message_length": 26}
+{"timestamp": "2026-01-17T13:27:26.737801", "user_id": 1147639806, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T13:27:39.902Z", "user_id": 1147639806, "action": "manager_message_sent", "message_length": 12}
+{"timestamp": "2026-01-17T13:28:14.464963", "user_id": 1147639806, "action": "note_added", "note": "Тестирую", "added_by": "6451825371"}
+{"timestamp": "2026-01-17T13:28:53.420807", "user_id": 400112157, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T13:29:13.092Z", "user_id": 400112157, "action": "manager_message_sent", "message_length": 39}
+{"timestamp": "2026-01-17T13:30:00.870Z", "user_id": 400112157, "action": "manager_message_sent", "message_length": 35}
+{"timestamp": "2026-01-17T13:30:37.656775", "user_id": 719766623, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T13:31:05.211Z", "user_id": 719766623, "action": "manager_message_sent", "message_length": 50}
+{"timestamp": "2026-01-17T13:31:17.717119", "user_id": 400112157, "action": "message_received", "content": "Здравствуйте. Пока нет. Я хотел посмотреть актуальные цены. Напишу если решусь. Спасибо🙏"}
+{"timestamp": "2026-01-17T13:31:17.721696", "user_id": 400112157, "action": "user_message_received", "message_length": 88, "username": "vetalzzz"}
+{"timestamp": "2026-01-17T13:32:06.244158", "user_id": 400112157, "action": "claude_paused", "by": "manager"}
+{"timestamp": "2026-01-17T13:34:10.150311", "user_id": 400112157, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T13:34:23.980935", "user_id": 400112157, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T14:20:50.966639", "user_id": 2091319994, "action": "claude_started"}
+{"timestamp": "2026-01-17T14:20:50.974137", "user_id": 2091319994, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T14:24:40.766527", "user_id": 2091319994, "action": "dialog_paused"}
+{"timestamp": "2026-01-17T14:24:40.772084", "user_id": 2091319994, "action": "claude_paused", "by": "manager"}
+{"timestamp": "2026-01-17T14:25:40.863879", "user_id": 2091319994, "action": "claude_started"}
+{"timestamp": "2026-01-17T14:25:40.868292", "user_id": 2091319994, "action": "claude_resumed", "by": "manager"}
+{"timestamp": "2026-01-17T14:25:55.955246", "user_id": 2091319994, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T14:25:55.958701", "user_id": 2091319994, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T14:41:50.455196", "user_id": 2091319994, "action": "claude_started"}
+{"timestamp": "2026-01-17T14:41:50.485600", "user_id": 2091319994, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T14:42:20.454Z", "user_id": 2091319994, "action": "manager_message_sent", "message_length": 6}
+{"timestamp": "2026-01-17T14:43:47.888923", "user_id": 7496794201, "action": "claude_started"}
+{"timestamp": "2026-01-17T14:43:47.896745", "user_id": 7496794201, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T14:44:39.084Z", "user_id": 7496794201, "action": "manager_message_sent", "message_length": 25}
+{"timestamp": "2026-01-17T14:48:13.807734", "user_id": 374897465, "action": "dialog_started", "initiated_by": "user", "username": "Marseloid"}
+{"timestamp": "2026-01-17T14:48:23.853523", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "days": 12, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T14:48:24.003168", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T14:48:24.145900", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "days": 12, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T14:48:24.382711", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T14:48:24.496269", "user_id": 374897465, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-28T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T14:48:39.314892", "user_id": 374897465, "action": "booking_submitted", "initiated_by": "user", "booking_id": "d16996e7", "form_data": {"car": {"id": "Mg 5", "name": "MG5 Mg5  2023 Gray", "brand": "MG5", "model": "Mg5 ", "year": "2023", "color": "Gray"}, "dates": {"start": "2026-01-17T17:00:00.000Z", "end": "2026-01-28T17:00:00.000Z", "days": 12}, "locations": {"pickup": "airport", "return": "airport"}, "pricing": {"season": "high_season", "dailyRate": 800, "totalRental": 9600, "deposit": 5000, "deliveryPickup": 0, "deliveryReturn": 0, "totalDelivery": 0, "grandTotal": 9600}, "contact": {"value": "@Marseloid", "type": "telegram"}, "timestamp": "2026-01-17T14:48:38.251Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-01-17T14:49:53.681273", "user_id": 374897465, "action": "claude_started"}
+{"timestamp": "2026-01-17T14:49:53.687146", "user_id": 374897465, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T14:50:19.215Z", "user_id": 374897465, "action": "manager_message_sent", "message_length": 11}
+{"timestamp": "2026-01-17T14:50:33.744495", "user_id": 374897465, "action": "message_received", "content": "Добрый день есть авто?"}
+{"timestamp": "2026-01-17T14:57:35.847756", "user_id": 719766623, "action": "message_received", "content": "Привет 👋 нет"}
+{"timestamp": "2026-01-17T14:57:35.856815", "user_id": 719766623, "action": "user_message_received", "message_length": 12, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-17T14:59:05.469Z", "user_id": 719766623, "action": "manager_message_sent", "message_length": 34}
+{"timestamp": "2026-01-17T15:00:03.057316", "user_id": 719766623, "action": "message_received", "content": "Нет. Байк нужен с 25-28"}
+{"timestamp": "2026-01-17T15:00:03.064520", "user_id": 719766623, "action": "user_message_received", "message_length": 23, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-17T15:00:13.426Z", "user_id": 400112157, "action": "manager_message_sent", "message_length": 29}
+{"timestamp": "2026-01-17T15:00:25.391875", "user_id": 403232994, "action": "dialog_started", "initiated_by": "user", "username": "Evgeniyonly"}
+{"timestamp": "2026-01-17T15:00:49.113788", "user_id": 719766623, "action": "message_received", "content": "С 28.01-05.02 нужно авто с большим багажником"}
+{"timestamp": "2026-01-17T15:00:49.121825", "user_id": 719766623, "action": "user_message_received", "message_length": 45, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-17T15:02:19.396Z", "user_id": 719766623, "action": "manager_message_sent", "message_length": 40}
+{"timestamp": "2026-01-17T15:03:10.722531", "user_id": 719766623, "action": "message_received", "content": "Нас 4 человека и 4 больших чемодана"}
+{"timestamp": "2026-01-17T15:03:10.730023", "user_id": 719766623, "action": "user_message_received", "message_length": 35, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-17T15:05:48.927Z", "user_id": 719766623, "action": "manager_message_sent", "message_length": 91}
+{"timestamp": "2026-01-17T15:06:38.343575", "user_id": 719766623, "action": "message_received", "content": "Думаю 7 ми местный крассовер подойдет"}
+{"timestamp": "2026-01-17T15:06:38.377287", "user_id": 719766623, "action": "user_message_received", "message_length": 37, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-17T15:08:40.348786", "user_id": 719766623, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T15:08:40.354765", "user_id": 719766623, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T15:09:25.187799", "user_id": 719766623, "action": "note_added", "note": "Ищу 7местный кроссовер", "added_by": "6451825371"}
+{"timestamp": "2026-01-17T15:46:14.412086", "user_id": 719766623, "action": "message_received", "content": "?"}
+{"timestamp": "2026-01-17T15:46:14.418489", "user_id": 719766623, "action": "user_message_received", "message_length": 1, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-17T16:19:01.242431", "user_id": 374897465, "action": "claude_started"}
+{"timestamp": "2026-01-17T16:19:01.250397", "user_id": 374897465, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T16:19:51.691566", "user_id": 374897465, "action": "message_received", "content": "Есть авто?"}
+{"timestamp": "2026-01-17T16:20:00.730306", "user_id": 374897465, "action": "claude_response"}
+{"timestamp": "2026-01-17T16:20:37.792659", "user_id": 374897465, "action": "message_received", "content": "Скинь фото яриса"}
+{"timestamp": "2026-01-17T16:20:43.795222", "user_id": 374897465, "action": "claude_response"}
+{"timestamp": "2026-01-17T16:22:47.447773", "user_id": 374897465, "action": "message_received", "content": "С 28.01 по 05.02 нужно авто с большим багажником. 5 человек + много багажа. Что советуешь?"}
+{"timestamp": "2026-01-17T16:22:52.955865", "user_id": 374897465, "action": "claude_response"}
+{"timestamp": "2026-01-17T16:39:59.781793", "user_id": 719766623, "action": "note_added", "note": "Сбросил предложение. Жду доки и оплату", "added_by": "6451825371"}
+{"timestamp": "2026-01-17T16:40:12.488Z", "user_id": 719766623, "action": "manager_message_sent", "message_length": 10}
+{"timestamp": "2026-01-17T16:40:15.909248", "user_id": 719766623, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T16:40:15.912605", "user_id": 719766623, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T16:40:36.791532", "user_id": 719766623, "action": "message_received", "content": "Кто?"}
+{"timestamp": "2026-01-17T16:40:36.795956", "user_id": 719766623, "action": "user_message_received", "message_length": 4, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-17T16:40:46.055704", "user_id": 719766623, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T16:40:46.058745", "user_id": 719766623, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T16:40:51.792952", "user_id": 719766623, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T16:40:51.798632", "user_id": 719766623, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T16:42:19.422Z", "user_id": 719766623, "action": "manager_message_sent", "message_length": 100}
+{"timestamp": "2026-01-17T16:42:28.419994", "user_id": 719766623, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T16:42:28.424464", "user_id": 719766623, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T16:42:37.960725", "user_id": 719766623, "action": "message_received", "content": "Марс это вы?"}
+{"timestamp": "2026-01-17T16:42:37.964827", "user_id": 719766623, "action": "user_message_received", "message_length": 12, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-17T16:42:46.848023", "user_id": 719766623, "action": "message_received", "content": "Ок"}
+{"timestamp": "2026-01-17T16:42:46.860486", "user_id": 719766623, "action": "user_message_received", "message_length": 2, "username": "Mudriy_KA"}
+{"timestamp": "2026-01-17T16:43:09.322Z", "user_id": 719766623, "action": "manager_message_sent", "message_length": 9}
+{"timestamp": "2026-01-17T18:23:27.829979", "user_id": 837850841, "action": "dialog_started", "initiated_by": "user", "username": "carphuket"}
+{"timestamp": "2026-01-17T18:30:34.609213", "user_id": 837850841, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-19T17:00:00.000Z", "endDate": "2026-01-29T17:00:00.000Z", "username": "carphuket"}, "username": "carphuket"}
+{"timestamp": "2026-01-17T18:30:35.116551", "user_id": 837850841, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-19T17:00:00.000Z", "endDate": "2026-01-29T17:00:00.000Z", "username": "carphuket"}, "username": "carphuket"}
+{"timestamp": "2026-01-17T18:30:35.266404", "user_id": 837850841, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-19T17:00:00.000Z", "endDate": "2026-01-29T17:00:00.000Z", "days": 11, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "carphuket"}, "username": "carphuket"}
+{"timestamp": "2026-01-17T18:30:35.598683", "user_id": 837850841, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-19T17:00:00.000Z", "endDate": "2026-01-29T17:00:00.000Z", "days": 11, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "carphuket"}, "username": "carphuket"}
+{"timestamp": "2026-01-17T18:31:28.294Z", "user_id": 837850841, "action": "manager_message_sent", "message_length": 19}
+{"timestamp": "2026-01-17T18:31:48.579120", "user_id": 837850841, "action": "claude_started"}
+{"timestamp": "2026-01-17T18:31:48.587705", "user_id": 837850841, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T18:32:34.260004", "user_id": 837850841, "action": "message_received", "content": "Петушиная аренда"}
+{"timestamp": "2026-01-17T18:32:42.410418", "user_id": 837850841, "action": "claude_response"}
+{"timestamp": "2026-01-17T18:34:05.095343", "user_id": 837850841, "action": "message_received", "content": "Хочу фортунер"}
+{"timestamp": "2026-01-17T18:34:10.994797", "user_id": 837850841, "action": "claude_response"}
+{"timestamp": "2026-01-17T18:34:11.737126", "user_id": 837850841, "action": "note_added", "note": "Какой то мудак", "added_by": "6451825371"}
+{"timestamp": "2026-01-17T18:37:00.302783", "user_id": 837850841, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T18:37:00.308986", "user_id": 837850841, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T18:38:01.997Z", "user_id": 837850841, "action": "manager_message_sent", "message_length": 16}
+{"timestamp": "2026-01-17T18:38:24.110639", "user_id": 837850841, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T18:38:24.117621", "user_id": 837850841, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T18:41:47.797443", "user_id": 837850841, "action": "message_received", "content": "Хочу тойота атив"}
+{"timestamp": "2026-01-17T18:41:47.806611", "user_id": 837850841, "action": "user_message_received", "message_length": 16, "username": "carphuket"}
+{"timestamp": "2026-01-17T18:42:41.835784", "user_id": 837850841, "action": "claude_started"}
+{"timestamp": "2026-01-17T18:42:41.840767", "user_id": 837850841, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T18:42:59.427261", "user_id": 837850841, "action": "message_received", "content": "С 21.01 по 30.01"}
+{"timestamp": "2026-01-17T18:43:04.288711", "user_id": 837850841, "action": "claude_response"}

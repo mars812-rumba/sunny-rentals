@@ -1,0 +1,2974 @@
+{
+  "cars": {
+    "toyota_yaris_2022_black": {
+      "id": "toyota_yaris_2022_black",
+      "name": "Toyota YARIS 2022 Black",
+      "class": "compact",
+      "brand": "Toyota",
+      "model": "YARIS",
+      "year": "2022",
+      "color": "Black",
+      "available": true,
+      "photos": {
+        "main": "compact/namo_yaris_sedan_black_2022/1.jpg",
+        "gallery": [
+          "compact/namo_yaris_sedan_black_2022/1.jpg",
+          "compact/namo_yaris_sedan_black_2022/2.jpg",
+          "compact/namo_yaris_sedan_black_2022/3.jpg",
+          "compact/namo_yaris_sedan_black_2022/4.jpg",
+          "compact/namo_yaris_sedan_black_2022/5.jpg",
+          "compact/namo_yaris_sedan_black_2022/6.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 940,
+          "price_7_14": 825,
+          "price_15_29": 732,
+          "price_30": 639
+        },
+        "high_season": {
+          "price_1_6": 978,
+          "price_7_14": 936,
+          "price_15_29": 847,
+          "price_30": 723
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.2L",
+        "power": "91 л.с.",
+        "transmission": "Автомат"
+      },
+      "supplier": "namo",
+      "quick_id": "toyota_yaris_2022_black",
+      "rating": 4.5,
+      "class_": "compact",
+      "updated_at": "2026-01-03T03:39:24.526068"
+    },
+    "toyota_yaris_2022_white": {
+      "id": "toyota_yaris_2022_white",
+      "name": "Toyota YARIS 2022 White",
+      "class": "compact",
+      "brand": "Toyota",
+      "model": "YARIS",
+      "year": "2022",
+      "color": "White",
+      "available": true,
+      "photos": {
+        "main": "compact/namo_yaris_sedan_white_2022/1.jpg",
+        "gallery": [
+          "compact/namo_yaris_sedan_white_2022/1.jpg",
+          "compact/namo_yaris_sedan_white_2022/2.jpg",
+          "compact/namo_yaris_sedan_white_2022/3.jpg",
+          "compact/namo_yaris_sedan_white_2022/4.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1030,
+          "price_7_14": 969,
+          "price_15_29": 912,
+          "price_30": 827
+        },
+        "high_season": {
+          "price_1_6": 978,
+          "price_7_14": 921,
+          "price_15_29": 820,
+          "price_30": 723
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.2L",
+        "power": "91 л.с.",
+        "transmission": "Автомат"
+      },
+      "supplier": "namo",
+      "quick_id": "yaris2022white",
+      "rating": 4.5,
+      "class_": "compact",
+      "updated_at": "2026-01-03T03:39:24.526107"
+    },
+    "toyota_yaris_2024_gray": {
+      "id": "toyota_yaris_2024_gray",
+      "name": "Toyota YARIS 2024 Gray",
+      "class": "compact",
+      "brand": "Toyota",
+      "model": "YARIS",
+      "year": "2024",
+      "color": "Gray",
+      "available": true,
+      "photos": {
+        "main": "compact/ar_yaris_premium_gray_2024/1.jpg",
+        "gallery": [
+          "compact/ar_yaris_premium_gray_2024/1.jpg",
+          "compact/ar_yaris_premium_gray_2024/IMG-20241129-WA0246.jpg",
+          "compact/ar_yaris_premium_gray_2024/IMG-20241129-WA0248.jpg",
+          "compact/ar_yaris_premium_gray_2024/IMG-20241129-WA0250.jpg",
+          "compact/ar_yaris_premium_gray_2024/IMG-20241129-WA0253.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 905,
+          "price_7_14": 805,
+          "price_15_29": 703,
+          "price_30": 620
+        },
+        "high_season": {
+          "price_1_6": 898,
+          "price_7_14": 886,
+          "price_15_29": 786,
+          "price_30": 704
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.2L",
+        "power": "91 л.с.",
+        "transmission": "Автомат"
+      },
+      "supplier": "namo",
+      "quick_id": "yaris2024gray",
+      "rating": 4.5,
+      "class_": "compact",
+      "updated_at": "2026-01-03T03:39:24.526119"
+    },
+    "toyota_yaris_white_sedan": {
+      "id": "toyota_yaris_white_sedan",
+      "name": "Toyota YARIS white Sedan",
+      "class": "compact",
+      "supplier": "namo",
+      "brand": "Toyota",
+      "model": "YARIS",
+      "color": "Sedan",
+      "year": "white",
+      "photos": {
+        "main": "compact/namo_yaris_sedan_white_sport_2022/1.jpg",
+        "gallery": [
+          "compact/namo_yaris_sedan_white_sport_2022/1.jpg",
+          "compact/namo_yaris_sedan_white_sport_2022/2.jpg",
+          "compact/namo_yaris_sedan_white_sport_2022/3.jpg",
+          "compact/namo_yaris_sedan_white_sport_2022/4.jpg",
+          "compact/namo_yaris_sedan_white_sport_2022/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 905,
+          "price_7_14": 805,
+          "price_15_29": 703,
+          "price_30": 639
+        },
+        "high_season": {
+          "price_1_6": 954,
+          "price_7_14": 886,
+          "price_15_29": 796,
+          "price_30": 714
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.2L",
+        "power": "91 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "yariswhitesedan",
+      "rating": 4.6,
+      "available": true,
+      "class_": "compact",
+      "updated_at": "2026-01-03T03:39:24.526130"
+    },
+    "toyota_yaris_2023_blue": {
+      "id": "toyota_yaris_2023_blue",
+      "name": "Toyota YARIS Hb 2023 Blue",
+      "class": "compact",
+      "brand": "Toyota",
+      "model": "YARIS",
+      "year": "2023",
+      "color": "Blue",
+      "available": true,
+      "photos": {
+        "main": "compact/ar_yaris_hb_blue_2023/1.jpg",
+        "gallery": [
+          "compact/ar_yaris_hb_blue_2023/1.jpg",
+          "compact/ar_yaris_hb_blue_2023/IMG-20241129-WA0239.jpg",
+          "compact/ar_yaris_hb_blue_2023/IMG-20241129-WA0241.jpg",
+          "compact/ar_yaris_hb_blue_2023/IMG-20241129-WA0242.jpg",
+          "compact/ar_yaris_hb_blue_2023/IMG-20241129-WA0244.jpg",
+          "compact/ar_yaris_hb_blue_2023/IMG-20241129-WA0245.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 905,
+          "price_7_14": 805,
+          "price_15_29": 731,
+          "price_30": 639
+        },
+        "high_season": {
+          "price_1_6": 898,
+          "price_7_14": 886,
+          "price_15_29": 813,
+          "price_30": 723
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.2L",
+        "power": "91 л.с.",
+        "transmission": "Автомат"
+      },
+      "supplier": "ar",
+      "quick_id": "yaris2023blue",
+      "rating": 4.8,
+      "class_": "compact",
+      "updated_at": "2026-01-03T03:39:24.526140"
+    },
+    "honda_civic_2024_black": {
+      "id": "honda_civic_2024_black",
+      "name": "Honda CIVIC RS 2024 Black",
+      "class": "sedan",
+      "supplier": "namo",
+      "brand": "Honda",
+      "model": "CIVIC RS",
+      "color": "Black",
+      "year": "2024",
+      "photos": {
+        "main": "sedan/ar_civic_rs_black_2024/1.jpg",
+        "gallery": [
+          "sedan/ar_civic_rs_black_2024/1.jpg",
+          "sedan/ar_civic_rs_black_2024/photo_2_2025-10-12_02-47-24.jpg",
+          "sedan/ar_civic_rs_black_2024/photo_3_2025-10-12_02-47-24.jpg",
+          "sedan/ar_civic_rs_black_2024/photo_4_2025-10-12_02-47-24.jpg",
+          "sedan/honda_civic_2024_black/1.jpg",
+          "sedan/honda_civic_2024_black/2.jpg",
+          "sedan/honda_civic_2024_black/3.jpg",
+          "sedan/honda_civic_2024_black/4.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1290,
+          "price_7_14": 1198,
+          "price_15_29": 1198,
+          "price_30": 997
+        },
+        "high_season": {
+          "price_1_6": 1435,
+          "price_7_14": 1435,
+          "price_15_29": 1338,
+          "price_30": 1156
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "2.0L",
+        "power": "250 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "civic2024black",
+      "rating": 4.5,
+      "available": true,
+      "class_": "sedan",
+      "updated_at": "2026-01-03T03:39:24.526149"
+    },
+    "honda_civic_2024_white": {
+      "id": "honda_civic_2024_white",
+      "name": "Honda CIVIC 2024 White",
+      "class": "sedan",
+      "brand": "Honda",
+      "model": "CIVIC",
+      "year": "2024",
+      "color": "White",
+      "available": true,
+      "photos": {
+        "main": "sedan/ar_civic_turbo_white_2024/1.jpg",
+        "gallery": [
+          "sedan/ar_civic_turbo_white_2024/1.jpg",
+          "sedan/ar_civic_turbo_white_2024/2.jpg",
+          "sedan/ar_civic_turbo_white_2024/IMG-20241129-WA0118.jpg",
+          "sedan/ar_civic_turbo_white_2024/IMG-20241129-WA0119.jpg",
+          "sedan/ar_civic_turbo_white_2024/IMG-20241129-WA0120.jpg",
+          "sedan/ar_civic_turbo_white_2024/IMG-20241129-WA0122.jpg",
+          "sedan/ar_civic_turbo_white_2024/IMG-20241129-WA0123.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1382,
+          "price_7_14": 1198,
+          "price_15_29": 1198,
+          "price_30": 997
+        },
+        "high_season": {
+          "price_1_6": 1445,
+          "price_7_14": 1349,
+          "price_15_29": 1245,
+          "price_30": 1045
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L Turbo",
+        "power": "182 л.с.",
+        "transmission": "CVT"
+      },
+      "supplier": "namo",
+      "quick_id": "honda_civic_2024_white",
+      "rating": 4.5,
+      "class_": "sedan",
+      "updated_at": "2026-01-03T03:39:24.526159"
+    },
+    "mazda_mazda2_2024_white": {
+      "id": "mazda_mazda2_2024_white",
+      "name": "Mazda MAZDA2 2024 White",
+      "class": "sedan",
+      "supplier": "ar",
+      "brand": "Mazda",
+      "model": "MAZDA2",
+      "color": "White",
+      "year": "2024",
+      "photos": {
+        "main": "sedan/ar_mazda2_white_2024/1.jpg",
+        "gallery": [
+          "sedan/ar_mazda2_white_2024/1.jpg",
+          "sedan/ar_mazda2_white_2024/IMG-20241129-WA0203.jpg",
+          "sedan/ar_mazda2_white_2024/IMG-20241129-WA0205.jpg",
+          "sedan/ar_mazda2_white_2024/IMG-20241129-WA0206.jpg",
+          "sedan/ar_mazda2_white_2024/IMG-20241129-WA0207.jpg",
+          "sedan/ar_mazda2_white_2024/IMG-20241129-WA0208.jpg",
+          "sedan/ar_mazda2_white_2024/IMG-20241129-WA0209.jpg",
+          "sedan/ar_mazda2_white_2024/IMG-20241129-WA0210.jpg",
+          "sedan/ar_mazda2_white_2024/IMG-20241129-WA0211.jpg",
+          "sedan/ar_mazda2_white_2024/IMG-20241129-WA0212.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 912,
+          "price_7_14": 817,
+          "price_15_29": 733,
+          "price_30": 654
+        },
+        "high_season": {
+          "price_1_6": 952,
+          "price_7_14": 855,
+          "price_15_29": 855,
+          "price_30": 771
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.3L",
+        "power": "91 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "mazda22024white",
+      "rating": 4.8,
+      "available": true,
+      "class_": "sedan",
+      "updated_at": "2026-01-03T03:39:24.526168"
+    },
+    "toyota_ativ_2024_gray": {
+      "id": "toyota_ativ_2024_gray",
+      "name": "Toyota ATIV Dark 2024 Gray",
+      "class": "sedan",
+      "supplier": "ar",
+      "brand": "Toyota",
+      "model": "ATIV",
+      "color": "Gray",
+      "year": "2024",
+      "photos": {
+        "main": "sedan/ar_ativ_dark_gray_2024/1.jpg",
+        "gallery": [
+          "sedan/ar_ativ_dark_gray_2024/1.jpg",
+          "sedan/ar_ativ_dark_gray_2024/IMG-20250207-WA0041.jpg",
+          "sedan/ar_ativ_dark_gray_2024/IMG-20250207-WA0043.jpg",
+          "sedan/ar_ativ_dark_gray_2024/IMG-20250319-WA0037.jpg",
+          "sedan/ar_ativ_dark_gray_2024/IMG-20250319-WA0038.jpg",
+          "sedan/ar_ativ_dark_gray_2024/IMG-20250319-WA0089.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 995,
+          "price_7_14": 902,
+          "price_15_29": 810,
+          "price_30": 643
+        },
+        "high_season": {
+          "price_1_6": 1038,
+          "price_7_14": 1032,
+          "price_15_29": 935,
+          "price_30": 849
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.2L",
+        "power": "86 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "ativ2024gray",
+      "rating": 4.9,
+      "available": true,
+      "updated_at": "2026-01-03T03:39:24.526177"
+    },
+    "mazda_mazda2_2023_gray": {
+      "id": "mazda_mazda2_2023_gray",
+      "name": "Mazda MAZDA2 2023 Gray",
+      "class": "sedan",
+      "supplier": "namo",
+      "brand": "Mazda",
+      "model": "MAZDA2",
+      "color": "Gray",
+      "year": "2023",
+      "photos": {
+        "main": "sedan/ar_mazda2_gray_2023/1.jpg",
+        "gallery": [
+          "sedan/ar_mazda2_gray_2023/1.jpg",
+          "sedan/ar_mazda2_gray_2023/2.jpg",
+          "sedan/ar_mazda2_gray_2023/IMG-20241129-WA0215.jpg",
+          "sedan/ar_mazda2_gray_2023/IMG-20241129-WA0216.jpg",
+          "sedan/ar_mazda2_gray_2023/IMG-20241129-WA0218.jpg",
+          "sedan/ar_mazda2_gray_2023/IMG-20241129-WA0221.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 902,
+          "price_7_14": 818,
+          "price_15_29": 734,
+          "price_30": 665
+        },
+        "high_season": {
+          "price_1_6": 1032,
+          "price_7_14": 1035,
+          "price_15_29": 946,
+          "price_30": 783
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.3L",
+        "power": "91 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "mazda22023gray",
+      "rating": 4.8,
+      "available": true,
+      "updated_at": "2026-01-03T03:39:24.526187"
+    },
+    "toyota_camry_2020_black": {
+      "id": "toyota_camry_2020_black",
+      "name": "Toyota CAMRY 2020 Black",
+      "class": "sedan",
+      "supplier": "ar",
+      "brand": "Toyota",
+      "model": "CAMRY",
+      "color": "Black",
+      "year": "2020",
+      "photos": {
+        "main": "sedan/ar_camry_black_2020/1.jpg",
+        "gallery": [
+          "sedan/ar_camry_black_2020/1.jpg",
+          "sedan/ar_camry_black_2020/12.jpg",
+          "sedan/ar_camry_black_2020/13.jpg",
+          "sedan/ar_camry_black_2020/14.jpg",
+          "sedan/ar_camry_black_2020/15.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1438,
+          "price_7_14": 1158,
+          "price_15_29": 1158,
+          "price_30": 997
+        },
+        "high_season": {
+          "price_1_6": 1627,
+          "price_7_14": 1334,
+          "price_15_29": 1334,
+          "price_30": 1165
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин/Гибрид",
+        "engine": "2.5L",
+        "power": "178 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "camry2020black",
+      "rating": 4.9,
+      "available": true,
+      "updated_at": "2026-01-03T03:39:24.526196"
+    },
+    "mg_mg5_2024_yellow": {
+      "id": "mg_mg5_2024_yellow",
+      "name": "MG MG5 2024 Yellow",
+      "class": "sedan",
+      "supplier": "namo",
+      "brand": "MG",
+      "model": "MG5",
+      "color": "Yellow",
+      "year": "2024",
+      "photos": {
+        "main": "sedan/namo_mg5_yellow_2024/1.jpg",
+        "gallery": [
+          "sedan/namo_mg5_yellow_2024/1.jpg",
+          "sedan/namo_mg5_yellow_2024/2.jpg",
+          "sedan/namo_mg5_yellow_2024/3.jpg",
+          "sedan/namo_mg5_yellow_2024/4.jpg",
+          "sedan/namo_mg5_yellow_2024/5.jpg",
+          "sedan/namo_mg5_yellow_2024/6.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1087,
+          "price_7_14": 1007,
+          "price_15_29": 913,
+          "price_30": 778
+        },
+        "high_season": {
+          "price_1_6": 1134,
+          "price_7_14": 1052,
+          "price_15_29": 1043,
+          "price_30": 874
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L",
+        "power": "114 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "mg52024yellow",
+      "rating": 4.7,
+      "available": true,
+      "class_": "sedan",
+      "updated_at": "2026-01-03T03:39:24.526205"
+    },
+    "honda_city_2023_gray": {
+      "id": "honda_city_2023_gray",
+      "name": "Honda CITY Sedan 2023 Gray",
+      "class": "sedan",
+      "supplier": "ar",
+      "brand": "Honda",
+      "model": "CITY",
+      "color": "Gray",
+      "year": "2023",
+      "photos": {
+        "main": "sedan/ar_city_sedan_gray_2023/1.jpg",
+        "gallery": [
+          "sedan/ar_city_sedan_gray_2023/1.jpg",
+          "sedan/ar_city_sedan_gray_2023/2.jpg",
+          "sedan/ar_city_sedan_gray_2023/3.jpg",
+          "sedan/ar_city_sedan_gray_2023/4.jpg",
+          "sedan/ar_city_sedan_gray_2023/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 914,
+          "price_7_14": 810,
+          "price_15_29": 735,
+          "price_30": 642
+        },
+        "high_season": {
+          "price_1_6": 955,
+          "price_7_14": 847,
+          "price_15_29": 838,
+          "price_30": 785
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.0L Turbo",
+        "power": "122 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "city2023gray",
+      "rating": 4.5,
+      "available": true,
+      "updated_at": "2026-01-03T03:39:24.526215"
+    },
+    "honda_civic_2023_white": {
+      "id": "honda_civic_2023_white",
+      "name": "Honda CIVIC 2023 White",
+      "class": "sedan",
+      "supplier": "ar",
+      "brand": "Honda",
+      "model": "CIVIC",
+      "color": "White",
+      "year": "2023",
+      "photos": {
+        "main": "sedan/ar_civic_white_2023/1.jpg",
+        "gallery": [
+          "sedan/ar_civic_white_2023/1.jpg",
+          "sedan/ar_civic_white_2023/IMG-20241202-WA0003.jpg",
+          "sedan/ar_civic_white_2023/IMG-20241202-WA0005.jpg",
+          "sedan/ar_civic_white_2023/IMG-20241202-WA0006.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1290,
+          "price_7_14": 1198,
+          "price_15_29": 1198,
+          "price_30": 997
+        },
+        "high_season": {
+          "price_1_6": 1627,
+          "price_7_14": 1418,
+          "price_15_29": 1418,
+          "price_30": 1250
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L Turbo",
+        "power": "182 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "civic2023white",
+      "rating": 4.9,
+      "available": true,
+      "updated_at": "2026-01-03T03:39:24.526224"
+    },
+    "toyota_altis_2023_gray": {
+      "id": "toyota_altis_2023_gray",
+      "name": "Toyota ALTIS 2023 Gray",
+      "class": "sedan",
+      "supplier": "ar",
+      "brand": "Toyota",
+      "model": "ALTIS",
+      "color": "Gray",
+      "year": "2023",
+      "photos": {
+        "main": "sedan/ar_altis_gray_2023/1.jpg",
+        "gallery": [
+          "sedan/ar_altis_gray_2023/1.jpg",
+          "sedan/ar_altis_gray_2023/10.jpg",
+          "sedan/ar_altis_gray_2023/7.jpg",
+          "sedan/ar_altis_gray_2023/8.jpg",
+          "sedan/ar_altis_gray_2023/9.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1476,
+          "price_7_14": 1198,
+          "price_15_29": 1198,
+          "price_30": 997
+        },
+        "high_season": {
+          "price_1_6": 1541,
+          "price_7_14": 1250,
+          "price_15_29": 1203,
+          "price_30": 1058
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин/Гибрид",
+        "engine": "1.8L",
+        "power": "140 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "altis2023gray",
+      "rating": 4.5,
+      "available": true,
+      "class_": "sedan",
+      "updated_at": "2026-01-03T03:39:24.526233"
+    },
+    "mg_mg5_2024_red": {
+      "id": "mg_mg5_2024_red",
+      "name": "MG5 MG5 2024 Red",
+      "class": "sedan",
+      "brand": "MG5",
+      "model": "MG5",
+      "year": "2024",
+      "color": "Red",
+      "available": true,
+      "photos": {
+        "main": "sedan/namo_mg5_red_2024/1.jpg",
+        "gallery": [
+          "sedan/namo_mg5_red_2024/1.jpg",
+          "sedan/namo_mg5_red_2024/2.jpg",
+          "sedan/namo_mg5_red_2024/3.jpg",
+          "sedan/namo_mg5_red_2024/4.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1007,
+          "price_7_14": 920,
+          "price_15_29": 808,
+          "price_30": 715
+        },
+        "high_season": {
+          "price_1_6": 1052,
+          "price_7_14": 1048,
+          "price_15_29": 933,
+          "price_30": 836
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L",
+        "power": "114 л.с.",
+        "transmission": "CVT"
+      },
+      "supplier": "namo",
+      "quick_id": "mg_mg5_2024_red",
+      "rating": 4.5,
+      "class_": "sedan",
+      "updated_at": "2026-01-03T03:39:24.526243"
+    },
+    "mazda_mazda2_2023_white": {
+      "id": "mazda_mazda2_2023_white",
+      "name": "Mazda MAZDA2 2023 White",
+      "class": "sedan",
+      "brand": "Mazda",
+      "model": "MAZDA2",
+      "year": "2023",
+      "color": "White",
+      "available": true,
+      "photos": {
+        "main": "sedan/ar_mazda2_white_2023/1.jpg",
+        "gallery": [
+          "sedan/ar_mazda2_white_2023/1.jpg",
+          "sedan/ar_mazda2_white_2023/IMG-20241129-WA0193.jpg",
+          "sedan/ar_mazda2_white_2023/IMG-20241129-WA0195.jpg",
+          "sedan/ar_mazda2_white_2023/IMG-20241129-WA0196.jpg",
+          "sedan/ar_mazda2_white_2023/IMG-20241129-WA0197.jpg",
+          "sedan/ar_mazda2_white_2023/IMG-20241129-WA0198.jpg",
+          "sedan/ar_mazda2_white_2023/IMG-20241129-WA0200.jpg",
+          "sedan/ar_mazda2_white_2023/IMG-20241129-WA0201.jpg",
+          "sedan/ar_mazda2_white_2023/IMG-20241129-WA0202.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1107,
+          "price_7_14": 1008,
+          "price_15_29": 912,
+          "price_30": 642
+        },
+        "high_season": {
+          "price_1_6": 946,
+          "price_7_14": 840,
+          "price_15_29": 830,
+          "price_30": 760
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.3L",
+        "power": "91 л.с.",
+        "transmission": "Автомат"
+      },
+      "supplier": "ar",
+      "quick_id": "mazda22023white",
+      "rating": 4.8,
+      "class_": "sedan",
+      "updated_at": "2026-01-03T03:39:24.526252"
+    },
+    "mg_mg5_2024_green": {
+      "id": "mg_mg5_2024_green",
+      "name": "MG MG5 2024 Green",
+      "class": "sedan",
+      "supplier": "namo",
+      "brand": "MG",
+      "model": "MG5",
+      "color": "Green",
+      "year": "2024",
+      "photos": {
+        "main": "sedan/namo_mg5_green_2024/1.jpg",
+        "gallery": [
+          "sedan/namo_mg5_green_2024/1.jpg",
+          "sedan/namo_mg5_green_2024/2.jpg",
+          "sedan/namo_mg5_green_2024/3.jpg",
+          "sedan/namo_mg5_green_2024/4.jpg",
+          "sedan/namo_mg5_green_2024/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1092,
+          "price_7_14": 1007,
+          "price_15_29": 907,
+          "price_30": 817
+        },
+        "high_season": {
+          "price_1_6": 1084,
+          "price_7_14": 1084,
+          "price_15_29": 1039,
+          "price_30": 885
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L",
+        "power": "114 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "mg52024green",
+      "rating": 4.6,
+      "available": true,
+      "class_": "sedan",
+      "updated_at": "2026-01-03T03:39:24.526261"
+    },
+    "ford_raptor_2024_gray": {
+      "id": "ford_raptor_2024_gray",
+      "name": "Ford RAPTOR 2024 Gray",
+      "class": "suv",
+      "supplier": "namo",
+      "brand": "Ford",
+      "model": "RAPTOR",
+      "color": "Gray",
+      "year": "2024",
+      "photos": {
+        "main": "suv/namo_raptor_gray_2024/1.jpg",
+        "gallery": [
+          "suv/namo_raptor_gray_2024/1.jpg",
+          "suv/namo_raptor_gray_2024/2.jpg",
+          "suv/namo_raptor_gray_2024/3.jpg",
+          "suv/namo_raptor_gray_2024/4.jpg",
+          "suv/namo_raptor_gray_2024/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 2584,
+          "price_7_14": 2536,
+          "price_15_29": 2445,
+          "price_30": 2030
+        },
+        "high_season": {
+          "price_1_6": 2520,
+          "price_7_14": 2399,
+          "price_15_29": 2375,
+          "price_30": 1965
+        },
+        "deposit": 8000
+      },
+      "specs": {
+        "fuel": "Дизель",
+        "engine": "3.0L",
+        "power": "177 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "raptor2024gray",
+      "rating": 4.9,
+      "available": true,
+      "class_": "suv",
+      "updated_at": "2026-01-03T03:39:24.526270"
+    },
+    "mazda_cx3_2023_bege": {
+      "id": "mazda_cx3_2023_bege",
+      "name": "Mazda CX3 2023 Bege",
+      "class": "suv",
+      "supplier": "ar",
+      "brand": "Mazda",
+      "model": "CX3",
+      "color": "Bege",
+      "year": "2023",
+      "photos": {
+        "main": "suv/ar_cx3_bege_2023/1.jpg",
+        "gallery": [
+          "suv/ar_cx3_bege_2023/1.jpg",
+          "suv/ar_cx3_bege_2023/IMG-20241129-WA0105.jpg",
+          "suv/ar_cx3_bege_2023/IMG-20241129-WA0107.jpg",
+          "suv/ar_cx3_bege_2023/IMG-20241129-WA0109.jpg",
+          "suv/ar_cx3_bege_2023/IMG-20241129-WA0110.jpg",
+          "suv/ar_cx3_bege_2023/IMG-20241129-WA0113.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1502,
+          "price_7_14": 1198,
+          "price_15_29": 1198,
+          "price_30": 1133
+        },
+        "high_season": {
+          "price_1_6": 1571,
+          "price_7_14": 1250,
+          "price_15_29": 1250,
+          "price_30": 1184
+        },
+        "deposit": 8000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "2.0L",
+        "power": "150 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "cx32023bege",
+      "rating": 4.8,
+      "available": true,
+      "updated_at": "2026-01-03T03:39:24.526280"
+    },
+    "honda_hrv_2025_blackv": {
+      "id": "honda_hrv_2025_blackv",
+      "name": "Honda HRV He 2025 Blackv",
+      "class": "suv",
+      "supplier": "ar",
+      "brand": "Honda",
+      "model": "HRV",
+      "color": "Blackv",
+      "year": "2025",
+      "photos": {
+        "main": "suv/ar_hrv_he_blackv_2025/1.jpg",
+        "gallery": [
+          "suv/ar_hrv_he_blackv_2025/1.jpg",
+          "suv/ar_hrv_he_blackv_2025/30.jpg",
+          "suv/ar_hrv_he_blackv_2025/31.jpg",
+          "suv/ar_hrv_he_blackv_2025/32.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1438,
+          "price_7_14": 1244,
+          "price_15_29": 1152,
+          "price_30": 997
+        },
+        "high_season": {
+          "price_1_6": 1501,
+          "price_7_14": 1300,
+          "price_15_29": 1292,
+          "price_30": 1052
+        },
+        "deposit": 8000
+      },
+      "specs": {
+        "fuel": "Бензин/Гибрид",
+        "engine": "1.5L",
+        "power": "121 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "hrv2025blackv",
+      "rating": 4.7,
+      "available": true,
+      "updated_at": "2026-01-03T03:39:24.526289"
+    },
+    "toyota_fortuner_2019_white": {
+      "id": "toyota_fortuner_2019_white",
+      "name": "Toyota FORTUNER 2019 White",
+      "class": "suv",
+      "supplier": "ar",
+      "brand": "Toyota",
+      "model": "FORTUNER",
+      "color": "White",
+      "year": "2019",
+      "photos": {
+        "main": "suv/ar_fortuner_white_2019/1.jpg",
+        "gallery": [
+          "suv/ar_fortuner_white_2019/1.jpg",
+          "suv/ar_fortuner_white_2019/2.jpg",
+          "suv/ar_fortuner_white_2019/3.jpg",
+          "suv/ar_fortuner_white_2019/4.jpg",
+          "suv/ar_fortuner_white_2019/5.jpg",
+          "suv/ar_fortuner_white_2019/6.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1678,
+          "price_7_14": 1358,
+          "price_15_29": 1152,
+          "price_30": 1014
+        },
+        "high_season": {
+          "price_1_6": 1879,
+          "price_7_14": 1785,
+          "price_15_29": 1748,
+          "price_30": 1334
+        },
+        "deposit": 8000
+      },
+      "specs": {
+        "fuel": "Дизель",
+        "engine": "2.4L",
+        "power": "150 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "fortuner2019white",
+      "rating": 4.9,
+      "available": false,
+      "class_": "suv",
+      "updated_at": "2026-01-03T03:39:24.526298"
+    },
+    "mazda_cx30_2023_bege": {
+      "id": "mazda_cx30_2023_bege",
+      "name": "Mazda CX30 2023 Bege",
+      "class": "suv",
+      "supplier": "ar",
+      "brand": "Mazda",
+      "model": "CX30",
+      "color": "Bege",
+      "year": "2023",
+      "photos": {
+        "main": "suv/ar_cx30_bege_2023/1.jpg",
+        "gallery": [
+          "suv/ar_cx30_bege_2023/1.jpg",
+          "suv/ar_cx30_bege_2023/21.jpg",
+          "suv/ar_cx30_bege_2023/22.jpg",
+          "suv/ar_cx30_bege_2023/23.jpg",
+          "suv/ar_cx30_bege_2023/24.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1476,
+          "price_7_14": 1290,
+          "price_15_29": 1059,
+          "price_30": 921
+        },
+        "high_season": {
+          "price_1_6": 1541,
+          "price_7_14": 1349,
+          "price_15_29": 1286,
+          "price_30": 1052
+        },
+        "deposit": 8000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "2.0L",
+        "power": "153 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "cx302023bege",
+      "rating": 4.5,
+      "available": true,
+      "updated_at": "2026-01-03T03:39:24.526307"
+    },
+    "toyota_fortuner_2023_gray": {
+      "id": "toyota_fortuner_2023_gray",
+      "name": "Toyota FORTUNER 2023 Gray",
+      "class": "suv",
+      "supplier": "ar",
+      "brand": "Toyota",
+      "model": "FORTUNER",
+      "color": "Gray",
+      "year": "2023",
+      "photos": {
+        "main": "suv/ar_fortuner_gray_2023/1.jpg",
+        "gallery": [
+          "suv/ar_fortuner_gray_2023/1.jpg",
+          "suv/ar_fortuner_gray_2023/26.jpg",
+          "suv/ar_fortuner_gray_2023/27.jpg",
+          "suv/ar_fortuner_gray_2023/28.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 2030,
+          "price_7_14": 1751,
+          "price_15_29": 1659,
+          "price_30": 1382
+        },
+        "high_season": {
+          "price_1_6": 2119,
+          "price_7_14": 1830,
+          "price_15_29": 1734,
+          "price_30": 1445
+        },
+        "deposit": 8000
+      },
+      "specs": {
+        "fuel": "Дизель",
+        "engine": "2.4L",
+        "power": "150 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "fortuner2023gray",
+      "rating": 4.6,
+      "available": true,
+      "class_": "suv",
+      "updated_at": "2026-01-03T03:39:24.526317"
+    },
+    "toyota_corolla_2024_white": {
+      "id": "toyota_corolla_2024_white",
+      "name": "Toyota COROLLA Cross 2024 White",
+      "class": "suv",
+      "supplier": "ar",
+      "brand": "Toyota",
+      "model": "COROLLA",
+      "color": "White",
+      "year": "2024",
+      "photos": {
+        "main": "suv/ar_corolla_cross_white_2024/1.jpg",
+        "gallery": [
+          "suv/ar_corolla_cross_white_2024/1.jpg",
+          "suv/ar_corolla_cross_white_2024/17.jpg",
+          "suv/ar_corolla_cross_white_2024/18.jpg",
+          "suv/ar_corolla_cross_white_2024/19.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1290,
+          "price_7_14": 1107,
+          "price_15_29": 1059,
+          "price_30": 781
+        },
+        "high_season": {
+          "price_1_6": 1508,
+          "price_7_14": 1402,
+          "price_15_29": 1247,
+          "price_30": 1134
+        },
+        "deposit": 8000
+      },
+      "specs": {
+        "fuel": "Бензин/Гибрид",
+        "engine": "1.8L",
+        "power": "140 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "corolla2024white",
+      "rating": 4.6,
+      "available": true,
+      "class_": "suv",
+      "updated_at": "2026-01-03T03:39:24.526326"
+    },
+    "mitsubishi_xforce_2025_white": {
+      "id": "mitsubishi_xforce_2025_white",
+      "name": "Mitsubishi XFORCE 2025 White",
+      "class": "suv",
+      "supplier": "namo",
+      "brand": "Mitsubishi",
+      "model": "XFORCE",
+      "color": "White",
+      "year": "2025",
+      "photos": {
+        "main": "suv/mitsubishi_xforce_2025_white/2.jpg",
+        "gallery": [
+          "suv/mitsubishi_xforce_2025_white/2.jpg",
+          "suv/mitsubishi_xforce_2025_white/3.jpg",
+          "suv/mitsubishi_xforce_2025_white/4.jpg",
+          "suv/mitsubishi_xforce_2025_white/5.jpg",
+          "suv/mitsubishi_xforce_2025_white/6.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1309,
+          "price_7_14": 1277,
+          "price_15_29": 1014,
+          "price_30": 829
+        },
+        "high_season": {
+          "price_1_6": 1500,
+          "price_7_14": 1501,
+          "price_15_29": 1203,
+          "price_30": 1141
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L Turbo",
+        "power": "145 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "xforce2025white",
+      "rating": 4.8,
+      "available": true,
+      "updated_at": "2026-01-03T03:39:24.526335"
+    },
+    "volvo_v60_2020_white": {
+      "id": "volvo_v60_2020_white",
+      "name": "Volvo V60 2020 White",
+      "class": "suv",
+      "supplier": "ar",
+      "brand": "Volvo",
+      "model": "V60",
+      "color": "White",
+      "year": "2020",
+      "photos": {
+        "main": "suv/ar_v60_white_2020/1.jpg",
+        "gallery": [
+          "suv/ar_v60_white_2020/1.jpg",
+          "suv/ar_v60_white_2020/2.jpg",
+          "suv/ar_v60_white_2020/3.jpg",
+          "suv/ar_v60_white_2020/4.jpg",
+          "suv/ar_v60_white_2020/5.jpg",
+          "suv/ar_v60_white_2020/6.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1918,
+          "price_7_14": 1758,
+          "price_15_29": 1758,
+          "price_30": 1598
+        },
+        "high_season": {
+          "price_1_6": 2128,
+          "price_7_14": 2003,
+          "price_15_29": 2003,
+          "price_30": 1879
+        },
+        "deposit": 8000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "2.0L Turbo",
+        "power": "250 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "v602020white",
+      "rating": 4.6,
+      "available": false,
+      "class_": "suv",
+      "updated_at": "2026-01-03T03:39:24.526344"
+    },
+    "isuzu_mux_2020_gray": {
+      "id": "isuzu_mux_2020_gray",
+      "name": "Isuzu MUX 2020 Gray",
+      "class": "suv",
+      "supplier": "namo",
+      "brand": "Isuzu",
+      "model": "MUX",
+      "color": "Gray",
+      "year": "2020",
+      "photos": {
+        "main": "suv/namo_mux_gray_2020/1.jpg",
+        "gallery": [
+          "suv/namo_mux_gray_2020/1.jpg",
+          "suv/namo_mux_gray_2020/IMG-20240925-WA0105.jpg",
+          "suv/namo_mux_gray_2020/IMG-20240925-WA0107.jpg",
+          "suv/namo_mux_gray_2020/IMG-20240925-WA0108.jpg",
+          "suv/namo_mux_gray_2020/IMG-20240925-WA0112.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1382,
+          "price_7_14": 1228,
+          "price_15_29": 1228,
+          "price_30": 1074
+        },
+        "high_season": {
+          "price_1_6": 1636,
+          "price_7_14": 1476,
+          "price_15_29": 1476,
+          "price_30": 1283
+        },
+        "deposit": 8000
+      },
+      "specs": {
+        "fuel": "Дизель",
+        "engine": "3.0L",
+        "power": "177 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "mux2020gray",
+      "rating": 4.9,
+      "available": true,
+      "updated_at": "2026-01-03T03:39:24.526353"
+    },
+    "mitsubishi_xpander_2023_white": {
+      "id": "mitsubishi_xpander_2023_white",
+      "name": "Mitsubishi XPANDER 2023 White",
+      "class": "7s",
+      "supplier": "namo",
+      "brand": "Mitsubishi",
+      "model": "XPANDER",
+      "color": "White",
+      "year": "2023",
+      "photos": {
+        "main": "7s/namo_xpander_white_2023/1.jpg",
+        "gallery": [
+          "7s/namo_xpander_white_2023/1.jpg",
+          "7s/namo_xpander_white_2023/2.jpg",
+          "7s/namo_xpander_white_2023/3.jpg",
+          "7s/namo_xpander_white_2023/4.jpg",
+          "7s/namo_xpander_white_2023/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1198,
+          "price_7_14": 1107,
+          "price_15_29": 1014,
+          "price_30": 781
+        },
+        "high_season": {
+          "price_1_6": 1431,
+          "price_7_14": 1334,
+          "price_15_29": 1248,
+          "price_30": 1058
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L",
+        "power": "105 л.с.",
+        "transmission": "Автомат"
+      },
+      "quick_id": "xpander2023white",
+      "rating": 4.6,
+      "available": true,
+      "class_": "7s",
+      "updated_at": "2026-01-03T03:39:24.526381"
+    },
+    "toyota_veloz_2024_gray": {
+      "id": "toyota_veloz_2024_gray",
+      "name": "Toyota VELOZ 2024 Gray",
+      "class": "7s",
+      "supplier": "namo",
+      "brand": "Toyota",
+      "model": "VELOZ",
+      "color": "Gray",
+      "year": "2024",
+      "photos": {
+        "main": "7s/namo_veloz_gray_2024/1.jpg",
+        "gallery": [
+          "7s/namo_veloz_gray_2024/1.jpg",
+          "7s/namo_veloz_gray_2024/2.jpg",
+          "7s/namo_veloz_gray_2024/3.jpg",
+          "7s/namo_veloz_gray_2024/4.jpg",
+          "7s/namo_veloz_gray_2024/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1317,
+          "price_7_14": 1158,
+          "price_15_29": 1158,
+          "price_30": 997
+        },
+        "high_season": {
+          "price_1_6": 1334,
+          "price_7_14": 1325,
+          "price_15_29": 1249,
+          "price_30": 1058
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L",
+        "power": "105 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "veloz2024gray",
+      "rating": 4.7,
+      "available": true,
+      "class_": "7s",
+      "updated_at": "2026-01-03T03:39:24.526392"
+    },
+    "toyota_veloz_2024_white": {
+      "id": "toyota_veloz_2024_white",
+      "name": "Toyota VELOZ 2024 White",
+      "class": "7s",
+      "supplier": "namo",
+      "brand": "Toyota",
+      "model": "VELOZ",
+      "color": "White",
+      "year": "2024",
+      "photos": {
+        "main": "7s/namo_veloz_white_2024/1.jpg",
+        "gallery": [
+          "7s/namo_veloz_white_2024/1.jpg",
+          "7s/namo_veloz_white_2024/2.jpg",
+          "7s/namo_veloz_white_2024/3.jpg",
+          "7s/namo_veloz_white_2024/4.jpg",
+          "7s/namo_veloz_white_2024/5.jpg",
+          "7s/namo_veloz_white_2024/6.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1317,
+          "price_7_14": 1158,
+          "price_15_29": 1014,
+          "price_30": 829
+        },
+        "high_season": {
+          "price_1_6": 1387,
+          "price_7_14": 1329,
+          "price_15_29": 1249,
+          "price_30": 1146
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L",
+        "power": "105 л.с.",
+        "transmission": "CVT"
+      },
+      "quick_id": "veloz2024white",
+      "rating": 4.7,
+      "available": true,
+      "class_": "7s",
+      "updated_at": "2026-01-03T03:39:24.526402"
+    },
+    "namo_vios_white_2022": {
+      "id": "namo_vios_white_2022",
+      "name": "Toyota Vios 2022 Белый",
+      "class": "compact",
+      "brand": "Toyota",
+      "model": "Vios",
+      "year": "2022",
+      "color": "Белый",
+      "available": true,
+      "photos": {
+        "main": "compact/namo_vios_white_2022/1.jpg",
+        "gallery": [
+          "compact/namo_vios_white_2022/1.jpg",
+          "compact/namo_vios_white_2022/2.jpg",
+          "compact/namo_vios_white_2022/3.jpg",
+          "compact/namo_vios_white_2022/4.jpg",
+          "compact/namo_vios_white_2022/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 912,
+          "price_7_14": 820,
+          "price_15_29": 729,
+          "price_30": 671
+        },
+        "high_season": {
+          "price_1_6": 904,
+          "price_7_14": 812,
+          "price_15_29": 813,
+          "price_30": 754
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L",
+        "power": "112 л.с.",
+        "transmission": "Автомат"
+      },
+      "supplier": "namo",
+      "quick_id": "namo_vios_white_2022",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526411"
+    },
+    "ar_hrvrs_black_2024": {
+      "id": "ar_hrvrs_black_2024",
+      "name": "Honda HRV RS 2024 black",
+      "class": "suv",
+      "brand": "Honda",
+      "model": "HRV RS",
+      "year": "2024",
+      "color": "black",
+      "available": true,
+      "photos": {
+        "main": "suv/ar_hrvrs_black_2024/1.jpg",
+        "gallery": [
+          "suv/ar_hrvrs_black_2024/1.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1659,
+          "price_7_14": 1659,
+          "price_15_29": 1382,
+          "price_30": 1107
+        },
+        "high_season": {
+          "price_1_6": 1541,
+          "price_7_14": 1445,
+          "price_15_29": 1445,
+          "price_30": 1278
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Гибрид",
+        "transmission": "CVT",
+        "power": "121 л.с.",
+        "engine": "1.5L"
+      },
+      "supplier": "namo",
+      "quick_id": "ar_hrvrs_black_2024",
+      "rating": 4.5,
+      "class_": "suv",
+      "updated_at": "2026-01-03T03:39:24.526421"
+    },
+    "fern_ativ_gray_lt_2023": {
+      "id": "fern_ativ_gray_lt_2023",
+      "name": "Toyota Ativ 2023 Dark Gray",
+      "class": "sedan",
+      "brand": "Toyota",
+      "model": "Ativ",
+      "year": "2023",
+      "color": "Dark Gray",
+      "available": true,
+      "photos": {
+        "main": "sedan/fern_ativ_gray_lt_2023/3.jpg",
+        "gallery": [
+          "sedan/fern_ativ_gray_lt_2023/3.jpg",
+          "sedan/fern_ativ_gray_lt_2023/4.jpg",
+          "sedan/fern_ativ_gray_lt_2023/5.jpg",
+          "sedan/fern_ativ_gray_lt_2023/6.jpg",
+          "sedan/fern_ativ_gray_lt_2023/7.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 737,
+          "price_7_14": 737,
+          "price_15_29": 644,
+          "price_30": 460
+        },
+        "high_season": {
+          "price_1_6": 1063,
+          "price_7_14": 1063,
+          "price_15_29": 1017,
+          "price_30": 931
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.2L",
+        "power": "86 л.с.",
+        "transmission": "Автомат"
+      },
+      "supplier": "namo",
+      "quick_id": "fern_ativ_gray_lt_2023",
+      "rating": 4.5,
+      "class_": "sedan",
+      "updated_at": "2026-01-03T03:39:24.526430"
+    },
+    "namo_veloz_white_2024": {
+      "id": "namo_veloz_white_2024",
+      "name": "Toyota Veloz 2024 white",
+      "class": "7s",
+      "brand": "Toyota",
+      "model": "Veloz",
+      "year": "2024",
+      "color": "white",
+      "available": true,
+      "photos": {
+        "main": "7s/namo_veloz_white_2024/8.jpg",
+        "gallery": [
+          "7s/namo_veloz_white_2024/8.jpg",
+          "7s/namo_veloz_white_2024/9.jpg",
+          "7s/namo_veloz_white_2024/10.jpg",
+          "7s/namo_veloz_white_2024/11.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 737,
+          "price_7_14": 737,
+          "price_15_29": 644,
+          "price_30": 460
+        },
+        "high_season": {
+          "price_1_6": 1431,
+          "price_7_14": 1345,
+          "price_15_29": 1240,
+          "price_30": 1058
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L",
+        "power": "105 л.с.",
+        "transmission": "CVT"
+      },
+      "supplier": "namo",
+      "quick_id": "namo_veloz_white_2024",
+      "rating": 4.5,
+      "class_": "7s",
+      "updated_at": "2026-01-03T03:39:24.526440"
+    },
+    "ar_corolla_cross_blue_2024": {
+      "id": "ar_corolla_cross_blue_2024",
+      "name": "Toyota Corolla Cross 2024 Blue",
+      "class": "suv",
+      "brand": "Toyota",
+      "model": "Corolla Cross",
+      "year": "2024",
+      "color": "Blue",
+      "available": true,
+      "photos": {
+        "main": "suv/ar_corolla_cross_blue_2024/1.jpg",
+        "gallery": [
+          "suv/ar_corolla_cross_blue_2024/1.jpg",
+          "suv/ar_corolla_cross_blue_2024/2.jpg",
+          "suv/ar_corolla_cross_blue_2024/7.jpg",
+          "suv/ar_corolla_cross_blue_2024/8.jpg",
+          "suv/ar_corolla_cross_blue_2024/9.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1244,
+          "price_7_14": 1059,
+          "price_15_29": 967,
+          "price_30": 1014
+        },
+        "high_season": {
+          "price_1_6": 1494,
+          "price_7_14": 1349,
+          "price_15_29": 1345,
+          "price_30": 1170
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Гибрид",
+        "transmission": "Вариатор",
+        "power": "140 лс",
+        "engine": "1.8 L"
+      },
+      "supplier": "namo",
+      "quick_id": "ar_corolla_cross_blue_2024",
+      "rating": 4.5,
+      "class_": "suv",
+      "updated_at": "2026-01-03T03:39:24.526450"
+    },
+    "namo_suzuki_swift_2020": {
+      "id": "namo_suzuki_swift_2020",
+      "name": "Suzuki Swift 2020 White",
+      "class": "compact",
+      "brand": "Suzuki",
+      "model": "Swift",
+      "year": "2020",
+      "color": "White",
+      "available": false,
+      "photos": {
+        "main": "compact/namo_suzuki_swift_2020/1.jpg",
+        "gallery": [
+          "compact/namo_suzuki_swift_2020/1.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 861,
+          "price_7_14": 790,
+          "price_15_29": 722,
+          "price_30": 620
+        },
+        "high_season": {
+          "price_1_6": 853,
+          "price_7_14": 784,
+          "price_15_29": 758,
+          "price_30": 704
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "Автомат",
+        "power": "90 лс",
+        "engine": "1.3L"
+      },
+      "supplier": "namo",
+      "quick_id": "Namoswift2020",
+      "rating": 4.5,
+      "class_": "compact",
+      "updated_at": "2026-01-03T03:39:24.526459"
+    },
+    "namo_city_sedan_white_2018": {
+      "id": "namo_city_sedan_white_2018",
+      "name": "Honda City 2018 white",
+      "class": "compact",
+      "brand": "Honda",
+      "model": "City",
+      "year": "2018",
+      "color": "white",
+      "available": true,
+      "photos": {
+        "main": "compact/namo_city_sedan_white_2018/1.jpg",
+        "gallery": [
+          "compact/namo_city_sedan_white_2018/1.jpg",
+          "compact/namo_city_sedan_white_2018/2.jpg",
+          "compact/namo_city_sedan_white_2018/3.jpg",
+          "compact/namo_city_sedan_white_2018/4.jpg",
+          "compact/namo_city_sedan_white_2018/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 905,
+          "price_7_14": 822,
+          "price_15_29": 731,
+          "price_30": 639
+        },
+        "high_season": {
+          "price_1_6": 898,
+          "price_7_14": 817,
+          "price_15_29": 791,
+          "price_30": 723
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.0L Turbo",
+        "power": "122 л.с.",
+        "transmission": "CVT"
+      },
+      "supplier": "namo",
+      "quick_id": "city_sedan_white_2018",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526469"
+    },
+    "namo_alphard_white_2024": {
+      "id": "namo_alphard_white_2024",
+      "name": "Toyota Alphard 12 Seats 2024 white",
+      "class": "7s",
+      "brand": "Toyota",
+      "model": "Alphard 12 Seats",
+      "year": "2024",
+      "color": "white",
+      "available": true,
+      "photos": {
+        "main": "7s/namo_alphard_white_2024/1.jpg",
+        "gallery": [
+          "7s/namo_alphard_white_2024/1.jpg",
+          "7s/namo_alphard_white_2024/2.jpg",
+          "7s/namo_alphard_white_2024/3.jpg",
+          "7s/namo_alphard_white_2024/4.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 737,
+          "price_7_14": 737,
+          "price_15_29": 644,
+          "price_30": 460
+        },
+        "high_season": {
+          "price_1_6": 9164,
+          "price_7_14": 8535,
+          "price_15_29": 7697,
+          "price_30": 6124
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Гибрид",
+        "transmission": "Автомат",
+        "power": "190 лс",
+        "engine": "2.5L"
+      },
+      "supplier": "namo",
+      "quick_id": "namoalphardwhite2024",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526478"
+    },
+    "namo_bmw220_white_2024": {
+      "id": "namo_bmw220_white_2024",
+      "name": "BMW 220i 2024 white",
+      "class": "sedan",
+      "brand": "BMW",
+      "model": "220i",
+      "year": "2024",
+      "color": "white",
+      "available": true,
+      "photos": {
+        "main": "sedan/namo_bmw220_white_2024/1.jpg",
+        "gallery": [
+          "sedan/namo_bmw220_white_2024/1.jpg",
+          "sedan/namo_bmw220_white_2024/2.jpg",
+          "sedan/namo_bmw220_white_2024/3.jpg",
+          "sedan/namo_bmw220_white_2024/4.jpg",
+          "sedan/namo_bmw220_white_2024/5.jpg",
+          "sedan/namo_bmw220_white_2024/6.jpg",
+          "sedan/namo_bmw220_white_2024/7.jpg",
+          "sedan/namo_bmw220_white_2024/8.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 737,
+          "price_7_14": 737,
+          "price_15_29": 644,
+          "price_30": 460
+        },
+        "high_season": {
+          "price_1_6": 6752,
+          "price_7_14": 5787,
+          "price_15_29": 5787,
+          "price_30": 3422
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "Автомат",
+        "power": "184 лс",
+        "engine": "2.0L turbo"
+      },
+      "supplier": "namo",
+      "quick_id": "namobmw220white2024",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526487"
+    },
+    "jazz_namo_2018": {
+      "id": "jazz_namo_2018",
+      "name": "Honda jazz 2018 Белый",
+      "class": "compact",
+      "brand": "Honda",
+      "model": "jazz",
+      "year": "2018",
+      "color": "Белый",
+      "available": true,
+      "photos": {
+        "main": "compact/jazz_namo_2018/1.jpg",
+        "gallery": [
+          "compact/jazz_namo_2018/1.jpg",
+          "compact/jazz_namo_2018/2.jpg",
+          "compact/jazz_namo_2018/3.jpg",
+          "compact/jazz_namo_2018/4.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 905,
+          "price_7_14": 805,
+          "price_15_29": 703,
+          "price_30": 600
+        },
+        "high_season": {
+          "price_1_6": 898,
+          "price_7_14": 798,
+          "price_15_29": 786,
+          "price_30": 775
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "CVT",
+        "power": "120",
+        "engine": "1.5L"
+      },
+      "supplier": "namo",
+      "quick_id": "jazznamo2018",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526497"
+    },
+    "namo_legender_2024": {
+      "id": "namo_legender_2024",
+      "name": "Toyota Legender 2024 white",
+      "class": "suv",
+      "brand": "Toyota",
+      "model": "Legender",
+      "year": "2024",
+      "color": "white",
+      "available": true,
+      "photos": {
+        "main": "compact/namo_legender_2024/1.jpg",
+        "gallery": [
+          "compact/namo_legender_2024/1.jpg",
+          "compact/namo_legender_2024/2.jpg",
+          "compact/namo_legender_2024/3.jpg",
+          "compact/namo_legender_2024/4.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 2265,
+          "price_7_14": 2133,
+          "price_15_29": 1868,
+          "price_30": 1867
+        },
+        "high_season": {
+          "price_1_6": 2409,
+          "price_7_14": 2216,
+          "price_15_29": 2119,
+          "price_30": 1927
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "Автомат",
+        "power": "250",
+        "engine": "2.4L"
+      },
+      "supplier": "namo",
+      "quick_id": "nmlegender2024",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526506"
+    },
+    "namo_yaris_cross_2025": {
+      "id": "namo_yaris_cross_2025",
+      "name": "Toyota Yaris Cross 2025 Gray",
+      "class": "suv",
+      "brand": "Toyota",
+      "model": "Yaris Cross",
+      "year": "2025",
+      "color": "Gray",
+      "available": true,
+      "photos": {
+        "main": "suv/namo_yaris_cross_2025/2.jpg",
+        "gallery": [
+          "suv/namo_yaris_cross_2025/2.jpg",
+          "suv/namo_yaris_cross_2025/3.jpg",
+          "suv/namo_yaris_cross_2025/4.jpg",
+          "suv/namo_yaris_cross_2025/5.jpg",
+          "suv/namo_yaris_cross_2025/6.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1381,
+          "price_7_14": 1370,
+          "price_15_29": 1277,
+          "price_30": 1014
+        },
+        "high_season": {
+          "price_1_6": 1440,
+          "price_7_14": 1332,
+          "price_15_29": 1334,
+          "price_30": 1146
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "Автомат",
+        "power": "125 hp",
+        "engine": "1.5L"
+      },
+      "supplier": "namo",
+      "quick_id": "nmcross2025",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526516"
+    },
+    "Namo_h1_blackvagon_2023": {
+      "id": "Namo_h1_blackvagon_2023",
+      "name": "Ford H1 12seats 2023 Black",
+      "class": "7s",
+      "brand": "Ford",
+      "model": "H1 12seats",
+      "year": "2023",
+      "color": "Black",
+      "available": true,
+      "photos": {
+        "main": "7s/Namo_h1_blackvagon_2023/1.jpg",
+        "gallery": [
+          "7s/Namo_h1_blackvagon_2023/1.jpg",
+          "7s/Namo_h1_blackvagon_2023/2.jpg",
+          "7s/Namo_h1_blackvagon_2023/3.jpg",
+          "7s/Namo_h1_blackvagon_2023/4.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 737,
+          "price_7_14": 737,
+          "price_15_29": 644,
+          "price_30": 460
+        },
+        "high_season": {
+          "price_1_6": 2890,
+          "price_7_14": 2698,
+          "price_15_29": 2409,
+          "price_30": 1879
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Дизель",
+        "transmission": "Автомат",
+        "power": "175 лс",
+        "engine": "2.5 L"
+      },
+      "supplier": "namo",
+      "quick_id": "Blackvagon2023",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526525"
+    },
+    "nm_toyota_ativ_gray_2024": {
+      "id": "nm_toyota_ativ_gray_2024",
+      "name": "Toyota Ativ 2024 Gray",
+      "class": "sedan",
+      "brand": "Toyota",
+      "model": "Ativ",
+      "year": "2024",
+      "color": "Gray",
+      "available": true,
+      "photos": {
+        "main": "sedan/nm_toyota_ativ_gray_2024/1.jpg",
+        "gallery": [
+          "sedan/nm_toyota_ativ_gray_2024/1.jpg",
+          "sedan/nm_toyota_ativ_gray_2024/2.jpg",
+          "sedan/nm_toyota_ativ_gray_2024/3.jpg",
+          "sedan/nm_toyota_ativ_gray_2024/4.jpg",
+          "sedan/nm_toyota_ativ_gray_2024/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 737,
+          "price_7_14": 737,
+          "price_15_29": 644,
+          "price_30": 460
+        },
+        "high_season": {
+          "price_1_6": 1038,
+          "price_7_14": 1032,
+          "price_15_29": 1025,
+          "price_30": 844
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.2L",
+        "power": "86 л.с.",
+        "transmission": "Автомат"
+      },
+      "supplier": "namo",
+      "quick_id": "nmtoyotaativgray2024",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526534"
+    },
+    "nmax155_2019_black": {
+      "id": "nmax155_2019_black",
+      "name": "Nmax155 2019 black",
+      "class": "bikes",
+      "brand": "Nmax155",
+      "model": "2019",
+      "year": "black",
+      "color": "",
+      "available": true,
+      "photos": {
+        "main": "bikes/nmax155_2019_black/1.jpg",
+        "gallery": [
+          "bikes/nmax155_2019_black/1.jpg",
+          "bikes/nmax155_2019_black/12.jpg",
+          "bikes/nmax155_2019_black/photo_1_2025-11-26_01-29-34.jpg",
+          "bikes/nmax155_2019_black/photo_2_2025-11-26_01-29-34.jpg",
+          "bikes/nmax155_2019_black/photo_4_2025-11-26_01-29-34.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 455,
+          "price_7_14": 409,
+          "price_15_29": 362,
+          "price_30": 302
+        },
+        "high_season": {
+          "price_1_6": 331,
+          "price_7_14": 331,
+          "price_15_29": 264,
+          "price_30": 207
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "CVT",
+        "power": "15 л.с.",
+        "engine": "155cc"
+      },
+      "supplier": "namo",
+      "quick_id": "2019black",
+      "rating": 4.6,
+      "class_": "bikes",
+      "updated_at": "2026-01-03T03:39:24.526544"
+    },
+    "pcx160_2023_keyless": {
+      "id": "pcx160_2023_keyless",
+      "name": "Pcx160 2023 keyless",
+      "class": "bikes",
+      "brand": "Pcx160",
+      "model": "2023",
+      "year": "keyless",
+      "color": "",
+      "available": true,
+      "photos": {
+        "main": "bikes/pcx160_2023_keyless/1.jpg",
+        "gallery": [
+          "bikes/pcx160_2023_keyless/1.jpg",
+          "bikes/pcx160_2023_keyless/photo_1_2025-11-26_01-35-55.jpg",
+          "bikes/pcx160_2023_keyless/photo_2_2025-11-26_01-35-55.jpg",
+          "bikes/pcx160_2023_keyless/photo_4_2025-11-26_01-35-55.jpg",
+          "bikes/pcx160_2023_keyless/photo_5_2025-11-26_01-35-55.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 455,
+          "price_7_14": 409,
+          "price_15_29": 362,
+          "price_30": 302
+        },
+        "high_season": {
+          "price_1_6": 408,
+          "price_7_14": 408,
+          "price_15_29": 350,
+          "price_30": 250
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "CVT",
+        "power": "15,6 л.с.",
+        "engine": "160cc"
+      },
+      "supplier": "bike_partner",
+      "quick_id": "2023keyless",
+      "rating": 4.8,
+      "class_": "bikes",
+      "updated_at": "2026-01-03T03:39:24.526554"
+    },
+    "nmax155_2024_keyless_topbox": {
+      "id": "nmax155_2024_keyless_topbox",
+      "name": "Nmax155 2024 keyless with Top Box",
+      "class": "bikes",
+      "brand": "Nmax155",
+      "model": "2024",
+      "year": "keyless",
+      "color": "",
+      "available": true,
+      "photos": {
+        "main": "bikes/nmax155_2024_keyless_topbox/1.jpg",
+        "gallery": [
+          "bikes/nmax155_2024_keyless_topbox/1.jpg",
+          "bikes/nmax155_2024_keyless_topbox/photo_2_2025-11-26_01-34-24.jpg",
+          "bikes/nmax155_2024_keyless_topbox/photo_3_2025-11-26_01-34-24.jpg",
+          "bikes/nmax155_2024_keyless_topbox/photo_4_2025-11-26_01-34-24.jpg",
+          "bikes/nmax155_2024_keyless_topbox/photo_5_2025-11-26_01-34-24.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 455,
+          "price_7_14": 409,
+          "price_15_29": 362,
+          "price_30": 302
+        },
+        "high_season": {
+          "price_1_6": 408,
+          "price_7_14": 379,
+          "price_15_29": 321,
+          "price_30": 250
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "CVT",
+        "power": "15,1 л.с.",
+        "engine": "155cc"
+      },
+      "supplier": "bike_partner",
+      "quick_id": "2024keyless",
+      "rating": 4.7,
+      "class_": "bikes",
+      "updated_at": "2026-01-03T03:39:24.526564"
+    },
+    "adv350_2025_new": {
+      "id": "adv350_2025_new",
+      "name": "Adv350 2025 new",
+      "class": "bikes",
+      "brand": "Adv350",
+      "model": "2025",
+      "year": "new",
+      "color": "",
+      "available": true,
+      "photos": {
+        "main": "bikes/adv350_2025_new/1.jpg",
+        "gallery": [
+          "bikes/adv350_2025_new/1.jpg",
+          "bikes/adv350_2025_new/photo_2_2025-11-25_17-39-34.jpg",
+          "bikes/adv350_2025_new/photo_3_2025-11-25_17-39-34.jpg",
+          "bikes/adv350_2025_new/photo_4_2025-11-25_17-39-34.jpg",
+          "bikes/adv350_2025_new/photo_5_2025-11-25_17-39-34.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 455,
+          "price_7_14": 409,
+          "price_15_29": 362,
+          "price_30": 302
+        },
+        "high_season": {
+          "price_1_6": 778,
+          "price_7_14": 684,
+          "price_15_29": 607,
+          "price_30": 552
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "CVT",
+        "power": "Adventure (29 hp)",
+        "engine": "350cc"
+      },
+      "supplier": "bike_partner",
+      "quick_id": "2025new",
+      "rating": 4.7,
+      "class_": "bikes",
+      "updated_at": "2026-01-03T03:39:24.526573"
+    },
+    "nmax155_2019_white": {
+      "id": "nmax155_2019_white",
+      "name": "Nmax155 2019 white",
+      "class": "bikes",
+      "brand": "Nmax155",
+      "model": "2019",
+      "year": "white",
+      "color": "",
+      "available": true,
+      "photos": {
+        "main": "bikes/nmax155_2019_white/1.jpg",
+        "gallery": [
+          "bikes/nmax155_2019_white/1.jpg",
+          "bikes/nmax155_2019_white/photo_2_2025-11-26_01-31-31.jpg",
+          "bikes/nmax155_2019_white/photo_3_2025-11-26_01-31-31.jpg",
+          "bikes/nmax155_2019_white/photo_4_2025-11-26_01-31-31.jpg",
+          "bikes/nmax155_2019_white/photo_5_2025-11-26_01-31-31.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 455,
+          "price_7_14": 409,
+          "price_15_29": 362,
+          "price_30": 302
+        },
+        "high_season": {
+          "price_1_6": 331,
+          "price_7_14": 302,
+          "price_15_29": 264,
+          "price_30": 207
+        },
+        "deposit": 3500
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "CVT",
+        "power": "14,9 л.с.",
+        "engine": "155cc"
+      },
+      "supplier": "bike_partner",
+      "quick_id": "2019white",
+      "rating": 4.7,
+      "class_": "bikes",
+      "updated_at": "2026-01-03T03:39:24.526583"
+    },
+    "nm_byd_seal_2024": {
+      "id": "nm_byd_seal_2024",
+      "name": "BYD Seal 2024 Black",
+      "class": "sedan",
+      "brand": "BYD",
+      "model": "Seal",
+      "year": "2024",
+      "color": "Black",
+      "available": true,
+      "photos": {
+        "main": "sedan/nm_byd_seal_2024/1.jpg",
+        "gallery": [
+          "sedan/nm_byd_seal_2024/1.jpg",
+          "sedan/nm_byd_seal_2024/2.jpg",
+          "sedan/nm_byd_seal_2024/3.jpg",
+          "sedan/nm_byd_seal_2024/4.jpg",
+          "sedan/nm_byd_seal_2024/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 3414,
+          "price_7_14": 3414,
+          "price_15_29": 3230,
+          "price_30": 2490
+        },
+        "high_season": {
+          "price_1_6": 3567,
+          "price_7_14": 3567,
+          "price_15_29": 3375,
+          "price_30": 2603
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Электро",
+        "transmission": "Автомат",
+        "power": "530 лс",
+        "engine": "3L "
+      },
+      "supplier": "namo",
+      "quick_id": "Bydseal2024",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526592"
+    },
+    "Forza_350_2024_topbox": {
+      "id": "Forza_350_2024_topbox",
+      "name": "Honda Forza 2024 Серый",
+      "class": "bikes",
+      "brand": "Honda",
+      "model": "Forza",
+      "year": "2024",
+      "color": "Серый",
+      "available": true,
+      "photos": {
+        "main": "bikes/Forza_350_2024_topbox/1.jpg",
+        "gallery": [
+          "bikes/Forza_350_2024_topbox/1.jpg",
+          "bikes/Forza_350_2024_topbox/2.jpg",
+          "bikes/Forza_350_2024_topbox/3.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 682,
+          "price_7_14": 589,
+          "price_15_29": 564,
+          "price_30": 484
+        },
+        "high_season": {
+          "price_1_6": 712,
+          "price_7_14": 616,
+          "price_15_29": 588,
+          "price_30": 502
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "Автомат",
+        "power": "33 лс",
+        "engine": "350cc"
+      },
+      "supplier": "namo",
+      "quick_id": "Denforza2024",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526602"
+    },
+    "Nmax_2024_blue_topbox": {
+      "id": "Nmax_2024_blue_topbox",
+      "name": "Yamaha Nmax 2024 Синий",
+      "class": "bikes",
+      "brand": "Yamaha",
+      "model": "Nmax",
+      "year": "2024",
+      "color": "Синий",
+      "available": false,
+      "photos": {
+        "main": "bikes/Nmax_2024_blue_topbox/1.jpg",
+        "gallery": [
+          "bikes/Nmax_2024_blue_topbox/1.jpg",
+          "bikes/Nmax_2024_blue_topbox/2.jpg",
+          "bikes/Nmax_2024_blue_topbox/3.jpg",
+          "bikes/Nmax_2024_blue_topbox/4.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 390,
+          "price_7_14": 362,
+          "price_15_29": 334,
+          "price_30": 240
+        },
+        "high_season": {
+          "price_1_6": 408,
+          "price_7_14": 379,
+          "price_15_29": 312,
+          "price_30": 250
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "CVT",
+        "power": "15лс",
+        "engine": "155сс"
+      },
+      "supplier": "namo",
+      "quick_id": "Nmax2024bltop",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526611"
+    },
+    "Bb_adv_2023": {
+      "id": "Bb_adv_2023",
+      "name": "Honda ADV 2023 Серый",
+      "class": "bikes",
+      "brand": "Honda",
+      "model": "ADV",
+      "year": "2023",
+      "color": "Серый",
+      "available": true,
+      "photos": {
+        "main": "bikes/Bb_adv_2023/1.jpg",
+        "gallery": [
+          "bikes/Bb_adv_2023/1.jpg",
+          "bikes/Bb_adv_2023/2.jpg",
+          "bikes/Bb_adv_2023/3.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 759,
+          "price_7_14": 667,
+          "price_15_29": 575,
+          "price_30": 484
+        },
+        "high_season": {
+          "price_1_6": 792,
+          "price_7_14": 697,
+          "price_15_29": 599,
+          "price_30": 505
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "Автомат",
+        "power": "40",
+        "engine": "350 cc"
+      },
+      "supplier": "namo",
+      "quick_id": "BumbleAdv2023",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526621"
+    },
+    "Bb_Cbr500r_2023": {
+      "id": "Bb_Cbr500r_2023",
+      "name": "Honda CBR500R 2023 Gray",
+      "class": "bikes",
+      "brand": "Honda",
+      "model": "CBR500R",
+      "year": "2023",
+      "color": "Gray",
+      "available": true,
+      "photos": {
+        "main": "compact/Bb_Cbr500r_2023/1.jpg",
+        "gallery": [
+          "compact/Bb_Cbr500r_2023/1.jpg",
+          "compact/Bb_Cbr500r_2023/2.jpg",
+          "compact/Bb_Cbr500r_2023/3.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1336,
+          "price_7_14": 1274,
+          "price_15_29": 865,
+          "price_30": 802
+        },
+        "high_season": {
+          "price_1_6": 1395,
+          "price_7_14": 1331,
+          "price_15_29": 898,
+          "price_30": 842
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "Механика",
+        "power": "50",
+        "engine": "650 cc "
+      },
+      "supplier": "namo",
+      "quick_id": "Cbrhonda500",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526630"
+    },
+    "Nm_city_white_2022": {
+      "id": "Nm_city_white_2022",
+      "name": "Honda City 2020 White",
+      "class": "compact",
+      "brand": "Honda",
+      "model": "City",
+      "year": "2020",
+      "color": "White",
+      "available": true,
+      "photos": {
+        "main": "compact/Nm_yaris_sedan_grey_2022/1.jpg",
+        "gallery": [
+          "compact/Nm_yaris_sedan_grey_2022/1.jpg",
+          "compact/Nm_yaris_sedan_grey_2022/2.jpg",
+          "compact/Nm_yaris_sedan_grey_2022/3.jpg",
+          "compact/Nm_yaris_sedan_grey_2022/5.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 822,
+          "price_7_14": 766,
+          "price_15_29": 684,
+          "price_30": 564
+        },
+        "high_season": {
+          "price_1_6": 860,
+          "price_7_14": 799,
+          "price_15_29": 796,
+          "price_30": 767
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.0L Turbo",
+        "power": "122 л.с.",
+        "transmission": "CVT"
+      },
+      "supplier": "namo",
+      "quick_id": "Nmyarissedangrey2024",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526640"
+    },
+    "PW_mazda_cx30_gray_2023": {
+      "id": "PW_mazda_cx30_gray_2023",
+      "name": "Mazda CX30 2023 Серый",
+      "class": "suv",
+      "brand": "Mazda",
+      "model": "CX30",
+      "year": "2023",
+      "color": "Серый",
+      "available": true,
+      "photos": {
+        "main": "suv/PW_mazda_cx30_gray_2023/4.jpg",
+        "gallery": [
+          "suv/PW_mazda_cx30_gray_2023/4.jpg",
+          "suv/PW_mazda_cx30_gray_2023/5.jpg",
+          "suv/PW_mazda_cx30_gray_2023/6.jpg",
+          "suv/PW_mazda_cx30_gray_2023/7.jpg",
+          "suv/PW_mazda_cx30_gray_2023/9.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1107,
+          "price_7_14": 1107,
+          "price_15_29": 1107,
+          "price_30": 1014
+        },
+        "high_season": {
+          "price_1_6": 1395,
+          "price_7_14": 1395,
+          "price_15_29": 1349,
+          "price_30": 1245
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "2.0L",
+        "power": "153 л.с.",
+        "transmission": "Автомат"
+      },
+      "supplier": "namo",
+      "quick_id": "Pwcx30",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526650"
+    },
+    "Ar_xpander_hev_white_2024": {
+      "id": "Ar_xpander_hev_white_2024",
+      "name": "Mitsubishi Xpander 2024 White",
+      "class": "7s",
+      "brand": "Mitsubishi",
+      "model": "Xpander",
+      "year": "2024",
+      "color": "White",
+      "available": true,
+      "photos": {
+        "main": "7s/Ar_xpander_hev_white_2024/1.jpg",
+        "gallery": [
+          "7s/Ar_xpander_hev_white_2024/1.jpg",
+          "7s/Ar_xpander_hev_white_2024/2.jpg",
+          "7s/Ar_xpander_hev_white_2024/3.jpg",
+          "7s/Ar_xpander_hev_white_2024/4.jpg",
+          "7s/Ar_xpander_hev_white_2024/5.jpg",
+          "7s/Ar_xpander_hev_white_2024/6.jpg",
+          "7s/Ar_xpander_hev_white_2024/7.jpg",
+          "7s/Ar_xpander_hev_white_2024/8.jpg",
+          "7s/Ar_xpander_hev_white_2024/9.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 1244,
+          "price_7_14": 1244,
+          "price_15_29": 1152,
+          "price_30": 1014
+        },
+        "high_season": {
+          "price_1_6": 1494,
+          "price_7_14": 1419,
+          "price_15_29": 1415,
+          "price_30": 1249
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L",
+        "power": "105 л.с.",
+        "transmission": "Автомат"
+      },
+      "supplier": "namo",
+      "quick_id": "Arxpander2024",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526659"
+    },
+    "Ar_veloz_gray_2024": {
+      "id": "Ar_veloz_gray_2024",
+      "name": "Toyota Veloz 2024 Gray",
+      "class": "7s",
+      "brand": "Toyota",
+      "model": "Veloz",
+      "year": "2024",
+      "color": "Gray",
+      "available": true,
+      "photos": {
+        "main": "7s/Ar_veloz_gray_2024/1.jpg",
+        "gallery": [
+          "7s/Ar_veloz_gray_2024/1.jpg",
+          "7s/Ar_veloz_gray_2024/2.jpg",
+          "7s/Ar_veloz_gray_2024/3.jpg",
+          "7s/Ar_veloz_gray_2024/4.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 737,
+          "price_7_14": 737,
+          "price_15_29": 644,
+          "price_30": 460
+        },
+        "high_season": {
+          "price_1_6": 1445,
+          "price_7_14": 1395,
+          "price_15_29": 1395,
+          "price_30": 1250
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "engine": "1.5L",
+        "power": "105 л.с.",
+        "transmission": "CVT"
+      },
+      "supplier": "namo",
+      "quick_id": "Arceliz2024",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526669"
+    },
+    "Ar_yaris_cross_white_2024": {
+      "id": "Ar_yaris_cross_white_2024",
+      "name": "Toyota Yaris Cross 2024 White",
+      "class": "suv",
+      "brand": "Toyota",
+      "model": "Yaris Cross",
+      "year": "2024",
+      "color": "White",
+      "available": true,
+      "photos": {
+        "main": "suv/Ar_yaris_cross_white_2024/2.jpg",
+        "gallery": [
+          "suv/Ar_yaris_cross_white_2024/2.jpg",
+          "suv/Ar_yaris_cross_white_2024/3.jpg",
+          "suv/Ar_yaris_cross_white_2024/4.jpg",
+          "suv/Ar_yaris_cross_white_2024/5.jpg",
+          "suv/Ar_yaris_cross_white_2024/6.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 737,
+          "price_7_14": 737,
+          "price_15_29": 644,
+          "price_30": 460
+        },
+        "high_season": {
+          "price_1_6": 1435,
+          "price_7_14": 1435,
+          "price_15_29": 1249,
+          "price_30": 1161
+        },
+        "deposit": 10000
+      },
+      "specs": {
+        "fuel": "Гибрид",
+        "transmission": "CVT",
+        "power": "122",
+        "engine": "1,5 L"
+      },
+      "supplier": "namo",
+      "quick_id": "Aryariscrosswhite24",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526678"
+    },
+    "Ar_city_rs_black_2025": {
+      "id": "Ar_city_rs_black_2025",
+      "name": "Honda City RS 2025 Black",
+      "class": "sedan",
+      "brand": "Honda",
+      "model": "City RS",
+      "year": "2025",
+      "color": "Black",
+      "available": true,
+      "photos": {
+        "main": "sedan/Ar_city_rs_black_2025/2.jpg",
+        "gallery": [
+          "sedan/Ar_city_rs_black_2025/2.jpg",
+          "sedan/Ar_city_rs_black_2025/3.jpg",
+          "sedan/Ar_city_rs_black_2025/4.jpg",
+          "sedan/Ar_city_rs_black_2025/5.jpg",
+          "sedan/Ar_city_rs_black_2025/6.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 737,
+          "price_7_14": 737,
+          "price_15_29": 644,
+          "price_30": 460
+        },
+        "high_season": {
+          "price_1_6": 1006,
+          "price_7_14": 997,
+          "price_15_29": 965,
+          "price_30": 726
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "Автомат",
+        "power": "159",
+        "engine": "1.6 L"
+      },
+      "supplier": "namo",
+      "quick_id": "ArCityblack2025",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526688"
+    },
+    "Fb_bike1_honda_adv350_black_2025": {
+      "id": "Fb_bike1_honda_adv350_black_2025",
+      "name": "Honda ADV 350 2025 Черный",
+      "class": "bikes",
+      "brand": "Honda",
+      "model": "ADV 350",
+      "year": "2025",
+      "color": "Черный",
+      "available": true,
+      "photos": {
+        "main": "bikes/Fb_bike1_honda_adv350_black_2025/1.jpg",
+        "gallery": [
+          "bikes/Fb_bike1_honda_adv350_black_2025/1.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 743,
+          "price_7_14": 743,
+          "price_15_29": 650,
+          "price_30": 464
+        },
+        "high_season": {
+          "price_1_6": 792,
+          "price_7_14": 704,
+          "price_15_29": 616,
+          "price_30": 528
+        },
+        "deposit": 7000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "Автомат",
+        "power": "40",
+        "engine": "350сс"
+      },
+      "supplier": "namo",
+      "quick_id": "Fbmpadv350black",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526697"
+    },
+    "Den_t-max2024": {
+      "id": "Den_t-max2024",
+      "name": "Yamaha T-max 2024 Black",
+      "class": "bikes",
+      "brand": "Yamaha",
+      "model": "T-max",
+      "year": "2024",
+      "color": "Black",
+      "available": true,
+      "photos": {
+        "main": "bikes/Den_t-max2024/1.jpg",
+        "gallery": [
+          "bikes/Den_t-max2024/1.jpg",
+          "bikes/Den_t-max2024/2.jpg",
+          "bikes/Den_t-max2024/3.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 743,
+          "price_7_14": 743,
+          "price_15_29": 650,
+          "price_30": 464
+        },
+        "high_season": {
+          "price_1_6": 1675,
+          "price_7_14": 1581,
+          "price_15_29": 1488,
+          "price_30": 1078
+        },
+        "deposit": 15000
+      },
+      "specs": {},
+      "supplier": "namo",
+      "quick_id": "Detmak2024",
+      "rating": 4.5,
+      "updated_at": "2026-01-03T03:39:24.526707"
+    },
+    "Mg 5": {
+      "id": "Mg 5",
+      "name": "MG5 Mg5  2023 Gray",
+      "class": "compact",
+      "brand": "MG5",
+      "model": "Mg5 ",
+      "year": "2023",
+      "color": "Gray",
+      "available": true,
+      "photos": {
+        "main": "compact/Mg 5/1.jpg",
+        "gallery": [
+          "compact/Mg 5/1.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 800,
+          "price_7_14": 800,
+          "price_15_29": 700,
+          "price_30": 500
+        },
+        "high_season": {
+          "price_1_6": 1100,
+          "price_7_14": 1100,
+          "price_15_29": 1000,
+          "price_30": 900
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "Автомат",
+        "power": "122",
+        "engine": "1.5l"
+      },
+      "supplier": "namo",
+      "quick_id": "Mg 5",
+      "rating": 4.5,
+      "updated_at": "2026-01-17T15:17:39.970712"
+    }
+  },
+  "categories": {
+    "compact": {
+      "id": "compact",
+      "name": "Compact",
+      "nameRu": "Компактные авто",
+      "description": "Лёгкие и экономичные для города и пляжей",
+      "icon": "🚗",
+      "gradient": "from-blue-400 to-blue-600",
+      "features": [
+        "Экономичный",
+        "Легкая парковка",
+        "Идеален для города"
+      ],
+      "specs": "⛽ Бензин | 🔧 1.2-1.5L | ⚡ 85-105 л.с. | 🔄 Автомат"
+    },
+    "sedan": {
+      "id": "sedan",
+      "name": "Sedan",
+      "nameRu": "Комфортные седаны",
+      "description": "Комфорт на трассе и в городе",
+      "icon": "🚙",
+      "gradient": "from-green-400 to-green-600",
+      "features": [
+        "Комфорт",
+        "Просторный багажник",
+        "Для дальних поездок"
+      ],
+      "specs": "⛽ Бензин | 🔧 1.5-2.0L | ⚡ 110-150 л.с. | 🔄 Автомат"
+    },
+    "suv": {
+      "id": "suv",
+      "name": "SUV",
+      "nameRu": "Внедорожники",
+      "description": "Высокая посадка и уверенность",
+      "icon": "🚛",
+      "gradient": "from-orange-400 to-orange-600",
+      "features": [
+        "Высокая посадка",
+        "Проходимость",
+        "Безопасность"
+      ],
+      "specs": "⛽ Бензин/Дизель | 🔧 1.8-2.8L | ⚡ 140-200 л.с."
+    },
+    "7s": {
+      "id": "7s",
+      "name": "7 Seater",
+      "nameRu": "Семейные минивэны",
+      "description": "Для семьи или компании",
+      "icon": "🚐",
+      "gradient": "from-purple-400 to-purple-600",
+      "features": [
+        "7 мест",
+        "Семейные поездки",
+        "Максимум комфорта"
+      ],
+      "specs": "⛽ Бензин | 🔧 1.5-1.6L | ⚡ 105-140 л.с."
+    },
+    "bikes": {
+      "id": "bikes",
+      "name": "Bikes",
+      "nameRu": "Мотобайки",
+      "description": "Скутеры и мотоциклы для свободы передвижения",
+      "icon": "🏍️",
+      "gradient": "from-red-400 to-red-600",
+      "features": [
+        "Экономичный",
+        "Лёгкая парковка",
+        "Свобода передвижения"
+      ],
+      "specs": "🏍️ 150-350cc | ⚡ 15-29 л.с. | 🛡️ ABS"
+    }
+  }
+}

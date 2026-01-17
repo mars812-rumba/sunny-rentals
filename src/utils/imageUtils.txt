@@ -1,0 +1,32 @@
+// imageUtils.ts - Готовые функции для работы с изображениями
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+/**
+ * Получить правильный URL изображения с кешбастингом
+ */
+export const getImageUrl = (path: string | undefined, timestamp?: number): string => {
+  if (!path) return "/placeholder.svg";
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("images_web/")) {
+    const url = `${API_URL}/${path}`;
+    return timestamp ? `${url}?t=${timestamp}` : url;
+  }
+  const ts = timestamp !== undefined ? timestamp : Date.now();
+  return `${API_URL}/images_web/${path}?t=${ts}`;
+};
+
+/**
+ * Получить URL главного фото машины
+ */
+export const getCarMainPhoto = (car: any, timestamp?: number): string => {
+  return getImageUrl(car?.photos?.main, timestamp);
+};
+
+/**
+ * Получить массив URL всех фото машины
+ */
+export const getCarGallery = (car: any, timestamp?: number): string[] => {
+  if (!car?.photos?.gallery) return [];
+  return car.photos.gallery.map((photo: string) => getImageUrl(photo, timestamp));
+};

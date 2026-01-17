@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "rent-461622",
+  "private_key_id": "8c6d3e600dde6b298c9e621075f3158061915baa",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDKCSJ5CP1K4Erg\n7MFgoFzhxSh8nR64F2e8Dj3mAn9vdK7OOdTan1ssOuiouzsqxoJUEZIWuV20N9Oc\nLL0O9XPJNlwPtK56eljzPukBMONyvZJPt//rqrnf5wFEs1bM8VYZilNvfoDRXSZ2\nMt54WaOyvV/AAhA8gzZ+Yy4HJhhj8x0mpkJoCbJMLvvub+0n3viCSwtfNeCgyvga\nnas9ksryJXCU5Al9zf+eADSAoLtdmWO7pThPSyENmsXN6Jfj8AmrpEGUcQ5pTgtk\nenxzIJNs3vgl/AkbS9nVVw1Zq7WMwDBNKeZnHPWkeaoAJDZ6pbkiUQ6qTW0igGD7\nFvav6d/RAgMBAAECggEABf5lP69SMB2uRaxikVfStmVMUA6i1iLEJ744r+J0r4XM\nQljqvLtBR1EKN466sMQL76MUveY+LwTvX0QTcnM6gkZ0+YekCtHipnkEYjRlF9Or\nqarZ577ee75GbLDxFcHP8SoIDxxQ2tQnS2v//AOmYO/plfSs6l6qKiMOC9nY8P4a\nQ7nQ+LSCpvmClT857cNxmxmszSO9fyUnqDzl+atqVivYyKEdf3aAkuny5w7sBN27\nn6kn8bdUxNJlX5lHtBLueUS6dr+8Mm8vRPcUUF0fP/aDaPlUfJyTIMYBckVXpdQZ\nNkH+mv1yAZGpx9EfDLn2oMPuMQU9GxDTqsoxSl2dEQKBgQD3cwHuksnr+T6kWKo7\nj98T0AE+pmVq2ltbQcqGWfFQyTZWf7xLvvIqMWDFR1eWFhjUJD2aZVRpSTfNsXvG\nmoU+2wAfWr1fmQdmAwTrWXWXg587ioJ1SwgCERDt37yXPpFHoVlpfDwWOaLs7IIE\n3LPYU81d770fYta4h5YLqldKYwKBgQDRBGNrV4eFwEFrujDSrd560MExVTN6snWZ\nU/V5EKvwjv9SF+zBE0R2Qq7j6HbFoKqGdFSsY1XTEF+FI2EBqwg2yuHuOTOg55D2\nyQK5KnkSImyxMXr3EI4sdFDJGZs6v/GW78o60BTY8jQCyhQa7/AaK9IXhCUtuMWr\nIpJkpUzJOwKBgFvB69950yKLxCzRLB72FLSWF0ASF91tpx7J4L29MHzSgDHHIB2+\narI2qTm+YL4o54ATCDzugkSgf+7od4uH1Q0fzIXT8hE2/8VWLUbQX4iVqEA99m5k\nKk4J4gszQg2bh+fV7v/sr6NWMBJHCVegN5hqSucgdTLkRdcbgApHWiMdAoGARYep\nLucSHQskeBqa7SqLjN1utuN52YIOHrBQQzKpj79x7bQpvNyU9KYgGY6WHA3jTBDc\nre/pd+nFbLulJHHprJh26dE7fHYrwfyCHGill8O91n/4QMHQGbejvBH5kmSRkD06\nT7Ayjyya4qaoY4GXpI0ZOVtrJreFgfVhL3vRfEsCgYEA3vx6+qh7LaeaRjA2GZUz\nUHlAQWeNd65ffiHcEBnEYR3WVGv/ZgeIZtnoi13qas3QqcAJsNPm/uouTmrZoaMG\nLrG4GMtHubvVNBNFDf+OYFfU8orXOFo79FSQSCuPKxI+IW/GXYIVs1q+0d0IZhLi\nM4X9/KNmR27I3R1AlYhhCH4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "car-rent@rent-461622.iam.gserviceaccount.com",
+  "client_id": "103335473407642808303",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/car-rent%40rent-461622.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
