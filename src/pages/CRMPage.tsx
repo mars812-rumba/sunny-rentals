@@ -4,21 +4,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import dayjs from 'dayjs'; 
+import dayjs from 'dayjs';
 import {
   Calendar, Car, StickyNote , MessageSquare, Plus, Pencil, Trash2,
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus,UserRoundMinus,UserRoundCheck,
-  Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle
+  Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
+import MarkerBadges from '@/components/MarkerBadges';
+import { MarkerType } from '@/types/crm';
 
 // TypeScript интерфейсы для работы с диалогами
 interface DialogEvent {
@@ -63,6 +65,9 @@ interface User {
     action?: string;
   }>;
   pickup_location?: string;
+  
+  // Маркеры для ручного управления менеджером
+  marker?: string | null;
 }
 
 const MAIN_STATUSES = ['new', 'interested', 'pending'];
@@ -98,6 +103,7 @@ const CRMPage: React.FC = () => {
   const [editingNote, setEditingNote] = useState<{id: string, text: string} | null>(null);
   const [editingNoteId, setEditingNoteId] = useState(null); // ID юзера, чью заметку правим
   const [tempNote, setTempNote] = useState(''); // Временный текст для ввода
+  const [markerFilter, setMarkerFilter] = useState<'all' | 'unprocessed' | 'in_progress' | 'ready' | 'rejected'>('all');
   const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
   const formatDateSimple = (dateStr: string) => {
@@ -117,6 +123,7 @@ const CRMPage: React.FC = () => {
     return users.filter(user => {
       const dialog = user.dialog_status;
 
+      // Фильтр по диалогам
       if (dialogFilter === 'new') {
         return dialog?.has_new_messages;
       }
@@ -126,6 +133,12 @@ const CRMPage: React.FC = () => {
       if (dialogFilter === 'ai-off') {
         return dialog?.active && dialog?.claude_status !== 'active';
       }
+
+      // Фильтр по маркерам
+      if (markerFilter !== 'all') {
+        return user.marker === markerFilter;
+      }
+
       return true;
     });
   };
@@ -504,7 +517,7 @@ const handleQuickSaveNote = async (userId) => {
   if (tempNote.trim() === (currentUser?.last_note || '')) return;
 
   // Оптимистичное обновление UI
-  setUsers(prev => prev.map(u => 
+  setUsers(prev => prev.map(u =>
     u.user_id === userId ? { ...u, last_note: tempNote.trim() } : u
   ));
 
@@ -520,6 +533,32 @@ const handleQuickSaveNote = async (userId) => {
   } catch (e) {
     console.error("Ошибка сохранения заметки:", e);
     loadMainData(); // Откатываемся к данным с сервера при ошибке
+  }
+};
+
+// Управление маркерами
+const handleMarkerChange = async (userId: number, marker: MarkerType | null) => {
+  try {
+    const response = await fetch('/api/crm/update_marker', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        marker: marker
+      })
+    });
+
+    if (response.ok) {
+      // Обновляем локальное состояние
+      setUsers(prev => prev.map(user =>
+        user.user_id === userId ? { ...user, marker } : user
+      ));
+      console.log(`Маркер для пользователя ${userId}:`, marker || 'сброшен');
+    } else {
+      console.error('Ошибка обновления маркера');
+    }
+  } catch (e) {
+    console.error('Ошибка обновления маркера:', e);
   }
 };
 
@@ -661,6 +700,48 @@ const handleUpdateNote = async () => {
   </Button>
 </div>
 
+{/* Фильтр по маркерам */}
+<div className="flex items-center justify-between gap-4 p-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 sticky top-[110px] z-40 mb-4">
+  <div className="flex gap-2 bg-slate-100/50 p-1 rounded-xl">
+    <Button
+      variant={markerFilter === 'all' ? 'default' : 'ghost'}
+      onClick={() => setMarkerFilter('all')}
+      className="relative h-10 px-4 rounded-lg flex gap-2"
+    >
+      <Filter className="w-5 h-5" />
+      <span className="text-[11px] font-black">Все</span>
+    </Button>
+    <Button
+      variant={markerFilter === 'unprocessed' ? 'default' : 'ghost'}
+      onClick={() => setMarkerFilter('unprocessed')}
+      className="relative h-10 px-4 rounded-lg flex gap-2"
+    >
+      <span className="text-[11px] font-black">🆕</span>
+    </Button>
+    <Button
+      variant={markerFilter === 'in_progress' ? 'default' : 'ghost'}
+      onClick={() => setMarkerFilter('in_progress')}
+      className="relative h-10 px-4 rounded-lg flex gap-2"
+    >
+      <span className="text-[11px] font-black">🔵</span>
+    </Button>
+    <Button
+      variant={markerFilter === 'ready' ? 'default' : 'ghost'}
+      onClick={() => setMarkerFilter('ready')}
+      className="relative h-10 px-4 rounded-lg flex gap-2"
+    >
+      <span className="text-[11px] font-black">✅</span>
+    </Button>
+    <Button
+      variant={markerFilter === 'rejected' ? 'default' : 'ghost'}
+      onClick={() => setMarkerFilter('rejected')}
+      className="relative h-10 px-4 rounded-lg flex gap-2"
+    >
+      <span className="text-[11px] font-black">❌</span>
+    </Button>
+  </div>
+</div>
+
   {/* User Cards Grid */}
   {loading ? (
     <div className="h-96 flex flex-col items-center justify-center text-slate-300">
@@ -777,10 +858,16 @@ const handleUpdateNote = async () => {
 
     {/* СТРОКА 4: Состояния (Слева) | Действия (Справа) */}
     <div className="flex items-center justify-between pt-1">
-      {/* Лево: Индикаторы */}
-
+      {/* Лево: Маркеры и Индикаторы */}
       <div className="flex items-center gap-2">
-
+        {/* Маркеры */}
+        <MarkerBadges
+          currentMarker={user.marker as MarkerType || null}
+          onMarkerChange={(marker) => handleMarkerChange(user.user_id, marker)}
+          className="scale-75"
+        />
+        
+        {/* Индикаторы чата */}
         <div className="flex items-center gap-1 text-slate-400 relative">
           <MessageSquare className="w-2.5 h-2.5" />
           <span className="text-[8px] font-bold">{dialog?.message_count || 0}</span>
@@ -797,8 +884,8 @@ const handleUpdateNote = async () => {
       {/* Право: Пульт управления */}
       <div className="flex gap-1.5">
         {/* 1. Кнопка Claude */}
-        <Button 
-          size="icon" variant="ghost" 
+        <Button
+          size="icon" variant="ghost"
           className="h-7 w-7 rounded-md bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-100"
           onClick={(e) => { e.stopPropagation(); handleClaudeAction(user.user_id, 'start'); }}
         >
@@ -806,8 +893,8 @@ const handleUpdateNote = async () => {
         </Button>
 
         {/* 2. Кнопка Внутренний Чат */}
-        <Button 
-          size="icon" variant="ghost" 
+        <Button
+          size="icon" variant="ghost"
           className="h-7 w-7 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100"
           onClick={(e) => { e.stopPropagation(); openUserChat(user); }}
         >
@@ -815,8 +902,8 @@ const handleUpdateNote = async () => {
         </Button>
 
         {/* 3. Кнопка Telegram (внешняя) */}
-        <Button 
-          size="icon" 
+        <Button
+          size="icon"
           className={`h-7 w-7 rounded-md shadow-sm shadow-blue-200 bg-blue-600 text-white hover:bg-blue-700 transition-all`}
           onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/${user.username}`, '_blank'); }}
         >

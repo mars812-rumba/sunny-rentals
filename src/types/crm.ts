@@ -20,6 +20,9 @@ export interface User {
   archived: boolean;
   archived_at: string | null;
   
+  // Маркеры для ручного управления менеджером
+  marker?: string | null;
+  
   // Старые поля для совместимости
   timestamp?: string;
   action?: string;
@@ -82,11 +85,52 @@ export interface Stats {
 
 export type ClaudeStatus = 'inactive' | 'active' | 'paused' | 'stopped';
 
-export type UserStatus = 
-  | 'new' 
-  | 'interested' 
-  | 'pending' 
-  | 'confirmed' 
-  | 'completed' 
-  | 'cancelled' 
+export type UserStatus =
+  | 'new'
+  | 'interested'
+  | 'pending'
+  | 'confirmed'
+  | 'completed'
+  | 'cancelled'
   | 'no_response';
+
+// Типы маркеров для ручного управления менеджером
+export type MarkerType =
+  | 'unprocessed'  // 🆕 Необработанный
+  | 'in_progress'  // 🔵 В работе
+  | 'ready'        // ✅ Готово
+  | 'rejected';    // ❌ Отказ
+
+export interface MarkerConfig {
+  label: string;
+  emoji: string;
+  color: string;
+  bgColor: string;
+}
+
+export const MARKER_CONFIGS: Record<MarkerType, MarkerConfig> = {
+  unprocessed: {
+    label: 'Необработанный',
+    emoji: '🆕',
+    color: '#3b82f6',
+    bgColor: '#dbeafe'
+  },
+  in_progress: {
+    label: 'В работе',
+    emoji: '🔵',
+    color: '#10b981',
+    bgColor: '#d1fae5'
+  },
+  ready: {
+    label: 'Готово',
+    emoji: '✅',
+    color: '#22c55e',
+    bgColor: '#dcfce7'
+  },
+  rejected: {
+    label: 'Отказ',
+    emoji: '❌',
+    color: '#ef4444',
+    bgColor: '#fee2e2'
+  }
+};
