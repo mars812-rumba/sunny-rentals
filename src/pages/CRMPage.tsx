@@ -16,10 +16,10 @@ import dayjs from 'dayjs';
 import {
   Calendar, Car, StickyNote , MessageSquare, Plus, Pencil, Trash2,
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus,UserRoundMinus,UserRoundCheck,
-  Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter
+  Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
+  CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
-import MarkerBadges from '@/components/MarkerBadges';
 import { MarkerType } from '@/types/crm';
 
 // TypeScript интерфейсы для работы с диалогами
@@ -450,9 +450,13 @@ const openUserChat = (user: any) => {
   };
 
   const handleArchiveAction = async (userId: number) => {
+    if (!window.confirm("Архивировать этого лида? Он будет перемещен в архив.")) {
+      return;
+    }
+    
     setLoadingAction(prev => ({ ...prev, [`archive_${userId}`]: true }));
     try {
-      const response = await fetch(`/api/crm/archive/${userId}`, {
+      const response = await fetch(`/api/crm/delete_user/${userId}`, {
         method: 'DELETE'
       });
       const result = await response.json();
@@ -462,9 +466,11 @@ const openUserChat = (user: any) => {
         console.log(`Пользователь ${userId} архивирован`);
       } else {
         console.error('Ошибка архивирования:', result);
+        alert('Ошибка при архивировании лида');
       }
     } catch (e) {
       console.error('Ошибка архивирования:', e);
+      alert('Ошибка сети при архивировании');
     }
     finally {
       setLoadingAction(prev => ({ ...prev, [`archive_${userId}`]: false }));
@@ -674,72 +680,64 @@ const handleUpdateNote = async () => {
     ))}
   </div>
 
-<div className="flex items-center justify-between gap-4 p-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 sticky top-[60px] z-40 mb-4">
-  <div className="flex gap-2 bg-slate-100/50 p-1 rounded-xl">
+  <div className="flex flex-col gap-2 p-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 sticky top-[60px] z-40 mb-4">
+  
+  {/* РЯД 1: Системные фильтры (Сообщения и ИИ) */}
+  <div className="flex items-center justify-between w-full">
+    <div className="flex gap-1.5 bg-slate-100/50 p-1 rounded-xl">
+      {[
+        { id: 'all', icon: Users, color: 'text-slate-500', count: users.length },
+        { id: 'new', icon: UserRoundCheck, color: 'text-red-500', count: users.filter(u => u.dialog_status?.has_new_messages).length },
+        { id: 'ai-on', icon: UserRoundPlus, color: 'text-green-600', count: users.filter(u => u.dialog_status?.claude_status === 'active').length },
+      ].map(f => (
+        <Button
+          key={f.id}
+          variant={dialogFilter === f.id ? 'default' : 'ghost'}
+          onClick={() => setDialogFilter(f.id as 'all' | 'new' | 'ai-on')}
+          className="h-8 px-2.5 rounded-lg flex gap-1.5 transition-all"
+        >
+          <f.icon className={`w-4 h-4 ${dialogFilter === f.id ? 'text-white' : f.color}`} />
+          <span className={`text-[10px] font-black ${dialogFilter === f.id ? 'text-white' : 'text-slate-500'}`}>
+            {f.count}
+          </span>
+        </Button>
+      ))}
+    </div>
+
+    {/* Кнопка обновления теперь в верхнем ряду сбоку */}
+    <Button 
+      size="icon" 
+      variant="ghost" 
+      onClick={refreshAllDialogStatuses} 
+      className="h-8 w-8 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
+    >
+      <RefreshCw className="w-3.5 h-3.5" />
+    </Button>
+  </div>
+
+  {/* РАЗДЕЛИТЕЛЬ (тонкая линия) */}
+  <div className="h-px bg-slate-100 w-full mx-auto"></div>
+
+  {/* РЯД 2: Маркеры (Бизнес-логика) */}
+  <div className="flex gap-1.5 bg-slate-100/30 p-1 rounded-xl w-fit">
     {[
-      { id: 'all', icon: Users, color: 'text-slate-600', count: users.length },
-      { id: 'new', icon: UserRoundCheck, color: 'text-red-500', count: users.filter(u => u.dialog_status?.has_new_messages).length },
-      { id: 'ai-on', icon: UserRoundPlus, color: 'text-green-600', count: users.filter(u => u.dialog_status?.claude_status === 'active').length },
-    ].map(f => (
+      { id: 'all', icon: Filter, color: 'text-slate-400' },
+      { id: 'unprocessed', icon: CirclePlus, color: 'text-blue-500' },
+      { id: 'in_progress', icon: CircleDollarSign, color: 'text-green-500' },
+      { id: 'ready', icon: CircleCheckBig, color: 'text-emerald-500' },
+      { id: 'rejected', icon: CircleMinus, color: 'text-red-500' },
+    ].map(m => (
       <Button
-        key={f.id}
-        variant={dialogFilter === f.id ? 'default' : 'ghost'}
-        onClick={() => setDialogFilter(f.id as 'all' | 'new' | 'ai-on')}
-        className="relative h-10 px-4 rounded-lg flex gap-2"
+        key={m.id}
+        variant={markerFilter === m.id ? 'default' : 'ghost'}
+        onClick={() => setMarkerFilter(m.id)}
+        className="h-8 w-10 px-0 rounded-lg transition-all"
       >
-        <f.icon className={`w-5 h-5 ${dialogFilter === f.id ? 'text-white' : f.color}`} />
-        <span className={`text-[11px] font-black ${dialogFilter === f.id ? 'text-white' : 'text-slate-500'}`}>
-          {f.count}
-        </span>
+        <m.icon className={`w-4 h-4 ${markerFilter === m.id ? 'text-white' : m.color}`} />
       </Button>
     ))}
   </div>
 
-  <Button size="icon" variant="ghost" onClick={refreshAllDialogStatuses} className="h-10 w-10 text-slate-400 hover:bg-blue-50">
-    <RefreshCw className="w-4 h-4" />
-  </Button>
-</div>
-
-{/* Фильтр по маркерам */}
-<div className="flex items-center justify-between gap-4 p-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 sticky top-[110px] z-40 mb-4">
-  <div className="flex gap-2 bg-slate-100/50 p-1 rounded-xl">
-    <Button
-      variant={markerFilter === 'all' ? 'default' : 'ghost'}
-      onClick={() => setMarkerFilter('all')}
-      className="relative h-10 px-4 rounded-lg flex gap-2"
-    >
-      <Filter className="w-5 h-5" />
-      <span className="text-[11px] font-black">Все</span>
-    </Button>
-    <Button
-      variant={markerFilter === 'unprocessed' ? 'default' : 'ghost'}
-      onClick={() => setMarkerFilter('unprocessed')}
-      className="relative h-10 px-4 rounded-lg flex gap-2"
-    >
-      <span className="text-[11px] font-black">🆕</span>
-    </Button>
-    <Button
-      variant={markerFilter === 'in_progress' ? 'default' : 'ghost'}
-      onClick={() => setMarkerFilter('in_progress')}
-      className="relative h-10 px-4 rounded-lg flex gap-2"
-    >
-      <span className="text-[11px] font-black">🔵</span>
-    </Button>
-    <Button
-      variant={markerFilter === 'ready' ? 'default' : 'ghost'}
-      onClick={() => setMarkerFilter('ready')}
-      className="relative h-10 px-4 rounded-lg flex gap-2"
-    >
-      <span className="text-[11px] font-black">✅</span>
-    </Button>
-    <Button
-      variant={markerFilter === 'rejected' ? 'default' : 'ghost'}
-      onClick={() => setMarkerFilter('rejected')}
-      className="relative h-10 px-4 rounded-lg flex gap-2"
-    >
-      <span className="text-[11px] font-black">❌</span>
-    </Button>
-  </div>
 </div>
 
   {/* User Cards Grid */}
@@ -819,10 +817,10 @@ const handleUpdateNote = async () => {
       </div>
     </div>
 {/* СТРОКА 3: Интерактивная заметка (Брендовый оранжевый #f8b515) */}
-<div 
+<div
   className={`flex items-center gap-1.5 rounded px-2 py-1 border transition-colors cursor-text min-h-[24px] ${
-    user.last_note 
-      ? 'bg-[#f8b515]/10 border-[#f8b515]/30 hover:bg-[#f8b515]/20 hover:border-[#f8b515]' 
+    user.last_note
+      ? 'bg-[#f8b515]/10 border-[#f8b515]/30 hover:bg-[#f8b515]/20 hover:border-[#f8b515]'
       : 'bg-slate-50 border-slate-100 hover:bg-white hover:border-blue-200'
   }`}
   onClick={(e) => {
@@ -858,14 +856,77 @@ const handleUpdateNote = async () => {
 
     {/* СТРОКА 4: Состояния (Слева) | Действия (Справа) */}
     <div className="flex items-center justify-between pt-1">
-      {/* Лево: Маркеры и Индикаторы */}
+      {/* Лево: Маркеры и Индикаторы чата */}
       <div className="flex items-center gap-2">
-        {/* Маркеры */}
-        <MarkerBadges
-          currentMarker={user.marker as MarkerType || null}
-          onMarkerChange={(marker) => handleMarkerChange(user.user_id, marker)}
-          className="scale-75"
-        />
+        {/* Маркеры - 4 иконки */}
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const newMarker = user.marker === 'unprocessed' ? null : 'unprocessed';
+              handleMarkerChange(user.user_id, newMarker);
+            }}
+            className={`p-0.5 rounded transition-colors ${
+              user.marker === 'unprocessed'
+                ? 'text-blue-600 bg-blue-50'
+                : 'text-slate-400 hover:text-blue-500 hover:bg-blue-50'
+            }`}
+            title="Интересный лид - обработать позже"
+          >
+            <CirclePlus className="w-3 h-3" />
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const newMarker = user.marker === 'in_progress' ? null : 'in_progress';
+              handleMarkerChange(user.user_id, newMarker);
+            }}
+            className={`p-0.5 rounded transition-colors ${
+              user.marker === 'in_progress'
+                ? 'text-green-600 bg-green-50'
+                : 'text-slate-400 hover:text-green-500 hover:bg-green-50'
+            }`}
+            title="В работе"
+          >
+            <CircleDollarSign className="w-3 h-3" />
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const newMarker = user.marker === 'rejected' ? null : 'rejected';
+              handleMarkerChange(user.user_id, newMarker);
+            }}
+            className={`p-0.5 rounded transition-colors ${
+              user.marker === 'rejected'
+                ? 'text-red-600 bg-red-50'
+                : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
+            }`}
+            title="Отказ"
+          >
+            <CircleMinus className="w-3 h-3" />
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const newMarker = user.marker === 'ready' ? null : 'ready';
+              handleMarkerChange(user.user_id, newMarker);
+            }}
+            className={`p-0.5 rounded transition-colors ${
+              user.marker === 'ready'
+                ? 'text-emerald-600 bg-emerald-50'
+                : 'text-slate-400 hover:text-emerald-500 hover:bg-emerald-50'
+            }`}
+            title="Готово!"
+          >
+            <CircleCheckBig className="w-3 h-3" />
+          </button>
+        </div>
+
+        {/* Разделитель */}
+        <div className="w-px h-4 bg-slate-200 mx-1"></div>
         
         {/* Индикаторы чата */}
         <div className="flex items-center gap-1 text-slate-400 relative">
@@ -883,7 +944,17 @@ const handleUpdateNote = async () => {
 
       {/* Право: Пульт управления */}
       <div className="flex gap-1.5">
-        {/* 1. Кнопка Claude */}
+        {/* 1. Кнопка Архивация */}
+        <Button
+          size="icon" variant="ghost"
+          className="h-7 w-7 rounded-md bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 border border-slate-100"
+          onClick={(e) => { e.stopPropagation(); handleArchiveAction(user.user_id); }}
+          title="Архивировать лид"
+        >
+          <Trash2 className="w-3 h-3" />
+        </Button>
+
+        {/* 2. Кнопка Claude */}
         <Button
           size="icon" variant="ghost"
           className="h-7 w-7 rounded-md bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-100"
@@ -892,7 +963,7 @@ const handleUpdateNote = async () => {
           <Play className="w-3 h-3 fill-current" />
         </Button>
 
-        {/* 2. Кнопка Внутренний Чат */}
+        {/* 3. Кнопка Внутренний Чат */}
         <Button
           size="icon" variant="ghost"
           className="h-7 w-7 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100"
@@ -901,7 +972,7 @@ const handleUpdateNote = async () => {
           <MessageCircle className="w-3.5 h-3.5" />
         </Button>
 
-        {/* 3. Кнопка Telegram (внешняя) */}
+        {/* 4. Кнопка Telegram (внешняя) */}
         <Button
           size="icon"
           className={`h-7 w-7 rounded-md shadow-sm shadow-blue-200 bg-blue-600 text-white hover:bg-blue-700 transition-all`}

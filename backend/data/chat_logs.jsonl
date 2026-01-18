@@ -1157,3 +1157,18 @@
 {"timestamp": "2026-01-17T18:42:59.428555", "user_id": 837850841, "role": "user", "content": "С 21.01 по 30.01"}
 {"timestamp": "2026-01-17T18:43:04.258326", "user_id": 837850841, "role": "user", "content": "С 21.01 по 30.01"}
 {"timestamp": "2026-01-17T18:43:04.258901", "user_id": 837850841, "role": "assistant", "content": "Ищешь что-то определенное? Могу подсказать.\n\nОтлично! 21-30 января это 9 дней аренды.\n\nToyota FORTUNER 2023 Gray будет стоить 1,830₿/день (тариф 7-14 дней)\n\n💰 Итого: 16,470₿ + депозит 8,000₿\n\nПодойдет такой вариант или рассмотрим другие внедорожники?"}
+{"timestamp": "2026-01-17T23:03:49.040467", "user_id": 837850841, "role": "user", "content": "Начни ответ СТРОГО с фразы: 'Ищешь что-то определенное? Могу подсказать.' Задай ОДИН короткий вопрос касающий потребности снять транспорт на Пхукете."}
+{"timestamp": "2026-01-17T23:03:49.040949", "user_id": 837850841, "role": "assistant", "content": "Ищешь что-то определенное? Могу подсказать.\n\nНужен именно Фортунер или можешь рассмотреть другие внедорожники?"}
+{"timestamp": "2026-01-18T00:09:39.624Z", "user_id": 320757191, "role": "manager", "text": "Добрый день!", "source": "crm_panel"}
+{"timestamp": "2026-01-18T00:10:04.154Z", "user_id": 489511259, "role": "manager", "text": "Добрый день! Подскажите с какого числа?", "source": "crm_panel"}
+{"timestamp": "2026-01-18T00:11:47.909Z", "user_id": 915010425, "role": "manager", "text": "Добрый день, да", "source": "crm_panel"}
+{"timestamp": "2026-01-18T00:12:21.849Z", "user_id": 7678520852, "role": "manager", "text": "Добрый день", "source": "crm_panel"}
+{"timestamp": "2026-01-18T04:52:51.132674", "user_id": 7678520852, "role": "user", "text": "Здравствуйте", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-18T07:01:48.677Z", "user_id": 984710052, "role": "manager", "text": "Я так понял вы уже забронировали авто, верно?", "source": "crm_panel"}
+{"timestamp": "2026-01-18T07:04:23.606Z", "user_id": 489824345, "role": "manager", "text": "Добрый день", "source": "crm_panel"}
+{"timestamp": "2026-01-18T07:04:55.826Z", "user_id": 489824345, "role": "manager", "text": "С 18.01-21.01 нужен авто верно?", "source": "crm_panel"}
+{"timestamp": "2026-01-18T07:05:05.214879", "user_id": 489824345, "role": "user", "text": "Да все верно )", "username": "peskova_o", "source": "telegram_bot"}
+{"timestamp": "2026-01-18T07:05:51.725022", "user_id": 489824345, "role": "user", "text": "И сразу же вопрос , будет выезд на краби , возможно ли ?)", "username": "peskova_o", "source": "telegram_bot"}
+{"timestamp": "2026-01-18T07:06:21.666Z", "user_id": 489824345, "role": "manager", "text": "Возможно + 1500 бат", "source": "crm_panel"}
+{"timestamp": "2026-01-18T07:06:42.979Z", "user_id": 489824345, "role": "manager", "text": "Минуту сейчас проверю наличае", "source": "crm_panel"}
+{"timestamp": "2026-01-18T07:06:53.257386", "user_id": 489824345, "role": "user", "text": "Поняла , жду наличие", "username": "peskova_o", "source": "telegram_bot"}

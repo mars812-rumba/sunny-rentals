@@ -588,3 +588,147 @@
 {"timestamp": "2026-01-17T18:42:41.840767", "user_id": 837850841, "action": "claude_started", "by": "manager"}
 {"timestamp": "2026-01-17T18:42:59.427261", "user_id": 837850841, "action": "message_received", "content": "С 21.01 по 30.01"}
 {"timestamp": "2026-01-17T18:43:04.288711", "user_id": 837850841, "action": "claude_response"}
+{"timestamp": "2026-01-17T21:27:07.012935", "user_id": 1080900705, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-17T21:27:51.733854", "user_id": 1080900705, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-25T21:00:00.000Z", "endDate": "2026-02-11T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-17T21:27:51.880524", "user_id": 1080900705, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-25T21:00:00.000Z", "endDate": "2026-02-11T21:00:00.000Z", "days": 18, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-17T21:27:52.060733", "user_id": 1080900705, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-25T21:00:00.000Z", "endDate": "2026-02-11T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-17T21:27:52.174394", "user_id": 1080900705, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-25T21:00:00.000Z", "endDate": "2026-02-11T21:00:00.000Z", "days": 18, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-17T21:29:12.700441", "user_id": 1080900705, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-25T21:00:00.000Z", "endDate": "2026-02-11T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-17T21:29:12.842069", "user_id": 1080900705, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-25T21:00:00.000Z", "endDate": "2026-02-11T21:00:00.000Z", "days": 18, "category": "suv", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-17T21:29:15.619235", "user_id": 1080900705, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-25T21:00:00.000Z", "endDate": "2026-02-11T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-17T21:29:15.857553", "user_id": 1080900705, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-25T21:00:00.000Z", "endDate": "2026-02-11T21:00:00.000Z", "days": 18, "category": "compact", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-17T21:29:46.034462", "user_id": 1080900705, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-25T21:00:00.000Z", "endDate": "2026-02-11T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-17T21:29:46.188130", "user_id": 1080900705, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-25T21:00:00.000Z", "endDate": "2026-02-11T21:00:00.000Z", "days": 18, "category": "bikes", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-17T23:03:12.688908", "user_id": 837850841, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T23:03:12.693063", "user_id": 837850841, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T23:03:45.750437", "user_id": 837850841, "action": "claude_started"}
+{"timestamp": "2026-01-17T23:03:45.754492", "user_id": 837850841, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-17T23:03:58.035493", "user_id": 837850841, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T23:03:58.038154", "user_id": 837850841, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T23:04:22.787891", "user_id": 837850841, "action": "note_added", "note": "Дима", "added_by": "6451825371"}
+{"timestamp": "2026-01-17T23:10:44.518575", "user_id": 719766623, "action": "dialog_stopped"}
+{"timestamp": "2026-01-17T23:10:44.522250", "user_id": 719766623, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-17T23:53:30.221235", "user_id": 837850841, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-17T23:53:36.580549", "user_id": 837850841, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-17T23:54:34.245549", "user_id": 1367409954, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-17T23:54:35.910466", "user_id": 1367409954, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-17T23:54:38.742518", "user_id": 1367409954, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-17T23:55:07.781143", "user_id": 984710052, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-17T23:55:09.711278", "user_id": 230155309, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-17T23:55:14.658672", "user_id": 1147639806, "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-01-17T23:55:32.875251", "user_id": 172077560, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-17T23:56:24.508321", "user_id": 837850841, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-17T23:56:28.555415", "user_id": 172077560, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:09:05.081167", "user_id": 915010425, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:09:06.210835", "user_id": 915010425, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:09:07.914446", "user_id": 915010425, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:09:11.211623", "user_id": 915010425, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:09:11.230600", "user_id": 915010425, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:09:11.452552", "user_id": 915010425, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:09:39.624Z", "user_id": 320757191, "action": "manager_message_sent", "message_length": 12}
+{"timestamp": "2026-01-18T00:10:04.154Z", "user_id": 489511259, "action": "manager_message_sent", "message_length": 39}
+{"timestamp": "2026-01-18T00:10:22.824851", "user_id": 489511259, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:10:22.986356", "user_id": 489511259, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:11:47.909Z", "user_id": 915010425, "action": "manager_message_sent", "message_length": 15}
+{"timestamp": "2026-01-18T00:12:21.849Z", "user_id": 7678520852, "action": "manager_message_sent", "message_length": 11}
+{"timestamp": "2026-01-18T00:13:12.726292", "user_id": 915010425, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:13:41.999194", "user_id": 915010425, "action": "note_added", "note": "С 18-23.01 интерес", "added_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:02.019779", "user_id": 1147639806, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:03.004048", "user_id": 1147639806, "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:04.977042", "user_id": 1147639806, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:06.235001", "user_id": 1147639806, "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:09.867153", "user_id": 1147639806, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:10.868997", "user_id": 1147639806, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:11.989166", "user_id": 1147639806, "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:13.882741", "user_id": 1147639806, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:14.327896", "user_id": 1147639806, "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:15.017438", "user_id": 1147639806, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:15.550836", "user_id": 1147639806, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:16.258118", "user_id": 1147639806, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:17.396332", "user_id": 1147639806, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:18.041511", "user_id": 1147639806, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:19.031505", "user_id": 1147639806, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:22.855953", "user_id": 1147639806, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:24.113357", "user_id": 1147639806, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:25.262518", "user_id": 1147639806, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:25.948798", "user_id": 1147639806, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:26.152456", "user_id": 1147639806, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:26.389161", "user_id": 1147639806, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:31.901097", "user_id": 1147639806, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:33.658134", "user_id": 1367409954, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:35.097199", "user_id": 1367409954, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:39.277226", "user_id": 374897465, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:41.112528", "user_id": 374897465, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:46.889718", "user_id": 1367409954, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:48.877676", "user_id": 374897465, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:50.921519", "user_id": 374897465, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:52.366233", "user_id": 374897465, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:54.791310", "user_id": 1367409954, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:56.325684", "user_id": 374897465, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:58.387193", "user_id": 1367409954, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:17:59.837720", "user_id": 374897465, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:18:00.537748", "user_id": 374897465, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:18:01.190221", "user_id": 374897465, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:30:55.909107", "user_id": 2091319994, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:41:32.432164", "user_id": 403232994, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:21.434353", "user_id": 374897465, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:22.326804", "user_id": 374897465, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:23.716641", "user_id": 374897465, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:24.447602", "user_id": 374897465, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:25.589676", "user_id": 374897465, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:26.118074", "user_id": 374897465, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:27.655939", "user_id": 374897465, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:29.214325", "user_id": 374897465, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:30.427236", "user_id": 374897465, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:38.675831", "user_id": 7201972549, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T00:43:44.903952", "user_id": 1488464254, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T00:45:02.474017", "user_id": 1147639806, "action": "dialog_stopped"}
+{"timestamp": "2026-01-18T00:45:02.479037", "user_id": 1147639806, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-18T00:52:45.550792", "user_id": 2091319994, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:52:48.493103", "user_id": 2091319994, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:52:51.725170", "user_id": 2091319994, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:52:54.576345", "user_id": 2091319994, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:52:54.976930", "user_id": 2091319994, "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:52:58.997266", "user_id": 2091319994, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T00:53:02.927657", "user_id": 2091319994, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T00:55:02.725402", "user_id": 7496794201, "action": "claude_started"}
+{"timestamp": "2026-01-18T00:55:02.729969", "user_id": 7496794201, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-18T01:15:13.581148", "user_id": 719766623, "action": "dialog_stopped"}
+{"timestamp": "2026-01-18T01:15:13.584951", "user_id": 719766623, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-18T01:16:01.123906", "user_id": 1147639806, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T01:16:04.366567", "user_id": 1367409954, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T01:16:26.861222", "user_id": 8440575981, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T01:16:33.082331", "user_id": 230155309, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T01:16:39.220998", "user_id": 1878859910, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T01:16:52.575600", "user_id": 837850841, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T01:17:33.314789", "user_id": 172077560, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T01:17:36.324965", "user_id": 719766623, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T01:17:46.498981", "user_id": 400112157, "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T01:17:47.713983", "user_id": 400112157, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T04:52:51.132117", "user_id": 7678520852, "action": "message_received", "content": "Здравствуйте"}
+{"timestamp": "2026-01-18T04:52:51.138587", "user_id": 7678520852, "action": "user_message_received", "message_length": 12, "username": null}
+{"timestamp": "2026-01-18T05:01:52.155588", "user_id": 1080900705, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T05:02:43.846285", "user_id": 172077560, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-18T06:00:52.419689", "user_id": 719766623, "action": "dialog_stopped"}
+{"timestamp": "2026-01-18T06:00:52.424035", "user_id": 719766623, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-18T06:55:02.490677", "user_id": 489824345, "action": "dialog_started", "initiated_by": "user", "username": "peskova_o"}
+{"timestamp": "2026-01-18T06:55:43.457559", "user_id": 489824345, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-20T17:00:00.000Z", "username": "peskova_o"}, "username": "peskova_o"}
+{"timestamp": "2026-01-18T06:55:43.596010", "user_id": 489824345, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-20T17:00:00.000Z", "days": 4, "category": "sedan", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "peskova_o"}, "username": "peskova_o"}
+{"timestamp": "2026-01-18T06:55:43.991020", "user_id": 489824345, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-20T17:00:00.000Z", "username": "peskova_o"}, "username": "peskova_o"}
+{"timestamp": "2026-01-18T06:55:44.130169", "user_id": 489824345, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-01-17T17:00:00.000Z", "endDate": "2026-01-20T17:00:00.000Z", "days": 4, "category": "sedan", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "peskova_o"}, "username": "peskova_o"}
+{"timestamp": "2026-01-18T06:58:10.895637", "user_id": 489824345, "action": "booking_submitted", "initiated_by": "user", "booking_id": "10a3c55f", "form_data": {"car": {"id": "mazda_mazda2_2024_white", "name": "Mazda MAZDA2 2024 White", "brand": "Mazda", "model": "MAZDA2", "year": "2024", "color": "White"}, "dates": {"start": "2026-01-17T17:00:00.000Z", "end": "2026-01-20T17:00:00.000Z", "days": 4}, "locations": {"pickup": "hotel", "return": "hotel"}, "pricing": {"season": "high_season", "dailyRate": 952, "totalRental": 3808, "deposit": 5000, "deliveryPickup": 500, "deliveryReturn": 500, "totalDelivery": 1000, "grandTotal": 4808}, "contact": {"value": "@peskova_o", "type": "telegram"}, "timestamp": "2026-01-18T06:58:09.793Z", "username": "peskova_o"}, "username": "peskova_o"}
+{"timestamp": "2026-01-18T06:59:17.104492", "user_id": 374897465, "action": "dialog_stopped"}
+{"timestamp": "2026-01-18T06:59:17.107502", "user_id": 374897465, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-18T07:01:48.677Z", "user_id": 984710052, "action": "manager_message_sent", "message_length": 45}
+{"timestamp": "2026-01-18T07:04:23.606Z", "user_id": 489824345, "action": "manager_message_sent", "message_length": 11}
+{"timestamp": "2026-01-18T07:04:55.826Z", "user_id": 489824345, "action": "manager_message_sent", "message_length": 31}
+{"timestamp": "2026-01-18T07:05:04.266668", "user_id": 489824345, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T07:05:05.214586", "user_id": 489824345, "action": "message_received", "content": "Да все верно )"}
+{"timestamp": "2026-01-18T07:05:05.221529", "user_id": 489824345, "action": "user_message_received", "message_length": 14, "username": "peskova_o"}
+{"timestamp": "2026-01-18T07:05:14.216227", "user_id": 374897465, "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-01-18T07:05:51.724045", "user_id": 489824345, "action": "message_received", "content": "И сразу же вопрос , будет выезд на краби , возможно ли ?)"}
+{"timestamp": "2026-01-18T07:05:51.733969", "user_id": 489824345, "action": "user_message_received", "message_length": 57, "username": "peskova_o"}
+{"timestamp": "2026-01-18T07:06:21.666Z", "user_id": 489824345, "action": "manager_message_sent", "message_length": 19}
+{"timestamp": "2026-01-18T07:06:42.979Z", "user_id": 489824345, "action": "manager_message_sent", "message_length": 29}
+{"timestamp": "2026-01-18T07:06:53.256939", "user_id": 489824345, "action": "message_received", "content": "Поняла , жду наличие"}
+{"timestamp": "2026-01-18T07:06:53.260543", "user_id": 489824345, "action": "user_message_received", "message_length": 20, "username": "peskova_o"}

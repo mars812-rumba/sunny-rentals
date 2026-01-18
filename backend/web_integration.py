@@ -335,6 +335,10 @@ class StatusUpdateRequest(BaseModel):
     status: str
     note: Optional[str] = None
 
+class MarkerUpdate(BaseModel):
+    user_id: int
+    marker: Optional[str] = None  # null для сброса маркера
+
 # ✅ ДОБАВЬ если нужна модель для User (опционально)
 class UserData(BaseModel):
     user_id: int
@@ -1891,6 +1895,10 @@ def get_crm_users(status: str, period: str = "week"):
                 user_with_status = u.copy()
                 user_with_status.update(computed)
                 
+                # ✅ ДОБАВЛЯЕМ ПОЛЕ MARKER (если его нет, ставим null)
+                if "marker" not in user_with_status:
+                    user_with_status["marker"] = None
+                
                 filtered.append(user_with_status)
 
         # Сортировка по времени создания (новые сверху)
@@ -2229,6 +2237,82 @@ async def update_user_status(update: StatusUpdate):
         raise
     except Exception as e:
         print(f"❌ Error in update_user_status: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post(API_PREFIX + "/crm/update_marker")
+async def update_user_marker(marker_update: MarkerUpdate):
+    """Обновить маркер пользователя"""
+    try:
+        user_id = marker_update.user_id
+        new_marker = marker_update.marker  # None для сброса маркера
+        
+        print(f"[update_marker] user_id={user_id}, marker={new_marker}")
+        
+        # Получаем текущий статус пользователя
+        current_user = get_user_latest_record(user_id)
+        if not current_user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Обновляем маркер пользователя
+        updates = {
+            'marker': new_marker,
+            'updated_at': datetime.utcnow().isoformat()
+        }
+        
+        success = update_all_user_records(user_id, updates)
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to update marker")
+        
+        # Логируем в историю
+        history_file = DATA / "crm_history.jsonl"
+        log_entry = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "user_id": user_id,
+            "action": "marker_updated",
+            "marker": new_marker,
+            "changed_by": ADMIN_ID
+        }
+        
+        try:
+            with open(history_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+        except Exception as e:
+            print(f"⚠️ Не удалось записать в историю: {e}")
+        
+        # Автологирование в user_actions.log
+        try:
+            action_log_entry = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "user_id": user_id,
+                "action_type": "marker_updated",
+                "description": f"Маркер изменен на '{new_marker}'" if new_marker else "Маркер сброшен",
+                "metadata": {
+                    "marker": new_marker
+                },
+                "performed_by": ADMIN_ID
+            }
+            
+            log_file = DATA / "user_actions.log"
+            with open(log_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(action_log_entry, ensure_ascii=False) + "\n")
+        except Exception as e:
+            print(f"⚠️ Не удалось записать в user_actions.log: {e}")
+        
+        marker_text = f"на '{new_marker}'" if new_marker else "сброшен"
+        print(f"✅ Маркер обновлен: user {user_id}: {marker_text}")
+        
+        return {
+            "status": "ok",
+            "message": f"Маркер изменен {marker_text}"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error in update_user_marker: {e}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

@@ -2398,5 +2398,45 @@
     },
     "status": "new",
     "created_at": "2026-01-17T14:48:39.182881"
+  },
+  {
+    "booking_id": "10a3c55f",
+    "user_id": "489824345",
+    "form_data": {
+      "car": {
+        "id": "mazda_mazda2_2024_white",
+        "name": "Mazda MAZDA2 2024 White",
+        "brand": "Mazda",
+        "model": "MAZDA2",
+        "year": "2024",
+        "color": "White"
+      },
+      "dates": {
+        "start": "2026-01-17T17:00:00.000Z",
+        "end": "2026-01-20T17:00:00.000Z",
+        "days": 4
+      },
+      "locations": {
+        "pickup": "hotel",
+        "return": "hotel"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 952,
+        "totalRental": 3808,
+        "deposit": 5000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 4808
+      },
+      "contact": {
+        "value": "@peskova_o",
+        "type": "telegram"
+      },
+      "timestamp": "2026-01-18T06:58:09.793Z"
+    },
+    "status": "new",
+    "created_at": "2026-01-18T06:58:10.698042"
   }
 ]
