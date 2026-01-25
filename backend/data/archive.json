@@ -5109,5 +5109,392 @@
     },
     "marker": "unprocessed",
     "archived_at": "2026-01-18T05:02:43.818217"
+  },
+  {
+    "user_id": 984710052,
+    "username": "Interventu",
+    "created_at": "2026-01-15T00:33:25.248221",
+    "updated_at": "2026-01-18T10:05:54.623154",
+    "status": "pending",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Honda City 2018 white",
+    "category_interested": "compact",
+    "dates_selected": {
+      "start": "2026-02-02T21:00:00.000Z",
+      "end": "2026-02-12T21:00:00.000Z",
+      "days": 11
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-18T09:11:04.793327",
+      "last_message_from": "user",
+      "message_count": 4,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-18T09:11:04.831484",
+    "marker": "rejected",
+    "archived_at": "2026-01-18T10:05:59.639475"
+  },
+  {
+    "user_id": 1158714474,
+    "username": "Boxing788",
+    "created_at": "2026-01-21T10:09:09.456912",
+    "updated_at": "2026-01-22T10:12:33.439647",
+    "status": "pending",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Toyota ATIV 2024 Gray",
+    "category_interested": "sedan",
+    "dates_selected": {
+      "start": "2026-01-20T17:00:00.000Z",
+      "end": "2026-01-26T17:00:00.000Z",
+      "days": 7
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-22T10:12:33.417298",
+      "last_message_from": "user",
+      "message_count": 2,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-22T10:12:33.439637",
+    "archived_at": "2026-01-22T11:38:29.314424"
+  },
+  {
+    "user_id": 489824345,
+    "username": "peskova_o",
+    "created_at": "2026-01-18T06:55:02.146830",
+    "updated_at": "2026-01-19T04:00:17.219632",
+    "status": "pending",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Mazda MAZDA2 2024 White",
+    "category_interested": "sedan",
+    "dates_selected": {
+      "start": "2026-01-17T17:00:00.000Z",
+      "end": "2026-01-20T17:00:00.000Z",
+      "days": 4
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "marker": "in_progress",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-18T07:06:53.241383",
+      "last_message_from": "user",
+      "message_count": 3,
+      "claude": {
+        "enabled": true,
+        "status": "active",
+        "started_at": "2026-01-19T04:00:17.206052",
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-18T07:06:53.263438",
+    "archived_at": "2026-01-22T11:39:29.470731"
+  },
+  {
+    "user_id": 1349802270,
+    "username": "heyeny",
+    "created_at": "2026-01-22T13:52:57.381542",
+    "updated_at": "2026-01-22T14:19:00.301591",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-22T14:19:00.283358",
+      "last_message_from": "user",
+      "message_count": 3,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-22T14:19:00.301581",
+    "archived_at": "2026-01-22T18:18:02.282766"
+  },
+  {
+    "user_id": 7496794201,
+    "username": "mastervenus",
+    "created_at": "2026-01-17T07:45:56.443586",
+    "updated_at": "2026-01-22T18:18:22.259444",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-17T07:51:23.452192",
+      "last_message_from": "user",
+      "message_count": 2,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": "2026-01-18T00:55:02.663409",
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-17T07:51:23.476974",
+    "archived_at": "2026-01-22T18:18:32.760466"
+  },
+  {
+    "user_id": 5621151209,
+    "username": null,
+    "created_at": "2026-01-22T09:07:20.380643",
+    "updated_at": "2026-01-22T18:19:45.161617",
+    "status": "interested",
+    "form_started": true,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": {
+      "start": "2026-01-22T19:00:00.000Z",
+      "end": "2026-02-04T19:00:00.000Z",
+      "days": 1
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-22T10:50:53.908551",
+      "last_message_from": "user",
+      "message_count": 9,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-22T10:50:53.942703",
+    "marker": "rejected",
+    "archived_at": "2026-01-22T18:19:47.553982"
+  },
+  {
+    "user_id": 450240234,
+    "username": "Alexey_Pavlenko1",
+    "created_at": "2026-01-20T06:06:26.602476",
+    "updated_at": "2026-01-22T11:45:05.710769",
+    "status": "interested",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Suzuki Swift 2020 White",
+    "category_interested": "compact",
+    "dates_selected": {
+      "start": "2026-01-21T17:00:00.000Z",
+      "end": "2026-02-10T17:00:00.000Z",
+      "days": 21
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-21T13:48:32.780528",
+      "last_message_from": "user",
+      "message_count": 3,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-21T13:48:32.840109",
+    "marker": "ready",
+    "last_note": "Заказал!!!!!",
+    "archived_at": "2026-01-22T18:21:21.021471"
+  },
+  {
+    "user_id": 7146253211,
+    "username": "perevozkabel",
+    "created_at": "2026-01-19T05:51:19.043293",
+    "updated_at": "2026-01-22T11:44:32.452855",
+    "status": "interested",
+    "form_started": true,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": "suv",
+    "dates_selected": {
+      "start": "2026-01-18T17:00:00.000Z",
+      "end": "2026-01-21T17:00:00.000Z",
+      "days": 4
+    },
+    "notes": [],
+    "source": "system",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-19T05:51:19.037464",
+      "last_message_from": "user",
+      "message_count": 1,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-19T05:51:19.066719",
+    "marker": "unprocessed",
+    "last_note": "Ответ просрочен",
+    "archived_at": "2026-01-22T18:21:27.113404"
+  },
+  {
+    "user_id": 207090655,
+    "username": "partizzan07",
+    "created_at": "2026-01-22T01:54:16.286970",
+    "updated_at": "2026-01-22T01:55:01.425542",
+    "status": "interested",
+    "form_started": true,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": "suv",
+    "dates_selected": {
+      "start": "2026-01-23T17:00:00.000Z",
+      "end": "2026-01-26T17:00:00.000Z",
+      "days": 4
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "archived_at": "2026-01-22T18:25:11.697620"
+  },
+  {
+    "user_id": 1016718900,
+    "username": "seryi_neo",
+    "created_at": "2026-01-18T20:11:48.177135",
+    "updated_at": "2026-01-19T16:54:30.153988",
+    "status": "interested",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Mazda MAZDA2 2024 White",
+    "category_interested": "suv",
+    "dates_selected": {
+      "start": "2026-01-21T21:00:00.000Z",
+      "end": "2026-01-31T21:00:00.000Z",
+      "days": 11
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "archived_at": "2026-01-22T18:27:21.695948"
+  },
+  {
+    "user_id": 255502880,
+    "username": "d1d1dddf",
+    "created_at": "2026-01-22T13:05:02.412557",
+    "updated_at": "2026-01-22T18:28:33.420803",
+    "status": "pending",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Honda City RS 2025 Black",
+    "category_interested": "sedan",
+    "dates_selected": {
+      "start": "2026-02-18T21:00:00.000Z",
+      "end": "2026-03-24T21:00:00.000Z",
+      "days": 35
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-22T13:32:34.219612",
+      "last_message_from": "user",
+      "message_count": 1,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-22T13:32:34.268396",
+    "marker": "ready",
+    "last_note": "Удачная сделка",
+    "archived_at": "2026-01-22T18:30:14.786722"
+  },
+  {
+    "user_id": 961082502,
+    "username": "mr_Sergey76",
+    "created_at": "2026-01-21T10:40:06.023753",
+    "updated_at": "2026-01-22T10:09:41.617208",
+    "status": "pending",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Mazda MAZDA2 2024 White",
+    "category_interested": "sedan",
+    "dates_selected": {
+      "start": "2026-01-21T17:00:00.000Z",
+      "end": "2026-02-11T17:00:00.000Z",
+      "days": 22
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "marker": "ready",
+    "archived_at": "2026-01-22T18:30:30.202397"
+  },
+  {
+    "user_id": 915010425,
+    "username": null,
+    "created_at": "2026-01-16T03:56:05.735787",
+    "updated_at": "2026-01-18T00:13:41.982727",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-16T04:05:06.900233",
+      "last_message_from": "user",
+      "message_count": 1,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-16T04:05:06.944385",
+    "marker": "in_progress",
+    "last_note": "С 18-23.01 интерес",
+    "archived_at": "2026-01-22T18:31:00.846442"
   }
 ]
