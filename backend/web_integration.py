@@ -650,18 +650,19 @@ def auto_archive_old_records():
                 continue
             
             age_days = (now - user_time).days
-            status = user.get('final_status', '')
+            # PRIORITY STATUS LOGIC: final_status overrides status
+            current_status = user.get("final_status") or user.get("status")
             
             # Правила:
             should_archive = False
             
-            if status == 'new' and age_days > 14:
+            if current_status == 'new' and age_days > 14:
                 should_archive = True  # Новые > 2 недели
-            elif status == 'awaiting_followup' and age_days > 30:
+            elif current_status == 'interested' and age_days > 30:
                 should_archive = True  # Теплые > 1 месяц
-            elif status in ['rejected', 'new']:
+            elif current_status in ['rejected', 'new']:
                 should_archive = True  # Отказы и холодные сразу
-            elif status == 'completed':
+            elif current_status == 'completed':
                 should_archive = True  # Завершенные сразу
             
             if should_archive:
@@ -1878,7 +1879,8 @@ def get_crm_users(status: str, period: str = "week"):
 
         filtered = []
         for u in users_data:
-            u_status = u.get("status")
+            # PRIORITY STATUS LOGIC: final_status overrides status
+            u_status = u.get("final_status") or u.get("status")
             u_at = u.get("created_at")
             
             if not u_at or not u_status: continue
@@ -1939,6 +1941,7 @@ def get_crm_stats(period: str = Query("week")):
         stats = {
             "new": 0,
             "interested": 0,
+            "in_work": 0,
             "pending": 0,
             "confirmed": 0,
             "completed": 0,
@@ -1961,13 +1964,15 @@ def get_crm_stats(period: str = Query("week")):
                 if user.get("archived") is True:
                     stats["archive"] += 1
                 else:
-                    status = user.get("status")
-                    # Маппинг на случай, если в базе остались старые статусы
-                    if status == "in_progress": status = "interested"
-                    if status in ["hot", "booked"]: status = "pending"
+                    # PRIORITY STATUS LOGIC: final_status overrides status
+                    user_status = user.get("final_status") or user.get("status")
                     
-                    if status in stats:
-                        stats[status] += 1
+                    # Маппинг на случай, если в базе остались старые статусы
+                    if user_status == "in_progress": user_status = "interested"
+                    if user_status in ["hot", "booked"]: user_status = "pending"
+                    
+                    if user_status in stats:
+                        stats[user_status] += 1
 
         return {
             "status": "ok",

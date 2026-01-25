@@ -1234,3 +1234,26 @@
 {"timestamp": "2026-01-25T07:47:53.671345", "user_id": 719766623, "role": "user", "text": "Здесь есть кто?", "username": "Mudriy_KA", "source": "telegram_bot"}
 {"timestamp": "2026-01-25T13:54:58.745524", "user_id": 5247377874, "role": "user", "text": "Жду информацию", "username": null, "source": "telegram_bot"}
 {"timestamp": "2026-01-25T13:55:43.193020", "user_id": 5247377874, "role": "user", "text": "Нужна машина эконом класса с 27.01-06.02", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-25T17:35:01.002Z", "user_id": 708890817, "role": "manager", "text": "Добрый день", "source": "crm_panel"}
+{"timestamp": "2026-01-25T17:55:27.906Z", "user_id": 493645415, "role": "manager", "text": "1000 бат", "source": "crm_panel"}
+{"timestamp": "2026-01-25T17:55:55.086Z", "user_id": 886948972, "role": "manager", "text": "Добрый день. Подскажите даты", "source": "crm_panel"}
+{"timestamp": "2026-01-25T17:56:30.867Z", "user_id": 101495270, "role": "manager", "text": "Стартуем!", "source": "crm_panel"}
+{"timestamp": "2026-01-25T17:57:51.055Z", "user_id": 5210936321, "role": "manager", "text": "Здравствуйте! Подскажите, какой транспорт интересует?", "source": "crm_panel"}
+{"timestamp": "2026-01-25T18:15:16.864Z", "user_id": 5094278896, "role": "manager", "text": "У нас есть предложения", "source": "crm_panel"}
+{"timestamp": "2026-01-25T18:20:43.196357", "user_id": 5094278896, "role": "user", "text": "С 20.02 по 3.03.26", "username": "Alexxmmmmm", "source": "telegram_bot"}
+{"timestamp": "2026-01-25T19:10:57.736Z", "user_id": 5094278896, "role": "manager", "text": "Без проблем", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:25:58.990Z", "user_id": 1746323346, "role": "manager", "text": "Здравствуйте, нужен авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:31:04.424Z", "user_id": 288205574, "role": "manager", "text": "Добрый день! Подскажите, интересует авто", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:31:15.132Z", "user_id": 288205574, "role": "manager", "text": "?", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:31:50.866Z", "user_id": 478717365, "role": "manager", "text": "Если актуально - дайте знать!", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:32:22.390767", "user_id": 478717365, "role": "user", "text": "Доброй ночи. Уже не актуально. Спасибо", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-25T19:32:24.678Z", "user_id": 5228668727, "role": "manager", "text": "Здравствуйте! Нашли байк?", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:33:19.105Z", "user_id": 5094278896, "role": "manager", "text": "Для брони, напишите, пожалуйста, менеджеру: @marseloid", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:34:53.349Z", "user_id": 478717365, "role": "manager", "text": "Спасибо🙏", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:36:35.796Z", "user_id": 733338401, "role": "manager", "text": "Добрый день! Подскажите, с 14.02 нужен авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:39:06.523Z", "user_id": 704190210, "role": "manager", "text": "Здравствуйте! Подскажите, Вас интересует аренда авто? ", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:39:32.244515", "user_id": 704190210, "role": "user", "text": "Уже нет", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-25T19:45:28.262302", "user_id": 1746323346, "role": "user", "text": "спасибо,уже нашли", "username": "LarisaKuznetcova", "source": "telegram_bot"}
+{"timestamp": "2026-01-25T19:52:59.462Z", "user_id": 311272681, "role": "manager", "text": "Добрый вечер! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:53:14.500Z", "user_id": 311272681, "role": "manager", "text": "С 27.04", "source": "crm_panel"}
+{"timestamp": "2026-01-25T19:55:56.645731", "user_id": 311272681, "role": "user", "text": "Да", "username": null, "source": "telegram_bot"}

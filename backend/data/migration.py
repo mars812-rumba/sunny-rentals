@@ -24,10 +24,14 @@ def migrate():
         car = entry.get("car_interested") or entry.get("vehicle_interested")
         dates = entry.get("dates_selected")
         is_submitted = entry.get("booking_submitted", False)
+        dialog_active = entry.get("dialog_active", False)
+        has_notes = entry.get("notes") and len(entry.get("notes", [])) > 0
         
         # Определяем статус с нуля
         if is_submitted:
             status = "pending"   # Заявка (была кнопка "забронировать")
+        elif dialog_active or has_notes or entry.get("marker"):
+            status = "in_work"   # В работе (активный диалог, есть заметки или маркер)
         elif car or dates:
             status = "interested" # Теплые (выбрал машину или даты)
         else:
@@ -41,15 +45,17 @@ def migrate():
             "username": entry.get("username"),
             "created_at": entry.get("created_at") or entry.get("timestamp"),
             "updated_at": datetime.utcnow().isoformat(),
-            "status": status, 
+            "status": status,
             "car_interested": car,
             "category_interested": entry.get("category_interested"),
             "dates_selected": dates,
             "form_started": entry.get("form_started", car is not None),
             "booking_submitted": is_submitted,
+            "dialog_active": dialog_active,
             "notes": entry.get("notes") if isinstance(entry.get("notes"), list) else [],
             "archived": entry.get("archived", False),
-            "source": entry.get("source", "direct")
+            "source": entry.get("source", "direct"),
+            "marker": entry.get("marker")
         }
 
         # Мерджим дубли (оставляем самый "сильный" статус)
@@ -57,14 +63,16 @@ def migrate():
             unique_users[uid] = record
         else:
             existing = unique_users[uid]
-            # Если у нового дубля статус "сильнее" (pending > interested > new), обновляем
-            weights = {"new": 1, "interested": 2, "pending": 3, "confirmed": 4, "completed": 5}
+            # Если у нового дубля статус "сильнее" (pending > in_work > interested > new), обновляем
+            weights = {"new": 1, "interested": 2, "in_work": 3, "pending": 4, "confirmed": 5, "completed": 6}
             if weights.get(status, 0) > weights.get(existing["status"], 0):
                 existing["status"] = status
             
             # Дозаполняем данные, если их не было
             if not existing["car_interested"]: existing["car_interested"] = car
             if not existing["dates_selected"]: existing["dates_selected"] = dates
+            if not existing["dialog_active"]: existing["dialog_active"] = dialog_active
+            if not existing["notes"]: existing["notes"] = record["notes"]
 
     # Сохраняем
     with open(USER_DATA_JSON, 'w', encoding='utf-8') as f:

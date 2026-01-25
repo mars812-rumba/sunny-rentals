@@ -1227,3 +1227,133 @@
 {"timestamp": "2026-01-25T13:54:58.752170", "user_id": 5247377874, "action": "user_message_received", "message_length": 14, "username": null}
 {"timestamp": "2026-01-25T13:55:43.192570", "user_id": 5247377874, "action": "message_received", "content": "Нужна машина эконом класса с 27.01-06.02"}
 {"timestamp": "2026-01-25T13:55:43.199402", "user_id": 5247377874, "action": "user_message_received", "message_length": 40, "username": null}
+{"timestamp": "2026-01-25T15:03:21.151646", "user_id": 8532621860, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-25T17:34:27.092349", "user_id": 708890817, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T17:35:01.002Z", "user_id": 708890817, "action": "manager_message_sent", "message_length": 11}
+{"timestamp": "2026-01-25T17:36:41.193813", "user_id": 708890817, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T17:55:27.906Z", "user_id": 493645415, "action": "manager_message_sent", "message_length": 8}
+{"timestamp": "2026-01-25T17:55:55.086Z", "user_id": 886948972, "action": "manager_message_sent", "message_length": 28}
+{"timestamp": "2026-01-25T17:56:15.638793", "user_id": 1349802270, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T17:56:20.731721", "user_id": 101495270, "action": "claude_started"}
+{"timestamp": "2026-01-25T17:56:20.735648", "user_id": 101495270, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-25T17:56:20.765663", "user_id": 101495270, "action": "claude_started"}
+{"timestamp": "2026-01-25T17:56:20.768090", "user_id": 101495270, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-25T17:56:30.867Z", "user_id": 101495270, "action": "manager_message_sent", "message_length": 9}
+{"timestamp": "2026-01-25T17:56:55.130817", "user_id": 5247377874, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T17:57:22.757180", "user_id": 187007513, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T17:57:51.055Z", "user_id": 5210936321, "action": "manager_message_sent", "message_length": 53}
+{"timestamp": "2026-01-25T17:57:55.409538", "user_id": 5210936321, "action": "claude_started"}
+{"timestamp": "2026-01-25T17:57:55.412414", "user_id": 5210936321, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-25T18:03:50.479635", "user_id": 288205574, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:04:19.184850", "user_id": 708890817, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:04:48.294199", "user_id": 708890817, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:04:50.012768", "user_id": 708890817, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:04:54.784879", "user_id": 708890817, "action": "note_added", "note": "Привет", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T18:06:09.600859", "user_id": 7553360348, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:06:42.960119", "user_id": 6547185186, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:06:53.561074", "user_id": 8532621860, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:07:40.249479", "user_id": 415322984, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:07:49.707173", "user_id": 662794365, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:08:08.507579", "user_id": 708890817, "action": "status_changed", "old_status": "in_work", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:08:38.170444", "user_id": 1746323346, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:09:46.235285", "user_id": 288205574, "action": "status_changed", "old_status": "in_work", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:14:47.313899", "user_id": 288205574, "action": "status_changed", "old_status": "in_work", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:15:16.864Z", "user_id": 5094278896, "action": "manager_message_sent", "message_length": 22}
+{"timestamp": "2026-01-25T18:15:37.064547", "user_id": 478717365, "action": "note_added", "note": "Общаюсь", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T18:15:58.189032", "user_id": 5094278896, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:16:04.019947", "user_id": 478717365, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:20:43.195917", "user_id": 5094278896, "action": "message_received", "content": "С 20.02 по 3.03.26"}
+{"timestamp": "2026-01-25T18:20:43.202723", "user_id": 5094278896, "action": "user_message_received", "message_length": 18, "username": "Alexxmmmmm"}
+{"timestamp": "2026-01-25T18:31:19.529134", "user_id": 708890817, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:31:50.118797", "user_id": 708890817, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:31:54.459232", "user_id": 708890817, "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:31:58.406629", "user_id": 708890817, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T18:32:01.438146", "user_id": 708890817, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:07:58.267825", "user_id": 1746323346, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:09:45.894585", "user_id": 5094278896, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:10:21.700515", "user_id": 708890817, "action": "note_added", "note": "Отписался", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T19:10:57.736Z", "user_id": 5094278896, "action": "manager_message_sent", "message_length": 11}
+{"timestamp": "2026-01-25T19:11:30.143588", "user_id": 5094278896, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:11:43.060674", "user_id": 5094278896, "action": "note_added", "note": "Настроен серьезно", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T19:25:19.606971", "user_id": 288205574, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:25:20.521860", "user_id": 478717365, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:25:21.238920", "user_id": 5228668727, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:25:58.990Z", "user_id": 1746323346, "action": "manager_message_sent", "message_length": 25}
+{"timestamp": "2026-01-25T19:30:26.097429", "user_id": 1746323346, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:30:36.683817", "user_id": 1746323346, "action": "note_added", "note": "Написал", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T19:31:04.424Z", "user_id": 288205574, "action": "manager_message_sent", "message_length": 40}
+{"timestamp": "2026-01-25T19:31:15.132Z", "user_id": 288205574, "action": "manager_message_sent", "message_length": 1}
+{"timestamp": "2026-01-25T19:31:29.355919", "user_id": 288205574, "action": "note_added", "note": "Написал", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T19:31:40.552768", "user_id": 478717365, "action": "dialog_stopped"}
+{"timestamp": "2026-01-25T19:31:40.556780", "user_id": 478717365, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-25T19:31:50.866Z", "user_id": 478717365, "action": "manager_message_sent", "message_length": 29}
+{"timestamp": "2026-01-25T19:32:08.579046", "user_id": 478717365, "action": "note_added", "note": "Не ответил", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T19:32:22.390443", "user_id": 478717365, "action": "message_received", "content": "Доброй ночи. Уже не актуально. Спасибо"}
+{"timestamp": "2026-01-25T19:32:22.403247", "user_id": 478717365, "action": "user_message_received", "message_length": 38, "username": null}
+{"timestamp": "2026-01-25T19:32:24.678Z", "user_id": 5228668727, "action": "manager_message_sent", "message_length": 25}
+{"timestamp": "2026-01-25T19:32:33.521305", "user_id": 5228668727, "action": "note_added", "note": "Написал", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T19:32:33.550911", "user_id": 5228668727, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:32:35.006128", "user_id": 478717365, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:32:37.247285", "user_id": 288205574, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:32:39.249313", "user_id": 708890817, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:32:48.990948", "user_id": 5094278896, "action": "dialog_stopped"}
+{"timestamp": "2026-01-25T19:32:48.994654", "user_id": 5094278896, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-25T19:33:19.105Z", "user_id": 5094278896, "action": "manager_message_sent", "message_length": 54}
+{"timestamp": "2026-01-25T19:34:53.349Z", "user_id": 478717365, "action": "manager_message_sent", "message_length": 8}
+{"timestamp": "2026-01-25T19:35:05.460739", "user_id": 478717365, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:35:08.920951", "user_id": 478717365, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T19:36:08.445708", "user_id": 490419041, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:36:35.796Z", "user_id": 733338401, "action": "manager_message_sent", "message_length": 44}
+{"timestamp": "2026-01-25T19:37:34.218723", "user_id": 733338401, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:37:37.159232", "user_id": 733338401, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:37:42.970410", "user_id": 5580520674, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T19:37:53.239267", "user_id": 410981831, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:37:53.726057", "user_id": 410981831, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:37:57.362558", "user_id": 410981831, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:38:06.893829", "user_id": 662794365, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T19:38:11.345456", "user_id": 391215422, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T19:38:17.926113", "user_id": 364225071, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T19:38:27.857844", "user_id": 5210936321, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:38:39.409260", "user_id": 5210936321, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:38:40.003737", "user_id": 5210936321, "action": "note_added", "note": "Первый контакт", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T19:39:06.523Z", "user_id": 704190210, "action": "manager_message_sent", "message_length": 54}
+{"timestamp": "2026-01-25T19:39:13.780821", "user_id": 704190210, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:39:14.309191", "user_id": 704190210, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:39:32.244121", "user_id": 704190210, "action": "message_received", "content": "Уже нет"}
+{"timestamp": "2026-01-25T19:39:32.250902", "user_id": 704190210, "action": "user_message_received", "message_length": 7, "username": null}
+{"timestamp": "2026-01-25T19:39:47.003216", "user_id": 261568265, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:39:48.617329", "user_id": 261568265, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:39:53.867220", "user_id": 415322984, "action": "claude_started"}
+{"timestamp": "2026-01-25T19:39:53.870130", "user_id": 415322984, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-01-25T19:40:04.354780", "user_id": 415322984, "action": "dialog_stopped"}
+{"timestamp": "2026-01-25T19:40:04.359067", "user_id": 415322984, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-01-25T19:40:09.320175", "user_id": 415322984, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:40:23.379718", "user_id": 170783558, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T19:40:27.480347", "user_id": 652924202, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T19:41:18.253146", "user_id": 704190210, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:41:18.850259", "user_id": 704190210, "action": "note_added", "note": "Отбой", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T19:41:27.729783", "user_id": 704190210, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T19:42:25.201242", "user_id": 708890817, "action": "note_added", "note": "Касание", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T19:42:57.608523", "user_id": 311272681, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-25T19:43:49.497595", "user_id": 311272681, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-04-26T21:00:00.000Z", "endDate": "2026-05-10T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-25T19:43:49.624836", "user_id": 311272681, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-04-26T21:00:00.000Z", "endDate": "2026-05-10T21:00:00.000Z", "days": 15, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-25T19:43:49.842008", "user_id": 311272681, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-04-26T21:00:00.000Z", "endDate": "2026-05-10T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-25T19:43:49.976054", "user_id": 311272681, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-04-26T21:00:00.000Z", "endDate": "2026-05-10T21:00:00.000Z", "days": 15, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-25T19:43:50.190027", "user_id": 311272681, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-04-26T21:00:00.000Z", "endDate": "2026-05-10T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-25T19:44:01.171277", "user_id": 311272681, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-04-26T21:00:00.000Z", "endDate": "2026-05-10T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-25T19:44:01.296237", "user_id": 311272681, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-04-26T21:00:00.000Z", "endDate": "2026-05-10T21:00:00.000Z", "days": 15, "category": "compact", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-25T19:45:28.262028", "user_id": 1746323346, "action": "message_received", "content": "спасибо,уже нашли"}
+{"timestamp": "2026-01-25T19:45:28.266159", "user_id": 1746323346, "action": "user_message_received", "message_length": 17, "username": "LarisaKuznetcova"}
+{"timestamp": "2026-01-25T19:45:41.087662", "user_id": 1746323346, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:45:50.100973", "user_id": 1746323346, "action": "note_added", "note": "Уже нашли", "added_by": "6451825371"}
+{"timestamp": "2026-01-25T19:46:02.080933", "user_id": 1746323346, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-25T19:46:55.846279", "user_id": 708890817, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:46:57.513028", "user_id": 288205574, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:47:05.047062", "user_id": 490419041, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:47:27.462667", "user_id": 5228668727, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:47:30.506873", "user_id": 415322984, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:52:59.462Z", "user_id": 311272681, "action": "manager_message_sent", "message_length": 30}
+{"timestamp": "2026-01-25T19:53:14.500Z", "user_id": 311272681, "action": "manager_message_sent", "message_length": 7}
+{"timestamp": "2026-01-25T19:53:24.810457", "user_id": 311272681, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-25T19:55:56.644351", "user_id": 311272681, "action": "message_received", "content": "Да"}
+{"timestamp": "2026-01-25T19:55:56.656955", "user_id": 311272681, "action": "user_message_received", "message_length": 2, "username": null}

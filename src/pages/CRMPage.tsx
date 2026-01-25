@@ -46,6 +46,7 @@ interface User {
   dialog_status?: DialogStatus; // Получаем из API
   // ... остальные поля из существующего интерфейса
   status?: string;
+  final_status?: string; // PRIORITY: Manager's manual choice overrides status
   car_interested?: string;
   category_interested?: string;
   dates_selected?: {
@@ -70,10 +71,11 @@ interface User {
   marker?: string | null;
 }
 
-const MAIN_STATUSES = ['new', 'interested', 'pending'];
+const MAIN_STATUSES = ['new', 'interested', 'in_work', 'pending'];
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   'new': { label: 'Холодные', color: '#64748b', bg: 'bg-slate-100' },
   'interested': { label: 'Теплые', color: '#2563eb', bg: 'bg-blue-50' },
+  'in_work': { label: 'В работе', color: '#7c3aed', bg: 'bg-purple-50' },
   'pending': { label: 'Заявки', color: '#ea580c', bg: 'bg-orange-50' },
   'confirmed': { label: 'Бронь', color: '#10b981', bg: 'bg-emerald-50' },
   'completed': { label: 'Завершен', color: '#059669', bg: 'bg-green-100' },
@@ -103,7 +105,7 @@ const CRMPage: React.FC = () => {
   const [editingNote, setEditingNote] = useState<{id: string, text: string} | null>(null);
   const [editingNoteId, setEditingNoteId] = useState(null); // ID юзера, чью заметку правим
   const [tempNote, setTempNote] = useState(''); // Временный текст для ввода
-  const [markerFilter, setMarkerFilter] = useState<'all' | 'unprocessed' | 'in_progress' | 'ready' | 'rejected'>('all');
+  const [markerFilter, setMarkerFilter] = useState<string>('all');
   const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
   const formatDateSimple = (dateStr: string) => {
@@ -477,6 +479,31 @@ const openUserChat = (user: any) => {
     }
   };
 
+  const handleStatusChange = async (userId: number, newStatus: string) => {
+    try {
+      const response = await fetch('/api/crm/update_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId,
+          status: newStatus
+        })
+      });
+
+      if (response.ok) {
+        // Обновляем локальное состояние
+        setUsers(prev => prev.map(user =>
+          user.user_id === userId ? { ...user, status: newStatus } : user
+        ));
+        console.log(`Статус пользователя ${userId} изменен на: ${newStatus}`);
+      } else {
+        console.error('Ошибка обновления статуса');
+      }
+    } catch (e) {
+      console.error('Ошибка обновления статуса:', e);
+    }
+  };
+
  const handleSaveNote = async () => {
   if (!note.trim() || !selectedUser) return;
   
@@ -752,6 +779,9 @@ const handleUpdateNote = async () => {
     const days = getDaysCount(user.dates_selected?.start, user.dates_selected?.end);
     const dialog = user.dialog_status;
     
+    // PRIORITY STATUS LOGIC: final_status overrides status
+    const currentStatus = user.final_status || user.status;
+    
     // ЛОГИКА ПОДСВЕТКИ: если последний ответил юзер - нужно внимание
     const needsReply = dialog?.last_message_from === 'user';
     const aiActive = dialog?.claude_status === 'active';
@@ -762,7 +792,7 @@ const handleUpdateNote = async () => {
   className={`group border-none shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden h-[115px] flex flex-col 
     ${needsReply ? 'bg-amber-50/40 ring-1 ring-amber-200' : 'bg-white'}`}
 >
-  <div className="absolute top-0 left-0 w-full h-[2px]" style={{ backgroundColor: STATUS_CONFIG[user.status]?.color }}></div>
+  <div className="absolute top-0 left-0 w-full h-[2px]" style={{ backgroundColor: STATUS_CONFIG[currentStatus]?.color }}></div>
 
   <CardContent className="p-2.5 flex flex-col justify-between h-full space-y-1">
     
@@ -772,7 +802,7 @@ const handleUpdateNote = async () => {
     <Car className="w-3.5 h-3.5 text-blue-500 shrink-0" />
     {/* ИСПРАВЛЕННАЯ СТРОКА НИЖЕ */}
     <span className="font-black text-[11px] text-slate-800 truncate uppercase tracking-tight">
-      {user.car_interested || "Unknown"}
+      {user.car_interested || "Не выбрно"}
     </span>
     {user.category_interested && (
       <span className="text-[7px] font-black text-slate-400 border border-slate-200 px-1 rounded uppercase">
@@ -944,6 +974,18 @@ const handleUpdateNote = async () => {
 
       {/* Право: Пульт управления */}
       <div className="flex gap-1.5">
+        {/* 0. Кнопка Изменить статус на "В работе" */}
+        {currentStatus !== 'in_work' && (
+          <Button
+            size="icon" variant="ghost"
+            className="h-7 w-7 rounded-md bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white border border-purple-100"
+            onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, 'in_work'); }}
+            title="Перевести в работу"
+          >
+            <CircleDollarSign className="w-3.5 h-3.5" />
+          </Button>
+        )}
+
         {/* 1. Кнопка Архивация */}
         <Button
           size="icon" variant="ghost"
