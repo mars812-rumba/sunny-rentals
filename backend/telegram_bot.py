@@ -1,8 +1,9 @@
 print("!!!!!!!!!! TEST PRINT !!!!!!!!!!!")
+from pathlib import Path
 import os
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, InputMediaVideo, InputMediaPhoto, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Form, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import threading
@@ -15,7 +16,7 @@ import yaml
 import threading
 import time
 import requests
-
+from io import BytesIO
 # Claude AI imports
 try:
     import anthropic
@@ -895,7 +896,215 @@ def get_video_id(message):
         bot.reply_to(message, "⚠️ Эта функция доступна только администратору")
 
 
+        # 1. Определяем корень проекта (поднимаемся на уровень выше из папки backend)
+BASE_DIR = Path(__file__).resolve().parent.parent 
+MEDIA_ROOT = Path("media")
 
+# === НОВЫЕ ХЭНДЛЕРЫ ДЛЯ МУЛЬТИМЕДИА ===
+@bot.message_handler(content_types=['photo'])
+def handle_photo_message(message):
+    """Обработка входящих фотографий от пользователей"""
+    try:
+        user_id = message.from_user.id
+        chat_id = message.chat.id
+        
+        # Пропускаем админов (они не отправляют фото как клиенты)
+        if is_admin_user(user_id):
+            return
+            
+        print(f"📸 Получена фотография от пользователя {user_id}")
+        
+        # Получаем лучшее качество фото
+        photo = message.photo[-1]  # Последний элемент - самое высокое разрешение
+        file_id = photo.file_id
+        file_size = photo.file_size
+        
+        # Создаем директорию для пользователя если не существует
+        from pathlib import Path
+        media_dir = Path("media") / str(user_id)
+        media_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Скачиваем файл
+        file_info = bot.get_file(file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+        
+        # Генерируем уникальное имя файла
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_extension = ".jpg"  # Telegram photos всегда в jpg
+        filename = f"photo_{timestamp}{file_extension}"
+        file_path = MEDIA_ROOT / str(user_id)
+
+        
+        # Сохраняем файл
+        with open(file_path, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        
+        # Логируем медиа сообщение
+        media_info = {
+            "type": "received_media",
+            "filename": safe_filename,
+            "content_type": file.content_type,
+            "file_size": file_path.stat().st_size,
+            "timestamp": datetime.now().isoformat(),
+            "message": message,
+            "download_url": f"/api/crm/media/{user_id}/download/{safe_filename}"
+        }
+
+        
+        # Обновляем статус диалога
+        handle_dialog_user_message(user_id, "[Фотография]")
+        
+        # Логируем в историю чата
+        log_chat_to_file(user_id, "user", {
+            "content": "[Фотография]",
+            "media": media_info
+        })
+        
+        # Отправляем уведомление в группу активных диалогов
+        if ACTIVE_DIALOGS_CHAT_ID:
+            user_data = tracker.get_user(user_id)
+            username = user_data.get('username') if user_data else None
+            user_link = f"@{username}" if username else f'<a href="tg://user?id={user_id}">{user_id}</a>'
+            
+            safe_send_message(
+                ACTIVE_DIALOGS_CHAT_ID,
+                f"📸 <b>Фотография от {user_link}</b>\n\n"
+                f"💾 Размер: {file_size:,} байт\n"
+                f"📁 Сохранено: {filename}",
+                parse_mode="HTML"
+            )
+        
+        # Отправляем информацию о медиа на бэкенд
+        try:
+            webhook_data = {
+                "user_id": user_id,
+                "media": media_info,
+                "username": username,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            response = requests.post("http://localhost:5000/api/internal/receive-media", json=webhook_data, timeout=5)
+            if response.status_code == 200:
+                print(f"✅ Media info sent to backend for user {user_id}")
+            else:
+                print(f"⚠️ Backend returned status {response.status_code} for media info")
+        except Exception as webhook_error:
+            print(f"⚠️ Error sending media info to backend: {webhook_error}")
+        
+        print(f"✅ Фотография сохранена: {file_path}")
+        
+    except Exception as e:
+        print(f"❌ Ошибка обработки фотографии: {e}")
+        import traceback
+        traceback.print_exc()
+
+@bot.message_handler(content_types=['document'])
+def handle_document_message(message):
+    """Обработка входящих документов от пользователей"""
+    try:
+        user_id = message.from_user.id
+        chat_id = message.chat.id
+        
+        # Пропускаем админов
+        if is_admin_user(user_id):
+            return
+            
+        print(f"📄 Получен документ от пользователя {user_id}")
+        
+        document = message.document
+        file_id = document.file_id
+        file_name = document.file_name
+        file_size = document.file_size
+        mime_type = document.mime_type
+        
+        # Проверяем тип файла (разрешаем только изображения и PDF)
+        allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+        if mime_type not in allowed_types:
+            bot.reply_to(message, "❌ Поддерживаются только изображения (JPG, PNG, WebP) и PDF файлы.")
+            return
+        
+
+
+
+        # Внутри функции:
+        media_dir = MEDIA_ROOT / str(user_id)
+        media_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Скачиваем файл
+        file_info = bot.get_file(file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+        
+        # Генерируем безопасное имя файла
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # Очищаем имя файла от небезопасных символов
+        safe_name = re.sub(r'[^\w\-_.]', '_', file_name)
+        filename = f"doc_{timestamp}_{safe_name}"
+        file_path = MEDIA_ROOT / str(user_id)
+
+        
+        # Сохраняем файл
+        with open(file_path, 'wb') as new_file:
+            new_file.write(downloaded_file)
+        
+        # Логируем медиа сообщение
+        media_info = {
+            "type": "document",
+            "file_id": file_id,
+            "file_name": file_name,
+            "file_path": str(file_path.relative_to(BASE_DIR)),
+            "file_size": file_size,
+            "mime_type": mime_type,
+            "filename": filename,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        # Обновляем статус диалога
+        handle_dialog_user_message(user_id, f"[Документ: {file_name}]")
+        
+        # Логируем в историю чата
+        log_chat_to_file(user_id, "user", {
+            "content": f"[Документ: {file_name}]",
+            "media": media_info
+        })
+        
+        # Отправляем уведомление в группу активных диалогов
+        if ACTIVE_DIALOGS_CHAT_ID:
+            user_data = tracker.get_user(user_id)
+            username = user_data.get('username') if user_data else None
+            user_link = f"@{username}" if username else f'<a href="tg://user?id={user_id}">{user_id}</a>'
+            
+            safe_send_message(
+                ACTIVE_DIALOGS_CHAT_ID,
+                f"📄 <b>Документ от {user_link}</b>\n\n"
+                f"📎 Файл: {file_name}\n"
+                f"💾 Размер: {file_size:,} байт\n"
+                f"📁 Сохранено: {filename}",
+                parse_mode="HTML"
+            )
+        
+        # Отправляем информацию о медиа на бэкенд
+        try:
+            webhook_data = {
+                "user_id": user_id,
+                "media": media_info,
+                "username": username,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            response = requests.post("http://localhost:5000/api/internal/receive-media", json=webhook_data, timeout=5)
+            if response.status_code == 200:
+                print(f"✅ Media info sent to backend for user {user_id}")
+            else:
+                print(f"⚠️ Backend returned status {response.status_code} for media info")
+        except Exception as webhook_error:
+            print(f"⚠️ Error sending media info to backend: {webhook_error}")
+        
+        print(f"✅ Документ сохранен: {file_path}")
+        
+    except Exception as e:
+        print(f"❌ Ошибка обработки документа: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 def handle_booking_confirmation(call):
@@ -1845,6 +2054,74 @@ async def internal_send_message(request: Request):
         
     except Exception as e:
         print(f"❌ Error in internal_send_message: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@bot.message_handler(content_types=['photo'])
+def handle_photo(message):
+    try:
+        print(f"📸 Incoming photo from {message.chat.id}")
+
+        # Получаем файл от Telegram
+        file_info = bot.get_file(message.photo[-1].file_id)
+        file_bytes = bot.download_file(file_info.file_path)
+
+        # Определяем имя файла
+        filename = file_info.file_path.split("/")[-1]
+        content_type = "image/jpeg"  # Telegram всегда отдаёт jpg для фото
+
+        # Готовим multipart запрос в CRM
+        files = {
+            "file": (filename, BytesIO(file_bytes), content_type)
+        }
+        data = {
+            "user_id": message.chat.id,
+            "message": message.caption or ""
+        }
+
+        crm_url = os.getenv("CRM_BACKEND_URL", "http://localhost:8000")
+
+        response = requests.post(
+            f"{crm_url}/api/crm/receive_media",
+            files=files,
+            data=data,
+            timeout=30
+        )
+
+        if response.status_code == 200:
+            print("✅ Photo forwarded to CRM")
+        else:
+            print(f"❌ CRM error: {response.status_code} {response.text}")
+
+    except Exception as e:
+        print("❌ Failed to forward photo:", e)
+
+@app.post("/internal/send_media")
+async def internal_send_media(
+    user_id: int = Form(...),
+    message: str = Form(""),
+    media: UploadFile = File(...)
+):
+    """Internal endpoint for sending media files from CRM to Telegram users"""
+    try:
+        print(f"📤 Received media for user {user_id}: {media.filename}")
+        
+        # Определяем тип медиа и отправляем
+        if media.content_type.startswith('image/'):
+            # Отправляем фото
+            bot.send_photo(user_id, media.file, caption=message)
+        elif media.content_type == 'application/pdf':
+            # Отправляем документ
+            bot.send_document(user_id, media.file, caption=message)
+        else:
+            raise HTTPException(status_code=400, detail=f"Unsupported media type: {media.content_type}")
+        
+        print(f"✅ Media sent successfully to user {user_id}")
+        return JSONResponse(content={"status": "ok", "message": "Media sent successfully"})
+        
+    except Exception as e:
+        print(f"❌ Error in internal_send_media: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/internal/update_claude_status")

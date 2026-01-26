@@ -68,11 +68,13 @@ model_specs = {
 # КОНФИГУРАЦИЯ
 # ==============================
 
-ROOT = Path(__file__).parent.parent 
+ROOT = Path(__file__).parent.parent
 DATA = Path(__file__).parent / "data"
 DATA.mkdir(exist_ok=True)
 IMAGES = ROOT / "public" / "images_web"
 IMAGES.mkdir(exist_ok=True)
+MEDIA_ROOT = Path(__file__).parent / "media"
+MEDIA_ROOT.mkdir(exist_ok=True)
 
 VALID_CLASSES = ["compact", "sedan", "suv", "7s", "bikes"]
 
@@ -2792,7 +2794,7 @@ async def api_get_claude_status(user_id: int):
     """Получает статус, вычисленный из ЛОГОВ (Source of Truth)"""
     try:
         # Теперь мы не верим только памяти, а смотрим в историю
-        computed_data = get_derived_status(user_id)
+        computed_data = get_dialog_status_from_history(user_id)
         
         return JSONResponse(content={
             "status": "success",
@@ -2908,7 +2910,7 @@ async def api_get_active_dialogs():
         active_dialogs = []
         
         for u_id in users:
-            status_info = get_derived_status(u_id)
+            status_info = get_dialog_status_from_history(u_id)
             if status_info["claude_status"] == "active":
                 active_dialogs.append({
                     "user_id": u_id,
@@ -3025,11 +3027,12 @@ async def receive_message_from_bot(request: Request):
         text = data.get('text')
         username = data.get('username')
         timestamp = data.get('timestamp')
+        media = data.get('media')  # Новое поле для медиа
         
-        if not user_id or not text:
-            raise HTTPException(status_code=400, detail="user_id and text are required")
+        if not user_id:
+            raise HTTPException(status_code=400, detail="user_id is required")
         
-        print(f"📨 Received message from bot: user {user_id}, text: {text[:50]}...")
+        print(f"📨 Received message from bot: user {user_id}, text: {text[:50] if text else 'No text'}...")
         
         # 1. Log message to chat history with role "user"
         try:
@@ -3037,10 +3040,14 @@ async def receive_message_from_bot(request: Request):
                 "timestamp": timestamp or datetime.utcnow().isoformat(),
                 "user_id": user_id,
                 "role": "user",
-                "text": text,
+                "text": text or "[Медиасообщение]",
                 "username": username,
                 "source": "telegram_bot"
             }
+            
+            # Добавляем информацию о медиа если есть
+            if media:
+                chat_log_entry["media"] = media
             
             with open(CHAT_LOGS_JSONL, "a", encoding="utf-8") as f:
                 f.write(json.dumps(chat_log_entry, ensure_ascii=False) + "\n")
@@ -3048,12 +3055,15 @@ async def receive_message_from_bot(request: Request):
         except Exception as log_error:
             print(f"⚠️ Failed to log message to chat history: {log_error}")
         
+        # Логируем событие диалога
         log_dialog_event(user_id, "user_message_received", {
-            "message_length": len(text),
-            "username": username
+            "message_length": len(text) if text else 0,
+            "message_type": "media" if media else "text",
+            "username": username,
+            "media_info": media
         })
         
-        # 3. Update user metadata (last message time) to move them up in CRM chat list
+        # 2. Update user metadata (last message time) to move them up in CRM chat list
         try:
             users_data = load_json(USER_DATA_JSON)
             user_updated = False
@@ -3100,6 +3110,97 @@ async def receive_message_from_bot(request: Request):
         
     except Exception as e:
         print(f"❌ Error in receive_message_from_bot: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/internal/receive-media")
+async def receive_media_from_bot(request: Request):
+    """Receive media from Telegram bot and log it"""
+    try:
+        data = await request.json()
+        user_id = data.get('user_id')
+        media_info = data.get('media')
+        username = data.get('username')
+        timestamp = data.get('timestamp')
+        
+        if not user_id or not media_info:
+            raise HTTPException(status_code=400, detail="user_id and media are required")
+        
+        print(f"📸 Received media from bot: user {user_id}, type: {media_info.get('type')}")
+        
+        # Log media message to chat history
+        try:
+            chat_log_entry = {
+                "timestamp": timestamp or datetime.utcnow().isoformat(),
+                "user_id": user_id,
+                "role": "user",
+                "text": f"[{media_info.get('type', 'media').capitalize()}]",
+                "username": username,
+                "source": "telegram_bot",
+                "media": media_info
+            }
+            
+            with open(CHAT_LOGS_JSONL, "a", encoding="utf-8") as f:
+                f.write(json.dumps(chat_log_entry, ensure_ascii=False) + "\n")
+            print(f"✅ Media logged to chat history for user {user_id}")
+        except Exception as log_error:
+            print(f"⚠️ Failed to log media to chat history: {log_error}")
+        
+        # Логируем событие диалога
+        log_dialog_event(user_id, "user_media_received", {
+            "media_type": media_info.get('type'),
+            "file_size": media_info.get('file_size'),
+            "filename": media_info.get('filename') or media_info.get('file_name'),
+            "username": username
+        })
+        
+        # Update user metadata
+        try:
+            users_data = load_json(USER_DATA_JSON)
+            user_updated = False
+            
+            for user in users_data:
+                if user.get('user_id') == user_id:
+                    user['last_message_at'] = datetime.utcnow().isoformat()
+                    user['updated_at'] = datetime.utcnow().isoformat()
+                    user_updated = True
+                    break
+            
+            if user_updated:
+                save_json(USER_DATA_JSON, users_data)
+                print(f"✅ Updated metadata for user {user_id}")
+            else:
+                # Create new user record if not exists
+                new_user = {
+                    "user_id": user_id,
+                    "username": username,
+                    "created_at": datetime.utcnow().isoformat(),
+                    "updated_at": datetime.utcnow().isoformat(),
+                    "status": "new",
+                    "form_started": False,
+                    "booking_submitted": False,
+                    "car_interested": None,
+                    "category_interested": None,
+                    "dates_selected": None,
+                    "notes": [],
+                    "source": "telegram_bot",
+                    "last_message_at": datetime.utcnow().isoformat()
+                }
+                users_data.append(new_user)
+                save_json(USER_DATA_JSON, users_data)
+                print(f"✅ Created new user record for {user_id}")
+                
+        except Exception as metadata_error:
+            print(f"⚠️ Failed to update user metadata: {metadata_error}")
+        
+        return {
+            "status": "ok",
+            "message": "Media received and logged successfully"
+        }
+        
+    except Exception as e:
+        print(f"❌ Error in receive_media_from_bot: {e}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
@@ -3831,6 +3932,211 @@ async def startup_event():
     """Запускается при старте сервера"""
     print("🚀 Starting CRM auto-archive...")
     # ... (original startup logic)
+
+# ==============================
+# МУЛЬТИМЕДИА API ENDPOINTS
+# ==============================
+
+@app.get(API_PREFIX + "/crm/media/{user_id}")
+async def get_user_media(user_id: int):
+    """Получить список медиафайлов пользователя"""
+    try:
+        # Fix path to be relative to backend directory
+        media_dir = Path(__file__).parent / "media" / str(user_id)
+        
+        if not media_dir.exists():
+            return {
+                "status": "ok",
+                "user_id": user_id,
+                "media_files": [],
+                "total": 0
+            }
+        
+        media_files = []
+        
+        # Сканируем все файлы в директории пользователя
+        for file_path in media_dir.iterdir():
+            if file_path.is_file():
+                file_stat = file_path.stat()
+                
+                # Определяем тип файла
+                file_extension = file_path.suffix.lower()
+                if file_extension in ['.jpg', '.jpeg', '.png', '.webp']:
+                    file_type = "image"
+                elif file_extension == '.pdf':
+                    file_type = "document"
+                else:
+                    file_type = "other"
+                
+                media_files.append({
+                    "filename": file_path.name,
+                    "file_type": file_type,
+                    "file_size": file_stat.st_size,
+                    "created_at": datetime.fromtimestamp(file_stat.st_ctime).isoformat(),
+                    "modified_at": datetime.fromtimestamp(file_stat.st_mtime).isoformat(),
+                    "download_url": f"/api/crm/media/{user_id}/download/{file_path.name}"
+                })
+        
+        # Сортируем по времени создания (новые сверху)
+        media_files.sort(key=lambda x: x['created_at'], reverse=True)
+        
+        return {
+            "status": "ok",
+            "user_id": user_id,
+            "media_files": media_files,
+            "total": len(media_files)
+        }
+        
+    except Exception as e:
+        print(f"❌ Error getting media for user {user_id}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(API_PREFIX + "/crm/media/{user_id}/download/{filename}")
+async def download_user_media(user_id: int, filename: str):
+    """Скачать медиафайл пользователя"""
+    try:
+        # Безопасность: проверяем что файл находится в правильной директории
+        media_dir = Path(__file__).parent / "media" / str(user_id)
+        file_path = media_dir / filename
+        
+        # Проверяем что файл существует и находится в правильной директории
+        if not file_path.exists() or not str(file_path).startswith(str(media_dir.resolve())):
+            raise HTTPException(status_code=404, detail="File not found")
+        
+        # Определяем Content-Type
+        file_extension = file_path.suffix.lower()
+        if file_extension in ['.jpg', '.jpeg']:
+            media_type = "image/jpeg"
+        elif file_extension == '.png':
+            media_type = "image/png"
+        elif file_extension == '.webp':
+            media_type = "image/webp"
+        elif file_extension == '.pdf':
+            media_type = "application/pdf"
+        else:
+            media_type = "application/octet-stream"
+        
+        return FileResponse(
+            path=str(file_path),
+            media_type=media_type,
+            filename=filename
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error downloading media {filename} for user {user_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+class MediaUploadRequest(BaseModel):
+    user_id: int
+    message: Optional[str] = None
+
+@app.post(API_PREFIX + "/crm/send_media")
+async def send_media_to_user(
+    user_id: int = Form(...),
+    message: Optional[str] = Form(None),
+    file: UploadFile = File(...)
+):
+    """Отправить медиафайл пользователю через Telegram бота"""
+    try:
+        print(f"📤 Sending media to user {user_id}")
+        
+        # Проверяем тип файла
+        allowed_types = ["image/jpeg", "image/png", "image/webp", "application/pdf"]
+        if file.content_type not in allowed_types:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported file type: {file.content_type}. Allowed: {', '.join(allowed_types)}"
+            )
+        
+        # Создаем директорию для пользователя если не существует
+        media_dir = Path(__file__).parent / "media" / str(user_id)
+        media_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Генерируем уникальное имя файла
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        original_extension = Path(file.filename).suffix if file.filename else ""
+        safe_filename = f"sent_{timestamp}_{file.filename}"
+        file_path = media_dir / safe_filename
+        
+        # Сохраняем файл
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        # Логируем отправку медиа
+        media_info = {
+            "type": "sent_media",
+            "filename": safe_filename,
+            "content_type": file.content_type,
+            "file_size": file_path.stat().st_size,
+            "timestamp": datetime.now().isoformat(),
+            "message": message,
+            "download_url": f"/api/crm/media/{user_id}/download/{safe_filename}"
+        }
+
+        # Отправляем через Telegram бота
+        try:
+            bot_url = os.getenv("TG_WEBHOOK_URL", "http://localhost:5001")
+            if bot_url.endswith('/'):
+                bot_url = bot_url[:-1]
+            
+            # Подготавливаем файл для отправки
+            with open(file_path, 'rb') as media_file:
+                files = {'media': (safe_filename, media_file, file.content_type)}
+                data = {
+                    'user_id': user_id,
+                    'message': message or ""
+                }
+                
+                response = requests.post(
+                    f"{bot_url}/internal/send_media",
+                    files=files,
+                    data=data,
+                    timeout=30
+                )
+            
+            if response.status_code == 200:
+                # Логируем в историю чата
+                log_chat_to_file(user_id, "assistant", {
+                    "content": message or "[Медиафайл]",
+                    "media": media_info,
+                    "sent_by": "manager"
+                })
+                
+                # Обновляем статус диалога
+                update_dialog_status(
+                    user_id=user_id,
+                    last_message_at=datetime.now().isoformat(),
+                    last_message_from="manager",
+                    message_count_increment=1
+                )
+                
+                print(f"✅ Media sent successfully to user {user_id}")
+                return {
+                    "status": "ok",
+                    "message": "Media sent successfully",
+                    "filename": safe_filename,
+                    "file_size": file_path.stat().st_size
+                }
+            else:
+                print(f"⚠️ Bot returned status {response.status_code}: {response.text}")
+                raise HTTPException(status_code=500, detail="Failed to send media via bot")
+                
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Error connecting to bot: {e}")
+            raise HTTPException(status_code=500, detail="Bot service unavailable")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error sending media to user {user_id}: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ==============================
 # ЗАПУСК

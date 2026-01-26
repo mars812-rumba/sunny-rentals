@@ -17,7 +17,7 @@ import {
   Calendar, Car, StickyNote , MessageSquare, Plus, Pencil, Trash2,
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus,UserRoundMinus,UserRoundCheck,
   Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
-  CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig
+  CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { MarkerType } from '@/types/crm';
@@ -33,6 +33,7 @@ interface DialogEvent {
 interface DialogStatus {
   active: boolean;
   has_new_messages: boolean;
+  has_media_messages?: boolean;
   last_message_at: string | null;
   last_message_from: 'user' | 'manager' | 'claude' | null;
   message_count: number;
@@ -106,6 +107,9 @@ const CRMPage: React.FC = () => {
   const [editingNoteId, setEditingNoteId] = useState(null); // ID юзера, чью заметку правим
   const [tempNote, setTempNote] = useState(''); // Временный текст для ввода
   const [markerFilter, setMarkerFilter] = useState<string>('all');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
   const formatDateSimple = (dateStr: string) => {
@@ -343,6 +347,72 @@ const loadUserDetails = async (user: any) => {
     await fetchChatHistory(selectedUser.user_id, false);
     setIsRefreshing(false);
     };
+
+  // File handling functions
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Поддерживаются только изображения (JPG, PNG) и PDF документы');
+        return;
+      }
+      
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Размер файла не должен превышать 10MB');
+        return;
+      }
+      
+      setSelectedFile(file);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile || !selectedUser) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('user_id', selectedUser.user_id.toString());
+      formData.append('message', managerMessage || '');
+
+      const response = await fetch('/api/crm/send_media', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        // Clear form
+        setSelectedFile(null);
+        setManagerMessage('');
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        
+        // Refresh chat history
+        await fetchChatHistory(selectedUser.user_id, false);
+        await refreshAllDialogStatuses();
+      } else {
+        const error = await response.json();
+        alert(`Ошибка загрузки: ${error.message || 'Неизвестная ошибка'}`);
+      }
+    } catch (e) {
+      console.error('Ошибка загрузки файла:', e);
+      alert('Ошибка сети при загрузке файла');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeSelectedFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
   // Функция для открытия деталей (на инфо)
   const openUserDetails = (user: any) => {
     setActiveTab('info');
@@ -695,7 +765,7 @@ const handleUpdateNote = async () => {
 
 <main className="p-4 max-w-[1600px] mx-auto w-full space-y-6">
   {/* Stats Section - Более чистый вид */}
-  <div className="grid grid-cols-3 gap-4">
+  <div className="grid grid-cols-4 gap-4">
     {MAIN_STATUSES.map(key => (
       <Card key={key} onClick={() => setActiveStatus(key)} 
         className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' : 'hover:bg-white/50 opacity-80'}`}>
@@ -967,6 +1037,16 @@ const handleUpdateNote = async () => {
           )}
         </div>
         
+        {/* Media indicators */}
+        <div className="flex items-center gap-1">
+          {dialog?.has_media_messages && (
+            <div className="flex items-center gap-0.5">
+              <Image className="w-2.5 h-2.5 text-blue-500" />
+              <span className="text-[7px] font-bold text-blue-600">📎</span>
+            </div>
+          )}
+        </div>
+        
         {dialog?.has_new_messages && (
           <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_4px_red]"></div>
         )}
@@ -1228,24 +1308,107 @@ const handleUpdateNote = async () => {
   </ScrollArea>
 </TabsContent>
 
-          {/* ВКЛАДКА ЧАТ (Без изменений) */}
+          {/* ВКЛАДКА ЧАТ (CORRECTED MEDIA RENDERING) */}
 <TabsContent value="chat" className="m-0 h-full flex flex-col bg-slate-100 overflow-hidden">
     {/* Чат занимает всё свободное место */}
-    <ScrollArea className="flex-1 p-2">
-        <div className="max-w-2xl mx-auto space-y-3 pb-4">
-            {chats.map((msg, i) => (
-                <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-start' : 'items-end'}`}>
-                    <div className={`max-w-[70%] p-3 rounded-2xl text-[10px] shadow-sm break-words ${
-                        msg.role === 'user' ? 'bg-white text-slate-800 rounded-bl-none' : 'bg-blue-600 text-white rounded-br-none'
-                    }`}>
-                        {msg?.content || msg?.text || "Пустое сообщение"}
+ <ScrollArea className="flex-1 p-2">
+  <div className="max-w-2xl mx-auto space-y-3 pb-4">
+    {chats.map((msg, i) => {
+      const media = msg?.content?.media;
+
+      return (
+        <div
+          key={i}
+          className={`flex flex-col ${msg.role === 'user' ? 'items-start' : 'items-end'}`}
+        >
+          <div
+            className={`max-w-[70%] p-3 rounded-2xl text-[10px] shadow-sm break-words ${
+              msg.role === 'user'
+                ? 'bg-white text-slate-800 rounded-bl-none'
+                : 'bg-blue-600 text-white rounded-br-none'
+            }`}
+          >
+            {/* ===== MEDIA MESSAGE ===== */}
+            {media?.type === 'sent_media' && media.download_url ? (
+              <div className="space-y-2">
+
+                {/* IMAGE */}
+                {media.content_type?.startsWith('image/') ? (
+                  <div className="space-y-2">
+                    <img
+                      src={media.download_url}
+                      alt={media.original_filename || 'image'}
+                      className="max-w-xs rounded cursor-pointer border"
+                      onClick={() => window.open(media.download_url, '_blank')}
+                    />
+                    {media.message && (
+                      <p className="text-[10px] text-slate-100">{media.message}</p>
+                    )}
+                  </div>
+                ) : (
+                  /* DOCUMENT */
+                  <div className="space-y-2">
+                    <div
+                      className="flex items-center gap-2 p-2 bg-slate-100 rounded-lg cursor-pointer hover:bg-slate-200 transition"
+                      onClick={() => window.open(media.download_url, '_blank')}
+                    >
+                      <div className="w-8 h-8 bg-red-100 rounded flex items-center justify-center">
+                        <span className="text-[8px] font-bold text-red-600">
+                          {media.content_type === 'application/pdf' ? 'PDF' : 'FILE'}
+                        </span>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[9px] font-bold text-slate-700 truncate">
+                          {media.original_filename || media.filename || 'Document'}
+                        </p>
+                        <p className="text-[7px] text-slate-500">Click to download</p>
+                      </div>
+
+                      <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                      </Button>
                     </div>
-                    <span className="text-[8px] font-bold text-slate-400 mt-1 uppercase px-2">{msg.role}</span>
-                </div>
-            ))}
-            <div ref={chatEndRef} />
+
+                    {media.message && (
+                      <p className="text-[10px] text-slate-100">{media.message}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* ===== TEXT MESSAGE ===== */
+              <p>
+                {typeof msg?.content === 'string'
+                  ? msg.content
+                  : msg?.text || 'Пустое сообщение'}
+              </p>
+            )}
+          </div>
+
+          <span className="text-[8px] font-bold text-slate-400 mt-1 uppercase px-2">
+            {msg.role}
+          </span>
         </div>
-    </ScrollArea>
+      );
+    })}
+
+    <div ref={chatEndRef} />
+  </div>
+</ScrollArea>
+
 {/* Единый компактный блок управления и ввода */}
 <div className="bg-white border-t border-slate-200 shrink-0 p-3">
     <div className="max-w-2xl mx-auto">
@@ -1323,20 +1486,81 @@ const handleUpdateNote = async () => {
                 </Button>
             </div>
         </div>
+            {/* File attachment preview */}
+            {selectedFile && (
+                <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            {selectedFile.type.startsWith('image/') ? (
+                                <Image className="w-4 h-4 text-blue-600" />
+                            ) : (
+                                <FileText className="w-4 h-4 text-red-600" />
+                            )}
+                            <span className="text-sm font-medium text-blue-800">
+                                {selectedFile.name}
+                            </span>
+                            <span className="text-xs text-blue-600">
+                                ({(selectedFile.size / 1024 / 1024).toFixed(1)} MB)
+                            </span>
+                        </div>
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={removeSelectedFile}
+                            className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800"
+                        >
+                            <X className="w-3 h-3" />
+                        </Button>
+                    </div>
+                </div>
+            )}
+
             {/* Поле ввода сообщения */}
             <div className="flex gap-2 bg-slate-50 p-1.5 rounded-full border border-slate-100 shadow-inner">
-                <input 
-                    className="flex-1 bg-transparent px-3 py-1 outline-none text-sm" 
-                    placeholder="Написать клиенту..." 
-                    value={managerMessage} 
-                    onChange={(e) => setManagerMessage(e.target.value)} 
-                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()} 
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    accept="image/*,.pdf"
+                    className="hidden"
                 />
-                <Button 
-                    onClick={handleSendMessage} 
-                    className="rounded-full w-8 h-8 p-0 bg-blue-600 hover:bg-blue-700 transition-transform active:scale-90"
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="rounded-full w-8 h-8 p-0 text-slate-500 hover:text-blue-600 hover:bg-blue-50"
                 >
-                    <Send className="w-3.5 h-3.5" />
+                    <Paperclip className="w-3.5 h-3.5" />
+                </Button>
+                
+                <input
+                    className="flex-1 bg-transparent px-3 py-1 outline-none text-sm"
+                    placeholder={selectedFile ? "Добавить описание к файлу..." : "Написать клиенту..."}
+                    value={managerMessage}
+                    onChange={(e) => setManagerMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            if (selectedFile) {
+                                handleFileUpload();
+                            } else {
+                                handleSendMessage();
+                            }
+                        }
+                    }}
+                />
+                
+                <Button
+                    onClick={selectedFile ? handleFileUpload : handleSendMessage}
+                    disabled={isUploading || (!managerMessage.trim() && !selectedFile)}
+                    className="rounded-full w-8 h-8 p-0 bg-blue-600 hover:bg-blue-700 transition-transform active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {isUploading ? (
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                        <Send className="w-3.5 h-3.5" />
+                    )}
                 </Button>
             </div>
         </div>

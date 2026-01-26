@@ -2878,5 +2878,85 @@
     },
     "status": "new",
     "created_at": "2026-01-24T10:52:52.832799"
+  },
+  {
+    "booking_id": "3cc6f9bd",
+    "user_id": "374897465",
+    "form_data": {
+      "car": {
+        "id": "toyota_veloz_2024_gray",
+        "name": "Toyota VELOZ 2024 Gray",
+        "brand": "Toyota",
+        "model": "VELOZ",
+        "year": "2024",
+        "color": "Gray"
+      },
+      "dates": {
+        "start": "2026-02-14T17:00:00.000Z",
+        "end": "2026-02-25T17:00:00.000Z",
+        "days": 12
+      },
+      "locations": {
+        "pickup": "airport",
+        "return": "airport"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 1325,
+        "totalRental": 15900,
+        "deposit": 10000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 0,
+        "grandTotal": 15900
+      },
+      "contact": {
+        "value": "@Marseloid",
+        "type": "telegram"
+      },
+      "timestamp": "2026-01-25T21:30:35.893Z"
+    },
+    "status": "new",
+    "created_at": "2026-01-25T21:30:36.287999"
+  },
+  {
+    "booking_id": "2fec2c26",
+    "user_id": "374897465",
+    "form_data": {
+      "car": {
+        "id": "honda_civic_2024_black",
+        "name": "Honda CIVIC RS 2024 Black",
+        "brand": "Honda",
+        "model": "CIVIC RS",
+        "year": "2024",
+        "color": "Black"
+      },
+      "dates": {
+        "start": "2026-02-07T17:00:00.000Z",
+        "end": "2026-02-25T17:00:00.000Z",
+        "days": 19
+      },
+      "locations": {
+        "pickup": "airport",
+        "return": "airport"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 1338,
+        "totalRental": 25422,
+        "deposit": 5000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 0,
+        "grandTotal": 25422
+      },
+      "contact": {
+        "value": "@Marseloid",
+        "type": "telegram"
+      },
+      "timestamp": "2026-01-25T22:13:30.232Z"
+    },
+    "status": "new",
+    "created_at": "2026-01-25T22:13:31.661702"
   }
 ]
