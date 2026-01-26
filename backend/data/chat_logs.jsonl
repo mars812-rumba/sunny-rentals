@@ -1332,3 +1332,82 @@
 {"timestamp": "2026-01-26T04:34:14.276240", "user_id": 374897465, "role": "user", "content": "Да"}
 {"timestamp": "2026-01-26T04:34:14.276921", "user_id": 374897465, "role": "assistant", "content": "[image:suv/ar_fortuner_gray_2023/26.jpg]\n[image:suv/ar_fortuner_gray_2023/27.jpg]\n[image:suv/ar_fortuner_gray_2023/28.jpg]\n\nВот дополнительные фото Toyota Fortuner 2023! Видно салон и все детали. Интересует эта машина?"}
 {"timestamp": "2026-01-26T04:58:36.953659", "user_id": 374897465, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_045836_FB_IMG_1702949164758.jpg", "content_type": "image/jpeg", "file_size": 55115, "timestamp": "2026-01-26T04:58:36.374987", "message": "", "download_url": "/api/crm/media/374897465/download/sent_20260126_045836_FB_IMG_1702949164758.jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T05:11:52.508955", "user_id": 374897465, "role": "assistant", "content": {"content": "Джихад акбар", "media": {"type": "sent_media", "filename": "sent_20260126_051151_Screenshot_20260126-104843.jpg", "content_type": "image/jpeg", "file_size": 175691, "timestamp": "2026-01-26T05:11:51.732305", "message": "Джихад акбар", "download_url": "/api/crm/media/374897465/download/sent_20260126_051151_Screenshot_20260126-104843.jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T05:24:03.088303", "user_id": 311272681, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_052402_IMG-20250322-WA0024 (1).jpg", "content_type": "image/jpeg", "file_size": 114855, "timestamp": "2026-01-26T05:24:02.296769", "message": "", "download_url": "/api/crm/media/311272681/download/sent_20260126_052402_IMG-20250322-WA0024 (1).jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T05:24:13.104762", "user_id": 311272681, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_052412_IMG-20250322-WA0026 (1).jpg", "content_type": "image/jpeg", "file_size": 123663, "timestamp": "2026-01-26T05:24:12.648149", "message": "", "download_url": "/api/crm/media/311272681/download/sent_20260126_052412_IMG-20250322-WA0026 (1).jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T05:35:04.853395", "user_id": 477966640, "role": "user", "text": "\\start", "username": "dmitry_podorozhkin", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T05:54:21.307689", "user_id": 379843472, "role": "user", "text": "Нужна машина с сегодняшнего дня до 4 марта ( финиш в аэропорту ). \nБюджет 20 000 бат.", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T05:55:27.521Z", "user_id": 379843472, "role": "manager", "text": "Ок, минуту", "source": "crm_panel"}
+{"timestamp": "2026-01-26T06:03:33.968139", "user_id": 379843472, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_060333_IMG-20260126-WA0008.jpg", "content_type": "image/jpeg", "file_size": 367342, "timestamp": "2026-01-26T06:03:33.226244", "message": "", "download_url": "/api/crm/media/379843472/download/sent_20260126_060333_IMG-20260126-WA0008.jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T06:03:44.163990", "user_id": 8390581871, "role": "user", "text": "Здравствуйте", "username": "AHTOH_AntoH", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:03:55.755494", "user_id": 8390581871, "role": "user", "text": "Интересует аренда авто", "username": "AHTOH_AntoH", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:04:05.088293", "user_id": 8390581871, "role": "user", "text": "start/", "username": "AHTOH_AntoH", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:05:04.840437", "user_id": 379843472, "role": "user", "text": "Это что за машина ? И какой двигатель ?", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:06:25.578177", "user_id": 379843472, "role": "user", "text": "Состояние машины. С детьми буду ездить. Подвеска, тормоза", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:06:35.319409", "user_id": 379843472, "role": "user", "text": "Условия аренды ?", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:10:51.031Z", "user_id": 379843472, "role": "manager", "text": "Стоимость аренды на ваши даты 22,000 бат", "source": "crm_panel"}
+{"timestamp": "2026-01-26T06:10:58.575Z", "user_id": 379843472, "role": "manager", "text": "Состояние отличное", "source": "crm_panel"}
+{"timestamp": "2026-01-26T06:11:13.735628", "user_id": 379843472, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_061113_IMG-20260126-WA0005.jpg", "content_type": "image/jpeg", "file_size": 198329, "timestamp": "2026-01-26T06:11:13.023745", "message": "", "download_url": "/api/crm/media/379843472/download/sent_20260126_061113_IMG-20260126-WA0005.jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T06:11:17.316865", "user_id": 379843472, "role": "user", "text": "Где вы находитесь ?", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:11:31.603595", "user_id": 379843472, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_061130_IMG-20260126-WA0002.jpg", "content_type": "image/jpeg", "file_size": 243808, "timestamp": "2026-01-26T06:11:30.928933", "message": "", "download_url": "/api/crm/media/379843472/download/sent_20260126_061130_IMG-20260126-WA0002.jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T06:11:40.293Z", "user_id": 379843472, "role": "manager", "text": "У нас только доставка", "source": "crm_panel"}
+{"timestamp": "2026-01-26T06:12:51.256Z", "user_id": 379843472, "role": "manager", "text": "Доставка 750 бат по городу", "source": "crm_panel"}
+{"timestamp": "2026-01-26T06:13:49.347442", "user_id": 379843472, "role": "user", "text": "Я подумаю.", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:14:00.432472", "user_id": 379843472, "role": "user", "text": "Да и какие условия ?", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:14:04.396583", "user_id": 379843472, "role": "user", "text": "Депозит ?", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:14:06.287873", "user_id": 379843472, "role": "user", "text": "Мойка", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:14:14.592572", "user_id": 379843472, "role": "user", "text": "Можно ли отдать в аэропорту", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:16:57.656Z", "user_id": 379843472, "role": "manager", "text": "Депозит 5000", "source": "crm_panel"}
+{"timestamp": "2026-01-26T06:17:36.227Z", "user_id": 379843472, "role": "manager", "text": "За мойку не берем, если только много песка в салоне. Возврат в аэропорту 750.", "source": "crm_panel"}
+{"timestamp": "2026-01-26T06:18:47.536Z", "user_id": 379843472, "role": "manager", "text": "Toyota Ativ 2023 Date : 26.01 - 04.03 Price 22,000 Delivery and return 1,500 Deposit 5000", "source": "crm_panel"}
+{"timestamp": "2026-01-26T06:27:40.669532", "user_id": 379843472, "role": "user", "text": "Какой у неё двигатель ?", "username": "onehomegrup", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T06:49:47.948402", "user_id": 719766623, "role": "user", "text": "✋", "username": "Mudriy_KA", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T08:47:09.592Z", "user_id": 477966640, "role": "manager", "text": "/start", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:47:37.801Z", "user_id": 8390581871, "role": "manager", "text": "Добрый день", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:47:52.077Z", "user_id": 8390581871, "role": "manager", "text": "Седан?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:48:08.032Z", "user_id": 8390581871, "role": "manager", "text": "Если только самовывоз из аэропорта", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:48:34.351Z", "user_id": 379843472, "role": "manager", "text": "1.2", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:50:13.543Z", "user_id": 7553360348, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:50:31.847Z", "user_id": 5143352391, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:50:47.410Z", "user_id": 6547185186, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:50:48.041010", "user_id": 8390581871, "role": "user", "text": "Какая стоимость и условия аренды?", "username": "AHTOH_AntoH", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T08:50:58.202Z", "user_id": 7478865911, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:51:12.358119", "user_id": 8390581871, "role": "user", "text": "Ну думаю что решаемо", "username": "AHTOH_AntoH", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T08:51:18.715Z", "user_id": 1959656909, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:51:41.285Z", "user_id": 735602457, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:51:54.309Z", "user_id": 5508965592, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:52:10.060Z", "user_id": 496522060, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:52:21.198Z", "user_id": 958309947, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:52:32.966Z", "user_id": 51943088, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:52:47.906Z", "user_id": 809040324, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:52:59.378Z", "user_id": 979339665, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:53:14.604Z", "user_id": 627399758, "role": "manager", "text": "Здравствуйте! Интересует авто?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:53:40.317292", "user_id": 627399758, "role": "user", "text": "Здравствуйте, уже нет. Нашли", "username": "itaksoidet_11", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T08:54:52.475Z", "user_id": 8390581871, "role": "manager", "text": "Минуту", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:56:27.433417", "user_id": 8390581871, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_085626_IMG-20251205-WA0010.jpg", "content_type": "image/jpeg", "file_size": 264157, "timestamp": "2026-01-26T08:56:26.538126", "message": "", "download_url": "/api/crm/media/8390581871/download/sent_20260126_085626_IMG-20251205-WA0010.jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T08:57:05.728034", "user_id": 8390581871, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_085704_IMG-20260126-WA0014.jpg", "content_type": "image/jpeg", "file_size": 243259, "timestamp": "2026-01-26T08:57:04.941790", "message": "", "download_url": "/api/crm/media/8390581871/download/sent_20260126_085704_IMG-20260126-WA0014.jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T08:57:05.407681", "user_id": 101495270, "role": "user", "text": "Добрый день.", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T08:57:44.338789", "user_id": 1959656909, "role": "user", "text": "Нет, нашли уже", "username": "vkosmose1995", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T08:58:08.353658", "user_id": 8390581871, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_085807_IMG-20251205-WA0014.jpg", "content_type": "image/jpeg", "file_size": 207861, "timestamp": "2026-01-26T08:58:07.480751", "message": "", "download_url": "/api/crm/media/8390581871/download/sent_20260126_085807_IMG-20251205-WA0014.jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T08:58:21.585Z", "user_id": 8390581871, "role": "manager", "text": "3 дня?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T08:58:26.770336", "user_id": 8390581871, "role": "user", "text": "Какая цена? Нужен не дорогой вариант", "username": "AHTOH_AntoH", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T08:58:38.651028", "user_id": 8390581871, "role": "user", "text": "Можно меньше?", "username": "AHTOH_AntoH", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T08:59:30.944490", "user_id": 101495270, "role": "user", "text": "Бот перестал работать.", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T09:01:32.535Z", "user_id": 8390581871, "role": "manager", "text": "Ярис 1000 баи в сутки. Минимальный срок 3 дня", "source": "crm_panel"}
+{"timestamp": "2026-01-26T09:01:49.241Z", "user_id": 101495270, "role": "manager", "text": "/start", "source": "crm_panel"}
+{"timestamp": "2026-01-26T09:03:08.718787", "user_id": 101495270, "role": "user", "text": "Уточните условия доставки и возврата авто. Например, получение в отеле на Кароне и возврат там же. В условиях описано неоднозначно и не понятно", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T09:04:17.654Z", "user_id": 101495270, "role": "manager", "text": "Доставка + возврат 1000 бат", "source": "crm_panel"}
+{"timestamp": "2026-01-26T09:05:41.868037", "user_id": 51943088, "role": "user", "text": "добрый день, уже нет( уезжаю сегодня", "username": "alexzibert", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T09:06:06.185Z", "user_id": 51943088, "role": "manager", "text": ",", "source": "crm_panel"}
+{"timestamp": "2026-01-26T09:06:12.461Z", "user_id": 51943088, "role": "manager", "text": "🙏", "source": "crm_panel"}
+{"timestamp": "2026-01-26T09:20:59.811631", "user_id": 8390581871, "role": "user", "text": "В каком районе находится авто", "username": "AHTOH_AntoH", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T09:21:34.873160", "user_id": 8390581871, "role": "user", "text": "Нас устроит такая цена, сколько депозит? Страховка у авто имеется?", "username": "AHTOH_AntoH", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T09:25:31.719507", "user_id": 8390581871, "role": "user", "text": "Аэропорт ?", "username": "AHTOH_AntoH", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T09:26:40.114486", "user_id": 1022583753, "role": "user", "text": "Добрый день\nПодскажите, можете помочь с арендой авто сегодня на Пхукете, интересует аренда эконом авто на 3 дня минимум, вероятно подольше", "username": "AJ034", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T09:32:15.700Z", "user_id": 8390581871, "role": "manager", "text": "Да, ехать в аэропорт. Страховка 1 класса", "source": "crm_panel"}
+{"timestamp": "2026-01-26T09:32:26.106Z", "user_id": 8390581871, "role": "manager", "text": "Депозит 5000", "source": "crm_panel"}
+{"timestamp": "2026-01-26T09:34:27.330Z", "user_id": 1022583753, "role": "manager", "text": "Добрый день! Да, единственное нужно самому из аэропорта щабирать", "source": "crm_panel"}
+{"timestamp": "2026-01-26T09:39:19.148483", "user_id": 1022583753, "role": "user", "text": "Предлагайте", "username": "AJ034", "source": "telegram_bot"}
+{"timestamp": "2026-01-26T11:53:59.234141", "user_id": 958309947, "role": "user", "text": "Здравствуйте, да", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T12:08:10.062Z", "user_id": 1391870076, "role": "manager", "text": "Здравствуйте. От вас поступила заявка на mg 5", "source": "crm_panel"}
+{"timestamp": "2026-01-26T12:08:59.707Z", "user_id": 409658901, "role": "manager", "text": "Добрый вечер! Нужен авто на 10.02?", "source": "crm_panel"}

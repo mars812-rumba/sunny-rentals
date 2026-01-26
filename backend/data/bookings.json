@@ -2958,5 +2958,89 @@
     },
     "status": "new",
     "created_at": "2026-01-25T22:13:31.661702"
+  },
+  {
+    "booking_id": "9a26c93a",
+    "user_id": "admin",
+    "form_data": {
+      "car": {
+        "id": "honda_civic_2023_white",
+        "name": "Honda CIVIC 2023 White",
+        "brand": "Honda",
+        "model": "CIVIC",
+        "year": "2023",
+        "color": "White"
+      },
+      "dates": {
+        "start": "2026-01-27T06:00:00.000Z",
+        "end": "2026-02-12T04:30:00.000Z",
+        "days": 17
+      },
+      "locations": {
+        "pickupLocation": "airport",
+        "returnLocation": "airport",
+        "pickupAddress": "Лапландия",
+        "returnAddress": "Хуй с горы"
+      },
+      "pricing": {
+        "dailyRate": 1198,
+        "totalRental": 20366,
+        "deposit": 5000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 0,
+        "grandTotal": 20366
+      },
+      "contact": {
+        "value": "8888888",
+        "type": "whatsapp",
+        "name": "Никитос",
+        "phone": ""
+      },
+      "timestamp": "2026-01-26T06:33:51.479Z"
+    },
+    "status": "confirmed",
+    "created_at": "2026-01-26T06:33:51.890588",
+    "source": "admin_panel"
+  },
+  {
+    "booking_id": "14eac309",
+    "user_id": "1391870076",
+    "form_data": {
+      "car": {
+        "id": "mg_mg5_2024_green",
+        "name": "MG MG5 2024 Green",
+        "brand": "MG",
+        "model": "MG5",
+        "year": "2024",
+        "color": "Green"
+      },
+      "dates": {
+        "start": "2026-02-20T14:00:00.000Z",
+        "end": "2026-02-25T14:00:00.000Z",
+        "days": 6
+      },
+      "locations": {
+        "pickup": "hotel",
+        "return": "hotel"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 1084,
+        "totalRental": 6504,
+        "deposit": 5000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 7504
+      },
+      "contact": {
+        "value": "89024888164",
+        "type": "whatsapp"
+      },
+      "timestamp": "2026-01-26T11:42:46.686Z"
+    },
+    "status": "new",
+    "created_at": "2026-01-26T11:42:47.343511"
   }
 ]
