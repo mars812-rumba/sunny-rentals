@@ -1627,3 +1627,66 @@
 {"timestamp": "2026-01-26T11:53:59.246842", "user_id": 958309947, "action": "user_message_received", "message_length": 16, "message_type": "text", "username": null, "media_info": null}
 {"timestamp": "2026-01-26T12:08:10.062Z", "user_id": 1391870076, "action": "manager_message_sent", "message_length": 45}
 {"timestamp": "2026-01-26T12:08:59.707Z", "user_id": 409658901, "action": "manager_message_sent", "message_length": 34}
+{"timestamp": "2026-01-26T13:07:29.969958", "user_id": 1223324329, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-26T13:07:47.121267", "user_id": 1223324329, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-03T21:00:00.000Z", "endDate": "2026-03-10T21:00:00.000Z", "days": 8, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-26T13:07:47.275658", "user_id": 1223324329, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-03T21:00:00.000Z", "endDate": "2026-03-10T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-26T13:07:48.447979", "user_id": 1223324329, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-03T21:00:00.000Z", "endDate": "2026-03-10T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-26T13:07:48.593639", "user_id": 1223324329, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-03T21:00:00.000Z", "endDate": "2026-03-10T21:00:00.000Z", "days": 8, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-26T13:07:49.157901", "user_id": 1223324329, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-03T21:00:00.000Z", "endDate": "2026-03-10T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-26T13:07:52.349748", "user_id": 1223324329, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-03T21:00:00.000Z", "endDate": "2026-03-10T21:00:00.000Z", "days": 8, "category": "suv", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-26T13:07:52.491255", "user_id": 1223324329, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-03T21:00:00.000Z", "endDate": "2026-03-10T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-26T13:07:52.650147", "user_id": 1223324329, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-03T21:00:00.000Z", "endDate": "2026-03-10T21:00:00.000Z", "days": 8, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-26T13:08:54.258629", "user_id": 1223324329, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-03T21:00:00.000Z", "endDate": "2026-03-10T21:00:00.000Z", "username": null}, "username": null}
+{"timestamp": "2026-01-26T13:08:54.507580", "user_id": 1223324329, "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-03T21:00:00.000Z", "endDate": "2026-03-10T21:00:00.000Z", "days": 8, "category": "suv", "pickupLocation": "airport", "returnLocation": "airport", "username": null}, "username": null}
+{"timestamp": "2026-01-26T13:08:54.822563", "user_id": 1022583753, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-26T13:08:56.649948", "user_id": 1022583753, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-26T13:09:58.541Z", "user_id": 1223324329, "action": "manager_message_sent", "message_length": 72}
+{"timestamp": "2026-01-26T13:10:46.386636", "user_id": 1223324329, "action": "message_received", "content": "Здравствуйте! \nДа, на март)"}
+{"timestamp": "2026-01-26T13:10:46.395058", "user_id": 1223324329, "action": "user_message_received", "message_length": 27, "message_type": "text", "username": null, "media_info": null}
+{"timestamp": "2026-01-26T13:11:42.173047", "user_id": 1223324329, "action": "message_received", "content": "Как узнать актуальные цены?"}
+{"timestamp": "2026-01-26T13:11:42.195144", "user_id": 1223324329, "action": "user_message_received", "message_length": 27, "message_type": "text", "username": null, "media_info": null}
+{"timestamp": "2026-01-26T13:11:41.264Z", "user_id": 958309947, "action": "manager_message_sent", "message_length": 38}
+{"timestamp": "2026-01-26T13:12:19.738966", "user_id": 886948972, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-26T13:12:30.997030", "user_id": 958309947, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-01-26T13:12:34.520850", "user_id": 958309947, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-26T13:14:01.130146", "user_id": 8390581871, "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-01-26T13:14:07.756028", "user_id": 8390581871, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-26T13:15:56.296650", "user_id": 5146757639, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-26T13:48:30.141Z", "user_id": 1223324329, "action": "manager_message_sent", "message_length": 53}
+{"timestamp": "2026-01-26T13:49:37.994913", "user_id": 1223324329, "action": "message_received", "content": "Седан либо кроссовер\n4 чел"}
+{"timestamp": "2026-01-26T13:49:38.009842", "user_id": 1223324329, "action": "user_message_received", "message_length": 26, "message_type": "text", "username": null, "media_info": null}
+{"timestamp": "2026-01-26T14:21:30.676498", "user_id": 1223324329, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-26T14:21:32.731937", "user_id": 1223324329, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-01-26T14:25:33.485Z", "user_id": 1223324329, "action": "manager_message_sent", "message_length": 20}
+{"timestamp": "2026-01-26T14:27:21.341882", "user_id": 409658901, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-01-26T14:27:49.660115", "user_id": 1223324329, "action": "message_received", "content": "Хорошо\nА есть еще варианты, чуть побольше что-нибудь?"}
+{"timestamp": "2026-01-26T14:27:49.671822", "user_id": 1223324329, "action": "user_message_received", "message_length": 53, "message_type": "text", "username": null, "media_info": null}
+{"timestamp": "2026-01-26T14:27:54.448679", "user_id": 1223324329, "action": "message_received", "content": "И какие условия?"}
+{"timestamp": "2026-01-26T14:27:54.453570", "user_id": 1223324329, "action": "user_message_received", "message_length": 16, "message_type": "text", "username": null, "media_info": null}
+{"timestamp": "2026-01-26T14:30:20.746546", "user_id": 914988296, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-26T14:37:25.358336", "user_id": 958309947, "action": "message_received", "content": "С 26 февраля по 10 марта, в эти дни хотим арендовать примерно на 3-4 дня"}
+{"timestamp": "2026-01-26T14:37:25.364756", "user_id": 958309947, "action": "user_message_received", "message_length": 72, "message_type": "text", "username": null, "media_info": null}
+{"timestamp": "2026-01-26T15:13:18.787Z", "user_id": 1223324329, "action": "manager_message_sent", "message_length": 40}
+{"timestamp": "2026-01-26T15:15:13.523Z", "user_id": 1223324329, "action": "manager_message_sent", "message_length": 13}
+{"timestamp": "2026-01-26T15:15:46.090Z", "user_id": 1223324329, "action": "manager_message_sent", "message_length": 71}
+{"timestamp": "2026-01-26T15:16:34.866Z", "user_id": 958309947, "action": "manager_message_sent", "message_length": 47}
+{"timestamp": "2026-01-26T15:17:35.825731", "user_id": 1223324329, "action": "note_added", "note": "4.03-11.03. Cross 10,500", "added_by": "6451825371"}
+{"timestamp": "2026-01-26T15:18:32.656735", "user_id": 311272681, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-26T15:19:04.237408", "user_id": 490419041, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-26T15:19:14.714307", "user_id": 1223324329, "action": "message_received", "content": "Хорошо"}
+{"timestamp": "2026-01-26T15:19:14.723739", "user_id": 1223324329, "action": "user_message_received", "message_length": 6, "message_type": "text", "username": null, "media_info": null}
+{"timestamp": "2026-01-26T15:19:18.317628", "user_id": 1223324329, "action": "message_received", "content": "Напишу тогда, что беру"}
+{"timestamp": "2026-01-26T15:19:18.324520", "user_id": 1223324329, "action": "user_message_received", "message_length": 22, "message_type": "text", "username": null, "media_info": null}
+{"timestamp": "2026-01-26T15:19:24.351440", "user_id": 1223324329, "action": "message_received", "content": "А депозит возвращается сразу после аренды?"}
+{"timestamp": "2026-01-26T15:19:24.357073", "user_id": 1223324329, "action": "user_message_received", "message_length": 42, "message_type": "text", "username": null, "media_info": null}
+{"timestamp": "2026-01-26T15:19:39.800916", "user_id": 1223324329, "action": "message_received", "content": "И страховка какая?"}
+{"timestamp": "2026-01-26T15:19:39.815463", "user_id": 1223324329, "action": "user_message_received", "message_length": 18, "message_type": "text", "username": null, "media_info": null}
+{"timestamp": "2026-01-26T15:24:16.353Z", "user_id": 1223324329, "action": "manager_message_sent", "message_length": 99}
+{"timestamp": "2026-01-26T15:26:11.930954", "user_id": 886948972, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-26T15:26:16.107192", "user_id": 415322984, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-26T15:26:24.980849", "user_id": 5228668727, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-26T15:26:29.649816", "user_id": 261568265, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-26T15:28:20.969141", "user_id": 379843472, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-26T15:28:36.215886", "user_id": 101495270, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-01-26T16:06:22.876730", "user_id": 490347040, "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-01-26T16:09:58.526222", "user_id": 1011097627, "action": "dialog_started", "initiated_by": "user", "username": null}

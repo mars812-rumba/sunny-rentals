@@ -214,42 +214,44 @@ export function BookingFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-w-[90vw] sm:max-w-md max-h-[90vh] overflow-y-auto bg-[hsl(220,18%,14%)] border border-[hsl(220,12%,22%)]/50 text-[hsl(220,10%,92%)] p-0">
-        {/* Header - тёмный */}
-        <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-[hsl(220,12%,22%)]/50 bg-[hsl(220,18%,16%)]">
-          <div className="flex items-center gap-2">
-            <div className="text-xs font-bold text-[hsl(200,80%,55%)]">
-              {car.brand} {car.model}
+      <DialogContent className="max-w-md bg-white p-0 overflow-hidden rounded-3xl shadow-xl">
+        {/* Header - светлый стиль */}
+        <div className="sticky top-0 z-10 px-6 py-4 bg-slate-50 border-b border-slate-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">
+                {car.brand} {car.model}
+              </h3>
+              <p className="text-xs text-slate-500">
+                {car.year} • {car.color}
+              </p>
             </div>
-            <div className="text-[9px] text-[hsl(220,8%,60%)]">
-              {car.year} • {car.color}
-            </div>
+            <button
+              onClick={handleClose}
+              className="text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
-          <button
-            onClick={handleClose}
-            className="text-[hsl(220,8%,60%)] hover:text-[hsl(220,10%,92%)] transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
 
-        {/* Form - тёмный стиль */}
-        <div className="px-4 py-3 space-y-3">
-          {/* Dates row */}
-          <div className="grid grid-cols-2 gap-2">
+        {/* Form */}
+        <div className="px-6 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
+          {/* Dates */}
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[9px] text-[hsl(220,8%,60%)] mb-1 block font-medium">Получение</label>
+              <label className="text-xs font-semibold text-slate-600 mb-1.5 block">Получение</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button 
                     variant="outline" 
-                    className="w-full h-8 text-[10px] px-2 bg-[hsl(220,18%,12%)] border-[hsl(220,12%,22%)]/60 text-[hsl(220,10%,92%)] justify-start hover:bg-[hsl(220,18%,18%)] hover:border-[hsl(200,80%,55%)]/50"
+                    className="w-full h-9 text-xs px-3 bg-white border-slate-200 text-slate-700 justify-start hover:bg-slate-50 hover:border-blue-300"
                   >
-                    <Calendar className="h-3 w-3 mr-1 text-[hsl(220,8%,60%)]" />
+                    <Calendar className="h-3.5 w-3.5 mr-2 text-slate-500" />
                     {startDate ? format(startDate, 'd MMM', { locale: ru }) : 'Дата'}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-[hsl(220,18%,14%)] border-[hsl(220,12%,22%)]/50" align="start">
+                <PopoverContent className="w-auto p-0 bg-white border-slate-200 shadow-lg" align="start">
                   <CalendarComponent
                     mode="single"
                     selected={startDate}
@@ -261,18 +263,18 @@ export function BookingFormModal({
               </Popover>
             </div>
             <div>
-              <label className="text-[9px] text-[hsl(220,8%,60%)] mb-1 block font-medium">Возврат</label>
+              <label className="text-xs font-semibold text-slate-600 mb-1.5 block">Возврат</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button 
                     variant="outline" 
-                    className="w-full h-8 text-[10px] px-2 bg-[hsl(220,18%,12%)] border-[hsl(220,12%,22%)]/60 text-[hsl(220,10%,92%)] justify-start hover:bg-[hsl(220,18%,18%)] hover:border-[hsl(200,80%,55%)]/50"
+                    className="w-full h-9 text-xs px-3 bg-white border-slate-200 text-slate-700 justify-start hover:bg-slate-50 hover:border-blue-300"
                   >
-                    <Calendar className="h-3 w-3 mr-1 text-[hsl(220,8%,60%)]" />
+                    <Calendar className="h-3.5 w-3.5 mr-2 text-slate-500" />
                     {endDate ? format(endDate, 'd MMM', { locale: ru }) : 'Дата'}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-[hsl(220,18%,14%)] border-[hsl(220,12%,22%)]/50" align="start">
+                <PopoverContent className="w-auto p-0 bg-white border-slate-200 shadow-lg" align="start">
                   <CalendarComponent
                     mode="single"
                     selected={endDate}
@@ -286,82 +288,82 @@ export function BookingFormModal({
             </div>
           </div>
 
-          {/* Time row */}
-          <div className="grid grid-cols-2 gap-2">
+          {/* Times */}
+          <div className="grid grid-cols-2 gap-3">
             <Select value={pickupTime} onValueChange={setPickupTime}>
-              <SelectTrigger className="h-8 text-[10px] bg-[hsl(220,18%,12%)] border-[hsl(220,12%,22%)]/60 text-[hsl(220,10%,92%)] hover:border-[hsl(200,80%,55%)]/50">
+              <SelectTrigger className="h-9 text-xs bg-white border-slate-200 text-slate-700 hover:border-blue-300">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[hsl(220,18%,14%)] border-[hsl(220,12%,22%)]/50 max-h-48">
+              <SelectContent className="bg-white border-slate-200 shadow-lg max-h-48">
                 {timeOptions.map(time => (
-                  <SelectItem key={time} value={time} className="text-[10px] text-[hsl(220,10%,92%)]">{time}</SelectItem>
+                  <SelectItem key={time} value={time} className="text-xs text-slate-700 hover:bg-slate-50">{time}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={returnTime} onValueChange={setReturnTime}>
-              <SelectTrigger className="h-8 text-[10px] bg-[hsl(220,18%,12%)] border-[hsl(220,12%,22%)]/60 text-[hsl(220,10%,92%)] hover:border-[hsl(200,80%,55%)]/50">
+              <SelectTrigger className="h-9 text-xs bg-white border-slate-200 text-slate-700 hover:border-blue-300">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[hsl(220,18%,14%)] border-[hsl(220,12%,22%)]/50 max-h-48">
+              <SelectContent className="bg-white border-slate-200 shadow-lg max-h-48">
                 {timeOptions.map(time => (
-                  <SelectItem key={time} value={time} className="text-[10px] text-[hsl(220,10%,92%)]">{time}</SelectItem>
+                  <SelectItem key={time} value={time} className="text-xs text-slate-700 hover:bg-slate-50">{time}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* Locations row */}
-          <div className="grid grid-cols-2 gap-2">
+          {/* Locations */}
+          <div className="grid grid-cols-2 gap-3">
             <Select value={pickupLocation} onValueChange={setPickupLocation}>
-              <SelectTrigger className="h-8 text-[10px] bg-[hsl(220,18%,12%)] border-[hsl(220,12%,22%)]/60 text-[hsl(220,10%,92%)] hover:border-[hsl(200,80%,55%)]/50">
-                <MapPin className="h-3 w-3 mr-1 text-[hsl(220,8%,60%)]" />
+              <SelectTrigger className="h-9 text-xs bg-white border-slate-200 text-slate-700 hover:border-blue-300">
+                <MapPin className="h-3.5 w-3.5 mr-2 text-slate-500" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[hsl(220,18%,14%)] border-[hsl(220,12%,22%)]/50">
+              <SelectContent className="bg-white border-slate-200 shadow-lg">
                 {PICKUP_LOCATIONS.map(loc => (
-                  <SelectItem key={loc.id} value={loc.id} className="text-[10px] text-[hsl(220,10%,92%)]">{loc.name}</SelectItem>
+                  <SelectItem key={loc.id} value={loc.id} className="text-xs text-slate-700 hover:bg-slate-50">{loc.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={returnLocation} onValueChange={setReturnLocation}>
-              <SelectTrigger className="h-8 text-[10px] bg-[hsl(220,18%,12%)] border-[hsl(220,12%,22%)]/60 text-[hsl(220,10%,92%)] hover:border-[hsl(200,80%,55%)]/50">
-                <MapPin className="h-3 w-3 mr-1 text-[hsl(220,8%,60%)]" />
+              <SelectTrigger className="h-9 text-xs bg-white border-slate-200 text-slate-700 hover:border-blue-300">
+                <MapPin className="h-3.5 w-3.5 mr-2 text-slate-500" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[hsl(220,18%,14%)] border-[hsl(220,12%,22%)]/50">
+              <SelectContent className="bg-white border-slate-200 shadow-lg">
                 {PICKUP_LOCATIONS.map(loc => (
-                  <SelectItem key={loc.id} value={loc.id} className="text-[10px] text-[hsl(220,10%,92%)]">{loc.name}</SelectItem>
+                  <SelectItem key={loc.id} value={loc.id} className="text-xs text-slate-700 hover:bg-slate-50">{loc.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* Addresses row */}
-          <div className="grid grid-cols-2 gap-2">
+          {/* Addresses */}
+          <div className="grid grid-cols-2 gap-3">
             <Input 
               placeholder="Адрес получения"
               value={pickupAddress}
               onChange={(e) => setPickupAddress(e.target.value)}
-              className="h-8 text-[10px] bg-[hsl(220,18%,12%)] border-[hsl(220,12%,22%)]/60 text-[hsl(220,10%,92%)] placeholder:text-[hsl(220,8%,45%)] focus:border-[hsl(200,80%,55%)]/50 focus:ring-[hsl(200,80%,55%)]/30"
+              className="h-9 text-xs bg-white border-slate-200 text-slate-700 placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
             />
             <Input 
               placeholder="Адрес возврата"
               value={returnAddress}
               onChange={(e) => setReturnAddress(e.target.value)}
-              className="h-8 text-[10px] bg-[hsl(220,18%,12%)] border-[hsl(220,12%,22%)]/60 text-[hsl(220,10%,92%)] placeholder:text-[hsl(220,8%,45%)] focus:border-[hsl(200,80%,55%)]/50 focus:ring-[hsl(200,80%,55%)]/30"
+              className="h-9 text-xs bg-white border-slate-200 text-slate-700 placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
             />
           </div>
 
-          {/* Customer row */}
-          <div className="grid grid-cols-2 gap-2">
+          {/* Customer */}
+          <div className="grid grid-cols-2 gap-3">
             <Input 
-              placeholder="Имя"
+              placeholder="Имя клиента"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              className="h-8 text-[10px] bg-[hsl(220,18%,12%)] border-[hsl(220,12%,22%)]/60 text-[hsl(220,10%,92%)] placeholder:text-[hsl(220,8%,45%)] focus:border-[hsl(200,80%,55%)]/50 focus:ring-[hsl(200,80%,55%)]/30"
+              className="h-9 text-xs bg-white border-slate-200 text-slate-700 placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
             />
             <Input 
-              placeholder="TG / WA / телефон"
+              placeholder="@telegram или +телефон"
               value={customerTelegram || customerWhatsapp || customerPhone}
               onChange={(e) => {
                 const value = e.target.value;
@@ -379,29 +381,29 @@ export function BookingFormModal({
                   setCustomerPhone('');
                 }
               }}
-              className="h-8 text-[10px] bg-[hsl(220,18%,12%)] border-[hsl(220,12%,22%)]/60 text-[hsl(220,10%,92%)] placeholder:text-[hsl(220,8%,45%)] focus:border-[hsl(200,80%,55%)]/50 focus:ring-[hsl(200,80%,55%)]/30"
+              className="h-9 text-xs bg-white border-slate-200 text-slate-700 placeholder:text-slate-400 focus:border-blue-400 focus:ring-blue-400"
             />
           </div>
 
-          {/* Pricing summary - тёмный градиент */}
+          {/* Pricing - светлый стиль */}
           {pricing && (
-            <div className="bg-gradient-to-br from-[hsl(220,18%,18%)] to-[hsl(220,18%,16%)] rounded-md p-2 space-y-1 border border-[hsl(220,12%,22%)]/50">
-              <div className="flex justify-between text-[9px]">
-                <span className="text-[hsl(220,8%,60%)]">
+            <div className="bg-slate-50 rounded-2xl p-4 space-y-2 border border-slate-200">
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-600">
                   {pricing.days} дн. × {pricing.dailyRate}฿
-                  {pricing.highSeason && <span className="ml-1 text-[hsl(45,100%,60%)] font-semibold">(HS)</span>}
+                  {pricing.highSeason && <span className="ml-1 text-amber-600 font-semibold">(HS)</span>}
                 </span>
-                <span className="text-[hsl(220,10%,92%)] font-medium">{pricing.totalRental.toLocaleString()}฿</span>
+                <span className="text-slate-800 font-semibold">{pricing.totalRental.toLocaleString()}฿</span>
               </div>
-              <div className="flex justify-between text-[9px]">
-                <span className="text-[hsl(220,8%,60%)]">Доставка</span>
-                <span className="text-[hsl(220,10%,92%)] font-medium">{pricing.totalDelivery}฿</span>
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-600">Доставка</span>
+                <span className="text-slate-800 font-semibold">{pricing.totalDelivery}฿</span>
               </div>
-              <div className="flex justify-between text-[10px] font-semibold pt-1 border-t border-[hsl(220,12%,22%)]/50">
-                <span className="text-[hsl(220,10%,92%)]">Итого</span>
-                <span className="text-[hsl(200,80%,55%)]">{pricing.grandTotal.toLocaleString()}฿</span>
+              <div className="flex justify-between text-sm font-bold pt-2 border-t border-slate-200">
+                <span className="text-slate-800">Итого</span>
+                <span className="text-blue-600">{pricing.grandTotal.toLocaleString()}฿</span>
               </div>
-              <div className="flex justify-between text-[9px] text-[hsl(220,8%,60%)]">
+              <div className="flex justify-between text-xs text-slate-500">
                 <span>Залог</span>
                 <span>{pricing.deposit.toLocaleString()}฿</span>
               </div>
@@ -409,22 +411,22 @@ export function BookingFormModal({
           )}
 
           {/* Actions */}
-          <div className="flex gap-2 pt-1">
+          <div className="flex gap-2 pt-2">
             <Button 
-              className="flex-1 h-9 text-[11px] font-medium text-white bg-gradient-to-r from-[hsl(200,80%,50%)] to-[hsl(200,80%,60%)] shadow-md hover:from-[hsl(200,80%,45%)] hover:to-[hsl(200,80%,55%)]"
+              className="flex-1 h-10 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-md"
               onClick={handleSubmit}
               disabled={isSubmitting || !pricing}
             >
-              {isSubmitting ? 'Сохр...' : isEditing ? 'Обновить' : 'Создать'}
+              {isSubmitting ? 'Сохранение...' : isEditing ? 'Обновить бронь' : 'Создать бронь'}
             </Button>
             {isEditing && (
               <Button
                 variant="destructive"
-                className="h-9 px-3 bg-[hsl(0,70%,45%)] hover:bg-[hsl(0,70%,40%)]"
+                className="h-10 px-4 bg-red-600 hover:bg-red-700 shadow-md"
                 onClick={handleDelete}
                 disabled={isSubmitting}
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2 className="h-4 w-4" />
               </Button>
             )}
           </div>

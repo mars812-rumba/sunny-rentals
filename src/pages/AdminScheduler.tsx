@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { startOfDay, startOfMonth } from 'date-fns';
-import { Calendar, Filter, LayoutGrid, List } from 'lucide-react';
+import { Calendar, Filter, LayoutGrid, List, ZoomIn, ZoomOut } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { SchedulerCalendar } from '@/components/admin/SchedulerCalendar';
 import { MonthCalendarView } from '@/components/admin/MonthCalendarView';
 import { BookingFormModal } from '@/components/admin/BookingFormModal';
+import { DayDetailsModal } from '@/components/admin/DayDetailsModal';
 import { fetchCars, fetchBookings, fetchCarOwners, Car, Booking } from '@/api/api.ts';
 
 const CAR_CLASSES = [
@@ -28,20 +29,22 @@ export default function AdminScheduler() {
   const [daysToShow, setDaysToShow] = useState(30);
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [carOwnersMap, setCarOwnersMap] = useState<Record<string, string>>({});
+  const [isCompactMode, setIsCompactMode] = useState(false);
   
-  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [initialDateRange, setInitialDateRange] = useState<{ start: Date; end: Date } | undefined>();
 
-  // ✅ Состояние для отслеживания двойного клика
+  const [isDayModalOpen, setIsDayModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDayEvents, setSelectedDayEvents] = useState<any[]>([]);
+
   const [lastTap, setLastTap] = useState<{
     id: string;
     timestamp: number;
   } | null>(null);
 
-  // Fetch data
   const { data: cars = [], isLoading: carsLoading, refetch: refetchCars } = useQuery({
     queryKey: ['admin-cars'],
     queryFn: () => fetchCars(),
@@ -52,7 +55,6 @@ export default function AdminScheduler() {
     queryFn: () => fetchBookings(),
   });
 
-  // Fetch car owners map
   useEffect(() => {
     fetchCarOwners().then(setCarOwnersMap);
   }, []);
@@ -68,7 +70,6 @@ export default function AdminScheduler() {
     return car?.class === selectedClass;
   });
 
-  // Клик по существующей броне (открываем сразу)
   const handleBookingClick = (booking: Booking) => {
     const car = cars.find(c => c.id === booking.form_data.car.id);
     if (car) {
@@ -78,7 +79,6 @@ export default function AdminScheduler() {
     }
   };
 
-  // ✅ Создание брони в режиме Ганта (Двойной клик)
   const handleCreateBooking = (carId: string, dateRange: { start: Date; end: Date }) => {
     const now = Date.now();
     const tapId = `gantt-${carId}-${dateRange.start.getTime()}`;
@@ -97,16 +97,21 @@ export default function AdminScheduler() {
     }
   };
 
-  // ✅ Клик по дню в режиме Месяца (Двойной клик)
-  const handleDayClick = (date: Date) => {
+  const handleDayClick = (date: Date, events: any[]) => {
     const now = Date.now();
     const tapId = `month-${date.getTime()}`;
 
     if (lastTap && lastTap.id === tapId && (now - lastTap.timestamp) < DOUBLE_TAP_DELAY) {
-      setSelectedCar(null);
-      setSelectedBooking(null);
-      setInitialDateRange({ start: date, end: date });
-      setIsModalOpen(true);
+      if (events.length > 0) {
+        setSelectedDate(date);
+        setSelectedDayEvents(events);
+        setIsDayModalOpen(true);
+      } else {
+        setSelectedCar(null);
+        setSelectedBooking(null);
+        setInitialDateRange({ start: date, end: date });
+        setIsModalOpen(true);
+      }
       setLastTap(null);
     } else {
       setLastTap({ id: tapId, timestamp: now });
@@ -118,6 +123,12 @@ export default function AdminScheduler() {
     setSelectedCar(null);
     setSelectedBooking(null);
     setInitialDateRange(undefined);
+  };
+
+  const handleDayModalClose = () => {
+    setIsDayModalOpen(false);
+    setSelectedDate(null);
+    setSelectedDayEvents([]);
   };
 
   const handleBookingSuccess = () => {
@@ -139,48 +150,80 @@ export default function AdminScheduler() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-3 py-2 shadow-sm">
+      {/* Header - НЕПРОЗРАЧНЫЙ с тенью */}
+      <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-3 py-2 shadow-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-bg-gray-100" />
-            <span className="text-sm font-semibold text-bg-gray-100">Календарь</span>
-            <span className="text-[9px] text-bg-gray-100 uppercase tracking-wider">(2x click to create)</span>
+            <Calendar className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-semibold text-gray-900">Календарь</span>
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="flex bg-bg-gray-100 rounded-md p-0.5">
+            {viewMode === 'gantt' && (
+              <>
+                {/* Фильтр - НЕПРОЗРАЧНЫЙ */}
+                <Select value={selectedClass} onValueChange={setSelectedClass}>
+                  <SelectTrigger className="w-24 h-7 text-xs bg-white border-gray-300 text-gray-900 font-medium">
+                    <Filter className="h-3 w-3 mr-1 text-gray-700" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-gray-300 shadow-lg">
+                    {CAR_CLASSES.map(cls => (
+                      <SelectItem 
+                        key={cls.id} 
+                        value={cls.id} 
+                        className="text-xs text-gray-900 hover:bg-gray-100 cursor-pointer"
+                      >
+                        {cls.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {/* Кнопка компактного режима */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsCompactMode(!isCompactMode)}
+                  className="h-7 w-7 p-0 bg-white border-gray-300"
+                  title={isCompactMode ? "Показать фото" : "Скрыть фото"}
+                >
+                  {isCompactMode ? (
+                    <ZoomIn className="h-3.5 w-3.5 text-gray-700" />
+                  ) : (
+                    <ZoomOut className="h-3.5 w-3.5 text-gray-700" />
+                  )}
+                </Button>
+              </>
+            )}
+
+            {/* Переключатель вида */}
+            <div className="flex bg-gray-100 rounded-md p-0.5">
               <Button
-                variant="ghost" size="sm"
+                variant="ghost" 
+                size="sm"
                 onClick={() => setViewMode('month')}
-                className={`h-7 px-2 text-xs ${viewMode === 'month' ? 'bg-[hsl(200,80%,55%)] text-white' : 'text-[hsl(220,8%,55%)]'}`}
+                className={`h-7 px-2 text-xs font-medium ${
+                  viewMode === 'month' 
+                    ? 'bg-blue-600 text-white shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
               >
-                <LayoutGrid className="h-3 w-3 mr-1" /> Месяц
+                <LayoutGrid className="h-3 w-3 mr-1" /> 
               </Button>
               <Button
-                variant="ghost" size="sm"
+                variant="ghost" 
+                size="sm"
                 onClick={() => setViewMode('gantt')}
-                className={`h-7 px-2 text-xs ${viewMode === 'gantt' ? 'bg-[hsl(200,80%,55%)] text-white' : 'text-[hsl(220,8%,55%)]'}`}
+                className={`h-7 px-2 text-xs font-medium ${
+                  viewMode === 'gantt' 
+                    ? 'bg-blue-600 text-white shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
               >
-                <List className="h-3 w-3 mr-1" /> Ганта
+                <List className="h-3 w-3 mr-1" /> 
               </Button>
             </div>
-
-            {viewMode === 'gantt' && (
-              <Select value={selectedClass} onValueChange={setSelectedClass}>
-                <SelectTrigger className="w-28 h-8 text-xs bg-bg-gray-100 border-bg-gray-100/60 text-[hsl(220,10%,92%)]">
-                  <Filter className="h-3 w-3 mr-1 opacity-50" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-bg-gray-100 border-[hsla(219, 37.40%, 80.60%, 0.74)]/50">
-                  {CAR_CLASSES.map(cls => (
-                    <SelectItem key={cls.id} value={cls.id} className="text-xs text-[hsl(220,10%,92%)]">
-                      {cls.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
           </div>
         </div>
       </div>
@@ -188,7 +231,7 @@ export default function AdminScheduler() {
       <main className="p-0">
         {isLoading ? (
           <div className="flex items-center justify-center h-[80vh]">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-[hsl(200,80%,55%)] border-t-transparent" />
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent" />
           </div>
         ) : viewMode === 'month' ? (
           <MonthCalendarView
@@ -209,6 +252,7 @@ export default function AdminScheduler() {
             onCreateBooking={handleCreateBooking}
             selectedClass={selectedClass}
             carOwnersMap={carOwnersMap}
+            isCompactMode={isCompactMode}
           />
         )}
       </main>
@@ -220,6 +264,14 @@ export default function AdminScheduler() {
         booking={selectedBooking}
         initialDateRange={initialDateRange}
         onSuccess={handleBookingSuccess}
+      />
+
+      <DayDetailsModal
+        isOpen={isDayModalOpen}
+        onClose={handleDayModalClose}
+        date={selectedDate}
+        events={selectedDayEvents}
+        onBookingClick={handleBookingClick}
       />
     </div>
   );

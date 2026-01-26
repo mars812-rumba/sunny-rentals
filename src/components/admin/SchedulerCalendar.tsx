@@ -24,14 +24,16 @@ interface SchedulerCalendarProps {
   onCreateBooking: (carId: string, dateRange: { start: Date; end: Date }) => void;
   selectedClass?: string;
   carOwnersMap?: Record<string, string>;
+  isCompactMode?: boolean; // 🆕 Компактный режим
 }
 
 const DAY_WIDTH = 24;
-const CAR_ROW_HEIGHT = 40; // Компактная высота
 const HEADER_HEIGHT = 32;
 const SIDEBAR_WIDTH = 60;
 const TOTAL_DAYS = 97;
 
+// 🆕 Динамическая высота строк
+const getRowHeight = (isCompact: boolean) => isCompact ? 24 : 40;
 
 // 🎨 Цвета для месяцев
 const MONTH_COLORS: Record<number, string> = {
@@ -47,6 +49,7 @@ export function SchedulerCalendar({
   onBookingClick,
   onCreateBooking,
   carOwnersMap = {},
+  isCompactMode = false, // 🆕 Дефолтное значение
 }: SchedulerCalendarProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
@@ -56,6 +59,9 @@ export function SchedulerCalendar({
     timestamp: number;
   } | null>(null);
   const DOUBLE_TAP_DELAY = 300;
+
+  // 🆕 Динамическая высота
+  const CAR_ROW_HEIGHT = getRowHeight(isCompactMode);
 
   const {
     dates,
@@ -191,32 +197,45 @@ export function SchedulerCalendar({
             return (
               <div 
                 key={car.id}
-                className="flex border-b border-gray-300/30"
+                className={cn(
+                  "flex border-b border-gray-300/30 transition-all duration-200"
+                )}
                 style={{ height: CAR_ROW_HEIGHT }}
               >
-                {/* Sidebar - только фото + название */}
+                {/* Sidebar */}
                 <div
-                  className="sticky left-0 z-10 flex-shrink-0 flex flex-col items-center justify-center px-1 py-0.5 border-r border-gray-300 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                  className={cn(
+                    "sticky left-0 z-10 flex-shrink-0 flex items-center px-1 border-r border-gray-300 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition-all",
+                    isCompactMode ? "flex-row gap-1 py-0.5" : "flex-col justify-center py-0.5"
+                  )}
                   style={{ width: SIDEBAR_WIDTH }}
                   onClick={() => {
                     setSelectedCarInfo({ car, owner: ownerBadge || null });
                   }}
                 >
-                  {/* Фото - чистое, без бейджа */}
-                  <div className="relative w-full aspect-video rounded overflow-hidden bg-gray-200">
-                    <div
-                      className="w-full h-full"
-                      style={{
-                        backgroundImage: car.photos?.main ? `url(${getPhotoUrl(car.photos.main)})` : 'none',
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center'
-                      }}
-                    />
-                  </div>
+                  {/* 🆕 Фото - показываем только если НЕ компактный режим */}
+                  {!isCompactMode && (
+                    <div className="relative w-full aspect-video rounded overflow-hidden bg-gray-200">
+                      <div
+                        className="w-full h-full"
+                        style={{
+                          backgroundImage: car.photos?.main ? `url(${getPhotoUrl(car.photos.main)})` : 'none',
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                    </div>
+                  )}
                   
-                  {/* Текст под фото - марка и модель */}
-                  <div className="w-full text-center mt-0.5">
-                    <div className="text-[7px] font-bold text-gray-900 leading-none truncate">
+                  {/* Текст */}
+                  <div className={cn(
+                    "w-full text-center",
+                    isCompactMode ? "mt-0" : "mt-0.5"
+                  )}>
+                    <div className={cn(
+                      "font-bold text-gray-900 leading-none truncate",
+                      isCompactMode ? "text-[6px]" : "text-[7px]"
+                    )}>
                       {car.brand} {car.model}
                     </div>
                   </div>
@@ -284,13 +303,19 @@ export function SchedulerCalendar({
                           onMouseEnter={() => setHoveredBooking(booking.booking_id)}
                           onMouseLeave={() => setHoveredBooking(null)}
                         >
+                          {/* 🆕 Компактный текст в зависимости от режима */}
                           <div className="px-0.5 h-full flex flex-col justify-center overflow-hidden leading-tight">
-                            <div className="text-[7px] font-semibold text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis">
+                            <div className={cn(
+                              "font-semibold text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis",
+                              isCompactMode ? "text-[6px]" : "text-[7px]"
+                            )}>
                               {badgeData.line1}
                             </div>
-                            <div className="text-[7px] font-medium text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
-                              {badgeData.line2}
-                            </div>
+                            {!isCompactMode && (
+                              <div className="text-[7px] font-medium text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+                                {badgeData.line2}
+                              </div>
+                            )}
                           </div>
                         </div>
                       );

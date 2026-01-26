@@ -7,6 +7,63 @@ const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY || 'sunny2025';
 const AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN || 'secret-auth-token-for-sunny-rentals';
 import { differenceInDays } from 'date-fns';
 
+// api.ts - добавить эти функции
+
+export interface LogisticsDate {
+  booking_id: string;
+  car_id: string;
+  car_name: string;
+  pickup_date: string;
+  return_date: string;
+  client_name: string;
+  location: string;
+}
+
+export interface LogisticsSummary {
+  pickups: Record<string, number>; // { "2026-01-20": 3, ... }
+  returns: Record<string, number>; // { "2026-01-25": 2, ... }
+}
+
+/**
+ * Получить все даты выдачи и возврата для броней
+ */
+export async function fetchBookingsLogistics(): Promise<LogisticsDate[]> {
+  const response = await fetch(`${API_BASE_URL}/api/bookings/logistics`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch bookings logistics');
+  }
+  return response.json();
+}
+
+/**
+ * Получить сводку по логистике (количество выдач/возвратов по дням)
+ */
+export async function fetchLogisticsSummary(): Promise<LogisticsSummary> {
+  const response = await fetch(`${API_BASE_URL}/api/bookings/logistics/summary`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch logistics summary');
+  }
+  return response.json();
+}
+
+// ПРИМЕР ИСПОЛЬЗОВАНИЯ В КОМПОНЕНТЕ:
+
+/*
+import { useQuery } from '@tanstack/react-query';
+import { fetchLogisticsSummary } from '@/api/api';
+
+export function MonthCalendarView() {
+  const { data: logisticsSummary } = useQuery({
+    queryKey: ['logistics-summary'],
+    queryFn: fetchLogisticsSummary,
+  });
+
+  // Теперь можно использовать для бейджей:
+  const pickupsCount = logisticsSummary?.pickups['2026-01-20'] || 0;
+  const returnsCount = logisticsSummary?.returns['2026-01-20'] || 0;
+}
+*/
+
 export interface Car {
   id: string;
   name: string;

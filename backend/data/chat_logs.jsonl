@@ -1411,3 +1411,25 @@
 {"timestamp": "2026-01-26T11:53:59.234141", "user_id": 958309947, "role": "user", "text": "Здравствуйте, да", "username": null, "source": "telegram_bot"}
 {"timestamp": "2026-01-26T12:08:10.062Z", "user_id": 1391870076, "role": "manager", "text": "Здравствуйте. От вас поступила заявка на mg 5", "source": "crm_panel"}
 {"timestamp": "2026-01-26T12:08:59.707Z", "user_id": 409658901, "role": "manager", "text": "Добрый вечер! Нужен авто на 10.02?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T13:08:05.858799", "user_id": 1391870076, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_130805_Screenshot_20260126-200745.jpg", "content_type": "image/jpeg", "file_size": 164370, "timestamp": "2026-01-26T13:08:05.254240", "message": "", "download_url": "/api/crm/media/1391870076/download/sent_20260126_130805_Screenshot_20260126-200745.jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T13:09:58.541Z", "user_id": 1223324329, "role": "manager", "text": "Здравствуйте. Если ищете авто на март, то в приложении прайс не верный. ", "source": "crm_panel"}
+{"timestamp": "2026-01-26T13:10:46.387423", "user_id": 1223324329, "role": "user", "text": "Здравствуйте! \nДа, на март)", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T13:11:42.177451", "user_id": 1223324329, "role": "user", "text": "Как узнать актуальные цены?", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T13:11:41.264Z", "user_id": 958309947, "role": "manager", "text": "Подскажите, пожалуйста, на какие даты?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T13:48:30.141Z", "user_id": 1223324329, "role": "manager", "text": "Подскажите формат авто? Сколько человек планируется?)", "source": "crm_panel"}
+{"timestamp": "2026-01-26T13:49:37.998450", "user_id": 1223324329, "role": "user", "text": "Седан либо кроссовер\n4 чел", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T14:24:11.836862", "user_id": 1223324329, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_142411_1 (11).jpg", "content_type": "image/jpeg", "file_size": 178891, "timestamp": "2026-01-26T14:24:11.023291", "message": "", "download_url": "/api/crm/media/1223324329/download/sent_20260126_142411_1 (11).jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T14:25:33.485Z", "user_id": 1223324329, "role": "manager", "text": "04.03 - 11.03 = 8400", "source": "crm_panel"}
+{"timestamp": "2026-01-26T14:27:49.661982", "user_id": 1223324329, "role": "user", "text": "Хорошо\nА есть еще варианты, чуть побольше что-нибудь?", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T14:27:54.449855", "user_id": 1223324329, "role": "user", "text": "И какие условия?", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T14:37:25.359346", "user_id": 958309947, "role": "user", "text": "С 26 февраля по 10 марта, в эти дни хотим арендовать примерно на 3-4 дня", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T15:13:18.787Z", "user_id": 1223324329, "role": "manager", "text": "Да, corolla cross побольше будет. Минуту", "source": "crm_panel"}
+{"timestamp": "2026-01-26T15:14:38.682304", "user_id": 1223324329, "role": "assistant", "content": {"content": "[Медиафайл]", "media": {"type": "sent_media", "filename": "sent_20260126_151437_IMG-20241129-WA0171 (1).jpg", "content_type": "image/jpeg", "file_size": 179638, "timestamp": "2026-01-26T15:14:37.911956", "message": "", "download_url": "/api/crm/media/1223324329/download/sent_20260126_151437_IMG-20241129-WA0171 (1).jpg"}, "sent_by": "manager"}}
+{"timestamp": "2026-01-26T15:15:13.523Z", "user_id": 1223324329, "role": "manager", "text": "10,500 аренда", "source": "crm_panel"}
+{"timestamp": "2026-01-26T15:15:46.090Z", "user_id": 1223324329, "role": "manager", "text": "10,000 депозит. Доставка в аэропорт 0 бат. По городу 500 в одну сторону", "source": "crm_panel"}
+{"timestamp": "2026-01-26T15:16:34.866Z", "user_id": 958309947, "role": "manager", "text": "Какой формат рассматриваете? Большая/маленькая?", "source": "crm_panel"}
+{"timestamp": "2026-01-26T15:19:14.715841", "user_id": 1223324329, "role": "user", "text": "Хорошо", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T15:19:18.318738", "user_id": 1223324329, "role": "user", "text": "Напишу тогда, что беру", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T15:19:24.352495", "user_id": 1223324329, "role": "user", "text": "А депозит возвращается сразу после аренды?", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T15:19:39.805555", "user_id": 1223324329, "role": "user", "text": "И страховка какая?", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-01-26T15:24:16.353Z", "user_id": 1223324329, "role": "manager", "text": "Да, при возврате авто - депозит. Страховка 1 класс, с франшизой 10000(стартовый ущерб). Бронируем? ", "source": "crm_panel"}
