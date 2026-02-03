@@ -911,7 +911,7 @@ const handleUpdateNote = async () => {
           <span className="truncate max-w-[80px]">{user.pickup_location || "Пхукет"}</span>
         </div>
       </div>
-      <div className="flex flex-col items-end leading-none shrink-0 opacity-40">
+      <div className="flex flex-col items-end leading-none shrink-0 opacity-80">
         <span className="text-[7px] font-mono italic">ID:{user.user_id}</span>
         <span className="text-[7px] font-mono tracking-tighter">{dayjs(user.created_at).format('DD.MM.YY')}</span>
       </div>

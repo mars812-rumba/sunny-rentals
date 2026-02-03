@@ -353,6 +353,16 @@ class UserData(BaseModel):
     form_started: bool
     booking_submitted: bool
     
+# Модель для возврата дат логистики
+class LogisticsDate(BaseModel):
+    booking_id: str
+    car_id: str
+    car_name: str
+    pickup_date: str
+    return_date: str
+    client_name: str
+    location: str
+
 
 # ==============================
 # УТИЛИТЫ
@@ -4139,19 +4149,9 @@ async def send_media_to_user(
         raise HTTPException(status_code=500, detail=str(e))
     
 
-router = APIRouter()
 
-# Модель для возврата дат логистики
-class LogisticsDate(BaseModel):
-    booking_id: str
-    car_id: str
-    car_name: str
-    pickup_date: str
-    return_date: str
-    client_name: str
-    location: str
 
-@router.get(API_PREFIX+"/bookings/logistics", response_model=List[LogisticsDate])
+@app.get("/api/bookings/logistics", response_model=List[LogisticsDate])
 async def get_bookings_logistics():
     """
     Возвращает даты выдачи и возврата для всех броней
@@ -4183,11 +4183,11 @@ async def get_bookings_logistics():
             car_id = car_info.get('id', '')
             
             # Извлекаем информацию о клиенте
-            client_name = booking.get('form_data', {}).get('client_name', 'Клиент')
-            location = booking.get('form_data', {}).get('location', '')
+            client_name = booking.get('form_data', {}).get('contact', {}).get('name', 'Клиент')
+            location = booking.get('form_data', {}).get('locations', {}).get('pickupLocation', '')
             
             logistics_data.append({
-                'booking_id': booking.get('id', ''),
+                'booking_id': booking.get('booking_id', ''),
                 'car_id': car_id,
                 'car_name': car_name,
                 'pickup_date': start_date,
@@ -4206,7 +4206,7 @@ async def get_bookings_logistics():
         raise HTTPException(status_code=500, detail=f"Error reading bookings: {str(e)}")
 
 
-@router.get(API_PREFIX+"/bookings/logistics/summary")
+@app.get("/api/bookings/logistics/summary")
 async def get_logistics_summary():
     """
     Возвращает сводку по датам логистики
@@ -4254,7 +4254,7 @@ async def get_logistics_summary():
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
-
+    
 # ==============================
 # ЗАПУСК
 # ==============================

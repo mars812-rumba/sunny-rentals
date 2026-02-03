@@ -387,7 +387,7 @@ def handle_dialog_user_message(user_id: int, message_text: str):
             content=message_text,
             timestamp=datetime.now().isoformat()
         )
-
+        
         print(f"✅ Обновлен статус диалога для пользователя {user_id}")
 
     except Exception as e:
@@ -1768,6 +1768,15 @@ def universal_handler(message):
     try:
         response = requests.post("http://localhost:5000/api/internal/receive-message", json=webhook_data, timeout=5)
         print(f"📨 Отправлено на бэкенд (молча) для пользователя {message.from_user.id}")
+        
+        new_message_text = (
+            f"📥 НОВОЕ СООБЩЕНИЕ \n"
+            f"User ID :  <b>{message.from_user.id}</b>\n"
+            f"Message: {text}\n"
+            )
+        
+        safe_send_message(ACTIVE_DIALOGS_CHAT_ID, new_message_text, parse_mode="HTML")
+        
     except Exception as webhook_error:
         print(f"⚠️ Ошибка отправки webhook на бэкенд: {webhook_error}")
         # Продолжаем работу даже если бэкенд недоступен

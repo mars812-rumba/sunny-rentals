@@ -680,86 +680,6 @@
     "created_at": "2026-01-02T16:11:16.265250"
   },
   {
-    "booking_id": "5f616964",
-    "user_id": "1457008496",
-    "form_data": {
-      "car": {
-        "id": "adv350_2025_new",
-        "name": "Adv350 2025 new",
-        "brand": "Adv350",
-        "model": "2025",
-        "year": "new",
-        "color": ""
-      },
-      "dates": {
-        "start": "2026-01-20T14:00:00.000Z",
-        "end": "2026-02-19T14:00:00.000Z",
-        "days": 31
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 655,
-        "totalRental": 20305,
-        "deposit": 10000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 21305
-      },
-      "contact": {
-        "value": "@tot1983",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-03T00:07:47.589Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-03T00:07:48.133345"
-  },
-  {
-    "booking_id": "801b8056",
-    "user_id": "280331686",
-    "form_data": {
-      "car": {
-        "id": "toyota_yaris_2024_gray",
-        "name": "Toyota YARIS 2024 Gray",
-        "brand": "Toyota",
-        "model": "YARIS",
-        "year": "2024",
-        "color": "Gray"
-      },
-      "dates": {
-        "start": "2026-01-12T19:00:00.000Z",
-        "end": "2026-02-03T19:00:00.000Z",
-        "days": 23
-      },
-      "locations": {
-        "pickup": "villa",
-        "return": "villa"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 786,
-        "totalRental": 18078,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 19078
-      },
-      "contact": {
-        "value": "@Ratmir_ve",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-03T05:05:17.755Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-03T05:05:17.981315"
-  },
-  {
     "booking_id": "4aa1d207",
     "user_id": "368788148",
     "form_data": {
@@ -920,46 +840,6 @@
     "created_at": "2026-01-04T06:45:25.013245"
   },
   {
-    "booking_id": "1f4117d7",
-    "user_id": "531857167",
-    "form_data": {
-      "car": {
-        "id": "honda_civic_2024_black",
-        "name": "Honda CIVIC RS 2024 Black",
-        "brand": "Honda",
-        "model": "CIVIC RS",
-        "year": "2024",
-        "color": "Black"
-      },
-      "dates": {
-        "start": "2026-01-20T21:00:00.000Z",
-        "end": "2026-01-27T21:00:00.000Z",
-        "days": 8
-      },
-      "locations": {
-        "pickup": "villa",
-        "return": "villa"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 1435,
-        "totalRental": 11480,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 12480
-      },
-      "contact": {
-        "value": "@ivn_fo",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-04T17:24:17.397Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-04T17:24:17.034151"
-  },
-  {
     "booking_id": "4f8a2a28",
     "user_id": "155619878",
     "form_data": {
@@ -1080,46 +960,6 @@
     "created_at": "2026-01-05T08:32:32.672346"
   },
   {
-    "booking_id": "943a97d0",
-    "user_id": "8076831342",
-    "form_data": {
-      "car": {
-        "id": "nmax155_2019_black",
-        "name": "Nmax155 2019 black",
-        "brand": "Nmax155",
-        "model": "2019",
-        "year": "black",
-        "color": ""
-      },
-      "dates": {
-        "start": "2026-01-05T17:00:00.000Z",
-        "end": "2026-01-24T17:00:00.000Z",
-        "days": 20
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 264,
-        "totalRental": 5280,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 6280
-      },
-      "contact": {
-        "value": "@A6031219",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-05T09:23:39.409Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-05T09:23:40.479995"
-  },
-  {
     "booking_id": "97343474",
     "user_id": "451315419",
     "form_data": {
@@ -1158,86 +998,6 @@
     },
     "status": "new",
     "created_at": "2026-01-05T12:54:15.250076"
-  },
-  {
-    "booking_id": "fcfa3a6f",
-    "user_id": "374897465",
-    "form_data": {
-      "car": {
-        "id": "mitsubishi_xpander_2023_white",
-        "name": "Mitsubishi XPANDER 2023 White",
-        "brand": "Mitsubishi",
-        "model": "XPANDER",
-        "year": "2023",
-        "color": "White"
-      },
-      "dates": {
-        "start": "2026-01-17T17:00:00.000Z",
-        "end": "2026-01-22T17:00:00.000Z",
-        "days": 6
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 1431,
-        "totalRental": 8586,
-        "deposit": 10000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 8586
-      },
-      "contact": {
-        "value": "@Marseloid",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-06T16:00:31.596Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-06T16:00:33.411212"
-  },
-  {
-    "booking_id": "42933e31",
-    "user_id": "311380850",
-    "form_data": {
-      "car": {
-        "id": "Mg 5",
-        "name": "MG5 Mg5  2023 Gray",
-        "brand": "MG5",
-        "model": "Mg5 ",
-        "year": "2023",
-        "color": "Gray"
-      },
-      "dates": {
-        "start": "2026-02-26T21:00:00.000Z",
-        "end": "2026-03-14T21:00:00.000Z",
-        "days": 17
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 700,
-        "totalRental": 11900,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 11900
-      },
-      "contact": {
-        "value": "@APerovski",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-06T22:25:47.737Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-06T22:25:48.128256"
   },
   {
     "booking_id": "882f55e1",
@@ -1358,46 +1118,6 @@
     },
     "status": "new",
     "created_at": "2026-01-09T01:31:24.604698"
-  },
-  {
-    "booking_id": "e23f507d",
-    "user_id": "660084361",
-    "form_data": {
-      "car": {
-        "id": "Mg 5",
-        "name": "MG5 Mg5  2023 Gray",
-        "brand": "MG5",
-        "model": "Mg5 ",
-        "year": "2023",
-        "color": "Gray"
-      },
-      "dates": {
-        "start": "2026-02-11T17:00:00.000Z",
-        "end": "2026-02-15T17:00:00.000Z",
-        "days": 5
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 900,
-        "totalRental": 4500,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 5500
-      },
-      "contact": {
-        "value": "@nuktoto0",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-09T02:07:21.978Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-09T02:07:23.165899"
   },
   {
     "booking_id": "97cae0f4",
@@ -1560,126 +1280,6 @@
     "created_at": "2026-01-09T06:50:54.223464"
   },
   {
-    "booking_id": "343c6a4e",
-    "user_id": "293116039",
-    "form_data": {
-      "car": {
-        "id": "mg_mg5_2024_yellow",
-        "name": "MG MG5 2024 Yellow",
-        "brand": "MG",
-        "model": "MG5",
-        "year": "2024",
-        "color": "Yellow"
-      },
-      "dates": {
-        "start": "2026-01-20T21:00:00.000Z",
-        "end": "2026-01-28T21:00:00.000Z",
-        "days": 9
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 1052,
-        "totalRental": 9468,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 9468
-      },
-      "contact": {
-        "value": "@RRK_999",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-09T17:52:04.144Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-09T17:52:04.372788"
-  },
-  {
-    "booking_id": "3417c734",
-    "user_id": "483236785",
-    "form_data": {
-      "car": {
-        "id": "Ar_city_rs_black_2025",
-        "name": "Honda City RS 2025 Black",
-        "brand": "Honda",
-        "model": "City RS",
-        "year": "2025",
-        "color": "Black"
-      },
-      "dates": {
-        "start": "2026-01-10T17:00:00.000Z",
-        "end": "2026-01-25T17:00:00.000Z",
-        "days": 16
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 965,
-        "totalRental": 15440,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 15440
-      },
-      "contact": {
-        "value": "+79635358555",
-        "type": "whatsapp"
-      },
-      "timestamp": "2026-01-09T18:37:56.324Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-09T18:37:58.669384"
-  },
-  {
-    "booking_id": "7ce97ab6",
-    "user_id": "829676558",
-    "form_data": {
-      "car": {
-        "id": "namo_suzuki_swift_2020",
-        "name": "Suzuki Swift 2020 White",
-        "brand": "Suzuki",
-        "model": "Swift",
-        "year": "2020",
-        "color": "White"
-      },
-      "dates": {
-        "start": "2026-01-29T21:00:00.000Z",
-        "end": "2026-02-01T21:00:00.000Z",
-        "days": 4
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 853,
-        "totalRental": 3412,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 3412
-      },
-      "contact": {
-        "value": "@Hitechpower",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-09T22:39:23.552Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-09T22:39:23.599242"
-  },
-  {
     "booking_id": "4dcbff35",
     "user_id": "501907701",
     "form_data": {
@@ -1758,46 +1358,6 @@
     },
     "status": "new",
     "created_at": "2026-01-10T09:27:44.036633"
-  },
-  {
-    "booking_id": "d3749bd2",
-    "user_id": "7926814745",
-    "form_data": {
-      "car": {
-        "id": "honda_civic_2024_white",
-        "name": "Honda CIVIC 2024 White",
-        "brand": "Honda",
-        "model": "CIVIC",
-        "year": "2024",
-        "color": "White"
-      },
-      "dates": {
-        "start": "2026-01-19T21:00:00.000Z",
-        "end": "2026-01-27T21:00:00.000Z",
-        "days": 9
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 1349,
-        "totalRental": 12141,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 13141
-      },
-      "contact": {
-        "value": "@anastaasia21",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-10T11:57:38.728Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-10T11:57:39.423205"
   },
   {
     "booking_id": "f382a40c",
@@ -1880,206 +1440,6 @@
     "created_at": "2026-01-12T00:48:01.726828"
   },
   {
-    "booking_id": "6cc456ab",
-    "user_id": "1488464254",
-    "form_data": {
-      "car": {
-        "id": "toyota_yaris_2023_blue",
-        "name": "Toyota YARIS Hb 2023 Blue",
-        "brand": "Toyota",
-        "model": "YARIS",
-        "year": "2023",
-        "color": "Blue"
-      },
-      "dates": {
-        "start": "2026-01-16T20:00:00.000Z",
-        "end": "2026-01-24T20:00:00.000Z",
-        "days": 9
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 886,
-        "totalRental": 7974,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 8974
-      },
-      "contact": {
-        "value": "+79371733381",
-        "type": "whatsapp"
-      },
-      "timestamp": "2026-01-12T11:38:51.249Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-12T11:38:51.962063"
-  },
-  {
-    "booking_id": "8108057f",
-    "user_id": "1147639806",
-    "form_data": {
-      "car": {
-        "id": "toyota_veloz_2024_gray",
-        "name": "Toyota VELOZ 2024 Gray",
-        "brand": "Toyota",
-        "model": "VELOZ",
-        "year": "2024",
-        "color": "Gray"
-      },
-      "dates": {
-        "start": "2026-01-31T21:00:00.000Z",
-        "end": "2026-02-03T21:00:00.000Z",
-        "days": 4
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 1334,
-        "totalRental": 5336,
-        "deposit": 10000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 5336
-      },
-      "contact": {
-        "value": "89388006640",
-        "type": "whatsapp"
-      },
-      "timestamp": "2026-01-12T16:19:48.387Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-12T16:19:48.970192"
-  },
-  {
-    "booking_id": "6614df5f",
-    "user_id": "280331686",
-    "form_data": {
-      "car": {
-        "id": "mazda_mazda2_2024_white",
-        "name": "Mazda MAZDA2 2024 White",
-        "brand": "Mazda",
-        "model": "MAZDA2",
-        "year": "2024",
-        "color": "White"
-      },
-      "dates": {
-        "start": "2026-01-12T17:00:00.000Z",
-        "end": "2026-02-04T17:00:00.000Z",
-        "days": 24
-      },
-      "locations": {
-        "pickup": "villa",
-        "return": "villa"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 855,
-        "totalRental": 20520,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 21520
-      },
-      "contact": {
-        "value": "@Ratmir_ve",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-13T03:07:59.935Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-13T03:08:00.726812"
-  },
-  {
-    "booking_id": "a1652364",
-    "user_id": "280331686",
-    "form_data": {
-      "car": {
-        "id": "Mg 5",
-        "name": "MG5 Mg5  2023 Gray",
-        "brand": "MG5",
-        "model": "Mg5 ",
-        "year": "2023",
-        "color": "Gray"
-      },
-      "dates": {
-        "start": "2026-01-12T17:00:00.000Z",
-        "end": "2026-02-04T17:00:00.000Z",
-        "days": 24
-      },
-      "locations": {
-        "pickup": "villa",
-        "return": "villa"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 700,
-        "totalRental": 16800,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 17800
-      },
-      "contact": {
-        "value": "@Ratmir_ve",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-13T04:36:08.970Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-13T04:36:09.763915"
-  },
-  {
-    "booking_id": "34c17bd0",
-    "user_id": "374897465",
-    "form_data": {
-      "car": {
-        "id": "mazda_cx3_2023_bege",
-        "name": "Mazda CX3 2023 Bege",
-        "brand": "Mazda",
-        "model": "CX3",
-        "year": "2023",
-        "color": "Bege"
-      },
-      "dates": {
-        "start": "2026-01-17T17:00:00.000Z",
-        "end": "2026-01-22T17:00:00.000Z",
-        "days": 6
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 1571,
-        "totalRental": 9426,
-        "deposit": 8000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 10426
-      },
-      "contact": {
-        "value": "@Marseloid",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-14T00:39:08.678Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-14T00:39:10.336485"
-  },
-  {
     "booking_id": "3a414338",
     "user_id": "230155309",
     "form_data": {
@@ -2118,46 +1478,6 @@
     },
     "status": "new",
     "created_at": "2026-01-14T02:43:34.014306"
-  },
-  {
-    "booking_id": "5eec018c",
-    "user_id": "984710052",
-    "form_data": {
-      "car": {
-        "id": "namo_city_sedan_white_2018",
-        "name": "Honda City 2018 white",
-        "brand": "Honda",
-        "model": "City",
-        "year": "2018",
-        "color": "white"
-      },
-      "dates": {
-        "start": "2026-02-02T21:00:00.000Z",
-        "end": "2026-02-12T21:00:00.000Z",
-        "days": 11
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 817,
-        "totalRental": 8987,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 8987
-      },
-      "contact": {
-        "value": "@Interventu",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-15T00:36:47.348Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-15T00:36:47.537957"
   },
   {
     "booking_id": "38cfcc78",
@@ -2200,46 +1520,6 @@
     "created_at": "2026-01-16T20:00:24.486901"
   },
   {
-    "booking_id": "d16996e7",
-    "user_id": "374897465",
-    "form_data": {
-      "car": {
-        "id": "Mg 5",
-        "name": "MG5 Mg5  2023 Gray",
-        "brand": "MG5",
-        "model": "Mg5 ",
-        "year": "2023",
-        "color": "Gray"
-      },
-      "dates": {
-        "start": "2026-01-17T17:00:00.000Z",
-        "end": "2026-01-28T17:00:00.000Z",
-        "days": 12
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 800,
-        "totalRental": 9600,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 9600
-      },
-      "contact": {
-        "value": "@Marseloid",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-17T14:48:38.251Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-17T14:48:39.182881"
-  },
-  {
     "booking_id": "10a3c55f",
     "user_id": "489824345",
     "form_data": {
@@ -2278,126 +1558,6 @@
     },
     "status": "new",
     "created_at": "2026-01-18T06:58:10.698042"
-  },
-  {
-    "booking_id": "41df6e23",
-    "user_id": "1016718900",
-    "form_data": {
-      "car": {
-        "id": "mazda_mazda2_2024_white",
-        "name": "Mazda MAZDA2 2024 White",
-        "brand": "Mazda",
-        "model": "MAZDA2",
-        "year": "2024",
-        "color": "White"
-      },
-      "dates": {
-        "start": "2026-01-21T21:00:00.000Z",
-        "end": "2026-01-31T21:00:00.000Z",
-        "days": 11
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 855,
-        "totalRental": 9405,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 9405
-      },
-      "contact": {
-        "value": "@seryi_neo",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-18T20:15:29.349Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-18T20:15:29.441504"
-  },
-  {
-    "booking_id": "463f239c",
-    "user_id": "5094278896",
-    "form_data": {
-      "car": {
-        "id": "toyota_ativ_2024_gray",
-        "name": "Toyota ATIV Dark 2024 Gray",
-        "brand": "Toyota",
-        "model": "ATIV",
-        "year": "2024",
-        "color": "Gray"
-      },
-      "dates": {
-        "start": "2026-02-18T21:00:00.000Z",
-        "end": "2026-03-02T21:00:00.000Z",
-        "days": 13
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 1032,
-        "totalRental": 13416,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 13416
-      },
-      "contact": {
-        "value": "@Alexxmmmmm",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-18T22:11:03.624Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-18T22:11:03.814800"
-  },
-  {
-    "booking_id": "600f38a3",
-    "user_id": "364225071",
-    "form_data": {
-      "car": {
-        "id": "Ar_city_rs_black_2025",
-        "name": "Honda City RS 2025 Black",
-        "brand": "Honda",
-        "model": "City RS",
-        "year": "2025",
-        "color": "Black"
-      },
-      "dates": {
-        "start": "2026-01-20T17:00:00.000Z",
-        "end": "2026-02-01T17:00:00.000Z",
-        "days": 13
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 997,
-        "totalRental": 12961,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 13961
-      },
-      "contact": {
-        "value": "@nsttttttttttttttttttttttt",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-20T02:54:17.061Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-20T02:54:17.894545"
   },
   {
     "booking_id": "d8463a31",
@@ -2440,166 +1600,6 @@
     "created_at": "2026-01-20T07:03:31.384737"
   },
   {
-    "booking_id": "1d7b22b9",
-    "user_id": "961082502",
-    "form_data": {
-      "car": {
-        "id": "mazda_mazda2_2024_white",
-        "name": "Mazda MAZDA2 2024 White",
-        "brand": "Mazda",
-        "model": "MAZDA2",
-        "year": "2024",
-        "color": "White"
-      },
-      "dates": {
-        "start": "2026-01-21T17:00:00.000Z",
-        "end": "2026-02-11T17:00:00.000Z",
-        "days": 22
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 855,
-        "totalRental": 18810,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 19810
-      },
-      "contact": {
-        "value": "@mr_Sergey76",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-21T10:45:50.218Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-21T10:45:50.497339"
-  },
-  {
-    "booking_id": "9e8427f7",
-    "user_id": "478717365",
-    "form_data": {
-      "car": {
-        "id": "mg_mg5_2024_yellow",
-        "name": "MG MG5 2024 Yellow",
-        "brand": "MG",
-        "model": "MG5",
-        "year": "2024",
-        "color": "Yellow"
-      },
-      "dates": {
-        "start": "2026-02-15T21:00:00.000Z",
-        "end": "2026-02-24T21:00:00.000Z",
-        "days": 10
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 1052,
-        "totalRental": 10520,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 11520
-      },
-      "contact": {
-        "value": "+79887499888",
-        "type": "whatsapp"
-      },
-      "timestamp": "2026-01-21T14:34:14.770Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-21T14:34:15.155773"
-  },
-  {
-    "booking_id": "3d3d4c7c",
-    "user_id": "374897465",
-    "form_data": {
-      "car": {
-        "id": "toyota_yaris_2022_white",
-        "name": "Toyota YARIS 2022 White",
-        "brand": "Toyota",
-        "model": "YARIS",
-        "year": "2022",
-        "color": "White"
-      },
-      "dates": {
-        "start": "2026-02-07T17:00:00.000Z",
-        "end": "2026-02-27T17:00:00.000Z",
-        "days": 21
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 820,
-        "totalRental": 17220,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 17220
-      },
-      "contact": {
-        "value": "@Marseloid",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-21T15:45:03.187Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-21T15:45:05.448565"
-  },
-  {
-    "booking_id": "8ca5aba5",
-    "user_id": "450240234",
-    "form_data": {
-      "car": {
-        "id": "namo_suzuki_swift_2020",
-        "name": "Suzuki Swift 2020 White",
-        "brand": "Suzuki",
-        "model": "Swift",
-        "year": "2020",
-        "color": "White"
-      },
-      "dates": {
-        "start": "2026-01-21T17:00:00.000Z",
-        "end": "2026-02-11T17:00:00.000Z",
-        "days": 22
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 758,
-        "totalRental": 16676,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 0,
-        "totalDelivery": 500,
-        "grandTotal": 17176
-      },
-      "contact": {
-        "value": "@Alexey_Pavlenko1",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-22T04:52:33.046Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-22T04:52:33.208967"
-  },
-  {
     "booking_id": "9b7dd655",
     "user_id": "255502880",
     "form_data": {
@@ -2617,151 +1617,79 @@
         "days": 35
       },
       "locations": {
-        "pickup": "airport",
-        "return": "airport"
+        "pickupLocation": "airport",
+        "returnLocation": "airport",
+        "pickupAddress": "",
+        "returnAddress": ""
       },
       "pricing": {
-        "season": "high_season",
-        "dailyRate": 726,
-        "totalRental": 25410,
+        "dailyRate": 415,
+        "totalRental": 14525,
         "deposit": 5000,
         "deliveryPickup": 0,
         "deliveryReturn": 0,
         "totalDelivery": 0,
-        "grandTotal": 25410
+        "grandTotal": 14525
       },
       "contact": {
-        "value": "@d1d1dddf",
-        "type": "telegram"
+        "value": "@d1d1dddf (+79102635765)",
+        "type": "telegram",
+        "name": "Dmutry",
+        "phone": ""
       },
-      "timestamp": "2026-01-22T13:44:22.661Z"
+      "timestamp": "2026-01-30T15:04:59.372Z"
     },
     "status": "new",
-    "created_at": "2026-01-22T13:44:22.691719"
+    "created_at": "2026-01-22T13:44:22.691719",
+    "updated_at": "2026-01-30T15:05:00.149582"
   },
   {
-    "booking_id": "33c7cac7",
-    "user_id": "288205574",
+    "booking_id": "9f098956",
+    "user_id": "772588593",
     "form_data": {
       "car": {
-        "id": "toyota_yaris_2023_blue",
-        "name": "Toyota YARIS Hb 2023 Blue",
-        "brand": "Toyota",
-        "model": "YARIS",
-        "year": "2023",
-        "color": "Blue"
+        "id": "namo_suzuki_swift_2020",
+        "name": "Suzuki Swift 2020 White",
+        "brand": "Suzuki",
+        "model": "Swift",
+        "year": "2020",
+        "color": "White"
       },
       "dates": {
-        "start": "2026-01-31T21:00:00.000Z",
-        "end": "2026-02-08T21:00:00.000Z",
-        "days": 9
+        "start": "2026-02-05T04:30:00.000Z",
+        "end": "2026-02-16T04:00:00.000Z",
+        "days": 11
       },
       "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
+        "pickupLocation": "airport",
+        "returnLocation": "airport",
+        "pickupAddress": "Su284",
+        "returnAddress": ""
       },
       "pricing": {
-        "season": "high_season",
-        "dailyRate": 886,
-        "totalRental": 7974,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 8974
-      },
-      "contact": {
-        "value": "@a3857036",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-24T10:52:52.241Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-24T10:52:52.832799"
-  },
-  {
-    "booking_id": "3cc6f9bd",
-    "user_id": "374897465",
-    "form_data": {
-      "car": {
-        "id": "toyota_veloz_2024_gray",
-        "name": "Toyota VELOZ 2024 Gray",
-        "brand": "Toyota",
-        "model": "VELOZ",
-        "year": "2024",
-        "color": "Gray"
-      },
-      "dates": {
-        "start": "2026-02-14T17:00:00.000Z",
-        "end": "2026-02-25T17:00:00.000Z",
-        "days": 12
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 1325,
-        "totalRental": 15900,
-        "deposit": 10000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 15900
-      },
-      "contact": {
-        "value": "@Marseloid",
-        "type": "telegram"
-      },
-      "timestamp": "2026-01-25T21:30:35.893Z"
-    },
-    "status": "new",
-    "created_at": "2026-01-25T21:30:36.287999"
-  },
-  {
-    "booking_id": "2fec2c26",
-    "user_id": "374897465",
-    "form_data": {
-      "car": {
-        "id": "honda_civic_2024_black",
-        "name": "Honda CIVIC RS 2024 Black",
-        "brand": "Honda",
-        "model": "CIVIC RS",
-        "year": "2024",
-        "color": "Black"
-      },
-      "dates": {
-        "start": "2026-02-07T17:00:00.000Z",
-        "end": "2026-02-25T17:00:00.000Z",
-        "days": 19
-      },
-      "locations": {
-        "pickup": "airport",
-        "return": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 1338,
-        "totalRental": 25422,
+        "dailyRate": 712,
+        "totalRental": 7832,
         "deposit": 5000,
         "deliveryPickup": 0,
         "deliveryReturn": 0,
         "totalDelivery": 0,
-        "grandTotal": 25422
+        "grandTotal": 7832
       },
       "contact": {
-        "value": "@Marseloid",
-        "type": "telegram"
+        "value": "@denisbolgov1994",
+        "type": "telegram",
+        "name": "Денис(AR mazda 2)",
+        "phone": ""
       },
-      "timestamp": "2026-01-25T22:13:30.232Z"
+      "timestamp": "2026-01-30T14:57:12.005Z"
     },
     "status": "new",
-    "created_at": "2026-01-25T22:13:31.661702"
+    "created_at": "2026-01-28T19:53:30.931764",
+    "updated_at": "2026-01-30T14:57:13.042891"
   },
   {
-    "booking_id": "14eac309",
-    "user_id": "1391870076",
+    "booking_id": "3317e8af",
+    "user_id": "admin",
     "form_data": {
       "car": {
         "id": "mg_mg5_2024_green",
@@ -2772,8 +1700,132 @@
         "color": "Green"
       },
       "dates": {
-        "start": "2026-02-20T14:00:00.000Z",
-        "end": "2026-02-25T14:00:00.000Z",
+        "start": "2026-02-20T02:30:00.000Z",
+        "end": "2026-02-25T02:30:00.000Z",
+        "days": 6
+      },
+      "locations": {
+        "pickupLocation": "hotel",
+        "returnLocation": "hotel",
+        "pickupAddress": "Wydham Hotel",
+        "returnAddress": "Wydham hotel"
+      },
+      "pricing": {
+        "dailyRate": 985,
+        "totalRental": 5910,
+        "deposit": 5000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 6910
+      },
+      "contact": {
+        "value": "+7 902 488-81-64",
+        "type": "phone",
+        "name": "Андрей",
+        "phone": "+7 902 488-81-64"
+      },
+      "timestamp": "2026-01-30T14:52:50.087Z"
+    },
+    "status": "confirmed",
+    "created_at": "2026-01-30T14:52:50.826579",
+    "source": "admin_panel"
+  },
+  {
+    "booking_id": "877fbd57",
+    "user_id": "370125988",
+    "form_data": {
+      "car": {
+        "id": "jazz_namo_2018",
+        "name": "Honda jazz 2018 Белый",
+        "brand": "Honda",
+        "model": "jazz",
+        "year": "2018",
+        "color": "Белый"
+      },
+      "dates": {
+        "start": "2026-02-08T15:00:00.000Z",
+        "end": "2026-02-15T15:00:00.000Z",
+        "days": 8
+      },
+      "locations": {
+        "pickup": "airport",
+        "return": "airport"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 720,
+        "totalRental": 5760,
+        "deposit": 5000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 0,
+        "grandTotal": 5760
+      },
+      "contact": {
+        "value": "@eretix1",
+        "type": "telegram"
+      },
+      "timestamp": "2026-01-31T09:48:37.241Z"
+    },
+    "status": "new",
+    "created_at": "2026-01-31T09:48:38.179054"
+  },
+  {
+    "booking_id": "2c3d8022",
+    "user_id": "1201464637",
+    "form_data": {
+      "car": {
+        "id": "mazda_mazda2_2024_white",
+        "name": "Mazda MAZDA2 2024 White",
+        "brand": "Mazda",
+        "model": "MAZDA2",
+        "year": "2024",
+        "color": "White"
+      },
+      "dates": {
+        "start": "2026-01-31T17:00:00.000Z",
+        "end": "2026-02-01T17:00:00.000Z",
+        "days": 2
+      },
+      "locations": {
+        "pickup": "hotel",
+        "return": "hotel"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 858,
+        "totalRental": 1716,
+        "deposit": 5000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 2716
+      },
+      "contact": {
+        "value": "+79147733443",
+        "type": "whatsapp"
+      },
+      "timestamp": "2026-02-01T03:42:08.808Z"
+    },
+    "status": "new",
+    "created_at": "2026-02-01T03:42:10.757922"
+  },
+  {
+    "booking_id": "129acecc",
+    "user_id": "1662941623",
+    "form_data": {
+      "car": {
+        "id": "nmax155_2019_black",
+        "name": "Nmax155 2019 black",
+        "brand": "Nmax155",
+        "model": "2019",
+        "year": "black",
+        "color": ""
+      },
+      "dates": {
+        "start": "2026-02-13T21:00:00.000Z",
+        "end": "2026-02-18T21:00:00.000Z",
         "days": 6
       },
       "locations": {
@@ -2782,65 +1834,61 @@
       },
       "pricing": {
         "season": "high_season",
-        "dailyRate": 1084,
-        "totalRental": 6504,
+        "dailyRate": 298,
+        "totalRental": 1788,
         "deposit": 5000,
         "deliveryPickup": 500,
         "deliveryReturn": 500,
         "totalDelivery": 1000,
-        "grandTotal": 7504
+        "grandTotal": 2788
       },
       "contact": {
-        "value": "89024888164",
-        "type": "whatsapp"
+        "value": "@danyaaynadd",
+        "type": "telegram"
       },
-      "timestamp": "2026-01-26T11:42:46.686Z"
+      "timestamp": "2026-02-01T16:11:03.944Z"
     },
     "status": "new",
-    "created_at": "2026-01-26T11:42:47.343511"
+    "created_at": "2026-02-01T16:11:04.187904"
   },
   {
-    "booking_id": "74113a88",
-    "user_id": "admin",
+    "booking_id": "1952f0e9",
+    "user_id": "312494705",
     "form_data": {
       "car": {
-        "id": "namo_yaris_cross_2025",
-        "name": "Toyota Yaris Cross 2025 Gray",
-        "brand": "Toyota",
-        "model": "Yaris Cross",
-        "year": "2025",
-        "color": "Gray"
+        "id": "nmax155_2019_white",
+        "name": "Nmax155 2019 white",
+        "brand": "Nmax155",
+        "model": "2019",
+        "year": "white",
+        "color": ""
       },
       "dates": {
-        "start": "2026-02-13T04:00:00.000Z",
-        "end": "2026-02-28T04:00:00.000Z",
-        "days": 16
+        "start": "2026-02-02T17:00:00.000Z",
+        "end": "2026-02-03T17:00:00.000Z",
+        "days": 2
       },
       "locations": {
-        "pickupLocation": "airport",
-        "returnLocation": "airport",
-        "pickupAddress": "",
-        "returnAddress": ""
+        "pickup": "hotel",
+        "return": "hotel"
       },
       "pricing": {
-        "dailyRate": 1277,
-        "totalRental": 20432,
-        "deposit": 10000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 20432
+        "season": "high_season",
+        "dailyRate": 298,
+        "totalRental": 596,
+        "deposit": 3500,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 1596
       },
       "contact": {
-        "value": "@Killer",
-        "type": "telegram",
-        "name": "Chupa",
-        "phone": ""
+        "value": "@ScratBelka",
+        "type": "telegram"
       },
-      "timestamp": "2026-01-26T15:59:27.476Z"
+      "timestamp": "2026-02-02T09:05:26.959Z"
     },
-    "status": "confirmed",
-    "created_at": "2026-01-26T15:59:27.694471",
-    "source": "admin_panel"
+    "status": "new",
+    "created_at": "2026-02-02T09:05:31.127622"
   }
 ]
