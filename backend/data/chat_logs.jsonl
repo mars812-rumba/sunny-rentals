@@ -1722,3 +1722,6 @@
 {"timestamp": "2026-02-03T15:10:46.824Z", "user_id": 639389622, "role": "manager", "text": "Хорошо, если что обращайтесь. Спасибо", "source": "crm_panel"}
 {"timestamp": "2026-02-03T15:13:30.759052", "user_id": 128064349, "role": "user", "text": "Блин \nЧуть-чуть не успели \nСегодня взяла уже \nНо у меня аренда до 25 февраля \nС 26 февраля по 9 марта взяла бы у вас , если можно", "username": "YULIANNAEVA", "source": "telegram_bot"}
 {"timestamp": "2026-02-03T15:16:20.981Z", "user_id": 128064349, "role": "manager", "text": "Хорошо, обращайтесь", "source": "crm_panel"}
+{"timestamp": "2026-02-03T16:38:29.224Z", "user_id": 7658402370, "role": "manager", "text": "Здравствуйте! Подскажите, не надумали бронировать?", "source": "crm_panel"}
+{"timestamp": "2026-02-03T16:41:02.812Z", "user_id": 128064349, "role": "manager", "text": "Лучше наверно сразу забронировать", "source": "crm_panel"}
+{"timestamp": "2026-02-03T16:42:35.190Z", "user_id": 128064349, "role": "manager", "text": "Какой формат авто рассматриваете?", "source": "crm_panel"}

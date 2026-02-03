@@ -7774,5 +7774,27 @@
     "notes": [],
     "source": "telegram_webapp",
     "archived_at": "2026-02-03T15:34:59.445309"
+  },
+  {
+    "user_id": 318769672,
+    "username": "ipechen",
+    "created_at": "2026-01-30T19:08:59.000637",
+    "updated_at": "2026-01-31T06:45:15.775641",
+    "status": "interested",
+    "form_started": true,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": "sedan",
+    "dates_selected": {
+      "start": "2026-02-22T21:00:00.000Z",
+      "end": "2026-03-05T21:00:00.000Z",
+      "days": 12
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "marker": "unprocessed",
+    "final_status": "in_work",
+    "last_note": "31.01 касание",
+    "archived_at": "2026-02-03T16:28:25.874704"
   }
 ]

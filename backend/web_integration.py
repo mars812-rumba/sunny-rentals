@@ -1622,6 +1622,8 @@ def get_available_cars(
         "available": available,
         "count": len(available)
     }
+    
+
 
 @app.get(API_PREFIX + "/bookings")
 def get_bookings(user_id: str | None = None):
@@ -1641,6 +1643,109 @@ def get_bookings(user_id: str | None = None):
 
 
 
+@app.get(API_PREFIX + "/bookings/logistics", response_model=List[LogisticsDate])
+async def get_bookings_logistics():
+    """
+    Возвращает даты выдачи и возврата для всех броней
+    Используется для корректного отображения бейджей в календаре
+    """
+    try:
+        with open(BOOKINGS_FILE, 'r', encoding='utf-8') as f:
+            bookings = json.load(f)
+        
+        logistics_data = []
+        
+        for booking in bookings:
+            # Извлекаем даты из разных возможных мест
+            start_date = (
+                booking.get('form_data', {}).get('dates', {}).get('start') or 
+                booking.get('start_date')
+            )
+            end_date = (
+                booking.get('form_data', {}).get('dates', {}).get('end') or 
+                booking.get('end_date')
+            )
+            
+            if not start_date or not end_date:
+                continue
+                
+            # Извлекаем информацию об авто
+            car_info = booking.get('form_data', {}).get('car', {})
+            car_name = car_info.get('model') or car_info.get('name') or 'Авто'
+            car_id = car_info.get('id', '')
+            
+            # Извлекаем информацию о клиенте
+            client_name = booking.get('form_data', {}).get('contact', {}).get('name', 'Клиент')
+            location = booking.get('form_data', {}).get('locations', {}).get('pickupLocation', '')
+            
+            logistics_data.append({
+                'booking_id': booking.get('booking_id', ''),
+                'car_id': car_id,
+                'car_name': car_name,
+                'pickup_date': start_date,
+                'return_date': end_date,
+                'client_name': client_name,
+                'location': location
+            })
+        
+        return logistics_data
+        
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Bookings file not found")
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Invalid JSON in bookings file")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reading bookings: {str(e)}")
+
+
+@app.get(API_PREFIX + "/bookings/logistics/summary")
+async def get_logistics_summary():
+    """
+    Возвращает сводку по датам логистики
+    Группирует выдачи и возвраты по дням
+    """
+    try:
+        with open(BOOKINGS_FILE, 'r', encoding='utf-8') as f:
+            bookings = json.load(f)
+        
+        # Словари для группировки по датам
+        pickups_by_date = {}
+        returns_by_date = {}
+        
+        for booking in bookings:
+            start_date = (
+                booking.get('form_data', {}).get('dates', {}).get('start') or 
+                booking.get('start_date')
+            )
+            end_date = (
+                booking.get('form_data', {}).get('dates', {}).get('end') or 
+                booking.get('end_date')
+            )
+            
+            if not start_date or not end_date:
+                continue
+            
+            # Извлекаем только дату без времени для группировки
+            pickup_date = start_date.split('T')[0] if 'T' in start_date else start_date.split(' ')[0]
+            return_date = end_date.split('T')[0] if 'T' in end_date else end_date.split(' ')[0]
+            
+            # Считаем выдачи
+            if pickup_date not in pickups_by_date:
+                pickups_by_date[pickup_date] = 0
+            pickups_by_date[pickup_date] += 1
+            
+            # Считаем возвраты
+            if return_date not in returns_by_date:
+                returns_by_date[return_date] = 0
+            returns_by_date[return_date] += 1
+        
+        return {
+            'pickups': pickups_by_date,
+            'returns': returns_by_date
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 @app.post(API_PREFIX + "/leads/track")
 def track_lead_event(request: LeadTrackRequest):
@@ -2333,6 +2438,9 @@ async def update_user_marker(marker_update: MarkerUpdate):
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+
 
 @app.get(API_PREFIX + "/crm/bookings/{user_id}")
 def get_user_bookings(user_id: str):
@@ -4150,110 +4258,6 @@ async def send_media_to_user(
     
 
 
-
-@app.get("/api/bookings/logistics", response_model=List[LogisticsDate])
-async def get_bookings_logistics():
-    """
-    Возвращает даты выдачи и возврата для всех броней
-    Используется для корректного отображения бейджей в календаре
-    """
-    try:
-        with open('bookings.json', 'r', encoding='utf-8') as f:
-            bookings = json.load(f)
-        
-        logistics_data = []
-        
-        for booking in bookings:
-            # Извлекаем даты из разных возможных мест
-            start_date = (
-                booking.get('form_data', {}).get('dates', {}).get('start') or 
-                booking.get('start_date')
-            )
-            end_date = (
-                booking.get('form_data', {}).get('dates', {}).get('end') or 
-                booking.get('end_date')
-            )
-            
-            if not start_date or not end_date:
-                continue
-                
-            # Извлекаем информацию об авто
-            car_info = booking.get('form_data', {}).get('car', {})
-            car_name = car_info.get('model') or car_info.get('name') or 'Авто'
-            car_id = car_info.get('id', '')
-            
-            # Извлекаем информацию о клиенте
-            client_name = booking.get('form_data', {}).get('contact', {}).get('name', 'Клиент')
-            location = booking.get('form_data', {}).get('locations', {}).get('pickupLocation', '')
-            
-            logistics_data.append({
-                'booking_id': booking.get('booking_id', ''),
-                'car_id': car_id,
-                'car_name': car_name,
-                'pickup_date': start_date,
-                'return_date': end_date,
-                'client_name': client_name,
-                'location': location
-            })
-        
-        return logistics_data
-        
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="Bookings file not found")
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="Invalid JSON in bookings file")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error reading bookings: {str(e)}")
-
-
-@app.get("/api/bookings/logistics/summary")
-async def get_logistics_summary():
-    """
-    Возвращает сводку по датам логистики
-    Группирует выдачи и возвраты по дням
-    """
-    try:
-        with open('bookings.json', 'r', encoding='utf-8') as f:
-            bookings = json.load(f)
-        
-        # Словари для группировки по датам
-        pickups_by_date = {}
-        returns_by_date = {}
-        
-        for booking in bookings:
-            start_date = (
-                booking.get('form_data', {}).get('dates', {}).get('start') or 
-                booking.get('start_date')
-            )
-            end_date = (
-                booking.get('form_data', {}).get('dates', {}).get('end') or 
-                booking.get('end_date')
-            )
-            
-            if not start_date or not end_date:
-                continue
-            
-            # Извлекаем только дату без времени для группировки
-            pickup_date = start_date.split('T')[0] if 'T' in start_date else start_date.split(' ')[0]
-            return_date = end_date.split('T')[0] if 'T' in end_date else end_date.split(' ')[0]
-            
-            # Считаем выдачи
-            if pickup_date not in pickups_by_date:
-                pickups_by_date[pickup_date] = 0
-            pickups_by_date[pickup_date] += 1
-            
-            # Считаем возвраты
-            if return_date not in returns_by_date:
-                returns_by_date[return_date] = 0
-            returns_by_date[return_date] += 1
-        
-        return {
-            'pickups': pickups_by_date,
-            'returns': returns_by_date
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
     
 # ==============================
 # ЗАПУСК

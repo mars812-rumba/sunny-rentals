@@ -24,25 +24,16 @@ export interface LogisticsSummary {
   returns: Record<string, number>; // { "2026-01-25": 2, ... }
 }
 
-/**
- * Получить все даты выдачи и возврата для броней
- */
 export async function fetchBookingsLogistics(): Promise<LogisticsDate[]> {
-  const response = await fetch(`${API_BASE_URL}/api/bookings/logistics`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch bookings logistics');
-  }
+  // Добавляем /api перед путем, если твой API_PREFIX на бэкенде равен "/api"
+  const response = await fetch(`${API_BASE_URL}/api/bookings/logistics?t=${Date.now()}`); 
+  if (!response.ok) throw new Error('Failed to fetch logistics');
   return response.json();
 }
 
-/**
- * Получить сводку по логистике (количество выдач/возвратов по дням)
- */
 export async function fetchLogisticsSummary(): Promise<LogisticsSummary> {
   const response = await fetch(`${API_BASE_URL}/api/bookings/logistics/summary`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch logistics summary');
-  }
+  if (!response.ok) throw new Error('Failed to fetch logistics summary');
   return response.json();
 }
 

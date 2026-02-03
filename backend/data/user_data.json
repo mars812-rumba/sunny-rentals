@@ -6683,7 +6683,7 @@
     "user_id": 128064349,
     "username": "YULIANNAEVA",
     "created_at": "2026-01-28T04:11:21.191430",
-    "updated_at": "2026-02-03T15:13:30.775202",
+    "updated_at": "2026-02-03T16:40:43.782633",
     "status": "interested",
     "form_started": true,
     "booking_submitted": false,
@@ -6711,35 +6711,14 @@
     },
     "last_message_at": "2026-02-03T15:13:30.775179",
     "final_status": "in_work",
-    "last_note": "04.02-09.03 отправил варианты",
+    "last_note": "С 25.02 нужен авто",
     "marker": "in_progress"
-  },
-  {
-    "user_id": 318769672,
-    "username": "ipechen",
-    "created_at": "2026-01-30T19:08:59.000637",
-    "updated_at": "2026-01-31T06:45:15.775641",
-    "status": "interested",
-    "form_started": true,
-    "booking_submitted": false,
-    "car_interested": null,
-    "category_interested": "sedan",
-    "dates_selected": {
-      "start": "2026-02-22T21:00:00.000Z",
-      "end": "2026-03-05T21:00:00.000Z",
-      "days": 12
-    },
-    "notes": [],
-    "source": "telegram_webapp",
-    "marker": "unprocessed",
-    "final_status": "in_work",
-    "last_note": "31.01 касание"
   },
   {
     "user_id": 7658402370,
     "username": null,
     "created_at": "2026-01-31T05:12:49.591889",
-    "updated_at": "2026-01-31T07:12:25.420619",
+    "updated_at": "2026-02-03T16:43:10.532577",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -6764,13 +6743,13 @@
     "last_message_at": "2026-01-31T07:02:58.807179",
     "marker": "in_progress",
     "final_status": "in_work",
-    "last_note": "1.03-24.03 + 2 кресла. Скинул Ярис. 16100. Думает"
+    "last_note": "1.03-24.03. выезд самуи 1500."
   },
   {
     "user_id": 708890817,
     "username": null,
     "created_at": "2026-01-31T06:17:18.993315",
-    "updated_at": "2026-01-31T07:54:26.131730",
+    "updated_at": "2026-02-03T16:37:40.898407",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -6795,7 +6774,7 @@
     "last_message_at": "2026-01-31T07:29:54.392980",
     "marker": "ready",
     "final_status": "in_work",
-    "last_note": "22.02-08.03.  атив 11,900.жду документы. Успех"
+    "last_note": "Успех"
   },
   {
     "user_id": 1528014590,
@@ -7106,5 +7085,19 @@
     "notes": [],
     "source": "telegram_webapp",
     "marker": "unprocessed"
+  },
+  {
+    "user_id": 782990455,
+    "username": "Oksanaa711",
+    "created_at": "2026-02-03T17:40:55.165961",
+    "updated_at": "2026-02-03T17:40:55.165993",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp"
   }
 ]

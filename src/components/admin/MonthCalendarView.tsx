@@ -1,213 +1,135 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback, useEffect, memo, useState } from 'react';
 import { 
-  format, 
-  startOfMonth, 
-  endOfMonth, 
-  startOfWeek, 
-  endOfWeek, 
-  addDays, 
-  isSameMonth, 
-  isToday 
+  format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, 
+  addDays, addMonths, isSameMonth, isToday 
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { Booking } from '@/api/api.ts';
+import useEmblaCarousel from 'embla-carousel-react';
+import { LogisticsDate, Booking } from '@/api/api.ts'; 
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { DayDetailsModal } from './DayDetailsModal'; 
 
 interface DayEvent {
   type: 'pickup' | 'return';
   time: string;
   carName: string;
+  clientName: string;
+  location: string;
+  booking_id: string;
   booking: Booking;
 }
 
 interface MonthCalendarViewProps {
   currentDate: Date;
   bookings: Booking[];
+  logisticsData: LogisticsDate[];
   onDateChange: (date: Date) => void;
   onBookingClick: (booking: Booking) => void;
-  onDayClick: (date: Date, events: DayEvent[]) => void;
+  onDayClick?: (date: Date, events: DayEvent[]) => void;
 }
 
-export function MonthCalendarView({
-  currentDate,
-  bookings,
-  onDateChange,
-  onBookingClick,
-  onDayClick,
-}: MonthCalendarViewProps) {
-  
-  const calendarDays = useMemo(() => {
-    const monthStart = startOfMonth(currentDate);
+const getMonthLetters = (date: Date) => {
+  let name = format(date, 'LLLL', { locale: ru }).toUpperCase();
+  if (name === 'СЕНТЯБРЬ') name = 'СЕНТЯБР'; 
+  return name.split('');
+};
+
+const MonthGrid = memo(({ 
+  date, 
+  eventsByDay, 
+  onDayClick 
+}: { 
+  date: Date, 
+  eventsByDay: Map<string, DayEvent[]>,
+  onDayClick: (date: Date, events: DayEvent[]) => void 
+}) => {
+  const days = useMemo(() => {
+    const monthStart = startOfMonth(date);
     const monthEnd = endOfMonth(monthStart);
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    const start = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const end = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    const res = [];
+    let d = start;
+    while (d <= end) { res.push(d); d = addDays(d, 1); }
+    return res;
+  }, [date]);
 
-    const days: Date[] = [];
-    let day = calendarStart;
-    while (day <= calendarEnd) {
-      days.push(day);
-      day = addDays(day, 1);
-    }
-    return days;
-  }, [currentDate]);
-
-  const eventsByDay = useMemo(() => {
-    const map = new Map<string, DayEvent[]>();
-    
-    bookings.forEach(booking => {
-      const start = booking.form_data?.dates?.start || booking.start_date;
-      const end = booking.form_data?.dates?.end || booking.end_date;
-      
-      if (!start || !end) return;
-
-      const startDate = new Date(start);
-      const endDate = new Date(end);
-      const carName = booking.form_data?.car?.model || booking.form_data?.car?.name || 'Авто';
-
-      // Выдача
-      const pickupKey = format(startDate, 'yyyy-MM-dd');
-      if (!map.has(pickupKey)) map.set(pickupKey, []);
-      map.get(pickupKey)!.push({
-        type: 'pickup',
-        time: format(startDate, 'HH:mm'),
-        carName,
-        booking,
-      });
-
-      // Возврат
-      const returnKey = format(endDate, 'yyyy-MM-dd');
-      if (!map.has(returnKey)) map.set(returnKey, []);
-      map.get(returnKey)!.push({
-        type: 'return',
-        time: format(endDate, 'HH:mm'),
-        carName,
-        booking,
-      });
-    });
-
-    map.forEach(events => events.sort((a, b) => a.time.localeCompare(b.time)));
-    return map;
-  }, [bookings]);
-
-  const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-  const weeks: Date[][] = [];
-  for (let i = 0; i < calendarDays.length; i += 7) {
-    weeks.push(calendarDays.slice(i, i + 7));
-  }
+  const monthLetters = useMemo(() => getMonthLetters(date), [date]);
+  const yearString = format(date, 'yyyy');
+  const weeks = [];
+  for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
 
   return (
-    <div className="bg-white min-h-[600px] flex flex-col select-none">
-      {/* Хедер - НЕПРОЗРАЧНЫЙ с тенью */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-md">
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => onDateChange(addDays(startOfMonth(currentDate), -1))} 
-            className="h-8 w-8 p-0 border-gray-300"
-          >
-            <ChevronLeft className="h-4 w-4 text-gray-600" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => onDateChange(new Date())} 
-            className="h-8 px-4 text-xs font-medium text-gray-600 border-gray-300"
-          >
-            Сегодня
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => onDateChange(addDays(endOfMonth(currentDate), 1))} 
-            className="h-8 w-8 p-0 border-gray-300"
-          >
-            <ChevronRight className="h-4 w-4 text-gray-600" />
-          </Button>
-        </div>
-        
-        {/* Месяц и год - МЕНЬШЕ, в одну строку */}
-        <h3 className="text-sm font-medium text-slate-600 capitalize">
-          {format(currentDate, 'LLLL yyyy', { locale: ru })}
-        </h3>
-        
-        <div className="w-24" /> 
-      </div>
-
-      {/* Дни недели */}
-      <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/50">
-        {weekDays.map((day) => (
-          <div key={day} className="py-2 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
-            {day}
+    <div className="flex-[0_0_100%] min-w-0 relative">
+      {/* ФОНОВАЯ ПОДЛОЖКА */}
+      <div className="absolute inset-0 pointer-events-none select-none flex flex-col">
+        <div className="h-[100px]" />
+        <div className="h-[100px] flex items-center justify-center">
+          <div className="flex justify-center items-center gap-4 px-4 text-slate-200/40 text-3xl font-black tracking-[0.2em] uppercase italic">
+            {monthLetters.map((char, i) => <span key={i}>{char}</span>)}
           </div>
-        ))}
+        </div>
+        <div className="h-[100px] flex items-center justify-center text-slate-100/50 text-6xl font-black tracking-tighter italic">
+          {yearString}
+        </div>
       </div>
 
-      {/* Сетка дней */}
-      <div className="flex-1 grid grid-flow-row auto-rows-fr divide-y divide-gray-100">
-        {weeks.map((week, weekIndex) => (
-          <div key={weekIndex} className="grid grid-cols-7 divide-x divide-gray-100">
+      <div className="relative z-10 grid grid-flow-row auto-rows-fr divide-y divide-gray-100 border-t border-gray-100">
+        {weeks.map((week, wIdx) => (
+          <div key={wIdx} className="grid grid-cols-7 divide-x divide-gray-100">
             {week.map((day) => {
               const dayKey = format(day, 'yyyy-MM-dd');
               const events = eventsByDay.get(dayKey) || [];
-              const pickups = events.filter(e => e.type === 'pickup');
-              const returns = events.filter(e => e.type === 'return');
-              
-              const isCurrentMonth = isSameMonth(day, currentDate);
+              const isCurrentMonth = isSameMonth(day, date);
               const dayIsToday = isToday(day);
 
               return (
                 <div
                   key={dayKey}
                   className={cn(
-                    "min-h-[100px] p-2 transition-all cursor-pointer group",
-                    !isCurrentMonth ? "bg-gray-50/30 opacity-40" : "bg-white hover:bg-blue-50/40"
+                    "min-h-[100px] p-1.5 transition-colors cursor-pointer group bg-transparent",
+                    !isCurrentMonth ? "opacity-20" : "hover:bg-blue-50/10"
                   )}
                   onClick={() => onDayClick(day, events)}
                 >
-                  {/* Номер дня */}
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex justify-between items-start mb-1">
                     <span className={cn(
-                      "text-[11px] font-black w-6 h-6 flex items-center justify-center rounded-full transition-colors",
-                      dayIsToday 
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-200" 
-                        : isCurrentMonth 
-                          ? "text-slate-500 group-hover:text-blue-600" 
-                          : "text-gray-300"
+                      "text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full transition-colors",
+                      dayIsToday ? "bg-blue-600 text-white shadow-md" : isCurrentMonth ? "text-slate-500" : "text-gray-300"
                     )}>
                       {format(day, 'd')}
                     </span>
                   </div>
 
-                  {/* Узкие полоски-бейджи - цвета как в AdminScheduler */}
-                  <div className="space-y-0.5">
-                    {/* Все события - цвет по статусу как в Gantt */}
-                    {pickups.map((pickup, idx) => {
-                      const status = pickup.booking.status || 'pending';
-                      const bgColor = status === 'confirmed' ? '#70eeb5' : '#70eeb5'; // Зеленый или желтый
+                  <div className="space-y-0.5 overflow-hidden font-sans">
+                    {events.slice(0, 5).map((ev, idx) => {
+                      const showTime = ev.time && ev.time !== "00:00" && ev.time !== "04:00" ;
                       return (
                         <div 
-                          key={`pickup-${idx}`}
-                          className="h-1 rounded-full shadow-sm" 
-                          style={{ width: '100%', backgroundColor: bgColor }}
-                          title={`${pickup.time} - ${pickup.carName} (${status})`} 
-                        />
+                          key={idx}
+                          className={cn(
+                            "px-1 py-0.5 rounded-[4px] text-[5px] font-bold truncate border shadow-sm flex justify-between items-center gap-1",
+                            ev.type === 'pickup' 
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
+                              : "bg-amber-50 text-amber-700 border-amber-100"
+                          )}
+                        >
+                          <span className="truncate flex-1 uppercase tracking-tighter">
+                            {ev.carName}
+                          </span>
+                          {showTime && (
+                            <span className="opacity-60 text-[6px] font-medium flex-shrink-0">
+                              {ev.time}
+                            </span>
+                          )}
+                        </div>
                       );
                     })}
-                    {returns.map((returnEvent, idx) => {
-                      const status = returnEvent.booking.status || 'pending';
-                      const bgColor = status === 'confirmed' ? '#86efac' : '#fde047'; // Зеленый или желтый
-                      return (
-                        <div 
-                          key={`return-${idx}`}
-                          className="h-1 rounded-full shadow-sm" 
-                          style={{ width: '100%', backgroundColor: bgColor }}
-                          title={`${returnEvent.time} - ${returnEvent.carName} (${status})`} 
-                        />
-                      );
-                    })}
+                    {events.length > 5 && (
+                      <div className="text-[7px] text-slate-400 font-bold pl-1 uppercase tracking-tighter">
+                        + ещё {events.length - 5}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -215,6 +137,115 @@ export function MonthCalendarView({
           </div>
         ))}
       </div>
+    </div>
+  );
+});
+
+export function MonthCalendarView({
+  currentDate,
+  bookings,
+  logisticsData,
+  onDateChange,
+  onBookingClick,
+  onDayClick,
+}: MonthCalendarViewProps) {
+  
+  const [selectedDayData, setSelectedDayData] = useState<{
+    isOpen: boolean;
+    date: Date | null;
+    events: DayEvent[];
+  }>({ isOpen: false, date: null, events: [] });
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, startIndex: 1, duration: 30 });
+
+  const eventsByDay = useMemo(() => {
+    const map = new Map<string, DayEvent[]>();
+    
+    if (!logisticsData || logisticsData.length === 0) return map;
+
+    logisticsData.forEach((item) => {
+      const pDate = new Date(item.pickup_date);
+      const rDate = new Date(item.return_date);
+
+      if (isNaN(pDate.getTime())) return;
+
+      const fullBooking = bookings?.find(b => b.booking_id === item.booking_id);
+
+      const baseEvent = {
+        carName: item.car_name,
+        clientName: item.client_name,
+        location: item.location || 'Не указано',
+        booking_id: item.booking_id,
+        booking: fullBooking || ({
+          booking_id: item.booking_id,
+          form_data: {
+            client_name: item.client_name,
+            car: { model: item.car_name },
+            locations: { pickupLocation: item.location }
+          }
+        } as any)
+      };
+
+      const pKey = format(pDate, 'yyyy-MM-dd');
+      const rKey = format(rDate, 'yyyy-MM-dd');
+
+      if (!map.has(pKey)) map.set(pKey, []);
+      map.get(pKey)!.push({ ...baseEvent, type: 'pickup', time: format(pDate, 'HH:mm') });
+
+      if (!map.has(rKey)) map.set(rKey, []);
+      map.get(rKey)!.push({ ...baseEvent, type: 'return', time: format(rDate, 'HH:mm') });
+    });
+
+    return map;
+  }, [logisticsData, bookings]);
+
+  const handleInnerDayClick = useCallback((date: Date, events: DayEvent[]) => {
+    setSelectedDayData({ isOpen: true, date, events });
+    if (onDayClick) onDayClick(date, events);
+  }, [onDayClick]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => {
+      const index = emblaApi.selectedScrollSnap();
+      if (index === 0) {
+        onDateChange(addMonths(currentDate, -1));
+        emblaApi.scrollTo(1, false);
+      } else if (index === 2) {
+        onDateChange(addMonths(currentDate, 1));
+        emblaApi.scrollTo(1, false);
+      }
+    };
+    emblaApi.on('select', onSelect);
+    return () => { emblaApi.off('select', onSelect); };
+  }, [emblaApi, currentDate, onDateChange]);
+
+  return (
+    <div className="bg-white min-h-[600px] flex flex-col select-none overflow-hidden relative">
+      <div className="grid grid-cols-7 bg-white relative z-20 pt-2 border-b border-gray-50 font-sans">
+        {['П', 'В', 'С', 'Ч', 'П', 'С', 'В'].map((day, i) => (
+          <div key={i} className="py-2 text-center text-[10px] font-bold text-gray-300 uppercase">{day}</div>
+        ))}
+      </div>
+
+      <div className="overflow-hidden flex-1 cursor-grab active:cursor-grabbing" ref={emblaRef}>
+        <div className="flex h-full">
+          <MonthGrid date={addMonths(currentDate, -1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} />
+          <MonthGrid date={currentDate} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} />
+          <MonthGrid date={addMonths(currentDate, 1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} />
+        </div>
+      </div>
+
+      <DayDetailsModal 
+        isOpen={selectedDayData.isOpen}
+        onClose={() => setSelectedDayData(prev => ({ ...prev, isOpen: false }))}
+        date={selectedDayData.date}
+        events={selectedDayData.events}
+        onBookingClick={(booking) => {
+          onBookingClick(booking);
+          setSelectedDayData(prev => ({ ...prev, isOpen: false }));
+        }}
+      />
     </div>
   );
 }

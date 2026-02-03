@@ -2628,3 +2628,11 @@
 {"timestamp": "2026-02-03T15:34:42.501852", "user_id": 5083529437, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
 {"timestamp": "2026-02-03T15:34:56.385168", "user_id": 5083529437, "action": "user_archived", "archived_by": "6451825371"}
 {"timestamp": "2026-02-03T15:34:59.476069", "user_id": 5711724868, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-02-03T16:28:25.951657", "user_id": 318769672, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-02-03T16:37:40.918103", "user_id": 708890817, "action": "note_added", "note": "Успех", "added_by": "6451825371"}
+{"timestamp": "2026-02-03T16:38:29.224Z", "user_id": 7658402370, "action": "manager_message_sent", "message_length": 50}
+{"timestamp": "2026-02-03T16:40:43.798809", "user_id": 128064349, "action": "note_added", "note": "С 25.02 нужен авто", "added_by": "6451825371"}
+{"timestamp": "2026-02-03T16:41:02.812Z", "user_id": 128064349, "action": "manager_message_sent", "message_length": 33}
+{"timestamp": "2026-02-03T16:42:35.190Z", "user_id": 128064349, "action": "manager_message_sent", "message_length": 33}
+{"timestamp": "2026-02-03T16:43:10.551269", "user_id": 7658402370, "action": "note_added", "note": "1.03-24.03. выезд самуи 1500.", "added_by": "6451825371"}
+{"timestamp": "2026-02-03T17:40:55.534432", "user_id": 782990455, "action": "dialog_started", "initiated_by": "user", "username": "Oksanaa711"}

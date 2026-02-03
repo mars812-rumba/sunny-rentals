@@ -8,7 +8,7 @@ import { SchedulerCalendar } from '@/components/admin/SchedulerCalendar';
 import { MonthCalendarView } from '@/components/admin/MonthCalendarView';
 import { BookingFormModal } from '@/components/admin/BookingFormModal';
 import { DayDetailsModal } from '@/components/admin/DayDetailsModal';
-import { fetchCars, fetchBookings, fetchCarOwners, Car, Booking } from '@/api/api.ts';
+import { fetchCars, fetchBookings, fetchCarOwners, Car, Booking, fetchBookingsLogistics  } from '@/api/api.ts';
 
 const CAR_CLASSES = [
   { id: 'all', name: 'Все' },
@@ -30,6 +30,11 @@ export default function AdminScheduler() {
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [carOwnersMap, setCarOwnersMap] = useState<Record<string, string>>({});
   const [isCompactMode, setIsCompactMode] = useState(false);
+
+  const { data: logisticsData = [], isLoading: logisticsLoading } = useQuery({
+      queryKey: ['admin-logistics'],
+      queryFn: fetchBookingsLogistics,
+    });
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
@@ -39,7 +44,7 @@ export default function AdminScheduler() {
   const [isDayModalOpen, setIsDayModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedDayEvents, setSelectedDayEvents] = useState<any[]>([]);
-
+  
   const [lastTap, setLastTap] = useState<{
     id: string;
     timestamp: number;
@@ -54,7 +59,7 @@ export default function AdminScheduler() {
     queryKey: ['admin-bookings'],
     queryFn: () => fetchBookings(),
   });
-
+  
   useEffect(() => {
     fetchCarOwners().then(setCarOwnersMap);
   }, []);
@@ -70,6 +75,7 @@ export default function AdminScheduler() {
     return car?.class === selectedClass;
   });
 
+
   const handleBookingClick = (booking: Booking) => {
     const car = cars.find(c => c.id === booking.form_data.car.id);
     if (car) {
@@ -78,6 +84,8 @@ export default function AdminScheduler() {
       setIsModalOpen(true);
     }
   };
+
+
 
   const handleCreateBooking = (carId: string, dateRange: { start: Date; end: Date }) => {
     const now = Date.now();
@@ -146,7 +154,7 @@ export default function AdminScheduler() {
     return () => window.removeEventListener('resize', updateDaysToShow);
   }, []);
 
-  const isLoading = carsLoading || bookingsLoading;
+ const isLoading = carsLoading || bookingsLoading || logisticsLoading;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -237,24 +245,25 @@ export default function AdminScheduler() {
           <MonthCalendarView
             currentDate={currentDate}
             bookings={filteredBookings}
+            logisticsData={logisticsData} // ТЕПЕРЬ ОНИ ПЕРЕДАЮТСЯ!  
             onDateChange={setCurrentDate}
             onBookingClick={handleBookingClick}
             onDayClick={handleDayClick}
           />
         ) : (
           <SchedulerCalendar
-            cars={filteredCars}
-            bookings={bookings}
-            startDate={startDate}
-            daysToShow={daysToShow}
-            onDateChange={setStartDate}
-            onBookingClick={handleBookingClick}
-            onCreateBooking={handleCreateBooking}
-            selectedClass={selectedClass}
-            carOwnersMap={carOwnersMap}
-            isCompactMode={isCompactMode}
-          />
-        )}
+                cars={filteredCars}
+                bookings={bookings}
+                startDate={startDate}
+                daysToShow={daysToShow}
+                onDateChange={setStartDate}
+                onBookingClick={handleBookingClick}
+                onCreateBooking={handleCreateBooking}
+                selectedClass={selectedClass}
+                carOwnersMap={carOwnersMap}
+                isCompactMode={isCompactMode}
+              />
+            )}
       </main>
 
       <BookingFormModal

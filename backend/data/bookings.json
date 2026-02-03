@@ -1656,7 +1656,7 @@
         "color": "White"
       },
       "dates": {
-        "start": "2026-02-05T04:30:00.000Z",
+        "start": "2026-02-05T03:00:00.000Z",
         "end": "2026-02-16T04:00:00.000Z",
         "days": 11
       },
@@ -1681,11 +1681,11 @@
         "name": "Денис(AR mazda 2)",
         "phone": ""
       },
-      "timestamp": "2026-01-30T14:57:12.005Z"
+      "timestamp": "2026-02-03T18:46:34.635Z"
     },
     "status": "new",
     "created_at": "2026-01-28T19:53:30.931764",
-    "updated_at": "2026-01-30T14:57:13.042891"
+    "updated_at": "2026-02-03T18:46:36.594307"
   },
   {
     "booking_id": "3317e8af",
@@ -1850,45 +1850,5 @@
     },
     "status": "new",
     "created_at": "2026-02-01T16:11:04.187904"
-  },
-  {
-    "booking_id": "1952f0e9",
-    "user_id": "312494705",
-    "form_data": {
-      "car": {
-        "id": "nmax155_2019_white",
-        "name": "Nmax155 2019 white",
-        "brand": "Nmax155",
-        "model": "2019",
-        "year": "white",
-        "color": ""
-      },
-      "dates": {
-        "start": "2026-02-02T17:00:00.000Z",
-        "end": "2026-02-03T17:00:00.000Z",
-        "days": 2
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 298,
-        "totalRental": 596,
-        "deposit": 3500,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 1596
-      },
-      "contact": {
-        "value": "@ScratBelka",
-        "type": "telegram"
-      },
-      "timestamp": "2026-02-02T09:05:26.959Z"
-    },
-    "status": "new",
-    "created_at": "2026-02-02T09:05:31.127622"
   }
 ]
