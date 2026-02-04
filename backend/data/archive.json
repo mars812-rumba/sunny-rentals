@@ -7796,5 +7796,88 @@
     "final_status": "in_work",
     "last_note": "31.01 касание",
     "archived_at": "2026-02-03T16:28:25.874704"
+  },
+  {
+    "user_id": 12345,
+    "username": "test_user",
+    "created_at": "2026-02-04T00:08:29.986019",
+    "updated_at": "2026-02-04T00:08:29.986048",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp",
+    "archived_at": "2026-02-04T00:43:44.921647"
+  },
+  {
+    "user_id": 370125988,
+    "username": "eretix1",
+    "created_at": "2026-01-31T09:45:13.036585",
+    "updated_at": "2026-02-03T15:09:03.507647",
+    "status": "pending",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Honda jazz 2018 Белый",
+    "category_interested": "compact",
+    "dates_selected": {
+      "start": "2026-02-08T15:00:00.000Z",
+      "end": "2026-02-15T15:00:00.000Z",
+      "days": 8
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-31T10:14:03.712186",
+      "last_message_from": "user",
+      "message_count": 1,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-31T10:14:03.755578",
+    "last_note": "Успех. Honda City(ar)",
+    "marker": "ready",
+    "final_status": "in_work",
+    "archived_at": "2026-02-04T00:51:11.801823"
+  },
+  {
+    "user_id": 708890817,
+    "username": null,
+    "created_at": "2026-01-31T06:17:18.993315",
+    "updated_at": "2026-02-03T16:37:40.898407",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "system",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-01-31T07:29:54.359894",
+      "last_message_from": "user",
+      "message_count": 9,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-01-31T07:29:54.392980",
+    "marker": "ready",
+    "final_status": "in_work",
+    "last_note": "Успех",
+    "archived_at": "2026-02-04T00:51:15.033603"
   }
 ]

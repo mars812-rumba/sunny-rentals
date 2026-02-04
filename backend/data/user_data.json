@@ -3,7 +3,7 @@
     "user_id": 6451825371,
     "username": "mars_rent",
     "created_at": "2025-12-29T03:33:37.272699",
-    "updated_at": "2026-01-12T22:29:52.758482",
+    "updated_at": "2026-02-04T00:46:55.012084",
     "status": "pending",
     "car_interested": "Nmax155 2019 black",
     "category_interested": null,
@@ -19,17 +19,18 @@
     "source": "unknown",
     "dialog": {
       "active": false,
-      "has_new_messages": false,
-      "last_message_at": "2026-01-12T22:23:10.426953",
+      "has_new_messages": true,
+      "last_message_at": "2026-02-04T00:46:54.969756",
       "last_message_from": "user",
-      "message_count": 0,
+      "message_count": 4,
       "claude": {
         "enabled": true,
         "status": "stopped",
         "started_at": null,
         "paused_at": null
       }
-    }
+    },
+    "last_message_at": "2026-02-04T00:46:55.012063"
   },
   {
     "user_id": 611185329,
@@ -4318,7 +4319,7 @@
   },
   {
     "user_id": 123456789,
-    "username": "test_user",
+    "username": "test_telegram_user",
     "created_at": "2025-12-27T13:21:14.381459",
     "updated_at": "2026-01-06T00:53:56.597794",
     "status": "pending",
@@ -6683,7 +6684,7 @@
     "user_id": 128064349,
     "username": "YULIANNAEVA",
     "created_at": "2026-01-28T04:11:21.191430",
-    "updated_at": "2026-02-03T16:40:43.782633",
+    "updated_at": "2026-02-04T01:33:39.048580",
     "status": "interested",
     "form_started": true,
     "booking_submitted": false,
@@ -6699,9 +6700,9 @@
     "dialog": {
       "active": false,
       "has_new_messages": true,
-      "last_message_at": "2026-02-03T15:13:30.729618",
+      "last_message_at": "2026-02-04T01:33:39.006427",
       "last_message_from": "user",
-      "message_count": 13,
+      "message_count": 14,
       "claude": {
         "enabled": false,
         "status": "stopped",
@@ -6709,16 +6710,16 @@
         "paused_at": null
       }
     },
-    "last_message_at": "2026-02-03T15:13:30.775179",
+    "last_message_at": "2026-02-04T01:33:39.048567",
     "final_status": "in_work",
-    "last_note": "С 25.02 нужен авто",
+    "last_note": "Не успел ответить. Взяла у других. С 25.02 нужен авто",
     "marker": "in_progress"
   },
   {
     "user_id": 7658402370,
     "username": null,
     "created_at": "2026-01-31T05:12:49.591889",
-    "updated_at": "2026-02-03T16:43:10.532577",
+    "updated_at": "2026-02-04T00:40:09.167913",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -6743,38 +6744,7 @@
     "last_message_at": "2026-01-31T07:02:58.807179",
     "marker": "in_progress",
     "final_status": "in_work",
-    "last_note": "1.03-24.03. выезд самуи 1500."
-  },
-  {
-    "user_id": 708890817,
-    "username": null,
-    "created_at": "2026-01-31T06:17:18.993315",
-    "updated_at": "2026-02-03T16:37:40.898407",
-    "status": "new",
-    "form_started": false,
-    "booking_submitted": false,
-    "car_interested": null,
-    "category_interested": null,
-    "dates_selected": null,
-    "notes": [],
-    "source": "system",
-    "dialog": {
-      "active": false,
-      "has_new_messages": true,
-      "last_message_at": "2026-01-31T07:29:54.359894",
-      "last_message_from": "user",
-      "message_count": 9,
-      "claude": {
-        "enabled": false,
-        "status": "stopped",
-        "started_at": null,
-        "paused_at": null
-      }
-    },
-    "last_message_at": "2026-01-31T07:29:54.392980",
-    "marker": "ready",
-    "final_status": "in_work",
-    "last_note": "Успех"
+    "last_note": "1.03-24.03. выезд самуи 1500 не устраивает цена выезда"
   },
   {
     "user_id": 1528014590,
@@ -6796,45 +6766,10 @@
     "marker": "unprocessed"
   },
   {
-    "user_id": 370125988,
-    "username": "eretix1",
-    "created_at": "2026-01-31T09:45:13.036585",
-    "updated_at": "2026-02-03T15:09:03.507647",
-    "status": "pending",
-    "form_started": true,
-    "booking_submitted": true,
-    "car_interested": "Honda jazz 2018 Белый",
-    "category_interested": "compact",
-    "dates_selected": {
-      "start": "2026-02-08T15:00:00.000Z",
-      "end": "2026-02-15T15:00:00.000Z",
-      "days": 8
-    },
-    "notes": [],
-    "source": "telegram_webapp",
-    "dialog": {
-      "active": false,
-      "has_new_messages": true,
-      "last_message_at": "2026-01-31T10:14:03.712186",
-      "last_message_from": "user",
-      "message_count": 1,
-      "claude": {
-        "enabled": false,
-        "status": "stopped",
-        "started_at": null,
-        "paused_at": null
-      }
-    },
-    "last_message_at": "2026-01-31T10:14:03.755578",
-    "last_note": "Успех. Honda City(ar)",
-    "marker": "ready",
-    "final_status": "in_work"
-  },
-  {
     "user_id": 895660575,
     "username": "Koly888",
     "created_at": "2026-01-31T11:57:50.737895",
-    "updated_at": "2026-01-31T12:24:53.777908",
+    "updated_at": "2026-02-04T00:41:18.193407",
     "status": "interested",
     "form_started": true,
     "booking_submitted": false,
@@ -6847,7 +6782,8 @@
     },
     "notes": [],
     "source": "telegram_webapp",
-    "marker": "unprocessed"
+    "marker": "in_progress",
+    "last_note": "Что то ему надо"
   },
   {
     "user_id": 1530009888,
@@ -6910,7 +6846,7 @@
     "user_id": 8010825309,
     "username": null,
     "created_at": "2026-02-01T00:52:57.720516",
-    "updated_at": "2026-02-01T00:52:57.720554",
+    "updated_at": "2026-02-04T00:49:36.100571",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -6918,13 +6854,14 @@
     "category_interested": null,
     "dates_selected": null,
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "marker": "unprocessed"
   },
   {
     "user_id": 63082669,
     "username": "kokovanya",
     "created_at": "2026-02-01T10:21:31.065790",
-    "updated_at": "2026-02-01T10:21:31.065823",
+    "updated_at": "2026-02-04T00:49:38.347087",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -6932,7 +6869,8 @@
     "category_interested": null,
     "dates_selected": null,
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "marker": "unprocessed"
   },
   {
     "user_id": 309292627,
@@ -6957,7 +6895,7 @@
     "user_id": 437005486,
     "username": "Nikita_Nikita92",
     "created_at": "2026-02-01T13:50:08.021785",
-    "updated_at": "2026-02-01T13:50:08.021804",
+    "updated_at": "2026-02-04T00:49:31.926167",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -6965,13 +6903,14 @@
     "category_interested": null,
     "dates_selected": null,
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "marker": "unprocessed"
   },
   {
     "user_id": 5040204637,
     "username": null,
     "created_at": "2026-02-01T14:31:23.064407",
-    "updated_at": "2026-02-01T14:31:23.064446",
+    "updated_at": "2026-02-04T00:49:29.463724",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -6979,7 +6918,8 @@
     "category_interested": null,
     "dates_selected": null,
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "marker": "unprocessed"
   },
   {
     "user_id": 1675250894,
@@ -7004,7 +6944,7 @@
     "user_id": 639389622,
     "username": "Denisyuk_Sergey",
     "created_at": "2026-02-02T17:04:11.107281",
-    "updated_at": "2026-02-03T15:34:38.011961",
+    "updated_at": "2026-02-03T23:55:15.866242",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -7027,7 +6967,8 @@
       }
     },
     "last_message_at": "2026-02-03T15:08:06.974017",
-    "marker": "unprocessed"
+    "marker": "in_progress",
+    "last_note": "Ой мама шикодым"
   },
   {
     "user_id": 697845003,
@@ -7090,7 +7031,7 @@
     "user_id": 782990455,
     "username": "Oksanaa711",
     "created_at": "2026-02-03T17:40:55.165961",
-    "updated_at": "2026-02-03T17:40:55.165993",
+    "updated_at": "2026-02-04T01:52:43.304137",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -7098,6 +7039,88 @@
     "category_interested": null,
     "dates_selected": null,
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "marker": "unprocessed",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-02-04T01:52:43.263395",
+      "last_message_from": "user",
+      "message_count": 1,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-02-04T01:52:43.304127"
+  },
+  {
+    "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni",
+    "username": null,
+    "created_at": "2026-02-03T23:39:22.692493",
+    "updated_at": "2026-02-04T00:49:14.541741",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp",
+    "last_note": "Веб браузер",
+    "marker": null
+  },
+  {
+    "user_id": "web_session_ml79gpi2_2pzoc31ql_62x1g8",
+    "username": null,
+    "created_at": "2026-02-03T23:59:58.757789",
+    "updated_at": "2026-02-04T00:49:12.373596",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp",
+    "marker": null,
+    "last_note": "Веб браузер"
+  },
+  {
+    "user_id": "web_session_ml79jgvg_wnsrninzr_ey0b9i",
+    "username": null,
+    "created_at": "2026-02-04T00:02:07.552665",
+    "updated_at": "2026-02-04T00:46:22.955616",
+    "status": "pending",
+    "form_started": false,
+    "booking_submitted": true,
+    "car_interested": "Honda CIVIC RS 2024 Black",
+    "category_interested": null,
+    "dates_selected": {
+      "start": "2026-02-07T17:00:00.000Z",
+      "end": "2026-02-26T17:00:00.000Z",
+      "days": 20
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "marker": "in_progress",
+    "last_note": "Тестовая бронь из браузера"
+  },
+  {
+    "user_id": "session_12345",
+    "username": "test_user",
+    "created_at": "2026-02-04T00:03:46.133691",
+    "updated_at": "2026-02-04T00:49:06.863024",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp",
+    "last_note": "Веб браузер(тест)"
   }
 ]

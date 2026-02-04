@@ -108,7 +108,7 @@ const MonthGrid = memo(({
                         <div 
                           key={idx}
                           className={cn(
-                            "px-1 py-0.5 rounded-[4px] text-[5px] font-bold truncate border shadow-sm flex justify-between items-center gap-1",
+                            "px-1 py-0.5 rounded-[4px] text-[7px] font-bold truncate border shadow-sm flex justify-between items-center gap-1",
                             ev.type === 'pickup' 
                               ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
                               : "bg-amber-50 text-amber-700 border-amber-100"

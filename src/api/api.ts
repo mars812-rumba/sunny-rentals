@@ -193,12 +193,24 @@ export async function trackLeadEvent(
   data?: LeadTrackData
 ): Promise<void> {
   try {
-    const userId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
-    const username = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.username;
+    let userId: string;
+    let username: string | null;
     
-    if (!userId) {
-      console.warn('No user_id available for tracking');
-      return;
+    // Try to get Telegram user data first
+    const telegramUserId = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    const telegramUsername = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.username;
+    
+    if (telegramUserId) {
+      // Telegram user - use their Telegram ID
+      userId = telegramUserId.toString();
+      username = telegramUsername || null;
+      console.log(`📱 Telegram user detected: ${userId}`);
+    } else {
+      // Non-Telegram user - generate consistent session ID
+      const sessionId = getOrCreateSessionId();
+      userId = `web_session_${sessionId}`;
+      username = null;
+      console.log(`🌐 Non-Telegram user detected: ${userId}`);
     }
     
     const response = await fetch(`${API_BASE_URL}/api/leads/track`, {
@@ -207,24 +219,61 @@ export async function trackLeadEvent(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        user_id: userId.toString(),
-        username: username || null,
+        user_id: userId,
+        username: username,
         event_type: eventType,
         data: data || null
       })
     });
     
     if (!response.ok) {
-      console.error('Failed to track event:', response.status);
+      console.error('Failed to track event:', response.status, response.statusText);
     } else {
       const result = await response.json();
-      console.log(`✅ Tracked: ${eventType} → ${result.current_status}`);
+      console.log(`✅ Tracked: ${eventType} for ${userId} → ${result.current_status || 'success'}`);
     }
     
   } catch (error) {
     console.error('Error tracking lead event:', error);
     // Не падаем если tracking failed - это не критично
   }
+}
+
+// Generate and persist session ID for non-Telegram users
+function getOrCreateSessionId(): string {
+  const STORAGE_KEY = 'sunny_rentals_session_id';
+  
+  // Try to get existing session ID
+  let sessionId = localStorage.getItem(STORAGE_KEY);
+  
+  // If no session ID exists, create a new one
+  if (!sessionId) {
+    sessionId = generateSessionId();
+    localStorage.setItem(STORAGE_KEY, sessionId);
+    console.log(`🔑 Generated new session ID: ${sessionId}`);
+  }
+  
+  return sessionId;
+}
+
+// Generate a unique session ID
+function generateSessionId(): string {
+  const timestamp = Date.now().toString(36);
+  const randomStr = Math.random().toString(36).substr(2, 9);
+  const userAgent = navigator.userAgent;
+  const hash = simpleHash(userAgent + timestamp + randomStr);
+  return `${timestamp}_${randomStr}_${hash}`;
+}
+
+// Simple hash function for consistency
+function simpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash).toString(36);
 }
 
 // Fetch all bookings

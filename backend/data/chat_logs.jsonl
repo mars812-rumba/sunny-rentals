@@ -1725,3 +1725,14 @@
 {"timestamp": "2026-02-03T16:38:29.224Z", "user_id": 7658402370, "role": "manager", "text": "Здравствуйте! Подскажите, не надумали бронировать?", "source": "crm_panel"}
 {"timestamp": "2026-02-03T16:41:02.812Z", "user_id": 128064349, "role": "manager", "text": "Лучше наверно сразу забронировать", "source": "crm_panel"}
 {"timestamp": "2026-02-03T16:42:35.190Z", "user_id": 128064349, "role": "manager", "text": "Какой формат авто рассматриваете?", "source": "crm_panel"}
+{"timestamp": "2026-02-03T22:50:23.056202", "user_id": 6451825371, "role": "user", "text": "🚀 Автопарк", "username": "mars_rent", "source": "telegram_bot"}
+{"timestamp": "2026-02-03T22:50:52.677152", "user_id": 6451825371, "role": "user", "text": "🚀 Автопарк", "username": "mars_rent", "source": "telegram_bot"}
+{"timestamp": "2026-02-03T22:51:28.386695", "user_id": 6451825371, "role": "user", "text": "Sunny-rentals.online/app", "username": "mars_rent", "source": "telegram_bot"}
+{"timestamp": "2026-02-04T00:43:04.951Z", "user_id": 12345, "role": "manager", "text": "Здравствуйте, если интересует авто в аренду на Пхукете, то напишите даты, и я пришлю что есть свободного.", "source": "crm_panel"}
+{"timestamp": "2026-02-04T00:43:25.191Z", "user_id": "session_12345", "role": "manager", "text": "Здравствуйте, если интересует авто в аренду на Пхукете, то напишите даты, и я пришлю что есть свободного.", "source": "crm_panel"}
+{"timestamp": "2026-02-04T00:44:24.433Z", "user_id": "web_session_ml79gpi2_2pzoc31ql_62x1g8", "role": "manager", "text": "Здравствуйте, если интересует авто в аренду на Пхукете, то напишите даты, и я пришлю что есть свободного.", "source": "crm_panel"}
+{"timestamp": "2026-02-04T00:44:47.907Z", "user_id": 782990455, "role": "manager", "text": "Здравствуйте, если интересует авто в аренду на Пхукете, то напишите даты, и я пришлю что есть свободного.", "source": "crm_panel"}
+{"timestamp": "2026-02-04T00:45:51.471Z", "user_id": 63082669, "role": "manager", "text": "Здравствуйте, если интересует авто в аренду на Пхукете, то напишите даты, и я пришлю что есть свободного.", "source": "crm_panel"}
+{"timestamp": "2026-02-04T00:46:54.998568", "user_id": 6451825371, "role": "user", "text": "Здрасте", "username": "mars_rent", "source": "telegram_bot"}
+{"timestamp": "2026-02-04T01:33:39.037535", "user_id": 128064349, "role": "user", "text": "Мне не принципиально какая машина \nНо, что-то побюджетнее", "username": "YULIANNAEVA", "source": "telegram_bot"}
+{"timestamp": "2026-02-04T01:52:43.289242", "user_id": 782990455, "role": "user", "text": "Добрый день ! Интересует дата 7 марта на 10 дней , Пхукет патонг", "username": "Oksanaa711", "source": "telegram_bot"}

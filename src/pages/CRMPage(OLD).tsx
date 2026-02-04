@@ -14,75 +14,15 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import dayjs from 'dayjs';
 import {
-  Calendar, Car, StickyNote , MessageSquare, Plus, Pencil, Trash2, Phone,
+  Calendar, Car, StickyNote , MessageSquare, Plus, Pencil, Trash2,
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus,UserRoundMinus,UserRoundCheck,
-  Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
+  Play, Square, Send, MapPin, X, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
   CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
-import { MarkerType } from '@/types/crm';
+import { MarkerType, DialogEvent, DialogStatus, User, MAIN_STATUSES, STATUS_CONFIG } from '@/types/crm';
 
-// TypeScript интерфейсы для работы с диалогами
-interface DialogEvent {
-  user_id: number;
-  action: string;
-  timestamp: string;
-
-}
-
-interface DialogStatus {
-  active: boolean;
-  has_new_messages: boolean;
-  has_media_messages?: boolean;
-  last_message_at: string | null;
-  last_message_from: 'user' | 'manager' | 'claude' | null;
-  message_count: number;
-  claude_status: 'active' | 'paused' | 'stopped';
-}
-
-
-interface User {
-  user_id: number;
-  username: string;
-  dialog_status?: DialogStatus; // Получаем из API
-  // ... остальные поля из существующего интерфейса
-  status?: string;
-  final_status?: string; // PRIORITY: Manager's manual choice overrides status
-  car_interested?: string;
-  category_interested?: string;
-  dates_selected?: {
-    start: string;
-    end: string;
-  };
-  created_at: string;
-  assistant_mode?: boolean;
-  claude_status?: string;
-  assistant_enabled?: boolean;
-  notes?: string[];
-  last_note?: string;
-  history_notes?: Array<{
-    note_id: string;
-    text: string;
-    timestamp: string;
-    action?: string;
-  }>;
-  pickup_location?: string;
-  
-  // Маркеры для ручного управления менеджером
-  marker?: string | null;
-}
-
-const MAIN_STATUSES = ['new', 'interested', 'in_work', 'pending'];
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  'new': { label: 'Холодные', color: '#64748b', bg: 'bg-slate-100' },
-  'interested': { label: 'Теплые', color: '#2563eb', bg: 'bg-blue-50' },
-  'in_work': { label: 'В работе', color: '#7c3aed', bg: 'bg-purple-50' },
-  'pending': { label: 'Заявки', color: '#ea580c', bg: 'bg-orange-50' },
-  'confirmed': { label: 'Бронь', color: '#10b981', bg: 'bg-emerald-50' },
-  'completed': { label: 'Завершен', color: '#059669', bg: 'bg-green-100' },
-  'archive': { label: 'Архив', color: '#94a3b8', bg: 'bg-slate-200' }
-};
-
+//import {  } from '@/api/crmAPI';
 const CRMPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<any>(null);
@@ -855,37 +795,24 @@ const handleUpdateNote = async () => {
     // ЛОГИКА ПОДСВЕТКИ: если последний ответил юзер - нужно внимание
     const needsReply = dialog?.last_message_from === 'user';
     const aiActive = dialog?.claude_status === 'active';
-    // 1. ОПРЕДЕЛЯЕМ ФОН В ЗАВИСИМОСТИ ОТ МАРКЕРА
-    const markerStyles: Record<string, string> = {
-      'unprocessed': 'bg-blue-50/60 border-blue-100', // Интересующийся (+) -> Синий
-      'in_progress': 'bg-green-50/60 border-green-100', // В работе ($) -> Зеленый
-      'ready': 'bg-purple-50/60 border-purple-100',     // Выполненный (checkmark) -> Фиолетовый
-      'rejected': 'bg-red-50/40 border-red-100',        // Отказ (-) -> Красный (опционально)
-    };
-
-    // Приоритет: если есть маркер — красим в его цвет. Если нет и нужен ответ — красим в янтарный. Иначе — белый.
-    const cardBgClass = user.marker && markerStyles[user.marker] 
-      ? markerStyles[user.marker] 
-      : (needsReply ? 'bg-amber-50/60 border-amber-200' : 'bg-white');
 
     return (
 
 <Card key={user.user_id} 
-        className={`group border-none shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden h-[115px] flex flex-col 
-          ${cardBgClass} ${needsReply ? 'ring-1 ring-amber-300/50' : ''}`}
-      >
-        {/* Индикатор статуса сверху */}
-        <div className="absolute top-0 left-0 w-full h-[2px]" style={{ backgroundColor: STATUS_CONFIG[currentStatus]?.color }}></div>
+  className={`group border-none shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden h-[115px] flex flex-col 
+    ${needsReply ? 'bg-amber-50/40 ring-1 ring-amber-200' : 'bg-white'}`}
+>
+  <div className="absolute top-0 left-0 w-full h-[2px]" style={{ backgroundColor: STATUS_CONFIG[currentStatus]?.color }}></div>
 
-        <CardContent className="p-2.5 flex flex-col justify-between h-full space-y-1">
-
+  <CardContent className="p-2.5 flex flex-col justify-between h-full space-y-1">
+    
    {/* СТРОКА 1: Авто (Слева) | Юзернейм + Инфо (Справа) */}
 <div className="flex justify-between items-center">
   <div className="flex items-center gap-1.5 min-w-0 flex-1">
     <Car className="w-3.5 h-3.5 text-blue-500 shrink-0" />
     {/* ИСПРАВЛЕННАЯ СТРОКА НИЖЕ */}
     <span className="font-black text-[11px] text-slate-800 truncate uppercase tracking-tight">
-      {user.car_interested || "не выбрано"}
+      {user.car_interested || "Не указано"}
     </span>
     {user.category_interested && (
       <span className="text-[7px] font-black text-slate-400 border border-slate-200 px-1 rounded uppercase">
@@ -924,24 +851,17 @@ const handleUpdateNote = async () => {
           <span className="truncate max-w-[80px]">{user.pickup_location || "Пхукет"}</span>
         </div>
       </div>
-        <div className="flex flex-col items-end leading-none shrink-0 opacity-80">
-          <span className="text-[7px] font-mono italic">
-            {/* Проверяем: если ID — строка, пишем Web Browser, если нет — выводим сам ID */}
-            ID:{typeof user.user_id === 'string' ? "Web Browser" : user.user_id}
-          </span>
-          <span className="text-[7px] font-mono tracking-tighter">
-            {dayjs(user.created_at).format('DD.MM.YY')}
-          </span>
-        </div>
+      <div className="flex flex-col items-end leading-none shrink-0 opacity-80">
+        <span className="text-[7px] font-mono italic">ID:{user.user_id}</span>
+        <span className="text-[7px] font-mono tracking-tighter">{dayjs(user.created_at).format('DD.MM.YY')}</span>
+      </div>
     </div>
-{/* СТРОКА 3: Интерактивная заметка с адаптивной логикой цветов */}
+{/* СТРОКА 3: Интерактивная заметка (Брендовый оранжевый #f8b515) */}
 <div
   className={`flex items-center gap-1.5 rounded px-2 py-1 border transition-colors cursor-text min-h-[24px] ${
-    user.marker === 'unprocessed' ? 'bg-blue-100/50 border-blue-200/50' :
-    user.marker === 'in_progress' ? 'bg-green-100/50 border-green-200/50' :
-    user.marker === 'ready'       ? 'bg-purple-100/50 border-purple-200/50' :
-    user.last_note                ? 'bg-[#f8b515]/10 border-[#f8b515]/30 hover:bg-[#f8b515]/20' : 
-                                    'bg-slate-50 border-slate-100 hover:bg-white hover:border-blue-200'
+    user.last_note
+      ? 'bg-[#f8b515]/10 border-[#f8b515]/30 hover:bg-[#f8b515]/20 hover:border-[#f8b515]'
+      : 'bg-slate-50 border-slate-100 hover:bg-white hover:border-blue-200'
   }`}
   onClick={(e) => {
     e.stopPropagation();
@@ -950,20 +870,14 @@ const handleUpdateNote = async () => {
   }}
 >
   <StickyNote className={`w-2.5 h-2.5 shrink-0 ${
-    user.marker === 'unprocessed' ? 'text-blue-600' :
-    user.marker === 'in_progress' ? 'text-green-600' :
-    user.marker === 'ready'       ? 'text-purple-600' :
-    user.last_note                ? 'text-[#f8b515]' : 'text-slate-400'
+    user.last_note ? 'text-[#f8b515]' : 'text-slate-400'
   }`} />
   
   {editingNoteId === user.user_id ? (
     <input
       autoFocus
-      className={`text-[8px] bg-transparent outline-none w-full font-bold ${
-        user.marker === 'unprocessed' ? 'text-blue-800' :
-        user.marker === 'in_progress' ? 'text-green-800' :
-        user.marker === 'ready'       ? 'text-purple-800' :
-        user.last_note                ? 'text-[#8a650d]' : 'text-blue-600'
+      className={`text-[10px] bg-transparent outline-none w-full font-bold ${
+        user.last_note ? 'text-[#8a650d]' : 'text-blue-600'
       }`}
       value={tempNote}
       onChange={(e) => setTempNote(e.target.value)}
@@ -972,11 +886,8 @@ const handleUpdateNote = async () => {
       onClick={(e) => e.stopPropagation()}
     />
   ) : (
-    <p className={`text-[8px] truncate w-full italic tracking-tight ${
-      user.marker === 'unprocessed' ? 'text-blue-700' :
-      user.marker === 'in_progress' ? 'text-green-700' :
-      user.marker === 'ready'       ? 'text-purple-700' :
-      user.last_note                ? 'text-[#8a650d]' : 'text-slate-400'
+    <p className={`text-[10px] font-medium truncate w-full italic ${
+      user.last_note ? 'text-[#8a650d]' : 'text-slate-400'
     }`}>
       {user.last_note || "Добавить заметку..."}
     </p>
@@ -1105,7 +1016,7 @@ const handleUpdateNote = async () => {
           <Trash2 className="w-3 h-3" />
         </Button>
 
-        {/* 2. Кнопка Claude
+        {/* 2. Кнопка Claude */}
         <Button
           size="icon" variant="ghost"
           className="h-7 w-7 rounded-md bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-100"
@@ -1113,7 +1024,6 @@ const handleUpdateNote = async () => {
         >
           <Play className="w-3 h-3 fill-current" />
         </Button>
-        */}
 
         {/* 3. Кнопка Внутренний Чат */}
         <Button
@@ -1187,64 +1097,33 @@ const handleUpdateNote = async () => {
       </TabsList>
 
       <div className="flex-1 overflow-hidden">
-        
    {/* ВКЛАДКА ИНФО: Сводка, Заявки и История заметок */}
 <TabsContent value="info" className="m-0 h-full bg-white">
   <ScrollArea className="h-full">
     <div className="max-w-3xl mx-auto p-6 space-y-8">
       
-{/* 1. БЛОК КОНТАКТОВ (Извлекаем из первой попавшейся заявки) */}
-{(() => {
-  // 1. Ищем первую заявку, где есть данные в поле value или name
-  const bWithContact = bookings?.find(b => b.form_data?.contact?.value || b.form_data?.contact?.name);
-  
-  // 2. Если заявок с контактами нет, ничего не выводим
-  if (!bWithContact) return null;
-
-  // 3. Берем данные из найденной заявки
-  const contactData = bWithContact.form_data.contact;
-  const clientName = contactData?.name;
-  const clientPhone = contactData?.value; // ваш телефон в параметре value
-
-  return (
-    <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl shadow-sm space-y-3 animate-in fade-in duration-500">
-      <div className="flex items-center gap-2 text-emerald-600">
-        <Users size={16} className="shrink-0" />
-        <h3 className="text-[10px] font-black uppercase tracking-widest">Прямые контакты из заявки</h3>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-6">
-        {/* Имя */}
-        <div className="space-y-1">
-          <span className="text-[8px] font-bold text-slate-400 uppercase block">Имя клиента</span>
-          <p className="text-sm font-black text-slate-800 leading-none">
-            {clientName || "Имя не указано"}
+      {/* Блок 1: Общая сводка (Grid 3) */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 transition-hover hover:bg-white hover:shadow-sm">
+          <span className="text-[8px] font-black uppercase text-slate-400 block mb-1 tracking-wider">Интерес</span>
+          <p className="text-xs font-black text-slate-800 uppercase truncate">
+            {selectedUser?.car_interested || 'Не выбрано'}
           </p>
         </div>
-        
-{/* Телефон / WhatsApp с иконкой действия */}
-{clientPhone && (
-  <div className="space-y-1">
-    <span className="text-[8px] font-bold text-slate-400 uppercase block">Телефон / WhatsApp</span>
-    <div className="flex items-center gap-2">
-            <button 
-        onClick={() => {
-          const cleanPhone = clientPhone.replace(/\D/g, '');
-          window.open(`https://wa.me/${cleanPhone}`, '_blank');
-        }}
-        className="p-1.5 rounded-full bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
-        title="Написать в WhatsApp"
-      >
-        <Phone size={12} className="fill-current" />
-      </button>
-      <p className="text-sm font-black text-slate-800 leading-none">{clientPhone}</p>
-    </div>
-  </div>
-)}
+        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 transition-hover hover:bg-white hover:shadow-sm">
+          <span className="text-[8px] font-black uppercase text-slate-400 block mb-1 tracking-wider">Даты (фильтр)</span>
+          <p className="text-xs font-black text-slate-800">
+            {formatDateSimple(selectedUser?.dates_selected?.start)} — {formatDateSimple(selectedUser?.dates_selected?.end)}
+          </p>
+        </div>
+        <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100 text-center">
+          <span className="text-[8px] font-black uppercase text-blue-400 block mb-1 tracking-wider">Дней</span>
+          <p className="text-xl font-black text-blue-600 leading-none">
+            {getDaysCount(selectedUser?.dates_selected?.start, selectedUser?.dates_selected?.end)}
+          </p>
+        </div>
       </div>
-    </div>
-  );
-})()}
+
       {/* Блок 2: Активные заявки (Bookings) */}
       <div className="space-y-4">
         <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
@@ -1263,7 +1142,7 @@ const handleUpdateNote = async () => {
                       </p>
                       <div className="flex items-center gap-2 text-[10px] text-blue-600 font-bold mt-1">
                         <Calendar size={12} />
-                        {dayjs(b.form_data?.dates?.start).format('DD.MM.YY')} — {dayjs(b.form_data?.dates?.end).format('DD.MM.YY')} ({getDaysCount(selectedUser?.dates_selected?.start, selectedUser?.dates_selected?.end)} дн.)
+                        {dayjs(b.form_data?.dates?.start).format('DD.MM.YY')} — {dayjs(b.form_data?.dates?.end).format('DD.MM.YY')}
                       </div>
                     </div>
                     <Badge className={`text-[9px] font-black uppercase border-none px-2 py-0.5 rounded-md ${
@@ -1283,23 +1162,6 @@ const handleUpdateNote = async () => {
                       <div className="flex items-center gap-2 text-slate-400 pl-5">
                         <span className="truncate">ВОЗВРАТ: {b.form_data?.locations?.dropoff || '—'}</span>
                       </div>
-                      
-                      {/* Contact Information - only show if exists */}
-                      {b.form_data?.contact && (
-                        <div className="flex items-center gap-2 text-slate-600 pt-1">
-                          <User size={12} className="text-blue-400 shrink-0" />
-                          <div className="flex flex-col">
-                            <span className="font-bold truncate">
-                              {b.form_data.contact.name || 'Имя не указано'}
-                            </span>
-                            {b.form_data.contact.value && (
-                              <span className="text-slate-400 text-[9px] truncate">
-                                {b.form_data.contact.value}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
                     </div>
                     <div className="flex flex-col items-end justify-center">
                       <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mb-0.5">Итоговая стоимость</span>
@@ -1317,6 +1179,70 @@ const handleUpdateNote = async () => {
             <p className="text-[10px] font-black text-slate-300 uppercase italic tracking-widest">Заявок пока нет</p>
           </div>
         )}
+      </div>
+
+      {/* Блок 3: История заметок и управление (УРОВЕНЬ!) */}
+      <div className="pt-8 border-t border-slate-100">
+        <h3 className="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest flex items-center gap-2">
+          <StickyNote size={14} /> История заметок менеджера
+        </h3>
+        
+        <div className="space-y-3">
+          {/* Список из истории */}
+          {selectedUser?.history_notes?.map((n) => (
+            <div key={n.note_id} className="group p-3 bg-slate-50 rounded-xl border border-slate-100 relative transition-all hover:bg-white hover:shadow-sm">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter bg-white px-1.5 py-0.5 rounded border border-slate-100">
+                  {n.action === 'status_changed' ? '🔄 Статус' : '📝 Заметка'} • {dayjs(n.timestamp).format('DD.MM HH:mm')}
+                </span>
+                
+                {/* Кнопки управления (появляются при наведении) */}
+                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => startEditNote(n)} className="text-blue-500 hover:scale-110 transition-transform">
+                    <Pencil size={12} />
+                  </button>
+                  <button onClick={() => handleDeleteNote(n.note_id)} className="text-red-400 hover:text-red-600">
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+              </div>
+
+              {editingNote?.id === n.note_id ? (
+                <div className="space-y-2 mt-2">
+                  <Textarea 
+                    value={editingNote.text} 
+                    onChange={(e) => setEditingNote({...editingNote, text: e.target.value})}
+                    className="text-[11px] min-h-[60px] bg-white font-bold uppercase"
+                  />
+                  <div className="flex gap-2">
+                    <Button size="sm" className="h-7 text-[10px] bg-green-600 font-black uppercase" onClick={handleUpdateNote}>Сохранить</Button>
+                    <Button size="sm" variant="ghost" className="h-7 text-[10px] font-black uppercase" onClick={() => setEditingNote(null)}>Отмена</Button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-[11px] text-slate-700 leading-relaxed font-bold uppercase tracking-tight">
+                  {n.text}
+                </p>
+              )}
+            </div>
+          ))}
+
+          {/* Поле добавления новой заметки */}
+          <div className="flex gap-2 pt-4">
+            <Textarea 
+              className="min-h-[80px] text-xs bg-slate-50 border-slate-200 focus:bg-white transition-colors" 
+              placeholder="Добавить новую заметку по клиенту..." 
+              value={note} 
+              onChange={(e) => setNote(e.target.value)} 
+            />
+            <Button 
+              className="h-auto bg-slate-900 px-6 hover:bg-blue-600 transition-colors shadow-lg shadow-slate-200" 
+              onClick={handleSaveNote}
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   </ScrollArea>

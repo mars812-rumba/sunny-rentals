@@ -2636,3 +2636,52 @@
 {"timestamp": "2026-02-03T16:42:35.190Z", "user_id": 128064349, "action": "manager_message_sent", "message_length": 33}
 {"timestamp": "2026-02-03T16:43:10.551269", "user_id": 7658402370, "action": "note_added", "note": "1.03-24.03. выезд самуи 1500.", "added_by": "6451825371"}
 {"timestamp": "2026-02-03T17:40:55.534432", "user_id": 782990455, "action": "dialog_started", "initiated_by": "user", "username": "Oksanaa711"}
+{"timestamp": "2026-02-03T22:48:58.274525", "user_id": 7658402370, "action": "note_added", "note": "1.03-24.03. выезд самуи 1500 не умтраивает", "added_by": "6451825371"}
+{"timestamp": "2026-02-03T22:50:23.055798", "user_id": 6451825371, "action": "message_received", "content": "🚀 Автопарк"}
+{"timestamp": "2026-02-03T22:50:23.061267", "user_id": 6451825371, "action": "user_message_received", "message_length": 10, "message_type": "text", "username": "mars_rent", "media_info": null}
+{"timestamp": "2026-02-03T22:50:52.676065", "user_id": 6451825371, "action": "message_received", "content": "🚀 Автопарк"}
+{"timestamp": "2026-02-03T22:50:52.683819", "user_id": 6451825371, "action": "user_message_received", "message_length": 10, "message_type": "text", "username": "mars_rent", "media_info": null}
+{"timestamp": "2026-02-03T22:51:28.384898", "user_id": 6451825371, "action": "message_received", "content": "Sunny-rentals.online/app"}
+{"timestamp": "2026-02-03T22:51:28.396754", "user_id": 6451825371, "action": "user_message_received", "message_length": 24, "message_type": "text", "username": "mars_rent", "media_info": null}
+{"timestamp": "2026-02-03T23:39:41.861747", "user_id": 639389622, "action": "note_added", "note": "Ой мама шикодым", "added_by": "6451825371"}
+{"timestamp": "2026-02-03T23:51:46.645138", "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni", "action": "note_added", "note": "Ассав", "added_by": "6451825371"}
+{"timestamp": "2026-02-03T23:53:35.153373", "user_id": 895660575, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-02-03T23:55:15.881020", "user_id": 639389622, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-02-03T23:56:42.962616", "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni", "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-02-03T23:56:45.882827", "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni", "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-02-03T23:56:49.080862", "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni", "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:00:14.868104", "user_id": "web_session_ml79gpi2_2pzoc31ql_62x1g8", "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:04:00.280496", "user_id": 895660575, "action": "note_added", "note": "Дядька черномырдин", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T00:06:37.837691", "user_id": "web_session_ml79jgvg_wnsrninzr_ey0b9i", "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:06:39.518163", "user_id": "web_session_ml79jgvg_wnsrninzr_ey0b9i", "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:06:40.913727", "user_id": "web_session_ml79jgvg_wnsrninzr_ey0b9i", "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:06:46.253981", "user_id": "web_session_ml79jgvg_wnsrninzr_ey0b9i", "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:08:30.588695", "user_id": 12345, "action": "dialog_started", "initiated_by": "user", "username": "test_user"}
+{"timestamp": "2026-02-04T00:39:47.418744", "user_id": 128064349, "action": "note_added", "note": "Не успел ответить. Взяла у других. С 25.02 нужен авто", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T00:40:09.196912", "user_id": 7658402370, "action": "note_added", "note": "1.03-24.03. выезд самуи 1500 не устраивает цена выезда", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T00:41:18.226100", "user_id": 895660575, "action": "note_added", "note": "Что то ему надо", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T00:43:04.951Z", "user_id": 12345, "action": "manager_message_sent", "message_length": 105}
+{"timestamp": "2026-02-04T00:43:25.191Z", "user_id": "session_12345", "action": "manager_message_sent", "message_length": 105}
+{"timestamp": "2026-02-04T00:43:45.029928", "user_id": 12345, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-02-04T00:44:24.433Z", "user_id": "web_session_ml79gpi2_2pzoc31ql_62x1g8", "action": "manager_message_sent", "message_length": 105}
+{"timestamp": "2026-02-04T00:44:47.907Z", "user_id": 782990455, "action": "manager_message_sent", "message_length": 105}
+{"timestamp": "2026-02-04T00:45:51.471Z", "user_id": 63082669, "action": "manager_message_sent", "message_length": 105}
+{"timestamp": "2026-02-04T00:46:22.972618", "user_id": "web_session_ml79jgvg_wnsrninzr_ey0b9i", "action": "note_added", "note": "Тестовая бронь из браузера", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T00:46:54.995851", "user_id": 6451825371, "action": "message_received", "content": "Здрасте"}
+{"timestamp": "2026-02-04T00:46:55.005259", "user_id": 6451825371, "action": "user_message_received", "message_length": 7, "message_type": "text", "username": "mars_rent", "media_info": null}
+{"timestamp": "2026-02-04T00:48:44.902606", "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni", "action": "note_added", "note": "Веб браузер", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T00:48:53.549787", "user_id": "web_session_ml79gpi2_2pzoc31ql_62x1g8", "action": "note_added", "note": "Веб браузер", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T00:49:06.888500", "user_id": "session_12345", "action": "note_added", "note": "Веб браузер(тест)", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T00:49:12.387936", "user_id": "web_session_ml79gpi2_2pzoc31ql_62x1g8", "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:49:14.564877", "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni", "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:49:24.459763", "user_id": 782990455, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:49:29.500956", "user_id": 5040204637, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:49:31.948054", "user_id": 437005486, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:49:36.119792", "user_id": 8010825309, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:49:38.362091", "user_id": 63082669, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T00:51:11.828282", "user_id": 370125988, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-02-04T00:51:15.062002", "user_id": 708890817, "action": "user_archived", "archived_by": "6451825371"}
+{"timestamp": "2026-02-04T01:33:39.034831", "user_id": 128064349, "action": "message_received", "content": "Мне не принципиально какая машина \nНо, что-то побюджетнее"}
+{"timestamp": "2026-02-04T01:33:39.044655", "user_id": 128064349, "action": "user_message_received", "message_length": 57, "message_type": "text", "username": "YULIANNAEVA", "media_info": null}
+{"timestamp": "2026-02-04T01:52:43.288878", "user_id": 782990455, "action": "message_received", "content": "Добрый день ! Интересует дата 7 марта на 10 дней , Пхукет патонг"}
+{"timestamp": "2026-02-04T01:52:43.298240", "user_id": 782990455, "action": "user_message_received", "message_length": 64, "message_type": "text", "username": "Oksanaa711", "media_info": null}

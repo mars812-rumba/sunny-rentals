@@ -1656,9 +1656,9 @@
         "color": "White"
       },
       "dates": {
-        "start": "2026-02-05T03:00:00.000Z",
+        "start": "2026-02-05T04:30:00.000Z",
         "end": "2026-02-16T04:00:00.000Z",
-        "days": 11
+        "days": 12
       },
       "locations": {
         "pickupLocation": "airport",
@@ -1668,12 +1668,12 @@
       },
       "pricing": {
         "dailyRate": 712,
-        "totalRental": 7832,
+        "totalRental": 8544,
         "deposit": 5000,
         "deliveryPickup": 0,
         "deliveryReturn": 0,
         "totalDelivery": 0,
-        "grandTotal": 7832
+        "grandTotal": 8544
       },
       "contact": {
         "value": "@denisbolgov1994",
@@ -1681,11 +1681,11 @@
         "name": "Денис(AR mazda 2)",
         "phone": ""
       },
-      "timestamp": "2026-02-03T18:46:34.635Z"
+      "timestamp": "2026-02-03T23:19:05.291Z"
     },
     "status": "new",
     "created_at": "2026-01-28T19:53:30.931764",
-    "updated_at": "2026-02-03T18:46:36.594307"
+    "updated_at": "2026-02-03T23:19:07.358251"
   },
   {
     "booking_id": "3317e8af",
@@ -1850,5 +1850,45 @@
     },
     "status": "new",
     "created_at": "2026-02-01T16:11:04.187904"
+  },
+  {
+    "booking_id": "06044f15",
+    "user_id": "web_session_ml79jgvg_wnsrninzr_ey0b9i",
+    "form_data": {
+      "car": {
+        "id": "honda_civic_2024_black",
+        "name": "Honda CIVIC RS 2024 Black",
+        "brand": "Honda",
+        "model": "CIVIC RS",
+        "year": "2024",
+        "color": "Black"
+      },
+      "dates": {
+        "start": "2026-02-07T17:00:00.000Z",
+        "end": "2026-02-26T17:00:00.000Z",
+        "days": 20
+      },
+      "locations": {
+        "pickup": "airport",
+        "return": "airport"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 1207,
+        "totalRental": 24140,
+        "deposit": 5000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 0,
+        "grandTotal": 24140
+      },
+      "contact": {
+        "value": "+79219959164",
+        "type": "whatsapp"
+      },
+      "timestamp": "2026-02-04T00:02:30.678Z"
+    },
+    "status": "new",
+    "created_at": "2026-02-04T00:02:31.089153"
   }
 ]

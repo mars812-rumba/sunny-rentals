@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from datetime import date, datetime, timedelta, UTC
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query, Depends, status, Header, Request
@@ -181,12 +181,12 @@ print(f"✅ Промпт загружен. Длина: {len(CLAUDE_SYSTEM_PROMPT
 # МОДЕЛИ Pydantic
 # ==============================
 class StatusUpdate(BaseModel):
-    user_id: int
+    user_id: Union[int, str]
     status: str
     note: str = ""
 
 class NoteAdd(BaseModel):
-    user_id: int
+    user_id: Union[int, str]
     note: str
 
 class LoginRequest(BaseModel):
@@ -194,11 +194,11 @@ class LoginRequest(BaseModel):
     password: str
 
 class InitiateDialogRequest(BaseModel):
-    user_id: int
+    user_id: Union[int, str]
     reason: str = "crm"
 
 class StartClaudeRequest(BaseModel):
-    user_id: int
+    user_id: Union[int, str]
 
 class PhotoUpload(BaseModel):
     car_id: str
@@ -327,23 +327,35 @@ class AdminBookingRequest(BaseModel):
     booking_id: Optional[str] = None
     
 class LeadTrackRequest(BaseModel):
-    user_id: int
+    user_id: Union[int, str] = Field(..., description="Telegram user ID (int) or web session ID (str)")
     username: Optional[str] = None
     event_type: str  # "webapp_opened", "filters_used", "booking_submitted"
     data: Optional[dict] = None
 
+    @validator('user_id')
+    def validate_user_id(cls, v):
+        # If it's already an int or str, return as-is
+        if isinstance(v, (int, str)):
+            return v
+        # Try to convert to int if possible
+        try:
+            return int(v)
+        except (ValueError, TypeError):
+            # If can't convert to int, return as string
+            return str(v)
+
 class StatusUpdateRequest(BaseModel):
-    user_id: int
+    user_id: Union[int, str]
     status: str
     note: Optional[str] = None
 
 class MarkerUpdate(BaseModel):
-    user_id: int
+    user_id: Union[int, str]
     marker: Optional[str] = None  # null для сброса маркера
 
 # ✅ ДОБАВЬ если нужна модель для User (опционально)
 class UserData(BaseModel):
-    user_id: int
+    user_id: Union[int, str]
     username: Optional[str] = None
     created_at: str  # Было timestamp
     status: str      # Было final_status
@@ -1751,16 +1763,36 @@ async def get_logistics_summary():
 def track_lead_event(request: LeadTrackRequest):
     """Track user events - ONE record per user"""
     try:
-        user_id = int(request.user_id)
+        # Handle both Telegram IDs (int) and session IDs (str)
+        user_id = request.user_id
         event_type = request.event_type
         event_data = request.data or {}
         username = request.username
 
+        # Enhanced diagnostic logging
+        print(f"🔍 track_lead_event: user_id={user_id} (type: {type(user_id).__name__}), event_type={event_type}")
+        print(f"🔍 User ID analysis: isinstance(user_id, int)={isinstance(user_id, int)}, isinstance(user_id, str)={isinstance(user_id, str)}")
+        
         users_data = load_json(USER_DATA_JSON)
         bookings = load_bookings()
+        
+        # Log existing user data analysis
+        print(f"📊 User database analysis:")
+        print(f"   - Total users in database: {len(users_data)}")
+        
+        # Check for existing user with detailed analysis
+        existing_users = []
+        for i, u in enumerate(users_data):
+            db_user_id = u.get("user_id")
+            if str(db_user_id) == str(user_id):
+                existing_users.append({"index": i, "user_id": db_user_id, "type": type(db_user_id).__name__})
+        
+        print(f"   - Users matching current user_id: {len(existing_users)}")
+        for user in existing_users:
+            print(f"     * Index {user['index']}: user_id={user['user_id']} (type: {user['type']})")
 
-        # Найти существующего пользователя
-        user_index = next((i for i, u in enumerate(users_data) if u.get("user_id") == user_id), None)
+        # Найти существующего пользователя (handle both int and str comparison)
+        user_index = next((i for i, u in enumerate(users_data) if str(u.get("user_id")) == str(user_id)), None)
         
         if user_index is not None:
             user_record = users_data[user_index]
@@ -1790,9 +1822,11 @@ def track_lead_event(request: LeadTrackRequest):
         # 1. ОТКРЫТИЕ WEBAPP
         if event_type == "webapp_opened":
             print(f"📱 Пользователь {user_id} открыл webapp")
-            # Уведомляем только если это новый пользователь
-            if user_index is None:
+            # Уведомляем только если это новый пользователь И это Telegram пользователь (int)
+            if user_index is None and isinstance(user_id, int):
                 notify_telegram_bot_about_webapp_opened(user_id, username)
+            elif user_index is None and isinstance(user_id, str):
+                print(f"🌐 Новый web session пользователь: {user_id} (не уведомляем Telegram)")
         
         # 2. ИСПОЛЬЗОВАНИЕ ФИЛЬТРОВ (теплый лид)
         elif event_type == "filters_used":
@@ -1815,8 +1849,11 @@ def track_lead_event(request: LeadTrackRequest):
                 }
                 print(f"📅 Даты: {event_data['startDate']} - {event_data['endDate']} ({event_data.get('days', 1)} дней)")
             
-            # Уведомляем Telegram о теплом лиде
-            notify_telegram_bot_about_filters(user_id, event_data, username)
+            # Уведомляем Telegram только для Telegram пользователей (int)
+            if isinstance(user_id, int):
+                notify_telegram_bot_about_filters(user_id, event_data, username)
+            else:
+                print(f"🌐 Web session пользователь {user_id} использовал фильтры (Telegram уведомление пропущено)")
 
         # 3. БРОНИРОВАНИЕ (горячий лид)
         elif event_type == "booking_submitted":
@@ -1866,8 +1903,11 @@ def track_lead_event(request: LeadTrackRequest):
             
             print(f"📋 Создано бронирование: {booking_id}")
             
-            # Уведомляем Telegram о горячем лиде
-            notify_telegram_bot_about_booking(booking_id, user_id, event_data, username)
+            # Уведомляем Telegram только для Telegram пользователей (int)
+            if isinstance(user_id, int):
+                notify_telegram_bot_about_booking(booking_id, user_id, event_data, username)
+            else:
+                print(f"🌐 Web session пользователь {user_id} отправил бронирование (Telegram уведомление пропущено)")
 
         # Обновляем запись пользователя
         if user_index is not None:
@@ -1884,7 +1924,8 @@ def track_lead_event(request: LeadTrackRequest):
             "status": "ok",
             "current_status": user_record["status"],
             "action": event_type,
-            "user_id": user_id
+            "user_id": user_id,
+            "user_type": "telegram" if isinstance(user_id, int) else "web_session"
         }
 
     except Exception as e:
@@ -2103,7 +2144,7 @@ def get_crm_stats(period: str = Query("week")):
 
 
 class LogActionRequest(BaseModel):
-    user_id: int
+    user_id: Union[int, str]
     action_type: str  # "status_changed", "note_added", "booking_created", "user_archived", "custom"
     description: str
     metadata: Optional[Dict[str, Any]] = None
@@ -3048,7 +3089,7 @@ async def api_get_active_dialogs():
 
 
 class SendMessageRequest(BaseModel):
-    user_id: int
+    user_id: Union[int, str]
     text: str
     role: str = "manager"
     timestamp: str
@@ -4150,7 +4191,7 @@ async def download_user_media(user_id: int, filename: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 class MediaUploadRequest(BaseModel):
-    user_id: int
+    user_id: Union[int, str]
     message: Optional[str] = None
 
 @app.post(API_PREFIX + "/crm/send_media")
