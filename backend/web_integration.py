@@ -375,6 +375,22 @@ class LogisticsDate(BaseModel):
     client_name: str
     location: str
 
+class LogActionRequest(BaseModel):
+    user_id: Union[int, str]
+    action_type: str  # "status_changed", "note_added", "booking_created", "user_archived", "custom"
+    description: str
+    metadata: Optional[Dict[str, Any]] = None
+    performed_by: Optional[str] = None  # admin_id или "system"
+    
+class SendMessageRequest(BaseModel):
+    user_id: Union[int, str]
+    text: str
+    role: str = "manager"
+    timestamp: str
+    
+class MediaUploadRequest(BaseModel):
+    user_id: Union[int, str]
+    message: Optional[str] = None
 
 # ==============================
 # УТИЛИТЫ
@@ -550,62 +566,36 @@ def update_all_user_records(user_id: int, updates: dict, in_archive: bool = Fals
     return updated
 
 
-def move_to_archive(user_id: int):
-    """Переместить пользователя в архив"""
+def move_to_archive(user_id: Union[int, str]):
     try:
-        print(f"🗂️ Moving user {user_id} to archive...")
-        
-        # Читаем user_data
-        if not USER_DATA_JSON.exists():
-            print(f"❌ USER_DATA_JSON not found: {USER_DATA_JSON}")
-            return False
+        u_id_str = str(user_id) # Фикс типов
+        if not USER_DATA_JSON.exists(): return False
         
         with open(USER_DATA_JSON, "r", encoding="utf-8") as f:
             users_data = json.load(f)
         
-        print(f"📊 Total records in user_data: {len(users_data)}")
+        # Сравниваем как строки
+        user_records = [u for u in users_data if str(u.get('user_id')) == u_id_str]
         
-        # Находим все записи пользователя
-        user_records = [u for u in users_data if u.get('user_id') == user_id]
         if not user_records:
-            print(f"❌ User {user_id} not found in user_data")
+            print(f"❌ User {u_id_str} not found")
             return False
-        
-        print(f"📋 Found {len(user_records)} records for user {user_id}")
-        
-        # Читаем архив
-        if not ARCHIVE_JSON.exists():
-            print(f"📁 Creating new archive file: {ARCHIVE_JSON}")
-            archive_data = []
-        else:
-            with open(ARCHIVE_JSON, "r", encoding="utf-8") as f:
-                archive_data = json.load(f)
-        
-        print(f"📊 Current archive size: {len(archive_data)} records")
-        
-        # Переносим в архив
+
+        archive_data = load_json(ARCHIVE_JSON)
         for record in user_records:
             record['archived_at'] = datetime.utcnow().isoformat()
+            record['archived'] = True # Помечаем для фильтрации
             archive_data.append(record)
         
-        # Удаляем из user_data
-        users_data = [u for u in users_data if u.get('user_id') != user_id]
+        # Удаляем, сравнивая строки
+        new_users_data = [u for u in users_data if str(u.get('user_id')) != u_id_str]
         
-        # Сохраняем
         with _lock:
-            save_json(USER_DATA_JSON, users_data)
+            save_json(USER_DATA_JSON, new_users_data)
             save_json(ARCHIVE_JSON, archive_data)
-        
-        print(f"✅ Moved user {user_id} to archive ({len(user_records)} records)")
-        print(f"📊 New user_data size: {len(users_data)}")
-        print(f"📊 New archive size: {len(archive_data)}")
-        
         return True
-        
     except Exception as e:
-        print(f"❌ Error moving to archive: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"Error: {e}")
         return False
 
 def restore_from_archive(user_id: int):
@@ -980,7 +970,7 @@ def get_all_dialog_statuses():
             
     return statuses
 
-def log_dialog_event(user_id: int, action: str, data: dict = None, **kwargs):
+def log_dialog_event(user_id: Union[int, str], action: str, data: dict = None, **kwargs):
     """
     Универсальная версия: принимает и словарь, и отдельные аргументы
     """
@@ -1442,9 +1432,13 @@ def process_claude_message(user_id, user_input):
 # HELPER ФУНКЦИЯ - добавь ПЕРЕД endpoints
 # ==============================
 
-def notify_telegram_bot_about_filters(user_id: int, filters: dict, username: str = None) -> bool:
-    """Уведомляет Telegram бота о теплом лиде (filters_used)"""
+def notify_telegram_bot_about_filters(user_id: Union[int, str], filters: dict, username: str = None) -> bool:
+    """Уведомляет Telegram бота о теплом лиде (filters_used) - для всех пользователей (Telegram и Web)"""
     try:
+        # ✅ ИСПРАВЛЕНИЕ: Отправляем уведомления для всех пользователей (и Telegram, и Web)
+        print(f"📤 Notifying bot about warm lead {user_id}")
+        print(f"📤 User type: {'Telegram' if isinstance(user_id, int) else 'Web Session'}")
+        
         # ✅ ИСПРАВЛЕНИЕ: Правильное определение webhook URL
         TG_WEBHOOK_URL = os.getenv("TG_WEBHOOK_URL", "http://localhost:5001")
         # Убираем trailing slash если есть
@@ -1487,9 +1481,13 @@ def notify_telegram_bot_about_filters(user_id: int, filters: dict, username: str
         return False
 
 
-def notify_telegram_bot_about_webapp_opened(user_id: int, username: str = None) -> bool:
-    """Уведомляет Telegram бота о входе в webapp"""
+def notify_telegram_bot_about_webapp_opened(user_id: Union[int, str], username: str = None) -> bool:
+    """Уведомляет Telegram бота о входе в webapp - для всех пользователей (Telegram и Web)"""
     try:
+        # ✅ ИСПРАВЛЕНИЕ: Отправляем уведомления для всех пользователей (и Telegram, и Web)
+        print(f"📤 Notifying bot about webapp opened: {user_id}")
+        print(f"📤 User type: {'Telegram' if isinstance(user_id, int) else 'Web Session'}")
+        
         # ✅ ИСПРАВЛЕНИЕ: Правильное определение webhook URL
         TG_WEBHOOK_URL = os.getenv("TG_WEBHOOK_URL", "http://localhost:5001")
         if TG_WEBHOOK_URL.endswith('/'):
@@ -1528,9 +1526,13 @@ def notify_telegram_bot_about_webapp_opened(user_id: int, username: str = None) 
         return False
 
 
-def notify_telegram_bot_about_booking(booking_id: str, user_id: int, form_data: dict, username: str = None):
-    """Уведомляет Telegram бота о новой брони"""
+def notify_telegram_bot_about_booking(booking_id: str, user_id: Union[int, str], form_data: dict, username: str = None):
+    """Уведомляет Telegram бота о новой брони - для всех пользователей (Telegram и Web)"""
     try:
+        # ✅ ИСПРАВЛЕНИЕ: Отправляем уведомления для всех пользователей (и Telegram, и Web)
+        print(f"📤 Notifying bot about booking: {user_id}")
+        print(f"📤 User type: {'Telegram' if isinstance(user_id, int) else 'Web Session'}")
+        
         # ✅ ИСПРАВЛЕНИЕ: Правильное определение webhook URL
         TG_WEBHOOK_URL = os.getenv("TG_WEBHOOK_URL", "http://localhost:5001")
         if TG_WEBHOOK_URL.endswith('/'):
@@ -1823,10 +1825,11 @@ def track_lead_event(request: LeadTrackRequest):
         if event_type == "webapp_opened":
             print(f"📱 Пользователь {user_id} открыл webapp")
             # Уведомляем только если это новый пользователь И это Telegram пользователь (int)
-            if user_index is None and isinstance(user_id, int):
-                notify_telegram_bot_about_webapp_opened(user_id, username)
-            elif user_index is None and isinstance(user_id, str):
-                print(f"🌐 Новый web session пользователь: {user_id} (не уведомляем Telegram)")
+            # ДИАГНОСТИКА: Отправляем уведомления для всех типов пользователей
+            if user_index is None:
+                print(f"🔍 DIAGNOSTIC: НОВЫЙ пользователь {user_id} (тип: {type(user_id).__name__}) - отправляем webapp_opened")
+                notify_result = notify_telegram_bot_about_webapp_opened(user_id, username)
+                print(f"🔍 DIAGNOSTIC: Результат уведомления webapp_opened: {notify_result}")
         
         # 2. ИСПОЛЬЗОВАНИЕ ФИЛЬТРОВ (теплый лид)
         elif event_type == "filters_used":
@@ -1849,11 +1852,10 @@ def track_lead_event(request: LeadTrackRequest):
                 }
                 print(f"📅 Даты: {event_data['startDate']} - {event_data['endDate']} ({event_data.get('days', 1)} дней)")
             
-            # Уведомляем Telegram только для Telegram пользователей (int)
-            if isinstance(user_id, int):
-                notify_telegram_bot_about_filters(user_id, event_data, username)
-            else:
-                print(f"🌐 Web session пользователь {user_id} использовал фильтры (Telegram уведомление пропущено)")
+            # ДИАГНОСТИКА: Отправляем уведомления для всех типов пользователей
+            print(f"🔍 DIAGNOSTIC: filters_used для пользователя {user_id} (тип: {type(user_id).__name__})")
+            notify_result = notify_telegram_bot_about_filters(user_id, event_data, username)
+            print(f"🔍 DIAGNOSTIC: Результат уведомления filters_used: {notify_result}")
 
         # 3. БРОНИРОВАНИЕ (горячий лид)
         elif event_type == "booking_submitted":
@@ -1903,11 +1905,10 @@ def track_lead_event(request: LeadTrackRequest):
             
             print(f"📋 Создано бронирование: {booking_id}")
             
-            # Уведомляем Telegram только для Telegram пользователей (int)
-            if isinstance(user_id, int):
-                notify_telegram_bot_about_booking(booking_id, user_id, event_data, username)
-            else:
-                print(f"🌐 Web session пользователь {user_id} отправил бронирование (Telegram уведомление пропущено)")
+            # ДИАГНОСТИКА: Отправляем уведомления для всех типов пользователей
+            print(f"🔍 DIAGNOSTIC: booking_submitted для пользователя {user_id} (тип: {type(user_id).__name__})")
+            notify_result = notify_telegram_bot_about_booking(booking_id, user_id, event_data, username)
+            print(f"🔍 DIAGNOSTIC: Результат уведомления booking_submitted: {notify_result}")
 
         # Обновляем запись пользователя
         if user_index is not None:
@@ -2022,61 +2023,94 @@ def get_computed_dialog_data(user_id: int):
         print(f"⚠️ Ошибка парсинга истории для {user_id}: {e}")
         return data
 
+def get_fast_dialog_map():
+    """
+    Собирает статусы ВСЕХ диалогов за один проход по хвосту файла.
+    Это в 100 раз быстрее, чем читать файл для каждого юзера отдельно.
+    """
+    statuses = {}
+    
+    def process_file(path, is_chat=False):
+        if not path.exists(): return
+        # Читаем только последние 1000 строк (хватит для актуальных статусов)
+        try:
+            cmd = ["tail", "-n", "1000", str(path)]
+            lines = subprocess.check_output(cmd).decode('utf-8').splitlines()
+        except:
+            with open(path, "r", encoding="utf-8") as f:
+                lines = f.readlines()[-1000:]
+
+        for line in lines:
+            try:
+                ev = json.loads(line.strip())
+                uid = str(ev.get("user_id"))
+                if uid not in statuses:
+                    statuses[uid] = {"claude_status": "stopped", "unread": False, "message_count": 0}
+                
+                entry = statuses[uid]
+                
+                if is_chat:
+                    entry["message_count"] += 1
+                    entry["last_message_from"] = ev.get("role")
+                    entry["last_message_at"] = ev.get("timestamp")
+                    # Если последнее сообщение от юзера — значит не прочитано
+                    entry["unread"] = (ev.get("role") == "user")
+                else:
+                    # Логика событий (Claude)
+                    action = ev.get("action")
+                    if action in ["claude_started", "claude_resumed", "claude_start"]:
+                        entry["claude_status"] = "active"
+                    elif action == "claude_paused":
+                        entry["claude_status"] = "paused"
+                    elif action == "claude_stopped":
+                        entry["claude_status"] = "stopped"
+                    elif action == "messages_marked_read":
+                        entry["unread"] = False
+            except: continue
+
+    process_file(CHAT_LOGS_JSONL, is_chat=True)
+    process_file(DATA / "crm_history.jsonl", is_chat=False)
+    return statuses
+
 @app.get(API_PREFIX + "/crm/users")
 def get_crm_users(status: str, period: str = "week"):
     try:
-        if not os.path.exists(USER_DATA_JSON):
-            return {"status": "ok", "users": []}
-
-        with open(USER_DATA_JSON, 'r', encoding='utf-8') as f:
-            users_data = json.load(f)
-
+        users_data = load_json(USER_DATA_JSON)
+        # Получаем карту состояний ОДИН раз
+        fast_map = get_fast_dialog_map()
+        
         now = datetime.utcnow()
         delta = {"today": 1, "week": 7, "month": 30}.get(period, 9999)
         start_date = now - timedelta(days=delta)
 
         filtered = []
         for u in users_data:
-            # PRIORITY STATUS LOGIC: final_status overrides status
+            # ФИКС АРХИВА: принудительно в строку
+            u_id = str(u.get("user_id"))
             u_status = u.get("final_status") or u.get("status")
             u_at = u.get("created_at")
             
-            if not u_at or not u_status: continue
+            if not u_at or u_status != status: continue
             
-            # Убираем 'Z' и парсим дату
             u_date = datetime.fromisoformat(u_at.replace('Z', ''))
             
-            if u_status == status and u_date >= start_date and not u.get("archived"):
-                # --- ВАЖНЫЙ МОМЕНТ: Вычисляем данные из истории ---
-                user_id = u.get("user_id")
-                computed = get_computed_dialog_data(user_id)
+            if u_date >= start_date and not u.get("archived"):
+                user_copy = u.copy()
+                # Подмешиваем данные из быстрой карты
+                if u_id in fast_map:
+                    user_copy.update(fast_map[u_id])
+                else:
+                    user_copy["claude_status"] = "stopped"
+                    user_copy["unread"] = False
                 
-                # Копируем пользователя и добавляем вычисленные поля (не меняя файл в БД)
-                user_with_status = u.copy()
-                user_with_status.update(computed)
-                
-                # ✅ ДОБАВЛЯЕМ ПОЛЕ MARKER (если его нет, ставим null)
-                if "marker" not in user_with_status:
-                    user_with_status["marker"] = None
-                
-                filtered.append(user_with_status)
+                filtered.append(user_copy)
 
-        # Сортировка по времени создания (новые сверху)
         filtered.sort(key=lambda x: x.get("created_at", ""), reverse=True)
-
-        return {
-            "status": "ok",
-            "users": filtered
-        }
+        return {"status": "ok", "users": filtered}
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return {"status": "error", "message": str(e)}
-        return {"status": "error", "message": str(e)}
-
-
-#RETURN STATS TO CRMPage.tsx
-
+        print(f"🔴 CRM Users Error: {e}")
+        return {"status": "error", "message": str(e), "users": []}
+    
 @app.get(API_PREFIX + "/crm/stats")
 def get_crm_stats(period: str = Query("week")):
     try:
@@ -2143,12 +2177,7 @@ def get_crm_stats(period: str = Query("week")):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-class LogActionRequest(BaseModel):
-    user_id: Union[int, str]
-    action_type: str  # "status_changed", "note_added", "booking_created", "user_archived", "custom"
-    description: str
-    metadata: Optional[Dict[str, Any]] = None
-    performed_by: Optional[str] = None  # admin_id или "system"
+
 
 
 @app.post(API_PREFIX + "/crm/log_action")
@@ -2228,40 +2257,7 @@ async def get_user_logs(user_id: int, limit: int = Query(50, ge=1, le=200)):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
-    
-@app.get(API_PREFIX + "/crm/chats/{user_id}")
-def get_user_chats(user_id: int):
-    """Получить историю чатов пользователя"""
-    try:
-        chats = []
-        
-        # ВАЖНО: используй CHAT_LOGS_JSONL
-        if CHAT_LOGS_JSONL.exists():
-            with open(CHAT_LOGS_JSONL, 'r', encoding='utf-8') as f:
-                for line in f:
-                    try:
-                        log_entry = json.loads(line.strip())
-                        if log_entry.get('user_id') == user_id:
-                            chats.append(log_entry)
-                    except json.JSONDecodeError:
-                        continue
-        else:
-            print(f"⚠️ Chat logs file not found: {CHAT_LOGS_JSONL}")
-        
-        chats.sort(key=lambda x: x.get('timestamp', ''))
-        
-        print(f"📊 Found {len(chats)} chat messages for user {user_id}")
-        
-        return {
-            "status": "ok",
-            "chats": chats,
-            "total": len(chats)
-        }
-    except Exception as e:
-        print(f"❌ Error in get_user_chats: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
+
     
 @app.get(API_PREFIX + "/crm/archive")
 def get_archive_users(period: str = Query("all", alias="period")):
@@ -2679,84 +2675,18 @@ async def get_user_history(user_id: int):
 
 
 @app.delete(API_PREFIX + "/crm/delete_user/{user_id}")
-async def delete_user_record(user_id: int):
-    """Удалить запись (переместить в архив)"""
-    try:
-        print(f"🗑️ DELETE request for user {user_id}")
-        
-        success = move_to_archive(user_id)
-        
-        if not success:
-            print(f"❌ Failed to move user {user_id} to archive")
-            raise HTTPException(status_code=404, detail="User not found or failed to archive")
-        
-        # Логируем
-        history_file = DATA / "crm_history.jsonl"
-        log_entry = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "user_id": user_id,
-            "action": "user_archived",
-            "archived_by": ADMIN_ID
-        }
-        
-        try:
-            with open(history_file, "a", encoding="utf-8") as f:
-                f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
-        except Exception as e:
-            print(f"⚠️ Не удалось записать в историю: {e}")
-        
-        print(f"✅ Successfully archived user {user_id}")
-        
-        return {
-            "status": "ok",
-            "message": "Пользователь перемещен в архив"
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"❌ Error in delete_user_record: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-
+async def delete_user_record(user_id: str): # Поменял int на str
+    success = move_to_archive(user_id)
+    if success:
+        return {"status": "ok"}
+    raise HTTPException(status_code=404, detail="User not found")
 
 @app.post(API_PREFIX + "/crm/restore_user/{user_id}")
-async def restore_user_record(user_id: int):
-    """Восстановить пользователя из архива"""
-    try:
-        success = restore_from_archive(user_id)
-        
-        if not success:
-            raise HTTPException(status_code=404, detail="User not found in archive")
-        
-        # Логируем
-        history_file = DATA / "crm_history.jsonl"
-        log_entry = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "user_id": user_id,
-            "action": "user_restored",
-            "restored_by": ADMIN_ID
-        }
-        
-        try:
-            with open(history_file, "a", encoding="utf-8") as f:
-                f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
-        except Exception as e:
-            print(f"⚠️ Не удалось записать в историю: {e}")
-        
-        return {
-            "status": "ok",
-            "message": "Пользователь восстановлен со статусом 'В работе'"
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"❌ Error in restore_user_record: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+async def restore_user_record(user_id: str): # Поменял int on str
+    success = restore_from_archive(user_id)
+    if success:
+        return {"status": "ok"}
+    raise HTTPException(status_code=404, detail="User not found in archive")
 
 
 @app.post(API_PREFIX + "/crm/auto_archive")
@@ -3088,11 +3018,6 @@ async def api_get_active_dialogs():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-class SendMessageRequest(BaseModel):
-    user_id: Union[int, str]
-    text: str
-    role: str = "manager"
-    timestamp: str
 
 @app.post(API_PREFIX + "/crm/send_message")
 async def send_message_to_user(msg_request: SendMessageRequest):
@@ -3395,6 +3320,28 @@ def get_car_owners_map():
             car_to_owner[car_id] = owner_id
     return car_to_owner
 
+@app.get(API_PREFIX + "/fleet")
+def get_fleet():
+    """Получить данные о флоте автомобилей"""
+    try:
+        data = load_json(CARS_JSON)
+        cars = data.get("cars", {})
+        
+        # Filter available cars only
+        available_cars = {}
+        for car_id, car_data in cars.items():
+            if car_data.get("available", True):  # Default to true if not specified
+                available_cars[car_id] = car_data
+        
+        return {
+            "status": "ok",
+            "vehicles": available_cars,
+            "count": len(available_cars)
+        }
+    except Exception as e:
+        print(f"❌ Error in get_fleet: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post(API_PREFIX + "/admin/car-owners")
 def create_car_owner(owner: CreateCarOwner):
     """Создать нового владельца авто"""
@@ -3695,9 +3642,11 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
     """Создание/обновление брони напрямую из админ-панели"""
     try:
         print("=== START admin_create_booking ===")
-        print(f"Received data: {booking_data}")
+        print(f"Successfully parsed request data: {booking_data}")
         
         form_data = booking_data.form_data
+        print(f"Form data parsed successfully: {form_data}")
+        
         booking_id = booking_data.booking_id
         
         if not form_data:
@@ -3940,8 +3889,9 @@ def bulk_update_prices(update: BulkPriceUpdate):
 # ==============================
 
 @app.get("/api/crm/dialog/{user_id}/status")
-def get_dialog_status_endpoint(user_id: int):
-    """Получить статус диалога из истории"""
+async def get_dialog_status(user_id: str):  # Ставим str, так как Union в путях FastAPI иногда капризничает
+    # Внутри функции вы уже можете попробовать сконвертировать в int, если нужно
+    target_id = int(user_id) if user_id.isdigit() else user_id
     try:
         dialog_status = get_dialog_status_from_history(user_id)
         return {"dialog": dialog_status}
@@ -4153,151 +4103,183 @@ async def get_user_media(user_id: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# --- 1. Единый эндпоинт для скачивания (Исправлен путь) ---
 @app.get(API_PREFIX + "/crm/media/{user_id}/download/{filename}")
-async def download_user_media(user_id: int, filename: str):
-    """Скачать медиафайл пользователя"""
+async def download_media_final(user_id: str, filename: str):
     try:
-        # Безопасность: проверяем что файл находится в правильной директории
-        media_dir = Path(__file__).parent / "media" / str(user_id)
-        file_path = media_dir / filename
+        print(f"📥 [DEBUG] Download request: user_id={user_id}, filename={filename}")
         
-        # Проверяем что файл существует и находится в правильной директории
-        if not file_path.exists() or not str(file_path).startswith(str(media_dir.resolve())):
+        # Media files are in backend/media/, not backend/data/media/
+        media_root = Path(__file__).parent / "media"
+        file_path = media_root / str(user_id) / filename
+        
+        # If file is in incoming subfolder (from bot)
+        incoming_path = media_root / str(user_id) / "incoming" / filename
+        
+        print(f"🔍 [DEBUG] Checking paths: {file_path} exists: {file_path.exists()}")
+        print(f"🔍 [DEBUG] Checking paths: {incoming_path} exists: {incoming_path.exists()}")
+        
+        target = file_path if file_path.exists() else incoming_path
+        
+        if not target.exists():
+            print(f"❌ File not found: {target}")
             raise HTTPException(status_code=404, detail="File not found")
         
-        # Определяем Content-Type
-        file_extension = file_path.suffix.lower()
-        if file_extension in ['.jpg', '.jpeg']:
-            media_type = "image/jpeg"
-        elif file_extension == '.png':
-            media_type = "image/png"
-        elif file_extension == '.webp':
-            media_type = "image/webp"
-        elif file_extension == '.pdf':
-            media_type = "application/pdf"
-        else:
-            media_type = "application/octet-stream"
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(str(target))
+        print(f"📤 [DEBUG] Serving file: {target}, mime_type: {mime_type}")
         
         return FileResponse(
-            path=str(file_path),
-            media_type=media_type,
+            path=str(target),
+            media_type=mime_type or "application/octet-stream",
             filename=filename
         )
-        
-    except HTTPException:
-        raise
     except Exception as e:
-        print(f"❌ Error downloading media {filename} for user {user_id}: {e}")
+        print(f"❌ Media download error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-class MediaUploadRequest(BaseModel):
-    user_id: Union[int, str]
-    message: Optional[str] = None
+# --- 2. Быстрый чат (Чтобы не было 502 Bad Gateway) ---
+@app.get(API_PREFIX + "/crm/chats/{user_id}")
+async def get_user_chats_fast(user_id: str):
+    try:
+        chats = []
+        t_id = str(user_id)
+        
+        if not CHAT_LOGS_JSONL.exists():
+            return {"status": "ok", "chats": []}
+
+        # Читаем только последние 500 строк, чтобы не вешать сервер
+        try:
+            with open(CHAT_LOGS_JSONL, 'r', encoding='utf-8') as f:
+                # Читаем хвост файла
+                lines = f.readlines()[-500:]
+                for line in lines:
+                    try:
+                        entry = json.loads(line.strip())
+                        if str(entry.get('user_id')) == t_id:
+                            # Debug logging for chat data structure
+                            if len(chats) < 3:  # Only log first 3 entries
+                                print(f"📊 [DEBUG] Chat entry structure for user {user_id}:", {
+                                    'has_media': 'media' in entry,
+                                    'has_content': 'content' in entry,
+                                    'media_keys': list(entry.get('media', {}).keys()) if entry.get('media') else None,
+                                    'content_keys': list(entry.get('content', {}).keys()) if entry.get('content') else None,
+                                    'role': entry.get('role'),
+                                    'sample_entry': {k: v for k, v in entry.items() if k != 'media' and k != 'content'}
+                                })
+                            chats.append(entry)
+                    except: continue
+        except Exception as e:
+            print(f"⚠️ Ошибка чтения файла чатов: {e}")
+
+        print(f"📤 [DEBUG] Returning {len(chats)} chats for user {user_id}")
+        return {"status": "ok", "chats": chats}
+    except Exception as e:
+        print(f"❌ Get chats error: {e}")
+        return {"status": "error", "message": str(e), "chats": []}
+
 
 @app.post(API_PREFIX + "/crm/send_media")
 async def send_media_to_user(
-    user_id: int = Form(...),
+    user_id: str = Form(...),
     message: Optional[str] = Form(None),
     file: UploadFile = File(...)
 ):
     """Отправить медиафайл пользователю через Telegram бота"""
     try:
-        print(f"📤 Sending media to user {user_id}")
+        u_id_str = str(user_id)
+        print(f"📤 Sending media to user {u_id_str}")
+        
+        # Проверка: если это web_session, мы не можем отправить файл через TG бота!
+        if u_id_str.startswith("web_session"):
+            raise HTTPException(
+                status_code=400, 
+                detail="Нельзя отправить файл в веб-сессию. Только пользователям Telegram."
+            )
         
         # Проверяем тип файла
         allowed_types = ["image/jpeg", "image/png", "image/webp", "application/pdf"]
         if file.content_type not in allowed_types:
             raise HTTPException(
                 status_code=400,
-                detail=f"Unsupported file type: {file.content_type}. Allowed: {', '.join(allowed_types)}"
+                detail=f"Unsupported file type: {file.content_type}"
             )
         
-        # Создаем директорию для пользователя если не существует
-        media_dir = Path(__file__).parent / "media" / str(user_id)
+        # Путь теперь строим через строковый ID
+        media_dir = DATA / "media" / u_id_str
         media_dir.mkdir(parents=True, exist_ok=True)
         
-        # Генерируем уникальное имя файла
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        original_extension = Path(file.filename).suffix if file.filename else ""
         safe_filename = f"sent_{timestamp}_{file.filename}"
         file_path = media_dir / safe_filename
         
-        # Сохраняем файл
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        # Логируем отправку медиа
-        media_info = {
-            "type": "sent_media",
-            "filename": safe_filename,
-            "content_type": file.content_type,
-            "file_size": file_path.stat().st_size,
-            "timestamp": datetime.now().isoformat(),
-            "message": message,
-            "download_url": f"/api/crm/media/{user_id}/download/{safe_filename}"
-        }
-
-        # Отправляем через Telegram бота
-        try:
-            bot_url = os.getenv("TG_WEBHOOK_URL", "http://localhost:5001")
-            if bot_url.endswith('/'):
-                bot_url = bot_url[:-1]
-            
-            # Подготавливаем файл для отправки
-            with open(file_path, 'rb') as media_file:
-                files = {'media': (safe_filename, media_file, file.content_type)}
-                data = {
-                    'user_id': user_id,
-                    'message': message or ""
-                }
-                
-                response = requests.post(
-                    f"{bot_url}/internal/send_media",
-                    files=files,
-                    data=data,
-                    timeout=30
-                )
-            
-            if response.status_code == 200:
-                # Логируем в историю чата
-                log_chat_to_file(user_id, "assistant", {
-                    "content": message or "[Медиафайл]",
-                    "media": media_info,
-                    "sent_by": "manager"
-                })
-                
-                # Обновляем статус диалога
-                update_dialog_status(
-                    user_id=user_id,
-                    last_message_at=datetime.now().isoformat(),
-                    last_message_from="manager",
-                    message_count_increment=1
-                )
-                
-                print(f"✅ Media sent successfully to user {user_id}")
-                return {
-                    "status": "ok",
-                    "message": "Media sent successfully",
-                    "filename": safe_filename,
-                    "file_size": file_path.stat().st_size
-                }
-            else:
-                print(f"⚠️ Bot returned status {response.status_code}: {response.text}")
-                raise HTTPException(status_code=500, detail="Failed to send media via bot")
-                
-        except requests.exceptions.RequestException as e:
-            print(f"❌ Error connecting to bot: {e}")
-            raise HTTPException(status_code=500, detail="Bot service unavailable")
+        # Отправляем боту
+        bot_url = os.getenv("TG_WEBHOOK_URL", "http://localhost:5001").rstrip('/')
         
+        with open(file_path, 'rb') as media_file:
+            files = {'media': (safe_filename, media_file, file.content_type)}
+            data = {
+                'user_id': u_id_str,
+                'message': message or ""
+            }
+            
+            response = requests.post(
+                f"{bot_url}/internal/send_media",
+                files=files,
+                data=data,
+                timeout=30
+            )
+        
+        if response.status_code == 200:
+            # Структура для логирования
+            media_object = {
+                "type": "sent_media",
+                "content_type": file.content_type,
+                "download_url": f"/api/crm/media/{u_id_str}/download/{safe_filename}",
+                "filename": safe_filename,
+                "file_size": file_path.stat().st_size if file_path.exists() else 0
+            }
+            
+            log_entry = {
+                "timestamp": datetime.now().isoformat(),
+                "user_id": u_id_str,
+                "role": "manager",  # ✅ ИЗМЕНЕНО: manager, а не assistant
+                "content": {
+                    "text": message or "",
+                    "message": message or "",
+                    "media": media_object
+                }
+            }
+            
+            with open(CHAT_LOGS_JSONL, "a", encoding="utf-8") as f:
+                f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+            
+            # Обновляем статус для CRM
+            log_dialog_event(u_id_str, "manager_media_sent", {"filename": safe_filename})
+            
+            # ✅ ГЛАВНОЕ ИСПРАВЛЕНИЕ: ВОЗВРАЩАЕМ JSON!
+            return {
+                "status": "ok",
+                "message": "Media sent successfully",
+                "media": media_object,
+                "text": message or ""
+            }
+        else:
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"Bot returned error: {response.text}"
+            )
+            
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Error sending media to user {user_id}: {e}")
+        print(f"❌ Error send_media: {e}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
-    
-
 
     
 # ==============================

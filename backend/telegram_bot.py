@@ -929,12 +929,19 @@ def handle_photo_message(message):
         downloaded_file = bot.download_file(file_info.file_path)
         
         # Генерируем уникальное имя файла
+       # 1. Генерируем уникальное имя файла
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        file_extension = ".jpg"  # Telegram photos всегда в jpg
+        file_extension = ".jpg" 
         filename = f"photo_{timestamp}{file_extension}"
-        file_path = MEDIA_ROOT / str(user_id)
-
         
+        # 2. Формируем путь к папке (добавляем 'incoming' для документов клиента)
+        # Это создаст структуру: media/374897465/incoming/
+        user_media_dir = MEDIA_ROOT / str(user_id) / "incoming"
+        user_media_dir.mkdir(parents=True, exist_ok=True)
+        
+        # 3. !!! ИСПРАВЛЕНИЕ: Соединяем путь папки с ИМЕНЕМ ФАЙЛА !!!
+        file_path = user_media_dir / filename
+
         # Сохраняем файл
         with open(file_path, 'wb') as new_file:
             new_file.write(downloaded_file)
@@ -942,12 +949,11 @@ def handle_photo_message(message):
         # Логируем медиа сообщение
         media_info = {
             "type": "received_media",
-            "filename": safe_filename,
-            "content_type": file.content_type,
+            "filename": filename,  # исправлено
+            "content_type": "image/jpeg", # исправлено
             "file_size": file_path.stat().st_size,
             "timestamp": datetime.now().isoformat(),
-            "message": message,
-            "download_url": f"/api/crm/media/{user_id}/download/{safe_filename}"
+            "download_url": f"/api/crm/media/{user_id}/incoming/{filename}" # добавили incoming
         }
 
         
@@ -1003,7 +1009,6 @@ def handle_document_message(message):
     """Обработка входящих документов от пользователей"""
     try:
         user_id = message.from_user.id
-        chat_id = message.chat.id
         
         # Пропускаем админов
         if is_admin_user(user_id):
@@ -1017,93 +1022,81 @@ def handle_document_message(message):
         file_size = document.file_size
         mime_type = document.mime_type
         
-        # Проверяем тип файла (разрешаем только изображения и PDF)
+        # Проверяем тип файла
         allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
         if mime_type not in allowed_types:
-            bot.reply_to(message, "❌ Поддерживаются только изображения (JPG, PNG, WebP) и PDF файлы.")
+            bot.reply_to(message, "❌ Поддерживаются только изображения (JPG, PNG) и PDF.")
             return
+
+        # 1. Создаем правильную директорию (media/{user_id}/incoming)
+        user_incoming_dir = MEDIA_ROOT / str(user_id) / "incoming"
+        user_incoming_dir.mkdir(parents=True, exist_ok=True)
         
-
-
-
-        # Внутри функции:
-        media_dir = MEDIA_ROOT / str(user_id)
-        media_dir.mkdir(parents=True, exist_ok=True)
+        # 2. Генерируем безопасное имя
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe_name = re.sub(r'[^\w\-_.]', '_', file_name)
+        filename = f"doc_{timestamp}_{safe_name}"
+        
+        # 3. !!! ИСПРАВЛЕНИЕ: Полный путь к ФАЙЛУ !!!
+        file_path = user_incoming_dir / filename
         
         # Скачиваем файл
         file_info = bot.get_file(file_id)
         downloaded_file = bot.download_file(file_info.file_path)
         
-        # Генерируем безопасное имя файла
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        # Очищаем имя файла от небезопасных символов
-        safe_name = re.sub(r'[^\w\-_.]', '_', file_name)
-        filename = f"doc_{timestamp}_{safe_name}"
-        file_path = MEDIA_ROOT / str(user_id)
-
-        
         # Сохраняем файл
         with open(file_path, 'wb') as new_file:
             new_file.write(downloaded_file)
         
-        # Логируем медиа сообщение
+        # Подготовка данных для CRM/Бэкенда
+        # Используем .relative_to(BASE_DIR) осторожно (убедитесь, что BASE_DIR - родитель)
+        try:
+            relative_path = str(file_path.relative_to(BASE_DIR))
+        except ValueError:
+            relative_path = str(file_path)
+
         media_info = {
             "type": "document",
             "file_id": file_id,
             "file_name": file_name,
-            "file_path": str(file_path.relative_to(BASE_DIR)),
+            "file_path": relative_path,
             "file_size": file_size,
             "mime_type": mime_type,
             "filename": filename,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
+            "download_url": f"/api/crm/media/{user_id}/incoming/{filename}"
         }
         
-        # Обновляем статус диалога
+        # Дальнейшая логика (уведомления и логирование)
         handle_dialog_user_message(user_id, f"[Документ: {file_name}]")
-        
-        # Логируем в историю чата
         log_chat_to_file(user_id, "user", {
             "content": f"[Документ: {file_name}]",
             "media": media_info
         })
         
-        # Отправляем уведомление в группу активных диалогов
+        # Отправка в группу активных диалогов
         if ACTIVE_DIALOGS_CHAT_ID:
             user_data = tracker.get_user(user_id)
             username = user_data.get('username') if user_data else None
-            user_link = f"@{username}" if username else f'<a href="tg://user?id={user_id}">{user_id}</a>'
+            user_link = f"@{username}" if username else f'ID: {user_id}'
             
             safe_send_message(
                 ACTIVE_DIALOGS_CHAT_ID,
                 f"📄 <b>Документ от {user_link}</b>\n\n"
                 f"📎 Файл: {file_name}\n"
-                f"💾 Размер: {file_size:,} байт\n"
-                f"📁 Сохранено: {filename}",
+                f"📁 Путь: <code>incoming/{filename}</code>",
                 parse_mode="HTML"
             )
+
+        # Webhook на бэкенд
+        requests.post("http://localhost:5000/api/internal/receive-media", 
+                      json={"user_id": user_id, "media": media_info}, 
+                      timeout=5)
         
-        # Отправляем информацию о медиа на бэкенд
-        try:
-            webhook_data = {
-                "user_id": user_id,
-                "media": media_info,
-                "username": username,
-                "timestamp": datetime.now().isoformat()
-            }
-            
-            response = requests.post("http://localhost:5000/api/internal/receive-media", json=webhook_data, timeout=5)
-            if response.status_code == 200:
-                print(f"✅ Media info sent to backend for user {user_id}")
-            else:
-                print(f"⚠️ Backend returned status {response.status_code} for media info")
-        except Exception as webhook_error:
-            print(f"⚠️ Error sending media info to backend: {webhook_error}")
-        
-        print(f"✅ Документ сохранен: {file_path}")
+        print(f"✅ Документ успешно сохранен: {file_path}")
         
     except Exception as e:
         print(f"❌ Ошибка обработки документа: {e}")
-        import traceback
         traceback.print_exc()
 
 

@@ -2685,3 +2685,147 @@
 {"timestamp": "2026-02-04T01:33:39.044655", "user_id": 128064349, "action": "user_message_received", "message_length": 57, "message_type": "text", "username": "YULIANNAEVA", "media_info": null}
 {"timestamp": "2026-02-04T01:52:43.288878", "user_id": 782990455, "action": "message_received", "content": "Добрый день ! Интересует дата 7 марта на 10 дней , Пхукет патонг"}
 {"timestamp": "2026-02-04T01:52:43.298240", "user_id": 782990455, "action": "user_message_received", "message_length": 64, "message_type": "text", "username": "Oksanaa711", "media_info": null}
+{"timestamp": "2026-02-04T01:53:22.329993", "user_id": 782990455, "action": "message_received", "content": "Аренда машины"}
+{"timestamp": "2026-02-04T01:53:22.349500", "user_id": 782990455, "action": "user_message_received", "message_length": 13, "message_type": "text", "username": "Oksanaa711", "media_info": null}
+{"timestamp": "2026-02-04T02:03:32.184Z", "user_id": 782990455, "action": "manager_message_sent", "message_length": 52}
+{"timestamp": "2026-02-04T02:03:53.402583", "user_id": 782990455, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T02:04:08.811745", "user_id": 782990455, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T02:04:43.162534", "user_id": 782990455, "action": "note_added", "note": "С 7.03 -17.03 в поиске", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T02:05:08.630929", "user_id": 128064349, "action": "note_added", "note": "Не успел ответить. Взяла у других. С 25.02-09.03", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T02:05:26.840622", "user_id": 782990455, "action": "note_added", "note": "С 7.03 -17.03 (10 дней) в поиске", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T02:06:44.068056", "user_id": 128064349, "action": "note_added", "note": "Не успел ответить. Взяла у других. С 25.02-09.03(12 дней)", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T03:56:13.033Z", "user_id": 782990455, "action": "manager_message_sent", "message_length": 44}
+{"timestamp": "2026-02-04T03:58:05.896300", "user_id": 128064349, "action": "message_received", "content": "Норм\nЦена ?"}
+{"timestamp": "2026-02-04T03:58:05.903986", "user_id": 128064349, "action": "user_message_received", "message_length": 11, "message_type": "text", "username": "YULIANNAEVA", "media_info": null}
+{"timestamp": "2026-02-04T03:59:20.053Z", "user_id": 128064349, "action": "manager_message_sent", "message_length": 18}
+{"timestamp": "2026-02-04T03:59:57.978189", "user_id": 782990455, "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T04:00:24.400768", "user_id": 782990455, "action": "note_added", "note": "С 7.03 -17.03 (10 дней) . Мазда 2", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T04:00:33.768912", "user_id": 128064349, "action": "message_received", "content": "Бронирую"}
+{"timestamp": "2026-02-04T04:00:33.778051", "user_id": 128064349, "action": "user_message_received", "message_length": 8, "message_type": "text", "username": "YULIANNAEVA", "media_info": null}
+{"timestamp": "2026-02-04T04:03:21.701Z", "user_id": 128064349, "action": "manager_message_sent", "message_length": 77}
+{"timestamp": "2026-02-04T04:03:59.636619", "user_id": 128064349, "action": "note_added", "note": "С 25.02-09.03(12 дней). Жлу документы", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T04:06:19.480603", "user_id": 782990455, "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T05:12:52.779797", "user_id": 128064349, "action": "message_received", "content": "Отправлено"}
+{"timestamp": "2026-02-04T05:12:52.786510", "user_id": 128064349, "action": "user_message_received", "message_length": 10, "message_type": "text", "username": "YULIANNAEVA", "media_info": null}
+{"timestamp": "2026-02-04T05:55:49.065568", "user_id": 374897465, "action": "message_received", "content": "[Фотография]"}
+{"timestamp": "2026-02-04T05:55:49.199889", "user_id": 374897465, "action": "user_media_received", "media_type": "received_media", "file_size": 67325, "filename": "photo_20260204_055549.jpg", "username": null}
+{"timestamp": "2026-02-04T06:14:55.908474", "user_id": 374897465, "action": "message_received", "content": "[Фотография]"}
+{"timestamp": "2026-02-04T06:14:56.116346", "user_id": 374897465, "action": "user_media_received", "media_type": "received_media", "file_size": 186534, "filename": "photo_20260204_061455.jpg", "username": null}
+{"timestamp": "2026-02-04T06:48:45.958Z", "user_id": 374897465, "action": "manager_message_sent", "message_length": 7}
+{"timestamp": "2026-02-04T06:49:00.102851", "user_id": 374897465, "action": "message_received", "content": "Приветствую сер"}
+{"timestamp": "2026-02-04T06:49:00.110788", "user_id": 374897465, "action": "user_message_received", "message_length": 15, "message_type": "text", "username": "Marseloid", "media_info": null}
+{"timestamp": "2026-02-04T06:51:41.522552", "user_id": "374897465", "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T06:51:45.038599", "user_id": "374897465", "action": "marker_updated", "marker": null, "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T06:51:46.129431", "user_id": "374897465", "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T06:52:11.524080", "user_id": "374897465", "action": "note_added", "note": "Тест заявка", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T06:52:45.695055", "user_id": "374897465", "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T07:07:05.024149", "user_id": "128064349", "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T07:10:53.982Z", "user_id": "128064349", "action": "manager_message_sent", "message_length": 1}
+{"timestamp": "2026-02-04T07:11:30.507Z", "user_id": "128064349", "action": "manager_message_sent", "message_length": 8}
+{"timestamp": "2026-02-04T07:44:26.674792", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_074426_IMG-20260203-WA0036.jpg"}
+{"timestamp": "2026-02-04T08:12:01.470035", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_081200_IMG-20260203-WA0035.jpg"}
+{"timestamp": "2026-02-04T08:18:25.357460", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_081824_IMG-20260203-WA0036.jpg"}
+{"timestamp": "2026-02-04T08:19:46.027551", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_081944_1.jpeg"}
+{"timestamp": "2026-02-04T08:27:00.137959", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_082659_IMG-20260203-WA0036.jpg"}
+{"timestamp": "2026-02-04T08:27:26.598879", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_082726_1.jpeg"}
+{"timestamp": "2026-02-04T08:28:15.143463", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_082814_3.jpeg"}
+{"timestamp": "2026-02-04T08:36:30.476057", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_083629_IMG-20260203-WA0036.jpg"}
+{"timestamp": "2026-02-04T08:39:12.683625", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_083912_3.jpeg"}
+{"timestamp": "2026-02-04T08:51:57.940030", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_085157_IMG-20260203-WA0036.jpg"}
+{"timestamp": "2026-02-04T08:53:02.950520", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_085301_5.jpeg"}
+{"timestamp": "2026-02-04T08:58:56.918289", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_085856_3.jpeg"}
+{"timestamp": "2026-02-04T09:04:14.202674", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_090413_1.jpeg"}
+{"timestamp": "2026-02-04T09:09:25.911180", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_090925_IMG-20260203-WA0036.jpg"}
+{"timestamp": "2026-02-04T09:09:35.527Z", "user_id": "374897465", "action": "manager_message_sent", "message_length": 4}
+{"timestamp": "2026-02-04T09:13:55.579505", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_091355_IMG-20260203-WA0036.jpg"}
+{"timestamp": "2026-02-04T09:14:08.228Z", "user_id": "374897465", "action": "manager_message_sent", "message_length": 4}
+{"timestamp": "2026-02-04T09:14:40.725Z", "user_id": "374897465", "action": "manager_message_sent", "message_length": 7}
+{"timestamp": "2026-02-04T09:14:56.452634", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_091456_IMG-20260203-WA0035.jpg"}
+{"timestamp": "2026-02-04T09:50:39.156517", "user_id": "web_session_ml7egnzi_olfru4g4l_4nv37f", "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T09:51:14.770Z", "user_id": "374897465", "action": "manager_message_sent", "message_length": 4}
+{"timestamp": "2026-02-04T09:51:29.853473", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260204_095129_IMG-20260203-WA0036.jpg"}
+{"timestamp": "2026-02-04T09:53:40.274704", "user_id": 374897465, "action": "message_received", "content": "Какешно!"}
+{"timestamp": "2026-02-04T09:53:40.281484", "user_id": 374897465, "action": "user_message_received", "message_length": 8, "message_type": "text", "username": "Marseloid", "media_info": null}
+{"timestamp": "2026-02-04T09:56:10.147860", "user_id": 374897465, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T09:59:30.034Z", "user_id": "719766623", "action": "manager_message_sent", "message_length": 11}
+{"timestamp": "2026-02-04T10:00:06.581580", "user_id": 719766623, "action": "message_received", "content": "Добрый день"}
+{"timestamp": "2026-02-04T10:00:06.660495", "user_id": 719766623, "action": "user_message_received", "message_length": 11, "message_type": "text", "username": "Mudriy_KA", "media_info": null}
+{"timestamp": "2026-02-04T10:01:09.975Z", "user_id": "719766623", "action": "manager_message_sent", "message_length": 43}
+{"timestamp": "2026-02-04T10:04:00.653723", "user_id": "719766623", "action": "status_changed", "old_status": "new", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T10:08:34.774Z", "user_id": "317984902", "action": "manager_message_sent", "message_length": 43}
+{"timestamp": "2026-02-04T10:08:53.317675", "user_id": "311272681", "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T10:26:26.309Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 41}
+{"timestamp": "2026-02-04T10:26:32.821Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 5}
+{"timestamp": "2026-02-04T10:27:12.874245", "user_id": "1952540", "action": "manager_media_sent", "filename": "sent_20260204_102712_IMG-20260203-WA0021.jpg"}
+{"timestamp": "2026-02-04T10:27:23.793Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 10}
+{"timestamp": "2026-02-04T10:35:44.548927", "user_id": "128064349", "action": "note_added", "note": "Успех", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T10:36:02.811756", "user_id": "1223324329", "action": "note_added", "note": "Успех", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T10:36:26.472463", "user_id": "370125988", "action": "note_added", "note": "Успех", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T10:36:51.693164", "user_id": "733338401", "action": "marker_updated", "marker": "rejected", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T10:37:58.650872", "user_id": 1952540, "action": "message_received", "content": "Да, нужна аренда машины с 08.02 по 08.03. С доставкой в район Раваи"}
+{"timestamp": "2026-02-04T10:37:58.657878", "user_id": 1952540, "action": "user_message_received", "message_length": 67, "message_type": "text", "username": "debrieff", "media_info": null}
+{"timestamp": "2026-02-04T10:38:41.719208", "user_id": 1952540, "action": "message_received", "content": "Это же Ярис, да? Коробка автомат? Какого она года?"}
+{"timestamp": "2026-02-04T10:38:41.731901", "user_id": 1952540, "action": "user_message_received", "message_length": 50, "message_type": "text", "username": "debrieff", "media_info": null}
+{"timestamp": "2026-02-04T10:39:03.012Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 12}
+{"timestamp": "2026-02-04T10:39:14.568087", "user_id": 1952540, "action": "message_received", "content": "Какие условия по залогу? Оформляете ли договор?"}
+{"timestamp": "2026-02-04T10:39:14.573635", "user_id": 1952540, "action": "user_message_received", "message_length": 47, "message_type": "text", "username": "debrieff", "media_info": null}
+{"timestamp": "2026-02-04T10:39:28.645Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 12}
+{"timestamp": "2026-02-04T10:39:37.868Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 19}
+{"timestamp": "2026-02-04T10:39:49.559Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 27}
+{"timestamp": "2026-02-04T10:41:02.343578", "user_id": 1952540, "action": "message_received", "content": "А сколько доставка в район аэропорта? Тоже 750 или подороже?"}
+{"timestamp": "2026-02-04T10:41:02.350330", "user_id": 1952540, "action": "user_message_received", "message_length": 60, "message_type": "text", "username": "debrieff", "media_info": null}
+{"timestamp": "2026-02-04T10:42:40.919Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 125}
+{"timestamp": "2026-02-04T10:43:58.361Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 68}
+{"timestamp": "2026-02-04T10:44:23.914524", "user_id": "1952540", "action": "manager_media_sent", "filename": "sent_20260204_104419_IMG-20260203-WA0026.jpg"}
+{"timestamp": "2026-02-04T10:44:49.459490", "user_id": "1952540", "action": "manager_media_sent", "filename": "sent_20260204_104448_IMG-20260203-WA0025.jpg"}
+{"timestamp": "2026-02-04T10:48:06.773615", "user_id": "961082502", "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T10:49:13.418348", "user_id": "255502880", "action": "status_changed", "old_status": "new", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T10:51:53.481297", "user_id": "1886091146", "action": "status_changed", "old_status": "new", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T10:52:47.362828", "user_id": "5633881656", "action": "manager_media_sent", "filename": "sent_20260204_105246_IMG-20250130-WA0029.jpg"}
+{"timestamp": "2026-02-04T10:53:48.938635", "user_id": "1952540", "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T10:53:51.517506", "user_id": "1952540", "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T10:54:04.454823", "user_id": "1952540", "action": "note_added", "note": "Предложил ярис 14000 мечяц", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T10:58:24.872492", "user_id": 374897465, "action": "message_received", "content": "[Фотография]"}
+{"timestamp": "2026-02-04T10:58:25.058040", "user_id": 374897465, "action": "user_media_received", "media_type": "received_media", "file_size": 239703, "filename": "photo_20260204_105824.jpg", "username": null}
+{"timestamp": "2026-02-04T11:07:32.498541", "user_id": 1952540, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T11:08:15.552794", "user_id": 1952540, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T11:15:54.051560", "user_id": 374897465, "action": "message_received", "content": "[Фотография]"}
+{"timestamp": "2026-02-04T11:15:54.179962", "user_id": 374897465, "action": "user_media_received", "media_type": "received_media", "file_size": 99651, "filename": "photo_20260204_111554.jpg", "username": null}
+{"timestamp": "2026-02-04T11:34:14.547326", "user_id": 1952540, "action": "message_received", "content": "Забыл уточнить, а с какой страховкой идет авто? Коммерческая или приватная?"}
+{"timestamp": "2026-02-04T11:34:14.552912", "user_id": 1952540, "action": "user_message_received", "message_length": 75, "message_type": "text", "username": "debrieff", "media_info": null}
+{"timestamp": "2026-02-04T11:47:13.567Z", "user_id": 1952540, "action": "manager_message_sent", "message_length": 141}
+{"timestamp": "2026-02-04T11:48:56.332357", "user_id": "1952540", "action": "manager_media_sent", "filename": "sent_20260204_114855_IMG-20260203-WA0031.jpg"}
+{"timestamp": "2026-02-04T11:49:07.119Z", "user_id": 1952540, "action": "manager_message_sent", "message_length": 6}
+{"timestamp": "2026-02-04T11:50:21.429Z", "user_id": 1952540, "action": "manager_message_sent", "message_length": 16}
+{"timestamp": "2026-02-04T11:51:08.011409", "user_id": 1952540, "action": "marker_updated", "marker": "in_progress", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T11:51:09.892593", "user_id": 1952540, "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T11:51:29.773936", "user_id": 1952540, "action": "note_added", "note": "08.03 на месяц", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T13:16:11.927579", "user_id": 1952540, "action": "message_received", "content": "Давайте остановлюсь на белом Ярисе 2022 года за 14,000 бат. Для меня его достаточно. Хочу его забронировать"}
+{"timestamp": "2026-02-04T13:16:11.935584", "user_id": 1952540, "action": "user_message_received", "message_length": 107, "message_type": "text", "username": "debrieff", "media_info": null}
+{"timestamp": "2026-02-04T13:17:11.805584", "user_id": 1952540, "action": "message_received", "content": "С подачей в район аэропорта (отель рядом с аэропортом)"}
+{"timestamp": "2026-02-04T13:17:11.819207", "user_id": 1952540, "action": "user_message_received", "message_length": 54, "message_type": "text", "username": "debrieff", "media_info": null}
+{"timestamp": "2026-02-04T13:17:21.158Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 84}
+{"timestamp": "2026-02-04T13:17:38.555Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 25}
+{"timestamp": "2026-02-04T13:18:00.204891", "user_id": 1952540, "action": "message_received", "content": "Ок, сейчас пришлю"}
+{"timestamp": "2026-02-04T13:18:00.262428", "user_id": 1952540, "action": "user_message_received", "message_length": 17, "message_type": "text", "username": "debrieff", "media_info": null}
+{"timestamp": "2026-02-04T13:17:59.554Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 50}
+{"timestamp": "2026-02-04T13:19:06.014588", "user_id": 1952540, "action": "message_received", "content": "Счета в тайском банке у меня нет, перевести баты я вам не смогу)"}
+{"timestamp": "2026-02-04T13:19:06.021357", "user_id": 1952540, "action": "user_message_received", "message_length": 64, "message_type": "text", "username": "debrieff", "media_info": null}
+{"timestamp": "2026-02-04T13:20:17.257Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 164}
+{"timestamp": "2026-02-04T13:21:20.988671", "user_id": 1952540, "action": "message_received", "content": "Только дата 08.02 - 08.03, с 8 февраля по 8 марта"}
+{"timestamp": "2026-02-04T13:21:20.996175", "user_id": 1952540, "action": "user_message_received", "message_length": 49, "message_type": "text", "username": "debrieff", "media_info": null}
+{"timestamp": "2026-02-04T13:21:17.118Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 45}
+{"timestamp": "2026-02-04T13:21:33.741Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 14}
+{"timestamp": "2026-02-04T13:22:37.058Z", "user_id": "1952540", "action": "manager_message_sent", "message_length": 54}
+{"timestamp": "2026-02-04T13:54:17.486065", "user_id": 1952540, "action": "message_received", "content": "[Фотография]"}
+{"timestamp": "2026-02-04T13:54:17.579328", "user_id": 1952540, "action": "message_received", "content": "[Фотография]"}
+{"timestamp": "2026-02-04T13:54:17.627568", "user_id": 1952540, "action": "user_media_received", "media_type": "received_media", "file_size": 140777, "filename": "photo_20260204_135417.jpg", "username": null}
+{"timestamp": "2026-02-04T13:54:17.721036", "user_id": 1952540, "action": "user_media_received", "media_type": "received_media", "file_size": 224387, "filename": "photo_20260204_135417.jpg", "username": null}
+{"timestamp": "2026-02-04T14:04:38.690663", "user_id": 1952540, "action": "message_received", "content": "[Фотография]"}
+{"timestamp": "2026-02-04T14:04:38.847171", "user_id": 1952540, "action": "user_media_received", "media_type": "received_media", "file_size": 140777, "filename": "photo_20260204_140438.jpg", "username": null}
+{"timestamp": "2026-02-04T14:16:01.006590", "user_id": 1952540, "action": "message_received", "content": "[Фотография]"}
+{"timestamp": "2026-02-04T14:16:01.166869", "user_id": 1952540, "action": "user_media_received", "media_type": "received_media", "file_size": 53654, "filename": "photo_20260204_141600.jpg", "username": null}
+{"timestamp": "2026-02-04T14:19:41.381295", "user_id": "1952540", "action": "marker_updated", "marker": "ready", "changed_by": "6451825371"}
+{"timestamp": "2026-02-04T14:20:16.264669", "user_id": "1952540", "action": "note_added", "note": "Toyota Ativ 2025 (08.02-08.03)", "added_by": "6451825371"}
+{"timestamp": "2026-02-04T15:21:26.814641", "user_id": "web_session_ml86dodi_fo0kxnpha_7sipcx", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-02-04T15:21:30.893953", "user_id": "web_session_ml86dt1u_fpqfi3qpw_z2zvm8", "action": "dialog_started", "initiated_by": "user", "username": null}

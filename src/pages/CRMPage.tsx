@@ -17,7 +17,7 @@ import {
   Calendar, Car, StickyNote , MessageSquare, Plus, Pencil, Trash2, Phone,
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus,UserRoundMinus,UserRoundCheck,
   Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
-  CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText
+  CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { MarkerType } from '@/types/crm';
@@ -111,6 +111,58 @@ const CRMPage: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+
+  // User Documents from Media Files
+  const userDocuments = React.useMemo(() => {
+    if (!chats || chats.length === 0) return [];
+    
+    const documents = [];
+    
+    for (const msg of chats) {
+      if (!msg || msg.role !== 'user') continue;
+      
+      // Check both possible media locations: msg.content.media and msg.media
+      const media = msg?.content?.media || msg?.media;
+      
+      if (media && typeof media === 'object') {
+        // Build correct download URL for incoming files
+        const filename = media.filename || media.file_name || media.original_filename || 'unknown';
+        const downloadUrl = `/api/crm/media/${selectedUser?.user_id}/download/${encodeURIComponent(filename)}`;
+        
+        documents.push({
+          ...media,
+          download_url: downloadUrl,
+          filename: filename, // Ensure filename is preserved
+          message_timestamp: msg.timestamp
+        });
+        
+        // Debug logging for first few documents
+        if (documents.length <= 3) {
+          console.log(`📁 [DEBUG] Document ${documents.length}:`, {
+            originalFilename: filename,
+            encodedFilename: encodeURIComponent(filename),
+            downloadUrl: downloadUrl,
+            contentType: media.content_type,
+            mediaKeys: Object.keys(media)
+          });
+        }
+      }
+    }
+    
+    console.log("📁 [DEBUG] Extracted user documents:", {
+      totalChats: chats.length,
+      userMessages: chats.filter(m => m.role === 'user').length,
+      documentsFound: documents.length,
+      sampleDoc: documents[0] ? {
+        filename: documents[0].filename,
+        contentType: documents[0].content_type,
+        hasDownloadUrl: !!documents[0].download_url,
+        downloadUrl: documents[0].download_url
+      } : null
+    });
+    
+    return documents;
+  }, [chats, selectedUser?.user_id]);
 
   const formatDateSimple = (dateStr: string) => {
     if (!dateStr) return '—';
@@ -206,32 +258,62 @@ const fetchChatHistory = async (userId: number, silent: boolean = false) => {
   }
 };
 const loadUserDetails = async (user: any) => {
+  console.log("🔍 [DEBUG] loadUserDetails called for user:", user.user_id);
   setSelectedUser(user);
   setIsDetailsOpen(true);
   setChats([]); // Сбрасываем старый чат
   setBookings([]);
   
   try {
-    const [cRes, bRes] = await Promise.all([
-      fetch(`/api/crm/chats/${user.user_id}`),
-      fetch(`/api/crm/bookings/${user.user_id}`)
-    ]);
+    console.log("📡 [DEBUG] Loading critical data first (bookings)");
     
-    const cData = await cRes.json();
+    // Load critical data first (bookings), then chat data
+    const bRes = await fetch(`/api/crm/bookings/${user.user_id}`);
     const bData = await bRes.json();
-
-    if (cData.status === 'ok' && cData.chats) {
-      // ФИЛЬТР: оставляем только те объекты, которые не null и имеют текст
-      const validChats = cData.chats.filter(msg => msg !== null && (msg.content || msg.text));
-      setChats(validChats);
-    }
+    
+    console.log("📅 [DEBUG] Bookings API response:", {
+      status: bData.status,
+      bookingsCount: bData.bookings?.length || 0
+    });
     
     if (bData.status === 'ok') setBookings(bData.bookings);
     
+    // Load chat data with performance optimization
+    console.log("💬 [DEBUG] Loading chat data with optimization");
+    const cRes = await fetch(`/api/crm/chats/${user.user_id}`);
+    const cData = await cRes.json();
+    
+    console.log("📊 [DEBUG] Chat API response:", {
+      status: cData.status,
+      chatsCount: cData.chats?.length || 0,
+      sampleChat: cData.chats?.[0] ? {
+        role: cData.chats[0].role,
+        hasContent: !!cData.chats[0].content,
+        hasMedia: !!cData.chats[0]?.content?.media,
+        mediaType: cData.chats[0]?.content?.media?.type,
+        mediaStructure: cData.chats[0]?.content?.media ? Object.keys(cData.chats[0].content.media) : null
+      } : null
+    });
+
+    if (cData.status === 'ok' && cData.chats) {
+      // Enhanced filtering for better performance
+      const validChats = cData.chats
+        .filter(msg => msg !== null && (msg.content || msg.text || msg.media))
+        .slice(-100); // Limit to last 100 messages for performance
+      
+      console.log("💬 [DEBUG] Filtered chats:", {
+        originalCount: cData.chats.length,
+        filteredCount: validChats.length,
+        limitedToRecent: validChats.length === 100,
+        mediaMessages: validChats.filter(msg => msg?.content?.media || msg?.media).length
+      });
+      setChats(validChats);
+    }
+    
     await fetchClaudeStatus(user.user_id);
     setTimeout(scrollToBottom, 100);
-  } catch (e) { 
-    console.error("Ошибка деталей:", e); 
+  } catch (e) {
+    console.error("❌ [ERROR] Ошибка деталей:", e);
   }
 };
 
@@ -925,10 +1007,10 @@ const handleUpdateNote = async () => {
         </div>
       </div>
         <div className="flex flex-col items-end leading-none shrink-0 opacity-80">
-          <span className="text-[7px] font-mono italic">
-            {/* Проверяем: если ID — строка, пишем Web Browser, если нет — выводим сам ID */}
-            ID:{typeof user.user_id === 'string' ? "Web Browser" : user.user_id}
-          </span>
+<span className="text-[7px] font-mono italic">
+  {/* Проверяем наличие префикса web_session вместо типа данных */}
+  ID: {String(user.user_id).startsWith('web_session') ? "Web Browser" : user.user_id}
+</span>
           <span className="text-[7px] font-mono tracking-tighter">
             {dayjs(user.created_at).format('DD.MM.YY')}
           </span>
@@ -1317,6 +1399,94 @@ const handleUpdateNote = async () => {
             <p className="text-[10px] font-black text-slate-300 uppercase italic tracking-widest">Заявок пока нет</p>
           </div>
         )}
+
+        {/* Documents from User */}
+        <div className="space-y-4">
+          <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
+            <Paperclip size={14} className="text-purple-500" />
+            Документы клиента ({userDocuments?.length || 0})
+          </h3>
+          
+          {userDocuments && userDocuments.length > 0 ? (
+            <div className="grid grid-cols-2 gap-3">
+              {userDocuments.map((doc, index) => (
+                <Card key={index} className="border-none bg-slate-50/50 shadow-none ring-1 ring-slate-100 overflow-hidden hover:ring-purple-200 transition-all">
+                  <CardContent className="p-3">
+                    {doc.content_type?.startsWith('image/') ? (
+                      // Image preview with download
+                      <div className="space-y-2">
+                        <img
+                          src={doc.download_url}
+                          alt={doc.filename || doc.file_name || doc.original_filename || 'image'}
+                          className="w-full h-24 object-cover rounded cursor-pointer"
+                          onClick={() => window.open(doc.download_url, '_blank')}
+                        />
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-medium truncate flex-1">
+                            {doc.filename || doc.file_name || doc.original_filename || 'image'}
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              const filename = doc.filename || doc.file_name || doc.original_filename || 'image';
+                              const downloadUrl = doc.download_url;
+                              
+                              console.log("📥 [DEBUG] Download attempt:", {
+                                originalFilename: filename,
+                                downloadUrl: downloadUrl,
+                                contentType: doc.content_type
+                              });
+                              
+                              const link = document.createElement('a');
+                              link.href = downloadUrl;
+                              link.download = filename;
+                              link.click();
+                              
+                              console.log("✅ [DEBUG] Download triggered for:", filename);
+                            }}
+                            className="h-6 w-6 p-0"
+                          >
+                            <Download size={12} />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      // Document with download
+                      <div className="flex items-center gap-2 p-2 bg-slate-100 rounded">
+                        <FileText className="w-5 h-5 text-slate-600 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-medium truncate">
+                            {doc.filename || doc.file_name || doc.original_filename || 'document'}
+                          </div>
+                          <div className="text-xs text-slate-500">{doc.content_type}</div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            const link = document.createElement('a');
+                            link.href = doc.download_url;
+                            link.download = doc.filename || doc.file_name || doc.original_filename || 'document';
+                            link.click();
+                          }}
+                          className="h-6 w-6 p-0"
+                        >
+                          <Download size={12} />
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/30">
+              <FileText className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-[10px] font-black text-slate-300 uppercase italic tracking-widest">Документов пока нет</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   </ScrollArea>
@@ -1328,7 +1498,22 @@ const handleUpdateNote = async () => {
  <ScrollArea className="flex-1 p-2">
   <div className="max-w-2xl mx-auto space-y-3 pb-4">
     {chats.map((msg, i) => {
-      const media = msg?.content?.media;
+      // Check both possible media locations: msg.content.media and msg.media
+      const media = msg?.content?.media || msg?.media;
+      
+      // Debug logging for media processing
+      if (i < 3) { // Only log first 3 messages to avoid spam
+        console.log(`📸 [DEBUG] Chat message ${i} media analysis:`, {
+          role: msg.role,
+          hasContent: !!msg.content,
+          hasMedia: !!media,
+          mediaType: media?.type,
+          hasDownloadUrl: !!media?.download_url,
+          contentType: media?.content_type,
+          filename: media?.filename || media?.file_name || media?.original_filename,
+          messageText: msg?.text || (typeof msg?.content === 'string' ? msg.content.substring(0, 50) : null)
+        });
+      }
 
       return (
         <div
@@ -1343,64 +1528,83 @@ const handleUpdateNote = async () => {
             }`}
           >
             {/* ===== MEDIA MESSAGE ===== */}
-            {media?.type === 'sent_media' && media.download_url ? (
+            {media && (media.download_url || media.filename || media.file_name) ? (
               <div className="space-y-2">
-
-                {/* IMAGE */}
-                {media.content_type?.startsWith('image/') ? (
-                  <div className="space-y-2">
-                    <img
-                      src={media.download_url}
-                      alt={media.original_filename || 'image'}
-                      className="max-w-xs rounded cursor-pointer border"
-                      onClick={() => window.open(media.download_url, '_blank')}
-                    />
-                    {media.message && (
-                      <p className="text-[10px] text-slate-100">{media.message}</p>
-                    )}
-                  </div>
-                ) : (
-                  /* DOCUMENT */
-                  <div className="space-y-2">
-                    <div
-                      className="flex items-center gap-2 p-2 bg-slate-100 rounded-lg cursor-pointer hover:bg-slate-200 transition"
-                      onClick={() => window.open(media.download_url, '_blank')}
-                    >
-                      <div className="w-8 h-8 bg-red-100 rounded flex items-center justify-center">
-                        <span className="text-[8px] font-bold text-red-600">
-                          {media.content_type === 'application/pdf' ? 'PDF' : 'FILE'}
-                        </span>
+                {/* Build download URL if not provided */}
+                {(() => {
+                  const filename = media.filename || media.file_name || media.original_filename || 'unknown';
+                  const downloadUrl = media.download_url || `/api/crm/media/${selectedUser?.user_id}/download/${encodeURIComponent(filename)}`;
+                  
+                  // IMAGE
+                  if (media.content_type?.startsWith('image/')) {
+                    return (
+                      <div className="space-y-2">
+                        <img
+                          src={downloadUrl}
+                          alt={media.original_filename || media.filename || 'image'}
+                          className="max-w-xs rounded cursor-pointer border"
+                          onClick={() => window.open(downloadUrl, '_blank')}
+                        />
+                        {media.message && (
+                          <p className="text-[10px] text-slate-100">{media.message}</p>
+                        )}
                       </div>
-
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[9px] font-bold text-slate-700 truncate">
-                          {media.original_filename || media.filename || 'Document'}
-                        </p>
-                        <p className="text-[7px] text-slate-500">Click to download</p>
-                      </div>
-
-                      <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
-                        <svg
-                          className="w-3 h-3"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                    );
+                  }
+                  // DOCUMENT
+                  else {
+                    return (
+                      <div className="space-y-2">
+                        <div
+                          className="flex items-center gap-2 p-2 bg-slate-100 rounded-lg cursor-pointer hover:bg-slate-200 transition"
+                          onClick={() => window.open(downloadUrl, '_blank')}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                          />
-                        </svg>
-                      </Button>
-                    </div>
+                          <div className="w-8 h-8 bg-red-100 rounded flex items-center justify-center">
+                            <span className="text-[8px] font-bold text-red-600">
+                              {media.content_type === 'application/pdf' ? 'PDF' : 'FILE'}
+                            </span>
+                          </div>
 
-                    {media.message && (
-                      <p className="text-[10px] text-slate-100">{media.message}</p>
-                    )}
-                  </div>
-                )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[9px] font-bold text-slate-700 truncate">
+                              {media.original_filename || media.filename || media.file_name || 'Document'}
+                            </p>
+                            <p className="text-[7px] text-slate-500">Click to download</p>
+                          </div>
+
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const filename = media.original_filename || media.filename || media.file_name || 'document';
+                              
+                              console.log("💾 [DEBUG] Chat media download:", {
+                                downloadUrl: downloadUrl,
+                                filename: filename,
+                                contentType: media.content_type
+                              });
+                              
+                              const link = document.createElement('a');
+                              link.href = downloadUrl;
+                              link.download = filename;
+                              link.click();
+                              
+                              console.log("✅ [DEBUG] Chat download triggered for:", filename);
+                            }}
+                          >
+                            <Download size={12} />
+                          </Button>
+                        </div>
+
+                        {media.message && (
+                          <p className="text-[10px] text-slate-100">{media.message}</p>
+                        )}
+                      </div>
+                    );
+                  }
+                })()}
               </div>
             ) : (
               /* ===== TEXT MESSAGE ===== */

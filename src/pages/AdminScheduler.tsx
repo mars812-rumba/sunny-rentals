@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { SchedulerCalendar } from '@/components/admin/SchedulerCalendar';
 import { MonthCalendarView } from '@/components/admin/MonthCalendarView';
-import { BookingFormModal } from '@/components/admin/BookingFormModal';
+import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 import { DayDetailsModal } from '@/components/admin/DayDetailsModal';
 import { fetchCars, fetchBookings, fetchCarOwners, Car, Booking, fetchBookingsLogistics  } from '@/api/api.ts';
 
@@ -266,10 +266,9 @@ export default function AdminScheduler() {
             )}
       </main>
 
-      <BookingFormModal
+      <BookingFormDialog
         isOpen={isModalOpen}
         onClose={handleModalClose}
-        car={selectedCar}
         booking={selectedBooking}
         initialDateRange={initialDateRange}
         onSuccess={handleBookingSuccess}
