@@ -31,10 +31,10 @@ export default function AdminScheduler() {
   const [carOwnersMap, setCarOwnersMap] = useState<Record<string, string>>({});
   const [isCompactMode, setIsCompactMode] = useState(false);
 
-  const { data: logisticsData = [], isLoading: logisticsLoading } = useQuery({
-      queryKey: ['admin-logistics'],
-      queryFn: fetchBookingsLogistics,
-    });
+  const { data: logisticsData = [], isLoading: logisticsLoading, refetch: refetchLogistics } = useQuery({
+    queryKey: ['admin-logistics'],
+    queryFn: fetchBookingsLogistics,
+  });
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
@@ -75,17 +75,19 @@ export default function AdminScheduler() {
     return car?.class === selectedClass;
   });
 
-
-  const handleBookingClick = (booking: Booking) => {
-    const car = cars.find(c => c.id === booking.form_data.car.id);
-    if (car) {
-      setSelectedCar(car);
-      setSelectedBooking(booking);
-      setIsModalOpen(true);
-    }
-  };
-
-
+const handleBookingClick = (booking: Booking) => {
+  // Ищем машину в парке
+  const car = cars.find(c => c.id === booking.form_data.car.id);
+  
+  // Устанавливаем машину (если нашли) или null (если ручной ввод)
+  setSelectedCar(car || null);
+  
+  // Устанавливаем саму бронь
+  setSelectedBooking(booking);
+  
+  // ОТКРЫВАЕМ модалку в любом случае
+  setIsModalOpen(true);
+};
 
   const handleCreateBooking = (carId: string, dateRange: { start: Date; end: Date }) => {
     const now = Date.now();
@@ -103,6 +105,13 @@ export default function AdminScheduler() {
     } else {
       setLastTap({ id: tapId, timestamp: now });
     }
+  };
+
+  const handleMonthCreateBooking = (dateRange: { start: Date; end: Date }) => {
+    setSelectedCar(null);
+    setSelectedBooking(null);
+    setInitialDateRange(dateRange);
+    setIsModalOpen(true);
   };
 
   const handleDayClick = (date: Date, events: any[]) => {
@@ -142,6 +151,7 @@ export default function AdminScheduler() {
   const handleBookingSuccess = () => {
     refetchBookings();
     refetchCars();
+    refetchLogistics(); // Обновляем logistics после любого изменения
   };
 
   useEffect(() => {
@@ -154,13 +164,13 @@ export default function AdminScheduler() {
     return () => window.removeEventListener('resize', updateDaysToShow);
   }, []);
 
- const isLoading = carsLoading || bookingsLoading || logisticsLoading;
+  const isLoading = carsLoading || bookingsLoading || logisticsLoading;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="w-full min-h-screen bg-gray-50">
       {/* Header - НЕПРОЗРАЧНЫЙ с тенью */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-3 py-2 shadow-md">
-        <div className="flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-4 py-2 shadow-md">
+        <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-blue-600" />
             <span className="text-sm font-semibold text-gray-900">Календарь</span>
@@ -236,7 +246,7 @@ export default function AdminScheduler() {
         </div>
       </div>
 
-      <main className="p-0">
+      <main className="w-full p-0">
         {isLoading ? (
           <div className="flex items-center justify-center h-[80vh]">
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent" />
@@ -245,28 +255,30 @@ export default function AdminScheduler() {
           <MonthCalendarView
             currentDate={currentDate}
             bookings={filteredBookings}
-            logisticsData={logisticsData} // ТЕПЕРЬ ОНИ ПЕРЕДАЮТСЯ!  
+            logisticsData={logisticsData}
             onDateChange={setCurrentDate}
             onBookingClick={handleBookingClick}
             onDayClick={handleDayClick}
+            onCreateBooking={handleMonthCreateBooking}
           />
         ) : (
           <SchedulerCalendar
-                cars={filteredCars}
-                bookings={bookings}
-                startDate={startDate}
-                daysToShow={daysToShow}
-                onDateChange={setStartDate}
-                onBookingClick={handleBookingClick}
-                onCreateBooking={handleCreateBooking}
-                selectedClass={selectedClass}
-                carOwnersMap={carOwnersMap}
-                isCompactMode={isCompactMode}
-              />
-            )}
+            cars={filteredCars}
+            bookings={bookings}
+            startDate={startDate}
+            daysToShow={daysToShow}
+            onDateChange={setStartDate}
+            onBookingClick={handleBookingClick}
+            onCreateBooking={handleCreateBooking}
+            selectedClass={selectedClass}
+            carOwnersMap={carOwnersMap}
+            isCompactMode={isCompactMode}
+          />
+        )}
       </main>
 
       <BookingFormDialog
+        key={selectedBooking?.booking_id || 'new'}
         isOpen={isModalOpen}
         onClose={handleModalClose}
         booking={selectedBooking}

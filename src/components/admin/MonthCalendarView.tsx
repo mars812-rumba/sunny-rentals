@@ -26,6 +26,7 @@ interface MonthCalendarViewProps {
   onDateChange: (date: Date) => void;
   onBookingClick: (booking: Booking) => void;
   onDayClick?: (date: Date, events: DayEvent[]) => void;
+  onCreateBooking?: (dateRange: { start: Date; end: Date }) => void;
 }
 
 const getMonthLetters = (date: Date) => {
@@ -37,11 +38,13 @@ const getMonthLetters = (date: Date) => {
 const MonthGrid = memo(({ 
   date, 
   eventsByDay, 
-  onDayClick 
+  onDayClick,
+  onBadgeClick
 }: { 
   date: Date, 
   eventsByDay: Map<string, DayEvent[]>,
-  onDayClick: (date: Date, events: DayEvent[]) => void 
+  onDayClick: (date: Date, events: DayEvent[]) => void,
+  onBadgeClick: (event: DayEvent, e: React.MouseEvent) => void
 }) => {
   const days = useMemo(() => {
     const monthStart = startOfMonth(date);
@@ -60,7 +63,7 @@ const MonthGrid = memo(({
   for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
 
   return (
-    <div className="flex-[0_0_100%] min-w-0 relative">
+    <div className="flex-[0_0_100%] w-full relative">
       {/* ФОНОВАЯ ПОДЛОЖКА */}
       <div className="absolute inset-0 pointer-events-none select-none flex flex-col">
         <div className="h-[100px]" />
@@ -88,7 +91,7 @@ const MonthGrid = memo(({
                   key={dayKey}
                   className={cn(
                     "min-h-[100px] p-1.5 transition-colors cursor-pointer group bg-transparent",
-                    !isCurrentMonth ? "opacity-20" : "hover:bg-blue-50/10"
+                    !isCurrentMonth ? "opacity-60" : "hover:bg-blue-60/50"
                   )}
                   onClick={() => onDayClick(day, events)}
                 >
@@ -99,34 +102,36 @@ const MonthGrid = memo(({
                     )}>
                       {format(day, 'd')}
                     </span>
-                  </div>
+                  </div> 
 
-                  <div className="space-y-0.5 overflow-hidden font-sans">
-                    {events.slice(0, 5).map((ev, idx) => {
-                      const showTime = ev.time && ev.time !== "00:00" && ev.time !== "04:00" ;
-                      return (
-                        <div 
-                          key={idx}
-                          className={cn(
-                            "px-1 py-0.5 rounded-[4px] text-[7px] font-bold truncate border shadow-sm flex justify-between items-center gap-1",
-                            ev.type === 'pickup' 
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
-                              : "bg-amber-50 text-amber-700 border-amber-100"
-                          )}
-                        >
-                          <span className="truncate flex-1 uppercase tracking-tighter">
-                            {ev.carName}
-                          </span>
-                          {showTime && (
-                            <span className="opacity-60 text-[6px] font-medium flex-shrink-0">
-                              {ev.time}
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })}
+ <div className="space-y-0.5 overflow-hidden font-sans">
+  {events.slice(0, 5).map((ev, idx) => {
+    return (
+      <div 
+        key={idx}
+        className={cn(
+          // Добавляем w-full, чтобы плашка тянулась на всю ширину ячейки
+          "w-full px-1 py-0.5 rounded-[4px] text-[7px] font-bold border shadow-sm cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all",
+          ev.type === 'pickup' 
+            ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
+            : "bg-amber-50 text-amber-700 border-amber-100"
+        )}
+        onClick={(e) => {
+          e.stopPropagation();
+          onBadgeClick(ev, e);
+        }}
+      >
+        {/* min-w-0 обязателен внутри flex, чтобы truncate понимал границы */}
+        <div className="flex items-center w-full gap-0.5">
+          <span className="truncate flex-1 tracking-tighter">
+            {ev.carName}
+          </span>
+        </div>
+      </div>
+    );
+  })}
                     {events.length > 5 && (
-                      <div className="text-[7px] text-slate-400 font-bold pl-1 uppercase tracking-tighter">
+                      <div className="text-[7px] text-slate-400 font-bold pl-1 tracking-tighter">
                         + ещё {events.length - 5}
                       </div>
                     )}
@@ -148,6 +153,7 @@ export function MonthCalendarView({
   onDateChange,
   onBookingClick,
   onDayClick,
+  onCreateBooking,
 }: MonthCalendarViewProps) {
   
   const [selectedDayData, setSelectedDayData] = useState<{
@@ -158,51 +164,61 @@ export function MonthCalendarView({
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, startIndex: 1, duration: 30 });
 
-  const eventsByDay = useMemo(() => {
-    const map = new Map<string, DayEvent[]>();
-    
-    if (!logisticsData || logisticsData.length === 0) return map;
+ const eventsByDay = useMemo(() => {
+  const map = new Map<string, DayEvent[]>();
+  if (!logisticsData || !bookings) return map;
 
-    logisticsData.forEach((item) => {
-      const pDate = new Date(item.pickup_date);
-      const rDate = new Date(item.return_date);
+  logisticsData.forEach((item) => {
+    // Ищем реальную бронь в массиве актуальных броней
+    const fullBooking = bookings.find(b => b.booking_id === item.booking_id);
 
-      if (isNaN(pDate.getTime())) return;
+    // КРИТИЧЕСКИЙ МОМЕНТ: Если брони нет в списке активных, 
+    // значит она удалена — игнорируем её для календаря
+    if (!fullBooking) return; 
 
-      const fullBooking = bookings?.find(b => b.booking_id === item.booking_id);
+    // Дополнительная проверка на статус, если статус есть в объекте
+    if (fullBooking.status === 'cancelled') return;
 
-      const baseEvent = {
-        carName: item.car_name,
-        clientName: item.client_name,
-        location: item.location || 'Не указано',
-        booking_id: item.booking_id,
-        booking: fullBooking || ({
-          booking_id: item.booking_id,
-          form_data: {
-            client_name: item.client_name,
-            car: { model: item.car_name },
-            locations: { pickupLocation: item.location }
-          }
-        } as any)
-      };
+    const baseEvent = {
+      carName: item.car_name,
+      clientName: item.client_name,
+      location: item.location || 'Не указано',
+      booking_id: item.booking_id,
+      booking: fullBooking
+    };
 
-      const pKey = format(pDate, 'yyyy-MM-dd');
-      const rKey = format(rDate, 'yyyy-MM-dd');
+    const pDate = new Date(item.pickup_date);
+    const rDate = new Date(item.return_date);
+    if (isNaN(pDate.getTime())) return;
 
-      if (!map.has(pKey)) map.set(pKey, []);
-      map.get(pKey)!.push({ ...baseEvent, type: 'pickup', time: format(pDate, 'HH:mm') });
+    const pKey = format(pDate, 'yyyy-MM-dd');
+    const rKey = format(rDate, 'yyyy-MM-dd');
 
-      if (!map.has(rKey)) map.set(rKey, []);
-      map.get(rKey)!.push({ ...baseEvent, type: 'return', time: format(rDate, 'HH:mm') });
-    });
+    if (!map.has(pKey)) map.set(pKey, []);
+    map.get(pKey)!.push({ ...baseEvent, type: 'pickup', time: format(pDate, 'HH:mm') });
 
-    return map;
-  }, [logisticsData, bookings]);
+    if (!map.has(rKey)) map.set(rKey, []);
+    map.get(rKey)!.push({ ...baseEvent, type: 'return', time: format(rDate, 'HH:mm') });
+  });
+
+  return map;
+}, [logisticsData, bookings]);
 
   const handleInnerDayClick = useCallback((date: Date, events: DayEvent[]) => {
-    setSelectedDayData({ isOpen: true, date, events });
+    // Click on empty space - create booking immediately
+    if (onCreateBooking) {
+      onCreateBooking({ start: date, end: date });
+    }
     if (onDayClick) onDayClick(date, events);
-  }, [onDayClick]);
+  }, [onDayClick, onCreateBooking]);
+
+  const handleBadgeClick = useCallback((event: DayEvent, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Click on badge - open booking for editing
+    if (event.booking) {
+      onBookingClick(event.booking);
+    }
+  }, [onBookingClick]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -221,18 +237,18 @@ export function MonthCalendarView({
   }, [emblaApi, currentDate, onDateChange]);
 
   return (
-    <div className="bg-white min-h-[600px] flex flex-col select-none overflow-hidden relative">
+    <div className="bg-white min-h-[600px] w-full flex flex-col select-none overflow-hidden relative">
       <div className="grid grid-cols-7 bg-white relative z-20 pt-2 border-b border-gray-50 font-sans">
-        {['П', 'В', 'С', 'Ч', 'П', 'С', 'В'].map((day, i) => (
+        {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day, i) => (
           <div key={i} className="py-2 text-center text-[10px] font-bold text-gray-300 uppercase">{day}</div>
         ))}
       </div>
 
-      <div className="overflow-hidden flex-1 cursor-grab active:cursor-grabbing" ref={emblaRef}>
+      <div className="overflow-hidden flex-1 cursor-grab active:cursor-grabbing w-full" ref={emblaRef}>
         <div className="flex h-full">
-          <MonthGrid date={addMonths(currentDate, -1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} />
-          <MonthGrid date={currentDate} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} />
-          <MonthGrid date={addMonths(currentDate, 1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} />
+          <MonthGrid date={addMonths(currentDate, -1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} />
+          <MonthGrid date={currentDate} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} />
+          <MonthGrid date={addMonths(currentDate, 1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} />
         </div>
       </div>
 

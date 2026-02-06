@@ -3130,3 +3130,20 @@
 {"timestamp": "2026-02-06T12:43:33.956074", "user_id": 374897465, "action": "message_received", "content": "[Фотография]"}
 {"timestamp": "2026-02-06T12:43:34.164253", "user_id": 374897465, "action": "user_media_received", "media_type": "received_media", "file_size": 221689, "filename": "photo_20260206_124333.jpg", "username": null}
 {"timestamp": "2026-02-06T12:48:37.525670", "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-02-06T13:01:55.202763", "user_id": "web_session_ml7egnzi_olfru4g4l_4nv37f", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-02-06T13:36:37.767878", "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-02-06T13:57:38.668Z", "user_id": "460037065", "action": "manager_message_sent", "message_length": 46}
+{"timestamp": "2026-02-06T14:00:13.265427", "user_id": "460037065", "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-06T14:00:18.066561", "user_id": "196955669", "action": "marker_updated", "marker": "unprocessed", "changed_by": "6451825371"}
+{"timestamp": "2026-02-06T14:00:56.591Z", "user_id": "765118819", "action": "manager_message_sent", "message_length": 61}
+{"timestamp": "2026-02-06T14:01:07.056823", "user_id": "75607252", "action": "status_changed", "old_status": "unknown", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-02-06T14:01:14.485180", "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-02-06T14:06:53.903149", "user_id": "web_session_ml7egnzi_olfru4g4l_4nv37f", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-02-06T14:11:24.093971", "user_id": "web_session_ml79gpi2_2pzoc31ql_62x1g8", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-02-06T14:29:08.173561", "user_id": "460037065", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-09T22:00:00.000Z", "endDate": "2026-03-17T22:00:00.000Z", "days": 37, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "sergejs3"}, "username": "sergejs3"}
+{"timestamp": "2026-02-06T14:29:08.365150", "user_id": "460037065", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-02-09T22:00:00.000Z", "endDate": "2026-03-17T22:00:00.000Z", "username": "sergejs3"}, "username": "sergejs3"}
+{"timestamp": "2026-02-06T15:31:09.395670", "user_id": "374897465", "action": "manager_media_sent", "filename": "sent_20260206_153107_IMG-20260206-WA0001.jpg"}
+{"timestamp": "2026-02-06T16:31:38.694580", "user_id": 460037065, "action": "message_received", "content": "да верно"}
+{"timestamp": "2026-02-06T16:31:38.718403", "user_id": 460037065, "action": "user_message_received", "message_length": 8, "message_type": "text", "username": "sergejs3", "media_info": null}
+{"timestamp": "2026-02-06T16:31:41.284886", "user_id": 460037065, "action": "message_received", "content": "до 18 марта"}
+{"timestamp": "2026-02-06T16:31:41.291604", "user_id": 460037065, "action": "user_message_received", "message_length": 11, "message_type": "text", "username": "sergejs3", "media_info": null}
