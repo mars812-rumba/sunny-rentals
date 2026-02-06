@@ -144,7 +144,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8080", "https://sunny-rentals.online", "https://*.web.telegram.org"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8080", "http://localhost:8081", "http://127.0.0.1:8081", "https://sunny-rentals.online", "https://*.web.telegram.org"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -4050,7 +4050,7 @@ async def startup_event():
 async def get_user_media(user_id: int):
     """Получить список медиафайлов пользователя"""
     try:
-        # Fix path to be relative to backend directory
+        # Media files are in backend/media/ (consistent with telegram_bot.py)
         media_dir = Path(__file__).parent / "media" / str(user_id)
         
         if not media_dir.exists():
@@ -4063,28 +4063,45 @@ async def get_user_media(user_id: int):
         
         media_files = []
         
-        # Сканируем все файлы в директории пользователя
-        for file_path in media_dir.iterdir():
-            if file_path.is_file():
-                file_stat = file_path.stat()
+        # Сканируем все файлы в директории пользователя (включая подпапку incoming)
+        directories_to_scan = [media_dir]
+        
+        # Добавляем подпапку incoming для обратной совместимости
+        incoming_dir = media_dir / "incoming"
+        if incoming_dir.exists():
+            directories_to_scan.append(incoming_dir)
+        
+        for scan_dir in directories_to_scan:
+            if not scan_dir.exists():
+                continue
                 
-                # Определяем тип файла
-                file_extension = file_path.suffix.lower()
-                if file_extension in ['.jpg', '.jpeg', '.png', '.webp']:
-                    file_type = "image"
-                elif file_extension == '.pdf':
-                    file_type = "document"
-                else:
-                    file_type = "other"
-                
-                media_files.append({
-                    "filename": file_path.name,
-                    "file_type": file_type,
-                    "file_size": file_stat.st_size,
-                    "created_at": datetime.fromtimestamp(file_stat.st_ctime).isoformat(),
-                    "modified_at": datetime.fromtimestamp(file_stat.st_mtime).isoformat(),
-                    "download_url": f"/api/crm/media/{user_id}/download/{file_path.name}"
-                })
+            for file_path in scan_dir.iterdir():
+                if file_path.is_file():
+                    file_stat = file_path.stat()
+                    
+                    # Определяем тип файла
+                    file_extension = file_path.suffix.lower()
+                    if file_extension in ['.jpg', '.jpeg', '.png', '.webp']:
+                        file_type = "image"
+                    elif file_extension == '.pdf':
+                        file_type = "document"
+                    else:
+                        file_type = "other"
+                    
+                    # Для файлов в подпапке incoming добавляем префикс к пути скачивания
+                    if scan_dir == incoming_dir:
+                        download_path = f"incoming/{file_path.name}"
+                    else:
+                        download_path = file_path.name
+                    
+                    media_files.append({
+                        "filename": file_path.name,
+                        "file_type": file_type,
+                        "file_size": file_stat.st_size,
+                        "created_at": datetime.fromtimestamp(file_stat.st_ctime).isoformat(),
+                        "modified_at": datetime.fromtimestamp(file_stat.st_mtime).isoformat(),
+                        "download_url": f"/api/crm/media/{user_id}/download/{download_path}"
+                    })
         
         # Сортируем по времени создания (новые сверху)
         media_files.sort(key=lambda x: x['created_at'], reverse=True)
@@ -4104,36 +4121,72 @@ async def get_user_media(user_id: int):
 
 
 # --- 1. Единый эндпоинт для скачивания (Исправлен путь) ---
+# Route for files with /download/ path (new format from get_user_media)
 @app.get(API_PREFIX + "/crm/media/{user_id}/download/{filename}")
+async def download_media_with_download_path(user_id: str, filename: str):
+    return await download_media_common(user_id, filename, "")
+
+# Route for files with path parameter (legacy)
+@app.get(API_PREFIX + "/crm/media/{user_id}/{path:path}/{filename}")
+async def download_media_with_path(user_id: str, filename: str, path: str = ""):
+    return await download_media_common(user_id, filename, path)
+
+# Route for files directly in user directory (main)
+@app.get(API_PREFIX + "/crm/media/{user_id}/{filename}")
 async def download_media_final(user_id: str, filename: str):
+    return await download_media_common(user_id, filename, "")
+
+async def download_media_common(user_id: str, filename: str, path: str = ""):
     try:
-        print(f"📥 [DEBUG] Download request: user_id={user_id}, filename={filename}")
+        print(f"📥 [DEBUG] Download request: user_id={user_id}, filename={filename}, path='{path}'")
         
-        # Media files are in backend/media/, not backend/data/media/
+        # Media files are in backend/media/ (consistent with telegram_bot.py)
         media_root = Path(__file__).parent / "media"
-        file_path = media_root / str(user_id) / filename
         
-        # If file is in incoming subfolder (from bot)
-        incoming_path = media_root / str(user_id) / "incoming" / filename
+        # Handle case where filename contains "incoming/" prefix
+        if filename.startswith("incoming/"):
+            filename = filename[8:]  # Remove "incoming/" prefix
+            file_path = media_root / str(user_id) / "incoming" / filename
+        else:
+            # Try direct path first (current structure)
+            file_path = media_root / str(user_id) / filename
         
-        print(f"🔍 [DEBUG] Checking paths: {file_path} exists: {file_path.exists()}")
-        print(f"🔍 [DEBUG] Checking paths: {incoming_path} exists: {incoming_path.exists()}")
+        # If not found, try old "incoming" structure (backward compatibility)
+        if not file_path.exists():
+            old_path = media_root / str(user_id) / "incoming" / filename
+            if old_path.exists():
+                file_path = old_path
+                print(f"🔄 [DEBUG] Using old structure path: {file_path}")
+            else:
+                print(f"❌ File not found in either location: {file_path} or {old_path}")
+                raise HTTPException(status_code=404, detail="File not found")
         
-        target = file_path if file_path.exists() else incoming_path
+        print(f"🔍 [DEBUG] Checking path: {file_path} exists: {file_path.exists()}")
         
-        if not target.exists():
-            print(f"❌ File not found: {target}")
+        if not file_path.exists():
+            print(f"❌ File not found: {file_path}")
             raise HTTPException(status_code=404, detail="File not found")
         
         import mimetypes
-        mime_type, _ = mimetypes.guess_type(str(target))
-        print(f"📤 [DEBUG] Serving file: {target}, mime_type: {mime_type}")
+        mime_type, _ = mimetypes.guess_type(str(file_path))
+        print(f"📤 [DEBUG] Serving file: {file_path}, mime_type: {mime_type}")
         
-        return FileResponse(
-            path=str(target),
+        # Create response with CORS headers
+        from fastapi import Response
+        from starlette.responses import FileResponse
+        
+        response = FileResponse(
+            path=str(file_path),
             media_type=mime_type or "application/octet-stream",
             filename=filename
         )
+        
+        # Add CORS headers
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        
+        return response
     except Exception as e:
         print(f"❌ Media download error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -4205,8 +4258,8 @@ async def send_media_to_user(
                 detail=f"Unsupported file type: {file.content_type}"
             )
         
-        # Путь теперь строим через строковый ID
-        media_dir = DATA / "media" / u_id_str
+        # Путь теперь строим через строковый ID (consistent with telegram_bot.py)
+        media_dir = Path(__file__).parent / "media" / u_id_str
         media_dir.mkdir(parents=True, exist_ok=True)
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -4238,7 +4291,7 @@ async def send_media_to_user(
             media_object = {
                 "type": "sent_media",
                 "content_type": file.content_type,
-                "download_url": f"/api/crm/media/{u_id_str}/download/{safe_filename}",
+                "download_url": f"/api/crm/media/{u_id_str}/{safe_filename}",
                 "filename": safe_filename,
                 "file_size": file_path.stat().st_size if file_path.exists() else 0
             }
@@ -4289,4 +4342,5 @@ async def send_media_to_user(
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("web_integration:app", host="0.0.0.0", port=5000, reload=True)
+
 

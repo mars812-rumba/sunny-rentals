@@ -125,9 +125,9 @@ const CRMPage: React.FC = () => {
       const media = msg?.content?.media || msg?.media;
       
       if (media && typeof media === 'object') {
-        // Build correct download URL for incoming files
+        // Build correct download URL - photos are stored directly in user directory
         const filename = media.filename || media.file_name || media.original_filename || 'unknown';
-        const downloadUrl = `/api/crm/media/${selectedUser?.user_id}/download/${encodeURIComponent(filename)}`;
+        const downloadUrl = `/api/crm/media/${selectedUser?.user_id}/${encodeURIComponent(filename)}`;
         
         documents.push({
           ...media,
@@ -1495,29 +1495,36 @@ const handleUpdateNote = async () => {
           {/* ВКЛАДКА ЧАТ (CORRECTED MEDIA RENDERING) */}
 <TabsContent value="chat" className="m-0 h-full flex flex-col bg-slate-100 overflow-hidden">
     {/* Чат занимает всё свободное место */}
- <ScrollArea className="flex-1 p-2">
+<ScrollArea className="flex-1 p-2">
   <div className="max-w-2xl mx-auto space-y-3 pb-4">
     {chats.map((msg, i) => {
-      // Check both possible media locations: msg.content.media and msg.media
-      const media = msg?.content?.media || msg?.media;
-      
-      // Debug logging for media processing
-      if (i < 3) { // Only log first 3 messages to avoid spam
-        console.log(`📸 [DEBUG] Chat message ${i} media analysis:`, {
-          role: msg.role,
-          hasContent: !!msg.content,
-          hasMedia: !!media,
-          mediaType: media?.type,
-          hasDownloadUrl: !!media?.download_url,
-          contentType: media?.content_type,
-          filename: media?.filename || media?.file_name || media?.original_filename,
-          messageText: msg?.text || (typeof msg?.content === 'string' ? msg.content.substring(0, 50) : null)
-        });
+      // ✅ ЗАЩИТА ОТ NULL
+      if (!msg) return null;
+
+      // ✅ УНИВЕРСАЛЬНОЕ ИЗВЛЕЧЕНИЕ МЕДИА (проверяем 3 места)
+      const media = 
+        msg?.content?.media ||  // Новый формат
+        msg?.media ||           // На верхнем уровне
+        null;
+
+      // ✅ УНИВЕРСАЛЬНОЕ ИЗВЛЕЧЕНИЕ ТЕКСТА (проверяем все варианты)
+      const messageText = 
+        msg?.text ||                           // Прямо в msg
+        msg?.content?.text ||                  // В content.text
+        msg?.content?.message ||               // В content.message
+        (typeof msg?.content === 'string' ? msg.content : null) ||  // content - строка
+        (msg?.content?.content && msg.content.content !== '[Медиафайл]' && msg.content.content !== '[Фотография]' 
+          ? msg.content.content : null);       // Вложенный content.content
+
+      // ✅ Пропускаем только если нет ни медиа, ни текста
+      if (!messageText && !media) {
+        console.warn(`⚠️ [SKIP] Empty message ${i}`);
+        return null;
       }
 
       return (
         <div
-          key={i}
+          key={`msg-${i}-${msg.timestamp || Date.now()}`}
           className={`flex flex-col ${msg.role === 'user' ? 'items-start' : 'items-end'}`}
         >
           <div
@@ -1528,96 +1535,82 @@ const handleUpdateNote = async () => {
             }`}
           >
             {/* ===== MEDIA MESSAGE ===== */}
-            {media && (media.download_url || media.filename || media.file_name) ? (
+            {media && media.download_url ? (
               <div className="space-y-2">
-                {/* Build download URL if not provided */}
-                {(() => {
-                  const filename = media.filename || media.file_name || media.original_filename || 'unknown';
-                  const downloadUrl = media.download_url || `/api/crm/media/${selectedUser?.user_id}/download/${encodeURIComponent(filename)}`;
-                  
-                  // IMAGE
-                  if (media.content_type?.startsWith('image/')) {
-                    return (
-                      <div className="space-y-2">
-                        <img
-                          src={downloadUrl}
-                          alt={media.original_filename || media.filename || 'image'}
-                          className="max-w-xs rounded cursor-pointer border"
-                          onClick={() => window.open(downloadUrl, '_blank')}
-                        />
-                        {media.message && (
-                          <p className="text-[10px] text-slate-100">{media.message}</p>
-                        )}
+                {media.content_type?.startsWith('image/') ? (
+                  /* IMAGE */
+                  <div className="space-y-2">
+                    <img
+                      src={media.download_url}
+                      alt={media.filename || 'image'}
+                      className="max-w-xs rounded cursor-pointer border border-white/20"
+                      onClick={() => window.open(media.download_url, '_blank')}
+                      onError={(e) => {
+                        console.error(`❌ Image failed:`, media.download_url);
+                        // Показываем fallback
+                        const target = e.currentTarget;
+                        const container = target.parentElement;
+                        if (container) {
+                          container.innerHTML = `
+                            <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg space-y-2">
+                              <div class="flex items-center gap-2 text-amber-700">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                                </svg>
+                                <span class="font-bold text-xs">Изображение</span>
+                              </div>
+                              <p class="text-xs text-slate-600">📎 ${media.filename || 'image'}</p>
+                              <a 
+                                href="${media.download_url}" 
+                                target="_blank"
+                                class="block w-full px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 text-center"
+                              >
+                                Открыть в новой вкладке
+                              </a>
+                            </div>
+                          `;
+                        }
+                      }}
+                    />
+                    {messageText && messageText !== '[Медиафайл]' && messageText !== '[Фотография]' && (
+                      <p className="text-[10px]">{messageText}</p>
+                    )}
+                  </div>
+                ) : (
+                  /* DOCUMENT (PDF etc) */
+                  <div className="space-y-2">
+                    <div
+                      className="flex items-center gap-2 p-2 bg-white/10 rounded-lg cursor-pointer hover:bg-white/20 transition"
+                      onClick={() => window.open(media.download_url, '_blank')}
+                    >
+                      <div className="w-8 h-8 bg-red-100 rounded flex items-center justify-center">
+                        <FileText className="w-4 h-4 text-red-600" />
                       </div>
-                    );
-                  }
-                  // DOCUMENT
-                  else {
-                    return (
-                      <div className="space-y-2">
-                        <div
-                          className="flex items-center gap-2 p-2 bg-slate-100 rounded-lg cursor-pointer hover:bg-slate-200 transition"
-                          onClick={() => window.open(downloadUrl, '_blank')}
-                        >
-                          <div className="w-8 h-8 bg-red-100 rounded flex items-center justify-center">
-                            <span className="text-[8px] font-bold text-red-600">
-                              {media.content_type === 'application/pdf' ? 'PDF' : 'FILE'}
-                            </span>
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[9px] font-bold text-slate-700 truncate">
-                              {media.original_filename || media.filename || media.file_name || 'Document'}
-                            </p>
-                            <p className="text-[7px] text-slate-500">Click to download</p>
-                          </div>
-
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-6 w-6 p-0"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const filename = media.original_filename || media.filename || media.file_name || 'document';
-                              
-                              console.log("💾 [DEBUG] Chat media download:", {
-                                downloadUrl: downloadUrl,
-                                filename: filename,
-                                contentType: media.content_type
-                              });
-                              
-                              const link = document.createElement('a');
-                              link.href = downloadUrl;
-                              link.download = filename;
-                              link.click();
-                              
-                              console.log("✅ [DEBUG] Chat download triggered for:", filename);
-                            }}
-                          >
-                            <Download size={12} />
-                          </Button>
-                        </div>
-
-                        {media.message && (
-                          <p className="text-[10px] text-slate-100">{media.message}</p>
-                        )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[9px] font-bold truncate">
+                          {media.filename || 'Document'}
+                        </p>
+                        <p className="text-[7px] opacity-70">Нажмите для скачивания</p>
                       </div>
-                    );
-                  }
-                })()}
+                      <Download className="w-4 h-4 opacity-50" />
+                    </div>
+                    {messageText && messageText !== '[Медиафайл]' && (
+                      <p className="text-[10px]">{messageText}</p>
+                    )}
+                  </div>
+                )}
               </div>
             ) : (
-              /* ===== TEXT MESSAGE ===== */
-              <p>
-                {typeof msg?.content === 'string'
-                  ? msg.content
-                  : msg?.text || 'Пустое сообщение'}
-              </p>
+              /* ===== TEXT ONLY MESSAGE ===== */
+              <p>{messageText}</p>
             )}
           </div>
 
+          {/* Role indicator */}
           <span className="text-[8px] font-bold text-slate-400 mt-1 uppercase px-2">
-            {msg.role}
+            {msg.role === 'manager' ? 'Менеджер' : 
+             msg.role === 'user' ? 'Клиент' : 
+             msg.role === 'assistant' ? 'AI' : msg.role}
           </span>
         </div>
       );

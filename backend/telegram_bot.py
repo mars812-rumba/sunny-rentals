@@ -897,8 +897,8 @@ def get_video_id(message):
 
 
         # 1. Определяем корень проекта (поднимаемся на уровень выше из папки backend)
-BASE_DIR = Path(__file__).resolve().parent.parent 
-MEDIA_ROOT = Path("media")
+BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_ROOT = BASE_DIR / "backend" / "media"
 
 # === НОВЫЕ ХЭНДЛЕРЫ ДЛЯ МУЛЬТИМЕДИА ===
 @bot.message_handler(content_types=['photo'])
@@ -934,12 +934,12 @@ def handle_photo_message(message):
         file_extension = ".jpg" 
         filename = f"photo_{timestamp}{file_extension}"
         
-        # 2. Формируем путь к папке (добавляем 'incoming' для документов клиента)
-        # Это создаст структуру: media/374897465/incoming/
-        user_media_dir = MEDIA_ROOT / str(user_id) / "incoming"
+        # 2. Формируем путь к папке (убираем 'incoming' для совместимости с веб-интерфейсом)
+        # Файлы будут сохраняться прямо в: backend/media/{user_id}/
+        user_media_dir = MEDIA_ROOT / str(user_id)
         user_media_dir.mkdir(parents=True, exist_ok=True)
         
-        # 3. !!! ИСПРАВЛЕНИЕ: Соединяем путь папки с ИМЕНЕМ ФАЙЛА !!!
+        # 3. Соединяем путь папки с ИМЕНЕМ ФАЙЛА
         file_path = user_media_dir / filename
 
         # Сохраняем файл
@@ -949,11 +949,11 @@ def handle_photo_message(message):
         # Логируем медиа сообщение
         media_info = {
             "type": "received_media",
-            "filename": filename,  # исправлено
-            "content_type": "image/jpeg", # исправлено
+            "filename": filename,
+            "content_type": "image/jpeg",
             "file_size": file_path.stat().st_size,
             "timestamp": datetime.now().isoformat(),
-            "download_url": f"/api/crm/media/{user_id}/incoming/{filename}" # добавили incoming
+            "download_url": f"/api/crm/media/{user_id}/{filename}"
         }
 
         
@@ -1028,8 +1028,8 @@ def handle_document_message(message):
             bot.reply_to(message, "❌ Поддерживаются только изображения (JPG, PNG) и PDF.")
             return
 
-        # 1. Создаем правильную директорию (media/{user_id}/incoming)
-        user_incoming_dir = MEDIA_ROOT / str(user_id) / "incoming"
+        # 1. Создаем правильную директорию (media/{user_id})
+        user_incoming_dir = MEDIA_ROOT / str(user_id)
         user_incoming_dir.mkdir(parents=True, exist_ok=True)
         
         # 2. Генерируем безопасное имя
@@ -1037,7 +1037,7 @@ def handle_document_message(message):
         safe_name = re.sub(r'[^\w\-_.]', '_', file_name)
         filename = f"doc_{timestamp}_{safe_name}"
         
-        # 3. !!! ИСПРАВЛЕНИЕ: Полный путь к ФАЙЛУ !!!
+        # 3. Полный путь к ФАЙЛУ
         file_path = user_incoming_dir / filename
         
         # Скачиваем файл
@@ -1064,7 +1064,7 @@ def handle_document_message(message):
             "mime_type": mime_type,
             "filename": filename,
             "timestamp": datetime.now().isoformat(),
-            "download_url": f"/api/crm/media/{user_id}/incoming/{filename}"
+            "download_url": f"/api/crm/media/{user_id}/{filename}"
         }
         
         # Дальнейшая логика (уведомления и логирование)
