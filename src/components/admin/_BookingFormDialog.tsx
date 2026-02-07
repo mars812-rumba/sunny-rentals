@@ -184,77 +184,76 @@ __________________
     navigator.clipboard.writeText(text);
     toast.success("Данные скопированы для клиента");
   };
- const handleSubmit = async () => {
-     if (!pricing || pricing.dailyRate === 0) {
-       toast.error("Данные не полны");
-       return;
-     }
- 
-     setIsSubmitting(true);
-     try {
-       const startDateTime = parse(pickupTime, 'HH:mm', startDate!);
-       const endDateTime = parse(returnTime, 'HH:mm', endDate!);
-       const v = selectedTab === 'fleet' ? vehicles.find(vec => vec.id === selectedVehicleId) : null;
-       const cId = isEditing && booking?.form_data?.car?.id ? booking.form_data.car.id : (selectedTab === 'fleet' ? v?.id : `manual_${Date.now()}`);
- 
-       const formDataForApi = {
-         car: {
-           id: String(cId),
-           name: String(selectedTab === 'fleet' ? v?.name : manualData.name),
-           brand: String(selectedTab === 'fleet' ? v?.brand : (manualData.brand || "")),
-           model: String(selectedTab === 'fleet' ? v?.model : (manualData.model || "")),
-           year: String(selectedTab === 'fleet' ? v?.year : (manualData.year || "")),
-           color: String(selectedTab === 'fleet' ? (v?.color || "") : "")
-         },
-         dates: {
-           start: startDateTime.toISOString(), end: endDateTime.toISOString(), days: Math.round(pricing.days)
-         },
-         locations: {
-           pickupLocation: String(pickupLocation), returnLocation: String(returnLocation),
-           pickupAddress: String(pickupAddress || ""), returnAddress: String(returnAddress || "")
-         },
-         pricing: {
-           dailyRate: Math.round(pricing.dailyRate), totalRental: Math.round(pricing.totalRental),
-           deposit: Math.round(pricing.deposit), deliveryPickup: Math.round(pricing.deliveryPickup),
-           deliveryReturn: Math.round(pricing.deliveryReturn), totalDelivery: Math.round(pricing.totalDelivery),
-           grandTotal: Math.round(pricing.grandTotal)
-         },
-         contact: {
-           value: String(customerContact), type: String(contactType), name: String(customerName || ""),
-           phone: contactType === 'phone' ? String(customerContact) : ""
-         },
-         timestamp: new Date().toISOString()
-       };
- 
-       const bId = booking?.booking_id || booking?.id || null;
-       await submitBooking(formDataForApi as any, bId);
- 
-       toast.success(isEditing ? "Обновлено" : "Создано");
-       onSuccess();
-       onClose();
-     } catch (e: any) {
-       toast.error(e.message || "Ошибка");
-     } finally {
-       setIsSubmitting(false);
-     }
-   };
- 
-   const handleDelete = async () => {
-     if (!booking?.booking_id || !confirm(`Удалить бронь?`)) return;
-     setIsDeleting(true);
-     try {
-       const res = await fetch(`/api/admin/bookings/${booking.booking_id}`, { method: 'DELETE' });
-       if (!res.ok) throw new Error("Ошибка API");
-       toast.success("Удалено");
-       onSuccess();
-       onClose();
-     } catch (e: any) {
-       toast.error(e.message);
-     } finally {
-       setIsDeleting(false);
-     }
-   };
- 
+  const handleSubmit = async () => {
+    if (!pricing || pricing.dailyRate === 0) {
+      toast.error("Данные не полны");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const startDateTime = parse(pickupTime, 'HH:mm', startDate!);
+      const endDateTime = parse(returnTime, 'HH:mm', endDate!);
+      const v = selectedTab === 'fleet' ? vehicles.find(vec => vec.id === selectedVehicleId) : null;
+      const cId = isEditing && booking?.form_data?.car?.id ? booking.form_data.car.id : (selectedTab === 'fleet' ? v?.id : `manual_${Date.now()}`);
+
+      const formDataForApi = {
+        car: {
+          id: String(cId),
+          name: String(selectedTab === 'fleet' ? v?.name : manualData.name),
+          brand: String(selectedTab === 'fleet' ? v?.brand : (manualData.brand || "")),
+          model: String(selectedTab === 'fleet' ? v?.model : (manualData.model || "")),
+          year: String(selectedTab === 'fleet' ? v?.year : (manualData.year || "")),
+          color: String(selectedTab === 'fleet' ? (v?.color || "") : "")
+        },
+        dates: {
+          start: startDateTime.toISOString(), end: endDateTime.toISOString(), days: Math.round(pricing.days)
+        },
+        locations: {
+          pickupLocation: String(pickupLocation), returnLocation: String(returnLocation),
+          pickupAddress: String(pickupAddress || ""), returnAddress: String(returnAddress || "")
+        },
+        pricing: {
+          dailyRate: Math.round(pricing.dailyRate), totalRental: Math.round(pricing.totalRental),
+          deposit: Math.round(pricing.deposit), deliveryPickup: Math.round(pricing.deliveryPickup),
+          deliveryReturn: Math.round(pricing.deliveryReturn), totalDelivery: Math.round(pricing.totalDelivery),
+          grandTotal: Math.round(pricing.grandTotal)
+        },
+        contact: {
+          value: String(customerContact), type: String(contactType), name: String(customerName || ""),
+          phone: contactType === 'phone' ? String(customerContact) : ""
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      const bId = booking?.booking_id || booking?.id || null;
+      await submitBooking(formDataForApi as any, bId);
+
+      toast.success(isEditing ? "Обновлено" : "Создано");
+      onSuccess();
+      onClose();
+    } catch (e: any) {
+      toast.error(e.message || "Ошибка");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!booking?.booking_id || !confirm(`Удалить бронь?`)) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/bookings/${booking.booking_id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error("Ошибка API");
+      toast.success("Удалено");
+      onSuccess();
+      onClose();
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const categories = [
     { id: 'all', label: 'Все' },

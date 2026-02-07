@@ -1,73 +1,5 @@
 [
   {
-    "user_id": "345280686",
-    "username": null,
-    "created_at": "2026-02-04T12:02:29.048799",
-    "updated_at": "2026-02-04T21:20:53.253952",
-    "status": "new",
-    "final_status": "new",
-    "form_started": false,
-    "booking_submitted": false,
-    "car_interested": null,
-    "category_interested": null,
-    "dates_selected": null,
-    "notes": [],
-    "source": "restored",
-    "marker": "unprocessed",
-    "last_note": "5 февраля"
-  },
-  {
-    "user_id": "230155309",
-    "username": null,
-    "created_at": "2026-02-04T12:02:29.057222",
-    "updated_at": "2026-02-04T21:20:30.826647",
-    "status": "new",
-    "final_status": "new",
-    "form_started": false,
-    "booking_submitted": false,
-    "car_interested": null,
-    "category_interested": null,
-    "dates_selected": null,
-    "notes": [],
-    "source": "restored",
-    "marker": "unprocessed",
-    "last_note": "5 февраля"
-  },
-  {
-    "user_id": "1080900705",
-    "username": null,
-    "created_at": "2026-02-04T12:02:29.060174",
-    "updated_at": "2026-02-04T21:20:49.416279",
-    "status": "new",
-    "final_status": "new",
-    "form_started": false,
-    "booking_submitted": false,
-    "car_interested": null,
-    "category_interested": null,
-    "dates_selected": null,
-    "notes": [],
-    "source": "restored",
-    "marker": "unprocessed",
-    "last_note": "5 февраля"
-  },
-  {
-    "user_id": "961082502",
-    "username": null,
-    "created_at": "2026-02-04T12:02:29.060234",
-    "updated_at": "2026-02-04T21:20:35.399687",
-    "status": "new",
-    "final_status": "new",
-    "form_started": false,
-    "booking_submitted": false,
-    "car_interested": null,
-    "category_interested": null,
-    "dates_selected": null,
-    "notes": [],
-    "source": "restored",
-    "marker": "unprocessed",
-    "last_note": "5 февраля"
-  },
-  {
     "user_id": "255502880",
     "username": null,
     "created_at": "2026-02-04T12:02:29.064115",
@@ -187,40 +119,6 @@
     "last_note": "Успех"
   },
   {
-    "user_id": "770824954",
-    "username": null,
-    "created_at": "2026-02-04T12:02:29.074314",
-    "updated_at": "2026-02-04T21:20:47.599754",
-    "status": "new",
-    "final_status": "new",
-    "form_started": false,
-    "booking_submitted": false,
-    "car_interested": null,
-    "category_interested": null,
-    "dates_selected": null,
-    "notes": [],
-    "source": "restored",
-    "marker": "unprocessed",
-    "last_note": "5 февраля"
-  },
-  {
-    "user_id": "309292627",
-    "username": null,
-    "created_at": "2026-02-04T12:02:29.076447",
-    "updated_at": "2026-02-04T21:20:38.698560",
-    "status": "new",
-    "final_status": "new",
-    "form_started": false,
-    "booking_submitted": false,
-    "car_interested": null,
-    "category_interested": null,
-    "dates_selected": null,
-    "notes": [],
-    "source": "restored",
-    "marker": "unprocessed",
-    "last_note": "5 февраля"
-  },
-  {
     "user_id": "782990455",
     "username": null,
     "created_at": "2026-02-04T12:02:29.076839",
@@ -236,42 +134,6 @@
     "source": "restored",
     "marker": "ready",
     "last_note": "Успех"
-  },
-  {
-    "user_id": "7092482256",
-    "username": null,
-    "created_at": "2026-02-04T18:32:56.035015",
-    "updated_at": "2026-02-04T21:24:26.171242",
-    "status": "pending",
-    "form_started": true,
-    "booking_submitted": true,
-    "car_interested": "Toyota YARIS 2022 Black",
-    "category_interested": null,
-    "dates_selected": {
-      "start": "2026-02-15T17:00:00.000Z",
-      "end": "2026-02-19T17:00:00.000Z",
-      "days": 5
-    },
-    "notes": [],
-    "source": "telegram_webapp",
-    "marker": "unprocessed",
-    "last_note": "Aunchalica"
-  },
-  {
-    "user_id": "120257831",
-    "username": "forgot_name",
-    "created_at": "2026-02-04T19:15:20.844591",
-    "updated_at": "2026-02-04T21:20:42.505617",
-    "status": "new",
-    "form_started": false,
-    "booking_submitted": false,
-    "car_interested": null,
-    "category_interested": null,
-    "dates_selected": null,
-    "notes": [],
-    "source": "telegram_webapp",
-    "marker": "unprocessed",
-    "last_note": "5 февраля"
   },
   {
     "user_id": 7553360348,
@@ -404,23 +266,52 @@
     "user_id": 374897465,
     "username": "Marseloid",
     "created_at": "2026-02-06T09:56:52.033131",
-    "updated_at": "2026-02-06T12:43:34.166307",
+    "updated_at": "2026-02-06T23:08:31.531752",
     "status": "pending",
     "form_started": true,
     "booking_submitted": true,
-    "car_interested": "Honda City 2020 White",
-    "category_interested": "compact",
+    "car_interested": "Mazda CX30 2023 Bege",
+    "category_interested": "suv",
     "dates_selected": {
-      "start": "2026-02-08T17:00:00.000Z",
-      "end": "2026-02-20T17:00:00.000Z",
-      "days": 13
+      "start": "2026-02-07T17:00:00.000Z",
+      "end": "2026-02-27T17:00:00.000Z",
+      "days": 21
     },
     "notes": [],
     "source": "system",
     "dialog": {
       "active": false,
       "has_new_messages": true,
-      "last_message_at": "2026-02-06T12:43:33.948832",
+      "last_message_at": "2026-02-06T19:40:09.471280",
+      "last_message_from": "user",
+      "message_count": 4,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-02-06T19:40:09.638937",
+    "marker": "in_progress"
+  },
+  {
+    "user_id": 460037065,
+    "username": null,
+    "created_at": "2026-02-06T16:31:38.678402",
+    "updated_at": "2026-02-07T03:32:24.521011",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "system",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-02-07T03:32:24.464424",
       "last_message_from": "user",
       "message_count": 3,
       "claude": {
@@ -430,13 +321,31 @@
         "paused_at": null
       }
     },
-    "last_message_at": "2026-02-06T12:43:34.166285"
+    "last_message_at": "2026-02-07T03:32:24.520987"
   },
   {
-    "user_id": "web_session_ml78j79m_xyg0ijylp_iaf1ni",
+    "user_id": "689846361",
+    "username": "deltavarm",
+    "created_at": "2026-02-06T18:29:44.816663",
+    "updated_at": "2026-02-06T18:38:48.111605",
+    "status": "interested",
+    "form_started": true,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": "compact",
+    "dates_selected": {
+      "start": "2026-02-20T19:00:00.000Z",
+      "end": "2026-02-22T19:00:00.000Z",
+      "days": 1
+    },
+    "notes": [],
+    "source": "telegram_webapp"
+  },
+  {
+    "user_id": "941646871",
     "username": null,
-    "created_at": "2026-02-06T14:01:14.238745",
-    "updated_at": "2026-02-06T14:01:14.238775",
+    "created_at": "2026-02-06T18:41:04.748247",
+    "updated_at": "2026-02-06T18:41:04.748286",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -447,24 +356,29 @@
     "source": "telegram_webapp"
   },
   {
-    "user_id": "web_session_ml7egnzi_olfru4g4l_4nv37f",
-    "username": null,
-    "created_at": "2026-02-06T14:06:53.483718",
-    "updated_at": "2026-02-06T14:06:53.483741",
-    "status": "new",
-    "form_started": false,
+    "user_id": "5282882609",
+    "username": "gubar_nikolay",
+    "created_at": "2026-02-06T23:38:35.285147",
+    "updated_at": "2026-02-07T00:59:15.867855",
+    "status": "interested",
+    "form_started": true,
     "booking_submitted": false,
     "car_interested": null,
-    "category_interested": null,
-    "dates_selected": null,
+    "category_interested": "suv",
+    "dates_selected": {
+      "start": "2026-02-20T14:00:00.000Z",
+      "end": "2026-02-25T14:00:00.000Z",
+      "days": 1
+    },
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "marker": null
   },
   {
     "user_id": "web_session_ml79gpi2_2pzoc31ql_62x1g8",
     "username": null,
-    "created_at": "2026-02-06T14:11:23.694464",
-    "updated_at": "2026-02-06T14:11:23.694509",
+    "created_at": "2026-02-07T00:56:02.557638",
+    "updated_at": "2026-02-07T00:56:02.557673",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -475,31 +389,21 @@
     "source": "telegram_webapp"
   },
   {
-    "user_id": 460037065,
-    "username": null,
-    "created_at": "2026-02-06T16:31:38.678402",
-    "updated_at": "2026-02-06T16:31:41.292726",
-    "status": "new",
-    "form_started": false,
+    "user_id": "121221856",
+    "username": "nike_v1",
+    "created_at": "2026-02-07T04:58:08.161312",
+    "updated_at": "2026-02-07T05:04:05.828832",
+    "status": "interested",
+    "form_started": true,
     "booking_submitted": false,
     "car_interested": null,
-    "category_interested": null,
-    "dates_selected": null,
-    "notes": [],
-    "source": "system",
-    "dialog": {
-      "active": false,
-      "has_new_messages": true,
-      "last_message_at": "2026-02-06T16:31:41.277619",
-      "last_message_from": "user",
-      "message_count": 2,
-      "claude": {
-        "enabled": false,
-        "status": "stopped",
-        "started_at": null,
-        "paused_at": null
-      }
+    "category_interested": "sedan",
+    "dates_selected": {
+      "start": "2026-02-27T17:00:00.000Z",
+      "end": "2026-02-27T17:00:00.000Z",
+      "days": 1
     },
-    "last_message_at": "2026-02-06T16:31:41.292711"
+    "notes": [],
+    "source": "telegram_webapp"
   }
 ]
