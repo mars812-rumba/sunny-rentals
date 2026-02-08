@@ -137,13 +137,27 @@ export interface BookingFormData {
     notes?: string;
   };
   timestamp: string;
+  source?: BookingSource;
 }
+
+// Helper to determine booking source
+export function getBookingSource(): BookingSource {
+  // Check if running in Telegram WebApp
+  if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
+    return 'telegram_webapp';
+  }
+  // Default to web browser
+  return 'web_browser';
+}
+
+export type BookingSource = 'telegram_webapp' | 'web_browser' | 'manager';
 
 export interface Booking {
   booking_id: string;
   user_id: string | number;
   form_data: BookingFormData;
   status: string;
+  source: BookingSource;
   created_at: string;
 }
 

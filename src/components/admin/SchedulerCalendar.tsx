@@ -283,10 +283,17 @@ export function SchedulerCalendar({
                     {carBookings.map((booking) => {
                       const position = getBookingPosition(booking, DAY_WIDTH);
                       if (!position) return null;
-                      
+
                       const badgeData = formatBookingBadge(booking);
                       const bgColor = booking.status === 'confirmed' ? '#86efac' : '#fde047';
-                      
+
+                      // Source badge
+                      const sourceBadge = {
+                        'telegram_webapp': '📱',
+                        'web_browser': '🌐',
+                        'manager': '👨‍💼'
+                      }[booking.source || 'manager'];
+
                       return (
                         <div
                           key={booking.booking_id}
@@ -317,6 +324,13 @@ export function SchedulerCalendar({
                               </div>
                             )}
                           </div>
+
+                          {/* 🆕 Source badge в правом нижнем углу */}
+                          {!isCompactMode && sourceBadge && (
+                            <div className="absolute bottom-0 right-0 text-[8px] opacity-70">
+                              {sourceBadge}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
