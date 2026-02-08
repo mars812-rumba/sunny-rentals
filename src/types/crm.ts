@@ -63,6 +63,7 @@ export interface Booking {
     };
   };
   status: string;
+  source?: 'telegram_webapp' | 'web_browser' | 'manager';
   created_at: string;
 }
 
