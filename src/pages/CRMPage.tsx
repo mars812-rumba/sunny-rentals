@@ -76,7 +76,7 @@ const MAIN_STATUSES = ['new', 'interested', 'in_work', 'pending'];
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   'new': { label: 'Холодные', color: '#64748b', bg: 'bg-slate-100' },
   'interested': { label: 'Теплые', color: '#2563eb', bg: 'bg-blue-50' },
-  'in_work': { label: 'В работе', color: '#7c3aed', bg: 'bg-purple-50' },
+  'in_work': { label: 'В работе', color: '#7c3aed', bg: 'bg-green-50' },
   'pending': { label: 'Заявки', color: '#ea580c', bg: 'bg-orange-50' },
   'confirmed': { label: 'Бронь', color: '#10b981', bg: 'bg-emerald-50' },
   'completed': { label: 'Завершен', color: '#059669', bg: 'bg-green-100' },
@@ -796,6 +796,36 @@ const handleUpdateNote = async () => {
     console.error("Ошибка обновления:", e);
   }
 };
+
+  const confirmBooking = async (bookingId: string) => {
+    setLoadingAction(prev => ({ ...prev, [`confirm_${bookingId}`]: true }));
+    
+    try {
+      const response = await fetch(`/api/admin/bookings/${bookingId}/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        // Update local bookings list
+        setBookings(prev => prev.map(b =>
+          b.booking_id === bookingId
+            ? { ...b, status: 'confirmed', confirmed_at: new Date().toISOString() }
+            : b
+        ));
+        
+        console.log('✅ Бронирование подтверждено');
+      } else {
+        const error = await response.json();
+        console.error('❌ Ошибка подтверждения:', error.message);
+      }
+    } catch (e) {
+      console.error('❌ Ошибка сети:', e);
+    } finally {
+      setLoadingAction(prev => ({ ...prev, [`confirm_${bookingId}`]: false }));
+    }
+  };
+
   useEffect(() => { loadMainData(); }, [loadMainData]);
 
   // Auto-refresh chat when user is selected
@@ -941,7 +971,7 @@ const handleUpdateNote = async () => {
     const markerStyles: Record<string, string> = {
       'unprocessed': 'bg-blue-50/60 border-blue-100', // Интересующийся (+) -> Синий
       'in_progress': 'bg-green-50/60 border-green-100', // В работе ($) -> Зеленый
-      'ready': 'bg-purple-50/60 border-purple-100',     // Выполненный (checkmark) -> Фиолетовый
+      'ready': 'bg-green-50/60 border-green-100',     // Выполненный (checkmark) -> Фиолетовый
       'rejected': 'bg-red-50/40 border-red-100',        // Отказ (-) -> Красный (опционально)
     };
 
@@ -1021,7 +1051,7 @@ const handleUpdateNote = async () => {
   className={`flex items-center gap-1.5 rounded px-2 py-1 border transition-colors cursor-text min-h-[24px] ${
     user.marker === 'unprocessed' ? 'bg-blue-100/50 border-blue-200/50' :
     user.marker === 'in_progress' ? 'bg-green-100/50 border-green-200/50' :
-    user.marker === 'ready'       ? 'bg-purple-100/50 border-purple-200/50' :
+    user.marker === 'ready'       ? 'bg-green-100/50 border-green-200/50' :
     user.last_note                ? 'bg-[#f8b515]/10 border-[#f8b515]/30 hover:bg-[#f8b515]/20' : 
                                     'bg-slate-50 border-slate-100 hover:bg-white hover:border-blue-200'
   }`}
@@ -1034,7 +1064,7 @@ const handleUpdateNote = async () => {
   <StickyNote className={`w-2.5 h-2.5 shrink-0 ${
     user.marker === 'unprocessed' ? 'text-blue-600' :
     user.marker === 'in_progress' ? 'text-green-600' :
-    user.marker === 'ready'       ? 'text-purple-600' :
+    user.marker === 'ready'       ? 'text-green-600' :
     user.last_note                ? 'text-[#f8b515]' : 'text-slate-400'
   }`} />
   
@@ -1044,7 +1074,7 @@ const handleUpdateNote = async () => {
       className={`text-[8px] bg-transparent outline-none w-full font-bold ${
         user.marker === 'unprocessed' ? 'text-blue-800' :
         user.marker === 'in_progress' ? 'text-green-800' :
-        user.marker === 'ready'       ? 'text-purple-800' :
+        user.marker === 'ready'       ? 'text-green-800' :
         user.last_note                ? 'text-[#8a650d]' : 'text-blue-600'
       }`}
       value={tempNote}
@@ -1057,7 +1087,7 @@ const handleUpdateNote = async () => {
     <p className={`text-[8px] truncate w-full italic tracking-tight ${
       user.marker === 'unprocessed' ? 'text-blue-700' :
       user.marker === 'in_progress' ? 'text-green-700' :
-      user.marker === 'ready'       ? 'text-purple-700' :
+      user.marker === 'ready'       ? 'text-green-700' :
       user.last_note                ? 'text-[#8a650d]' : 'text-slate-400'
     }`}>
       {user.last_note || "Добавить заметку..."}
@@ -1169,7 +1199,7 @@ const handleUpdateNote = async () => {
         {currentStatus !== 'in_work' && (
           <Button
             size="icon" variant="ghost"
-            className="h-7 w-7 rounded-md bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white border border-purple-100"
+            className="h-7 w-7 rounded-md bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-100"
             onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, 'in_work'); }}
             title="Перевести в работу"
           >
@@ -1349,8 +1379,8 @@ const handleUpdateNote = async () => {
                       </div>
                     </div>
                     <Badge className={`text-[9px] font-black uppercase border-none px-2 py-0.5 rounded-md ${
-                      b.status === 'confirmed' ? 'bg-green-500 text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 
-                      b.status === 'pending' ? 'bg-orange-500 text-white' : 'bg-slate-400 text-white'
+                      b.status === 'confirmed' ? 'bg-green-500 text-white shadow-[0_0_8px_rgba(147,51,234,0.4)]' :
+                      b.status === 'pre_booking' ? 'bg-gray-500 text-white' : 'bg-slate-400 text-white'
                     }`}>
                       {b.status || 'new'}
                     </Badge>
@@ -1388,6 +1418,17 @@ const handleUpdateNote = async () => {
                       <span className="text-lg font-black text-slate-900 tracking-tight">
                         {b.form_data?.pricing?.grandTotal ? `${b.form_data.pricing.grandTotal.toLocaleString()} ฿` : '0 ฿'}
                       </span>
+                      {/* Кнопка подтверждения для pre_booking */}
+                      {b.status === 'pre_booking' && (
+                        <Button
+                          size="sm"
+                          className="mt-2 bg-green-500 hover:bg-green-600 text-white text-xs"
+                          onClick={() => confirmBooking(b.booking_id)}
+                          disabled={loadingAction[`confirm_${b.booking_id}`]}
+                        >
+                          {loadingAction[`confirm_${b.booking_id}`] ? 'Подтверждаю...' : 'Подтвердить'}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -1403,14 +1444,14 @@ const handleUpdateNote = async () => {
         {/* Documents from User */}
         <div className="space-y-4">
           <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
-            <Paperclip size={14} className="text-purple-500" />
+            <Paperclip size={14} className="text-green-500" />
             Документы клиента ({userDocuments?.length || 0})
           </h3>
           
           {userDocuments && userDocuments.length > 0 ? (
             <div className="grid grid-cols-2 gap-3">
               {userDocuments.map((doc, index) => (
-                <Card key={index} className="border-none bg-slate-50/50 shadow-none ring-1 ring-slate-100 overflow-hidden hover:ring-purple-200 transition-all">
+                <Card key={index} className="border-none bg-slate-50/50 shadow-none ring-1 ring-slate-100 overflow-hidden hover:ring-green-200 transition-all">
                   <CardContent className="p-3">
                     {doc.content_type?.startsWith('image/') ? (
                       // Image preview with download
@@ -1646,7 +1687,7 @@ const handleUpdateNote = async () => {
 
             <Button
                 size="sm" variant="ghost"
-                className="flex-1 h-8 text-[7px] font-bold bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200"
+                className="flex-1 h-8 text-[7px] font-bold bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
                 onClick={() => handleClaudeAction(selectedUser?.user_id, 'resume')}
                 disabled={loadingAction[`claude_${selectedUser?.user_id}_resume`]}
             >

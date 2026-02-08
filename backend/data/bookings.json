@@ -90,47 +90,259 @@
     "updated_at": "2026-02-06T16:00:52.532275"
   },
   {
-    "booking_id": "d83f926c",
+    "booking_id": "403bd6cf",
     "user_id": "admin",
     "form_data": {
       "car": {
-        "id": "toyota_ativ_2024_gray",
-        "name": "Toyota ATIV Dark 2024 Gray",
-        "brand": "Toyota",
-        "model": "ATIV",
+        "id": "webapp_car_789",
+        "name": "Nissan Altima 2024",
+        "brand": "Nissan",
+        "model": "Altima",
         "year": "2024",
-        "color": "Gray"
+        "color": "silver"
       },
       "dates": {
-        "start": "2026-02-09T02:00:00.000Z",
-        "end": "2026-02-19T05:00:00.000Z",
-        "days": 10
+        "start": "2026-04-01T09:00:00.000Z",
+        "end": "2026-04-05T18:00:00.000Z",
+        "days": 4
+      },
+      "locations": {
+        "pickupLocation": "hotel",
+        "returnLocation": "hotel",
+        "pickupAddress": "Resort Hotel Phuket",
+        "returnAddress": "Resort Hotel Phuket"
+      },
+      "pricing": {
+        "dailyRate": 1400,
+        "totalRental": 5600,
+        "deposit": 10000,
+        "deliveryPickup": 400,
+        "deliveryReturn": 400,
+        "totalDelivery": 800,
+        "grandTotal": 6400
+      },
+      "contact": {
+        "value": "+1555123456",
+        "type": "whatsapp",
+        "name": "Web App Customer",
+        "phone": ""
+      },
+      "timestamp": "2026-02-07T07:54:00.000Z"
+    },
+    "status": "confirmed",
+    "created_at": "2026-02-07T07:55:03.742632",
+    "source": "admin_panel"
+  },
+  {
+    "booking_id": "fa3da99a",
+    "user_id": "admin",
+    "form_data": {
+      "car": {
+        "id": "test_car_new",
+        "name": "Honda Accord 2024",
+        "brand": "Honda",
+        "model": "Accord",
+        "year": "2024",
+        "color": "black"
+      },
+      "dates": {
+        "start": "2026-05-01T09:00:00.000Z",
+        "end": "2026-05-06T18:00:00.000Z",
+        "days": 5
       },
       "locations": {
         "pickupLocation": "airport",
         "returnLocation": "airport",
-        "pickupAddress": "",
-        "returnAddress": ""
+        "pickupAddress": "Phuket Airport",
+        "returnAddress": "Phuket Airport"
       },
       "pricing": {
-        "dailyRate": 931,
-        "totalRental": 9310,
+        "dailyRate": 1700,
+        "totalRental": 8500,
+        "deposit": 12000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 9500
+      },
+      "contact": {
+        "value": "+1239876543",
+        "type": "whatsapp",
+        "name": "New Test User",
+        "phone": ""
+      },
+      "timestamp": "2026-02-07T08:00:00.000Z"
+    },
+    "status": "confirmed",
+    "created_at": "2026-02-07T08:01:12.331562",
+    "source": "admin_panel",
+    "confirmed_at": "2026-02-07T08:04:14.502692",
+    "updated_at": "2026-02-07T08:04:14.502706"
+  },
+  {
+    "booking_id": "41c2ddab",
+    "user_id": "374897465",
+    "form_data": {
+      "car": {
+        "id": "nmax155_2019_black",
+        "name": "Nmax155 2019 black",
+        "brand": "Nmax155",
+        "model": "2019",
+        "year": "black",
+        "color": ""
+      },
+      "dates": {
+        "start": "2026-02-14T17:00:00.000Z",
+        "end": "2026-02-27T17:00:00.000Z",
+        "days": 14
+      },
+      "locations": {
+        "pickup": "hotel",
+        "return": "hotel"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 298,
+        "totalRental": 4172,
+        "deposit": 5000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 5172
+      },
+      "contact": {
+        "value": "@Marseloid",
+        "type": "telegram"
+      },
+      "timestamp": "2026-02-07T11:46:00.126Z"
+    },
+    "status": "pre_booking",
+    "source": "telegram_webapp",
+    "created_at": "2026-02-07T11:46:01.658968"
+  },
+  {
+    "booking_id": "b9428937",
+    "user_id": "374897465",
+    "form_data": {
+      "car": {
+        "id": "Nm_city_white_2022",
+        "name": "Honda City 2020 White",
+        "brand": "Honda",
+        "model": "City",
+        "year": "2020",
+        "color": "White"
+      },
+      "dates": {
+        "start": "2026-02-21T17:00:00.000Z",
+        "end": "2026-02-26T17:00:00.000Z",
+        "days": 6
+      },
+      "locations": {
+        "pickupLoc": "airport",
+        "returnLoc": "airport"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 776,
+        "totalRental": 4656,
         "deposit": 5000,
         "deliveryPickup": 0,
         "deliveryReturn": 0,
         "totalDelivery": 0,
-        "grandTotal": 9310
+        "grandTotal": 4656
       },
       "contact": {
-        "value": "Тест",
-        "type": "telegram",
-        "name": "Тест",
-        "phone": ""
+        "value": "@Marseloid",
+        "type": "telegram"
       },
-      "timestamp": "2026-02-07T04:17:25.897Z"
+      "timestamp": "2026-02-07T19:17:34.674Z"
     },
     "status": "confirmed",
-    "created_at": "2026-02-07T04:17:26.313940",
-    "source": "admin_panel"
+    "source": "telegram_webapp",
+    "created_at": "2026-02-07T19:17:34.882862",
+    "confirmed_at": "2026-02-07T23:48:09.018283",
+    "updated_at": "2026-02-07T23:48:09.018327"
+  },
+  {
+    "booking_id": "27498267",
+    "user_id": "410812780",
+    "form_data": {
+      "car": {
+        "id": "mazda_mazda2_2024_white",
+        "name": "Mazda MAZDA2 2024 White",
+        "brand": "Mazda",
+        "model": "MAZDA2",
+        "year": "2024",
+        "color": "White"
+      },
+      "dates": {
+        "start": "2026-02-07T17:00:00.000Z",
+        "end": "2026-02-19T17:00:00.000Z",
+        "days": 13
+      },
+      "locations": {
+        "pickupLocation": "hotel",
+        "returnLocation": "hotel"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 771,
+        "totalRental": 10023,
+        "deposit": 5000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 11023
+      },
+      "contact": {
+        "value": "@Denis_Merinov",
+        "type": "telegram"
+      },
+      "timestamp": "2026-02-08T10:00:41.799Z"
+    },
+    "status": "pre_booking",
+    "source": "telegram_webapp",
+    "created_at": "2026-02-08T10:00:42.611225"
+  },
+  {
+    "booking_id": "e973024d",
+    "user_id": "524583621",
+    "form_data": {
+      "car": {
+        "id": "namo_suzuki_swift_2020",
+        "name": "Suzuki Swift 2020 White",
+        "brand": "Suzuki",
+        "model": "Swift",
+        "year": "2020",
+        "color": "White"
+      },
+      "dates": {
+        "start": "2026-02-09T17:00:00.000Z",
+        "end": "2026-02-13T17:00:00.000Z",
+        "days": 5
+      },
+      "locations": {
+        "pickupLocation": "hotel",
+        "returnLocation": "hotel"
+      },
+      "pricing": {
+        "season": "high_season",
+        "dailyRate": 769,
+        "totalRental": 3845,
+        "deposit": 5000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 4845
+      },
+      "contact": {
+        "value": "@yana_notess",
+        "type": "telegram"
+      },
+      "timestamp": "2026-02-08T10:13:12.637Z"
+    },
+    "status": "pre_booking",
+    "source": "telegram_webapp",
+    "created_at": "2026-02-08T10:13:15.210123"
   }
 ]

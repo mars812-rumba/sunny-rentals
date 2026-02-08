@@ -1320,3 +1320,59 @@
 {"timestamp": "2026-02-07T01:02:25.866892", "user_id": "460037065", "role": "manager", "content": {"text": "", "message": "", "media": {"type": "sent_media", "content_type": "image/jpeg", "download_url": "/api/crm/media/460037065/sent_20260207_010225_4 (1).jpeg", "filename": "sent_20260207_010225_4 (1).jpeg", "file_size": 270175}}}
 {"timestamp": "2026-02-07T01:02:43.082Z", "user_id": "460037065", "role": "manager", "text": "Стоимость аренды 10.02-18.02 = 9,600", "source": "crm_panel"}
 {"timestamp": "2026-02-07T03:32:24.491652", "user_id": 460037065, "role": "user", "text": "Мне надо до 18.03", "username": "sergejs3", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T06:12:55.620651", "user_id": "460037065", "role": "manager", "content": {"text": "", "message": "", "media": {"type": "sent_media", "content_type": "image/jpeg", "download_url": "/api/crm/media/460037065/sent_20260207_061254_IMG-20240808-WA0041.jpg", "filename": "sent_20260207_061254_IMG-20240808-WA0041.jpg", "file_size": 306146}}}
+{"timestamp": "2026-02-07T06:14:34.276977", "user_id": "460037065", "role": "manager", "content": {"text": "", "message": "", "media": {"type": "sent_media", "content_type": "image/jpeg", "download_url": "/api/crm/media/460037065/sent_20260207_061433_IMG-20240808-WA0038.jpg", "filename": "sent_20260207_061433_IMG-20240808-WA0038.jpg", "file_size": 229024}}}
+{"timestamp": "2026-02-07T06:15:25.903Z", "user_id": "460037065", "role": "manager", "text": "10.02-18.03 - 21,600 бат", "source": "crm_panel"}
+{"timestamp": "2026-02-07T06:19:06.424809", "user_id": "460037065", "role": "manager", "content": {"text": "", "message": "", "media": {"type": "sent_media", "content_type": "image/jpeg", "download_url": "/api/crm/media/460037065/sent_20260207_061905_IMG-20260205-WA0004.jpg", "filename": "sent_20260207_061905_IMG-20260205-WA0004.jpg", "file_size": 270402}}}
+{"timestamp": "2026-02-07T06:19:26.129733", "user_id": "460037065", "role": "manager", "content": {"text": "", "message": "", "media": {"type": "sent_media", "content_type": "image/jpeg", "download_url": "/api/crm/media/460037065/sent_20260207_061925_IMG-20260205-WA0007.jpg", "filename": "sent_20260207_061925_IMG-20260205-WA0007.jpg", "file_size": 248486}}}
+{"timestamp": "2026-02-07T06:20:01.657930", "user_id": "460037065", "role": "manager", "content": {"text": "", "message": "", "media": {"type": "sent_media", "content_type": "image/jpeg", "download_url": "/api/crm/media/460037065/sent_20260207_062000_IMG-20260205-WA0003.jpg", "filename": "sent_20260207_062000_IMG-20260205-WA0003.jpg", "file_size": 399609}}}
+{"timestamp": "2026-02-07T06:20:12.590Z", "user_id": 460037065, "role": "manager", "text": "22,600", "source": "crm_panel"}
+{"timestamp": "2026-02-07T06:23:47.001Z", "user_id": "392906277", "role": "manager", "text": "Здравствуйте! Нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-02-07T06:24:06.798Z", "user_id": "1885503902", "role": "manager", "text": "Здравствуйте! Нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-02-07T06:24:08.198574", "user_id": 392906277, "role": "user", "text": "Добрый день! Да", "username": "Alexandr_2757", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T06:24:33.908Z", "user_id": "392906277", "role": "manager", "text": "Хорошо🙏", "source": "crm_panel"}
+{"timestamp": "2026-02-07T06:26:56.179Z", "user_id": "121221856", "role": "manager", "text": "Здравствуйте! Ищете авто на 1 день?", "source": "crm_panel"}
+{"timestamp": "2026-02-07T06:27:15.333Z", "user_id": "689846361", "role": "manager", "text": "Здравствуйте! Нужен авто на 2 дня?", "source": "crm_panel"}
+{"timestamp": "2026-02-07T06:29:09.251Z", "user_id": "5633881656", "role": "manager", "text": "Здравствуйте! Предложение ни чего? Или есть что то интересней?", "source": "crm_panel"}
+{"timestamp": "2026-02-07T07:33:42.674864", "user_id": 7553360348, "role": "user", "text": "Нужен бюджетный автомобиль", "username": "dobry_bober", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T08:03:19.947658", "user_id": "7553360348", "role": "manager", "content": {"text": "", "message": "", "media": {"type": "sent_media", "content_type": "image/jpeg", "download_url": "/api/crm/media/7553360348/sent_20260207_080317_IMG-20241129-WA0205.jpg", "filename": "sent_20260207_080317_IMG-20241129-WA0205.jpg", "file_size": 160624}}}
+{"timestamp": "2026-02-07T08:04:09.422Z", "user_id": 7553360348, "role": "manager", "text": "4250", "source": "crm_panel"}
+{"timestamp": "2026-02-07T08:05:56.523919", "user_id": 7553360348, "role": "user", "text": "👍", "username": "dobry_bober", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T08:25:19.849061", "user_id": 7553360348, "role": "user", "text": "Прошу предоставить информацию по полной стоимости авто с 09.02 по 14.02", "username": "dobry_bober", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T08:26:36.468803", "user_id": 7553360348, "role": "user", "text": "Машина нужна на патонг к отелю Patong Lodge Hotel", "username": "dobry_bober", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T08:41:57.974637", "user_id": 1097844047, "role": "user", "text": "Аренда авто", "username": "scrrrr_rrr", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T08:42:56.022030", "user_id": "7553360348", "role": "manager", "content": {"text": "", "message": "", "media": {"type": "sent_media", "content_type": "image/jpeg", "download_url": "/api/crm/media/7553360348/sent_20260207_084254_Изображение WhatsApp 2024-12-02 в 13.01.40_666c1d34 (1).jpg", "filename": "sent_20260207_084254_Изображение WhatsApp 2024-12-02 в 13.01.40_666c1d34 (1).jpg", "file_size": 370717}}}
+{"timestamp": "2026-02-07T08:43:20.031688", "user_id": "7553360348", "role": "manager", "content": {"text": "", "message": "", "media": {"type": "sent_media", "content_type": "image/jpeg", "download_url": "/api/crm/media/7553360348/sent_20260207_084319_IMG-20241202-WA0013 (2).jpg", "filename": "sent_20260207_084319_IMG-20241202-WA0013 (2).jpg", "file_size": 94715}}}
+{"timestamp": "2026-02-07T08:43:37.901Z", "user_id": 7553360348, "role": "manager", "text": "Прошу прощения на мазде бронь. Атив 4500", "source": "crm_panel"}
+{"timestamp": "2026-02-07T08:44:09.092Z", "user_id": 7553360348, "role": "manager", "text": "Доставка 500  возврат 500 депозит 5000", "source": "crm_panel"}
+{"timestamp": "2026-02-07T08:45:00.327Z", "user_id": 7553360348, "role": "manager", "text": "10500 полная стоимость из них 5000 депозит возвращается при сдаче", "source": "crm_panel"}
+{"timestamp": "2026-02-07T08:47:04.216Z", "user_id": 1097844047, "role": "manager", "text": "Добрый день", "source": "crm_panel"}
+{"timestamp": "2026-02-07T08:47:43.267Z", "user_id": 1097844047, "role": "manager", "text": "С 08.02-17.02 нужен авто?", "source": "crm_panel"}
+{"timestamp": "2026-02-07T08:48:06.145Z", "user_id": 7553360348, "role": "manager", "text": "Бронируем?", "source": "crm_panel"}
+{"timestamp": "2026-02-07T08:48:27.227706", "user_id": 1097844047, "role": "user", "text": "Нужен недорогой, с 8 по 10 число(включительно)", "username": "scrrrr_rrr", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T08:49:44.883Z", "user_id": 1097844047, "role": "manager", "text": "Минимальный срок аренды 3 дня, от 5 дней возможна доставка. Лидо самовывоз - аэропорт🙏", "source": "crm_panel"}
+{"timestamp": "2026-02-07T09:00:15.057Z", "user_id": 7553360348, "role": "manager", "text": "И мазда хэтч свободна 4250", "source": "crm_panel"}
+{"timestamp": "2026-02-07T09:15:13.023969", "user_id": 460037065, "role": "user", "text": "А есть BYD dolphin или что-то китайское дешевое но интересное ?", "username": "sergejs3", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T09:54:53.152Z", "user_id": 460037065, "role": "manager", "text": "Увы)", "source": "crm_panel"}
+{"timestamp": "2026-02-07T09:55:40.476Z", "user_id": 460037065, "role": "manager", "text": "Есть не дешёвое, но интересное", "source": "crm_panel"}
+{"timestamp": "2026-02-07T09:56:58.127Z", "user_id": 460037065, "role": "manager", "text": "Honda Civic RS вроде с 10.02 освободится", "source": "crm_panel"}
+{"timestamp": "2026-02-07T09:58:06.172Z", "user_id": 460037065, "role": "manager", "text": "В районе 39,000 ", "source": "crm_panel"}
+{"timestamp": "2026-02-07T11:42:40.530Z", "user_id": "479138035", "role": "manager", "text": "Добрый день! Подскажите, нужен авто?", "source": "crm_panel"}
+{"timestamp": "2026-02-07T11:42:56.624Z", "user_id": "479138035", "role": "manager", "text": "С 15.02-26.02", "source": "crm_panel"}
+{"timestamp": "2026-02-07T11:43:56.545773", "user_id": "374897465", "role": "manager", "content": {"text": "", "message": "", "media": {"type": "sent_media", "content_type": "image/jpeg", "download_url": "/api/crm/media/374897465/sent_20260207_114356_IMG-20241129-WA0205.jpg", "filename": "sent_20260207_114356_IMG-20241129-WA0205.jpg", "file_size": 160624}}}
+{"timestamp": "2026-02-07T13:09:33.515843", "user_id": 460037065, "role": "user", "text": "А в аэропорту можно забрать ?", "username": "sergejs3", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T13:09:37.697500", "user_id": 460037065, "role": "user", "text": "и что с депозитом ?", "username": "sergejs3", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T13:10:58.059Z", "user_id": 460037065, "role": "manager", "text": "А вы где находитесь? В аэропорту цивик бесплатно.", "source": "crm_panel"}
+{"timestamp": "2026-02-07T13:11:08.255Z", "user_id": 460037065, "role": "manager", "text": " Можно забрать.т", "source": "crm_panel"}
+{"timestamp": "2026-02-07T13:11:51.012576", "user_id": 460037065, "role": "user", "text": "да мне спортивный не надо мне что-то покомфортнее бы", "username": "sergejs3", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T13:11:54.245Z", "user_id": 460037065, "role": "manager", "text": "А тойота и хонда только доставкой 750 бат в одну сторону", "source": "crm_panel"}
+{"timestamp": "2026-02-07T13:12:09.690Z", "user_id": 460037065, "role": "manager", "text": "Например?", "source": "crm_panel"}
+{"timestamp": "2026-02-07T13:13:01.629010", "user_id": 460037065, "role": "user", "text": "MG", "username": "sergejs3", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T13:13:07.770544", "user_id": 460037065, "role": "user", "text": "5-ый", "username": "sergejs3", "source": "telegram_bot"}
+{"timestamp": "2026-02-07T16:24:33.889Z", "user_id": 460037065, "role": "manager", "text": "Посмотрю, должен быть", "source": "crm_panel"}
+{"timestamp": "2026-02-08T16:35:54.884790", "user_id": 400112157, "role": "user", "text": "Здравствуйте. Нужна машина с 23 февраля до 21 марта.", "username": "vetalzzz", "source": "telegram_bot"}
+{"timestamp": "2026-02-08T17:43:41.505Z", "user_id": 400112157, "role": "manager", "text": "Здравствуйте! Подскажите какой формат? Сколько человек?", "source": "crm_panel"}
+{"timestamp": "2026-02-08T17:44:56.917Z", "user_id": "410812780", "role": "manager", "text": "Здравствуйте! Оставляли заявку на бронь Mazda 2", "source": "crm_panel"}
+{"timestamp": "2026-02-08T17:45:05.109Z", "user_id": "410812780", "role": "manager", "text": "Подскажите, актуально?", "source": "crm_panel"}
+{"timestamp": "2026-02-08T17:55:18.801759", "user_id": 400112157, "role": "user", "text": "Что-то по размеру типа Honda jazz. Для 4 человек.", "username": "vetalzzz", "source": "telegram_bot"}
+{"timestamp": "2026-02-08T19:27:58.880034", "user_id": 410812780, "role": "user", "text": "Доброй ночи, уже нашёл в другом месте", "username": "Denis_Merinov", "source": "telegram_bot"}

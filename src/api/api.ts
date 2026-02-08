@@ -291,8 +291,13 @@ export async function fetchBookings(userId?: string): Promise<Booking[]> {
 }
 
 // Submit a new booking or update existing
-export async function submitBooking(formData: BookingFormData, bookingId?: string) {
-  const response = await fetch(`${API_BASE_URL}/api/admin/bookings`, {
+export async function submitBooking(formData: BookingFormData, bookingId?: string, isPreBooking: boolean = true) {
+  // ✅ ИСПРАВЛЕНИЕ: Используем разные эндпоинты в зависимости от типа брони
+  const endpoint = isPreBooking ?
+    `${API_BASE_URL}/api/bookings/web-create` :
+    `${API_BASE_URL}/api/admin/bookings`;
+    
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -315,6 +320,23 @@ export async function submitBooking(formData: BookingFormData, bookingId?: strin
     
     // Другие ошибки
     throw new Error(errorData.detail || 'Failed to save booking');
+  }
+
+  return response.json();
+}
+
+// Confirm a pre_booking (convert to confirmed)
+export async function confirmBooking(bookingId: string) {
+  const response = await fetch(`${API_BASE_URL}/api/admin/bookings/${bookingId}/confirm`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${AUTH_TOKEN}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to confirm booking');
   }
 
   return response.json();

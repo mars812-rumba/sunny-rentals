@@ -36,6 +36,11 @@ const BookingConfirmationContent = ({ car, filters, onClose, onBookingSubmit, is
   const grandTotal = totalRentalPrice + totalDelivery;
 
   const handleBooking = () => {
+    if (!onBookingSubmit) {
+      // Если нет обработчика, ничего не делаем (для site компонентов)
+      return;
+    }
+    
     if (requireWhatsApp) {
       if (!whatsapp.trim()) {
         setError(t('whatsapp_error_required'));
@@ -154,11 +159,11 @@ export interface BookingModalProps {
   onClose: () => void;
   car: any; // Consider a more specific type for car
   filters: any; // Consider a more specific type for filters
-  onBookingSubmit: (contact: { value: string; type: string }) => Promise<void>;
-  isSubmitting: boolean;
-  requireWhatsApp: boolean;
-  isSubmitted: boolean;
-  bookingId: string | null;
+  onBookingSubmit?: (contact: { value: string; type: string }) => Promise<void>;
+  isSubmitting?: boolean;
+  requireWhatsApp?: boolean;
+  isSubmitted?: boolean;
+  bookingId?: string | null;
 }
 
 const BookingModal = ({ isOpen, onClose, car, filters, onBookingSubmit, isSubmitting, requireWhatsApp, isSubmitted, bookingId }: BookingModalProps) => {

@@ -414,6 +414,10 @@ def check_booking_overlap(
     for booking in bookings:
         if exclude_booking_id and booking.get('booking_id') == exclude_booking_id:
             continue
+        
+        # 🔧 КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Игнорируем pre_booking
+        if booking.get('status') == 'pre_booking':
+            continue
             
         form_data = booking.get('form_data', {})
         if isinstance(form_data, dict):
@@ -3709,11 +3713,11 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
                 "booking_id": booking_id,
                 "user_id": "admin",
                 "form_data": form_data_dict,
-                "status": "confirmed",
+                "status": "pre_booking",  # ✅ ВСЕ брони начинаются как предварительные
                 "created_at": datetime.utcnow().isoformat(),
                 "source": "admin_panel"
             })
-            print(f"✓ Created booking {booking_id}")
+            print(f"✓ Created pre_booking {booking_id}")
         
         # Сохраняем
         with _lock:
@@ -3730,6 +3734,277 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
         raise
     except Exception as e:
         print(f"!!! FATAL ERROR in admin_create_booking: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(API_PREFIX + "/bookings/web-create")
+async def web_create_booking(booking_data: AdminBookingRequest):
+    """Создание брони с веб-интерфейса (предварительная бронь)"""
+    try:
+        print("=== START web_create_booking ===")
+        print(f"Successfully parsed request data: {booking_data}")
+        
+        form_data = booking_data.form_data
+        print(f"Form data parsed successfully: {form_data}")
+        
+        booking_id = booking_data.booking_id
+        
+        if not form_data:
+            print("ERROR: form_data is missing")
+            raise HTTPException(status_code=400, detail="form_data is missing")
+        
+        # ✅ НОВАЯ ПРОВЕРКА: Проверяем пересечение дат
+        car_id = form_data.car.id
+        start_date = form_data.dates.start
+        end_date = form_data.dates.end
+        
+        overlap_check = check_booking_overlap(
+            car_id=car_id,
+            start_date=start_date,
+            end_date=end_date,
+            exclude_booking_id=booking_id  # При редактировании исключаем текущую бронь
+        )
+        
+        if not overlap_check["available"]:
+            conflicts = overlap_check["conflicting_bookings"]
+            # ✅ Красивое сообщение
+            conflict_messages = []
+            for c in conflicts:
+                conflict_messages.append(
+                    f"• {c['customer_name']}: {c['start']} - {c['end']}"
+                )
+            
+            conflict_info = "\n".join(conflict_messages)  # ✅ Добавлены отступы
+            raise HTTPException(                           # ✅ Добавлены отступы
+                status_code=409,
+                detail=f"Машина уже забронирована на эти даты:\n{conflict_info}"
+            )
+        
+        # Конвертируем Pydantic в dict
+        form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
+        
+        bookings = load_bookings()
+        
+        if booking_id:
+            # Редактирование
+            print(f"Updating existing booking: {booking_id}")
+            found = False
+            for booking in bookings:
+                if booking.get('booking_id') == booking_id:
+                    booking['form_data'] = form_data_dict
+                    booking['updated_at'] = datetime.utcnow().isoformat()
+                    found = True
+                    print(f"✓ Updated booking {booking_id}")
+                    break
+            
+            if not found:
+                print(f"ERROR: Booking {booking_id} not found")
+                raise HTTPException(status_code=404, detail="Booking not found")
+        else:
+            # Создание
+            booking_id = str(uuid.uuid4())[:8]
+            print(f"Creating new booking: {booking_id}")
+            
+            bookings.append({
+                "booking_id": booking_id,
+                "user_id": "web_user",
+                "form_data": form_data_dict,
+                "status": "pre_booking",  # ✅ КЛЮЧЕВОЕ ОТЛИЧИЕ: создаем как предварительную бронь
+                "created_at": datetime.utcnow().isoformat(),
+                "source": "web_frontend"
+            })
+            print(f"✓ Created pre_booking {booking_id}")
+        
+        # Сохраняем
+        with _lock:
+            save_json(BOOKINGS_FILE, bookings)
+        print("✓ Bookings saved to JSON")
+        
+        # ✅ Уведомляем Telegram бота о новой предварительной брони
+        try:
+            notify_telegram_bot_about_booking(
+                booking_id=booking_id,
+                user_id=booking_data.form_data.contact.phone or "web_user",
+                form_data=form_data_dict,
+                username=None
+            )
+        except Exception as e:
+            print(f"Warning: Failed to notify bot about booking: {e}")
+        
+        print("=== SUCCESS ===")
+        return {
+            "status": "ok",
+            "booking_id": booking_id,
+            "message": "Предварительная бронь создана успешно"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"!!! FATAL ERROR in web_create_booking: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(API_PREFIX + "/bookings/telegram_webapp")
+async def telegram_webapp_create_booking(booking_data: AdminBookingRequest):
+    """Создание брони из Telegram WebApp (предварительная бронь)"""
+    try:
+        print("=== START telegram_webapp_create_booking ===")
+        print(f"Successfully parsed request data: {booking_data}")
+        
+        form_data = booking_data.form_data
+        print(f"Form data parsed successfully: {form_data}")
+        
+        booking_id = booking_data.booking_id
+        
+        if not form_data:
+            print("ERROR: form_data is missing")
+            raise HTTPException(status_code=400, detail="form_data is missing")
+        
+        # ✅ НОВАЯ ПРОВЕРКА: Проверяем пересечение дат
+        car_id = form_data.car.id
+        start_date = form_data.dates.start
+        end_date = form_data.dates.end
+        
+        overlap_check = check_booking_overlap(
+            car_id=car_id,
+            start_date=start_date,
+            end_date=end_date,
+            exclude_booking_id=booking_id  # При редактировании исключаем текущую бронь
+        )
+        
+        if not overlap_check["available"]:
+            conflicts = overlap_check["conflicting_bookings"]
+            # ✅ Красивое сообщение
+            conflict_messages = []
+            for c in conflicts:
+                conflict_messages.append(
+                    f"• {c['customer_name']}: {c['start']} - {c['end']}"
+                )
+            
+            conflict_info = "\n".join(conflict_messages)  # ✅ Добавлены отступы
+            raise HTTPException(                           # ✅ Добавлены отступы
+                status_code=409,
+                detail=f"Машина уже забронирована на эти даты:\n{conflict_info}"
+            )
+        
+        # Конвертируем Pydantic в dict
+        form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
+        
+        bookings = load_bookings()
+        
+        if booking_id:
+            # Редактирование
+            print(f"Updating existing booking: {booking_id}")
+            found = False
+            for booking in bookings:
+                if booking.get('booking_id') == booking_id:
+                    booking['form_data'] = form_data_dict
+                    booking['updated_at'] = datetime.utcnow().isoformat()
+                    found = True
+                    print(f"✓ Updated booking {booking_id}")
+                    break
+            
+            if not found:
+                print(f"ERROR: Booking {booking_id} not found")
+                raise HTTPException(status_code=404, detail="Booking not found")
+        else:
+            # Создание
+            booking_id = str(uuid.uuid4())[:8]
+            print(f"Creating new booking: {booking_id}")
+            
+            bookings.append({
+                "booking_id": booking_id,
+                "user_id": "telegram_user",
+                "form_data": form_data_dict,
+                "status": "pre_booking",  # ✅ КЛЮЧЕВОЕ ОТЛИЧИЕ: создаем как предварительную бронь
+                "created_at": datetime.utcnow().isoformat(),
+                "source": "telegram_webapp"
+            })
+            print(f"✓ Created pre_booking {booking_id}")
+        
+        # Сохраняем
+        with _lock:
+            save_json(BOOKINGS_FILE, bookings)
+        print("✓ Bookings saved to JSON")
+        
+        # ✅ Уведомляем Telegram бота о новой предварительной брони
+        try:
+            notify_telegram_bot_about_booking(
+                booking_id=booking_id,
+                user_id=booking_data.form_data.contact.phone or "telegram_user",
+                form_data=form_data_dict,
+                username=None
+            )
+        except Exception as e:
+            print(f"Warning: Failed to notify bot about booking: {e}")
+        
+        print("=== SUCCESS ===")
+        return {
+            "status": "ok",
+            "booking_id": booking_id,
+            "message": "Предварительная бронь создана успешно"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"!!! FATAL ERROR in telegram_webapp_create_booking: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(API_PREFIX + "/admin/bookings/{booking_id}/confirm")
+async def confirm_booking(booking_id: str):
+    """Подтвердить предварительную бронь (convert pre_booking to confirmed)"""
+    try:
+        print(f"=== START confirm_booking for {booking_id} ===")
+        
+        bookings = load_bookings()
+        
+        # Находим бронь
+        booking_found = False
+        for booking in bookings:
+            if booking.get('booking_id') == booking_id:
+                if booking.get('status') != 'pre_booking':
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Бронь {booking_id} уже подтверждена или имеет статус {booking.get('status')}"
+                    )
+                
+                # Подтверждаем бронь
+                booking['status'] = 'confirmed'
+                booking['confirmed_at'] = datetime.utcnow().isoformat()
+                booking['updated_at'] = datetime.utcnow().isoformat()
+                booking_found = True
+                
+                print(f"✓ Подтверждена бронь {booking_id}")
+                break
+        
+        if not booking_found:
+            raise HTTPException(status_code=404, detail=f"Бронь {booking_id} не найдена")
+        
+        # Сохраняем
+        with _lock:
+            save_json(BOOKINGS_FILE, bookings)
+        print("✓ Bookings saved to JSON")
+        
+        print("=== SUCCESS ===")
+        return {
+            "status": "ok",
+            "booking_id": booking_id,
+            "message": "Бронь успешно подтверждена"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"!!! FATAL ERROR in confirm_booking: {e}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

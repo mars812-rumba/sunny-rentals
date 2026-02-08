@@ -1,0 +1,32 @@
+  // Функция подтверждения бронирования
+  const confirmBooking = async (bookingId: string) => {
+    setLoadingAction(prev => ({ ...prev, [`confirm_${bookingId}`]: true }));
+    
+    try {
+      const response = await fetch(`/api/admin/bookings/${bookingId}/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        // Обновляем локальный список бронирований
+        setBookings(prev => prev.map(b => 
+          b.booking_id === bookingId 
+            ? { ...b, status: 'confirmed', confirmed_at: new Date().toISOString() }
+            : b
+        ));
+        
+        // Показываем уведомление
+        console.log('✅ Бронирование подтверждено');
+      } else {
+        const error = await response.json();
+        console.error('❌ Ошибка подтверждения:', error.message);
+      }
+    } catch (e) {
+      console.error('❌ Ошибка сети:', e);
+    } finally {
+      setLoadingAction(prev => ({ ...prev, [`confirm_${bookingId}`]: false }));
+    }
+  };
+
+  useEffect(() => { loadMainData(); }, [loadMainData]);`

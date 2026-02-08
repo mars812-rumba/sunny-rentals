@@ -706,7 +706,7 @@
       "model": "MG5",
       "year": "2024",
       "color": "Red",
-      "available": true,
+      "available": false,
       "photos": {
         "main": "sedan/namo_mg5_red_2024/1.jpg",
         "gallery": [
@@ -741,7 +741,7 @@
       "quick_id": "mg_mg5_2024_red",
       "rating": 4.5,
       "class_": "sedan",
-      "updated_at": "2026-01-30T13:59:56.751714"
+      "updated_at": "2026-02-07T09:48:50.377985"
     },
     "mazda_mazda2_2023_white": {
       "id": "mazda_mazda2_2023_white",
@@ -2856,47 +2856,6 @@
       "quick_id": "Detmak2024",
       "rating": 4.5,
       "updated_at": "2026-01-30T13:59:56.752153"
-    },
-    "Mg 5": {
-      "id": "Mg 5",
-      "name": "MG5 Mg5  2023 Gray",
-      "class": "compact",
-      "brand": "MG5",
-      "model": "Mg5 ",
-      "year": "2023",
-      "color": "Gray",
-      "available": true,
-      "photos": {
-        "main": "compact/Mg 5/1.jpg",
-        "gallery": [
-          "compact/Mg 5/1.jpg"
-        ]
-      },
-      "pricing": {
-        "low_season": {
-          "price_1_6": 722,
-          "price_7_14": 722,
-          "price_15_29": 631,
-          "price_30": 451
-        },
-        "high_season": {
-          "price_1_6": 992,
-          "price_7_14": 992,
-          "price_15_29": 902,
-          "price_30": 812
-        },
-        "deposit": 5000
-      },
-      "specs": {
-        "fuel": "Бензин",
-        "transmission": "Автомат",
-        "power": "122",
-        "engine": "1.5l"
-      },
-      "supplier": "namo",
-      "quick_id": "Mg 5",
-      "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752162"
     }
   },
   "categories": {

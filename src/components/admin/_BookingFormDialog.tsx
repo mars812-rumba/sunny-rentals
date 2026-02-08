@@ -215,8 +215,8 @@ __________________
         },
         pricing: {
           dailyRate: Math.round(pricing.dailyRate), totalRental: Math.round(pricing.totalRental),
-          deposit: Math.round(pricing.deposit), deliveryPickup: Math.round(pricing.deliveryPickup),
-          deliveryReturn: Math.round(pricing.deliveryReturn), totalDelivery: Math.round(pricing.totalDelivery),
+          deposit: Math.round(pricing.deposit), deliveryPickup: Math.round((pricing as any).deliveryPickup || 0),
+          deliveryReturn: Math.round((pricing as any).deliveryReturn || 0), totalDelivery: Math.round(pricing.totalDelivery),
           grandTotal: Math.round(pricing.grandTotal)
         },
         contact: {
@@ -227,7 +227,7 @@ __________________
       };
 
       const bId = booking?.booking_id || booking?.id || null;
-      await submitBooking(formDataForApi as any, bId);
+      await submitBooking(formDataForApi as any, bId, true); // Admin тоже создает предварительные брони
 
       toast.success(isEditing ? "Обновлено" : "Создано");
       onSuccess();
