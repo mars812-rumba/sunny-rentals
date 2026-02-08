@@ -445,3 +445,52 @@ export function getDeliveryPrice(locationId: string): number {
   const location = PICKUP_LOCATIONS.find(l => l.id === locationId);
   return location?.price ?? 500;
 }
+
+// Car Owner type
+export interface CarOwner {
+  id: string;
+  name: string;
+  contact?: string;
+  car_ids?: Record<string, {
+    name: string;
+    license_plate?: string;
+  }>;
+}
+
+// Fetch all car owners
+export async function fetchCarOwners(): Promise<Record<string, string>> {
+  const response = await fetch(`${API_BASE_URL}/api/car-owners`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch car owners');
+  }
+  const data = await response.json();
+  const owners = data.owners || [];
+
+  // Convert array to map: { carId: ownerName }
+  const carOwnersMap: Record<string, string> = {};
+
+  for (const owner of owners) {
+    if (owner.car_ids) {
+      for (const carId of Object.keys(owner.car_ids)) {
+        carOwnersMap[carId] = owner.name;
+      }
+    }
+  }
+
+  return carOwnersMap;
+}
+
+// Fetch owners list for filter dropdown
+export async function fetchOwnersList(): Promise<{ id: string; name: string }[]> {
+  const response = await fetch(`${API_BASE_URL}/api/car-owners`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch owners list');
+  }
+  const data = await response.json();
+  const owners = data.owners || [];
+
+  return owners.map((owner: any) => ({
+    id: owner.id,
+    name: owner.name
+  }));
+}

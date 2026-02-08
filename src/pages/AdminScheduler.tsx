@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { startOfDay, startOfMonth } from 'date-fns';
-import { Calendar, Filter, LayoutGrid, List, ZoomIn, ZoomOut } from 'lucide-react';
+import { Calendar, Filter, LayoutGrid, List, ZoomIn, ZoomOut, Users } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { SchedulerCalendar } from '@/components/admin/SchedulerCalendar';
 import { MonthCalendarView } from '@/components/admin/MonthCalendarView';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 import { DayDetailsModal } from '@/components/admin/DayDetailsModal';
-import { fetchCars, fetchBookings, fetchCarOwners, Car, Booking, fetchBookingsLogistics  } from '@/api/api.ts';
+import { fetchCars, fetchBookings, fetchCarOwners, Car, Booking, fetchBookingsLogistics, fetchOwnersList } from '@/api/api.ts';
 
 const CAR_CLASSES = [
-  { id: 'all', name: 'Все' },
+  { id: 'all', name: 'Все классы' },
   { id: 'compact', name: 'Компакт' },
   { id: 'sedan', name: 'Седан' },
   { id: 'suv', name: 'SUV' },
@@ -26,16 +26,18 @@ export default function AdminScheduler() {
   const [currentDate, setCurrentDate] = useState<Date>(startOfMonth(new Date()));
   const [startDate, setStartDate] = useState<Date>(startOfDay(new Date()));
   const [selectedClass, setSelectedClass] = useState<string>('all');
+  const [selectedOwner, setSelectedOwner] = useState<string>('all');
   const [daysToShow, setDaysToShow] = useState(30);
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [carOwnersMap, setCarOwnersMap] = useState<Record<string, string>>({});
   const [isCompactMode, setIsCompactMode] = useState(false);
+  const [ownersList, setOwnersList] = useState<{ id: string; name: string }[]>([]);
 
   const { data: logisticsData = [], isLoading: logisticsLoading, refetch: refetchLogistics } = useQuery({
     queryKey: ['admin-logistics'],
     queryFn: fetchBookingsLogistics,
   });
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
@@ -44,7 +46,7 @@ export default function AdminScheduler() {
   const [isDayModalOpen, setIsDayModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedDayEvents, setSelectedDayEvents] = useState<any[]>([]);
-  
+
   const [lastTap, setLastTap] = useState<{
     id: string;
     timestamp: number;
@@ -59,33 +61,39 @@ export default function AdminScheduler() {
     queryKey: ['admin-bookings'],
     queryFn: () => fetchBookings(),
   });
-  
+
+  // Загружаем мапу владельцев (carId -> ownerName) и список владельцев для фильтра
   useEffect(() => {
     fetchCarOwners().then(setCarOwnersMap);
+    fetchOwnersList().then(setOwnersList).catch(() => setOwnersList([]));
   }, []);
 
   const filteredCars = cars.filter(car => {
-    if (selectedClass === 'all') return true;
-    return car.class === selectedClass;
+    const matchesClass = selectedClass === 'all' || car.class === selectedClass;
+    const matchesOwner = selectedOwner === 'all' || carOwnersMap[car.id] === ownersList.find(o => o.id === selectedOwner)?.name;
+    return matchesClass && matchesOwner;
   });
 
   const filteredBookings = bookings.filter(booking => {
-    if (selectedClass === 'all') return true;
     const car = cars.find(c => c.id === booking.form_data.car.id);
-    return car?.class === selectedClass;
+    const matchesClass = selectedClass === 'all' || car?.class === selectedClass;
+    const matchesOwner = selectedOwner === 'all' || carOwnersMap[car?.id] === ownersList.find(o => o.id === selectedOwner)?.name;
+    return matchesClass && matchesOwner;
+  });
+
+  // Фильтруем logisticsData по выбранным фильтрам
+  const filteredLogisticsData = logisticsData.filter(item => {
+    const car = cars.find(c => c.id === item.car_id);
+    const matchesClass = selectedClass === 'all' || car?.class === selectedClass;
+    const matchesOwner = selectedOwner === 'all' || carOwnersMap[item.car_id] === ownersList.find(o => o.id === selectedOwner)?.name;
+    return matchesClass && matchesOwner;
   });
 
 const handleBookingClick = (booking: Booking) => {
-  // Ищем машину в парке
   const car = cars.find(c => c.id === booking.form_data.car.id);
-  
-  // Устанавливаем машину (если нашли) или null (если ручной ввод)
+
   setSelectedCar(car || null);
-  
-  // Устанавливаем саму бронь
   setSelectedBooking(booking);
-  
-  // ОТКРЫВАЕМ модалку в любом случае
   setIsModalOpen(true);
 };
 
@@ -151,7 +159,7 @@ const handleBookingClick = (booking: Booking) => {
   const handleBookingSuccess = () => {
     refetchBookings();
     refetchCars();
-    refetchLogistics(); // Обновляем logistics после любого изменения
+    refetchLogistics();
   };
 
   useEffect(() => {
@@ -166,83 +174,109 @@ const handleBookingClick = (booking: Booking) => {
 
   const isLoading = carsLoading || bookingsLoading || logisticsLoading;
 
+  // Сброс фильтров
+  const resetFilters = () => {
+    setSelectedClass('all');
+    setSelectedOwner('all');
+  };
+
+  const hasActiveFilters = selectedClass !== 'all' || selectedOwner !== 'all';
+
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      {/* Header - НЕПРОЗРАЧНЫЙ с тенью */}
+      {/* Header */}
       <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-4 py-2 shadow-md">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4 text-blue-600" />
             <span className="text-sm font-semibold text-gray-900">Календарь</span>
           </div>
-          
-          <div className="flex items-center gap-2">
-            {viewMode === 'gantt' && (
-              <>
-                {/* Фильтр - НЕПРОЗРАЧНЫЙ */}
-                <Select value={selectedClass} onValueChange={setSelectedClass}>
-                  <SelectTrigger className="w-24 h-7 text-xs bg-white border-gray-300 text-gray-900 font-medium">
-                    <Filter className="h-3 w-3 mr-1 text-gray-700" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white border-gray-300 shadow-lg">
-                    {CAR_CLASSES.map(cls => (
-                      <SelectItem 
-                        key={cls.id} 
-                        value={cls.id} 
-                        className="text-xs text-gray-900 hover:bg-gray-100 cursor-pointer"
-                      >
-                        {cls.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
 
-                {/* Кнопка компактного режима */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsCompactMode(!isCompactMode)}
-                  className="h-7 w-7 p-0 bg-white border-gray-300"
-                  title={isCompactMode ? "Показать фото" : "Скрыть фото"}
-                >
-                  {isCompactMode ? (
-                    <ZoomIn className="h-3.5 w-3.5 text-gray-700" />
-                  ) : (
-                    <ZoomOut className="h-3.5 w-3.5 text-gray-700" />
-                  )}
-                </Button>
-              </>
-            )}
-
-            {/* Переключатель вида */}
-            <div className="flex bg-gray-100 rounded-md p-0.5">
-              <Button
-                variant="ghost" 
-                size="sm"
-                onClick={() => setViewMode('month')}
-                className={`h-7 px-2 text-xs font-medium ${
-                  viewMode === 'month' 
-                    ? 'bg-blue-600 text-white shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <LayoutGrid className="h-3 w-3 mr-1" /> 
-              </Button>
-              <Button
-                variant="ghost" 
-                size="sm"
-                onClick={() => setViewMode('gantt')}
-                className={`h-7 px-2 text-xs font-medium ${
-                  viewMode === 'gantt' 
-                    ? 'bg-blue-600 text-white shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <List className="h-3 w-3 mr-1" /> 
-              </Button>
-            </div>
+          {/* Переключатель вида */}
+          <div className="flex bg-gray-100 rounded-md p-0.5">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setViewMode('month')}
+              className={`h-7 px-2 text-xs font-medium ${
+                viewMode === 'month'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <LayoutGrid className="h-3 w-3 mr-1" />
+              Месяц
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setViewMode('gantt')}
+              className={`h-7 px-2 text-xs font-medium ${
+                viewMode === 'gantt'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <List className="h-3 w-3 mr-1" />
+              Гант
+            </Button>
           </div>
+        </div>
+      </div>
+
+      {/* Фильтры - теперь ВНИЗУ */}
+      <div className="sticky top-[50px] z-30 bg-gray-100 border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-xs font-medium text-gray-600 flex items-center gap-1">
+            <Filter className="h-3 w-3" /> Фильтры:
+          </span>
+
+          {/* Фильтр класса */}
+          <Select value={selectedClass} onValueChange={setSelectedClass}>
+            <SelectTrigger className="w-32 h-8 text-xs bg-white border-gray-300">
+              <SelectValue placeholder="Класс" />
+            </SelectTrigger>
+            <SelectContent>
+              {CAR_CLASSES.map(cls => (
+                <SelectItem key={cls.id} value={cls.id}>
+                  {cls.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Фильтр владельца */}
+          <Select value={selectedOwner} onValueChange={setSelectedOwner}>
+            <SelectTrigger className="w-48 h-8 text-xs bg-white border-gray-300">
+              <Users className="h-3 w-3 mr-1" />
+              <SelectValue placeholder="Все владельцы" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Все владельцы</SelectItem>
+              {ownersList.map(owner => (
+                <SelectItem key={owner.id} value={owner.id}>
+                  {owner.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Кнопка сброса */}
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetFilters}
+              className="h-8 px-2 text-xs text-gray-500 hover:text-gray-900"
+            >
+              Сбросить
+            </Button>
+          )}
+
+          {/* Показываем количество */}
+          <span className="text-xs text-gray-500 ml-auto">
+            {filteredCars.length} авто / {filteredLogisticsData.length} доставок
+          </span>
         </div>
       </div>
 
@@ -255,7 +289,7 @@ const handleBookingClick = (booking: Booking) => {
           <MonthCalendarView
             currentDate={currentDate}
             bookings={filteredBookings}
-            logisticsData={logisticsData}
+            logisticsData={filteredLogisticsData}
             onDateChange={setCurrentDate}
             onBookingClick={handleBookingClick}
             onDayClick={handleDayClick}
@@ -264,7 +298,7 @@ const handleBookingClick = (booking: Booking) => {
         ) : (
           <SchedulerCalendar
             cars={filteredCars}
-            bookings={bookings}
+            bookings={filteredBookings}
             startDate={startDate}
             daysToShow={daysToShow}
             onDateChange={setStartDate}
