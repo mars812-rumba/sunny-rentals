@@ -98,8 +98,11 @@ export const UserCard: React.FC<UserCardProps> = ({
         {/* Row 4: Indicators & Actions */}
         <div className="flex items-center justify-between pt-1">
           <div className="flex items-center gap-1">
-            <MarkerButton type="unprocessed" active={user.marker === 'unprocessed'} onClick={() => onMarkerChange(user.user_id, 'unprocessed')} Icon={CirclePlus} />
-            <MarkerButton type="in_progress" active={user.marker === 'in_progress'} onClick={() => onMarkerChange(user.user_id, 'in_progress')} Icon={CircleDollarSign} />
+            {/* Маркеры (только для in_work) */}
+            <MarkerButton type="need_offer" active={user.marker === 'need_offer'} onClick={() => user.status === 'in_work' && onMarkerChange(user.user_id, 'need_offer')} Icon={CircleDollarSign} color="text-amber-600" />
+            <MarkerButton type="offer_sent" active={user.marker === 'offer_sent'} onClick={() => user.status === 'in_work' && onMarkerChange(user.user_id, 'offer_sent')} Icon={CircleCheckBig} color="text-blue-600" />
+            <MarkerButton type="follow_up" active={user.marker === 'follow_up'} onClick={() => user.status === 'in_work' && onMarkerChange(user.user_id, 'follow_up')} Icon={CirclePlus} color="text-purple-600" />
+            <MarkerButton type="need_new" active={user.marker === 'need_new'} onClick={() => user.status === 'in_work' && onMarkerChange(user.user_id, 'need_new')} Icon={MessageSquare} color="text-gray-600" />
             <div className="w-px h-3 bg-slate-200 mx-0.5"></div>
             <div className="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
               <MessageSquare className="w-2.5 h-2.5" />
@@ -125,9 +128,9 @@ export const UserCard: React.FC<UserCardProps> = ({
   );
 };
 
-const MarkerButton = ({ type, active, onClick, Icon }: any) => (
+const MarkerButton = ({ type, active, onClick, Icon, color }: { type: string, active: boolean, onClick: () => void, Icon: any, color: string }) => (
   <button onClick={(e) => { e.stopPropagation(); onClick(); }}
-    className={`p-0.5 rounded transition-colors ${active ? 'text-blue-600 bg-blue-50' : 'text-slate-400 hover:bg-slate-50'}`}>
+    className={`p-0.5 rounded transition-colors ${active ? `${color} bg-opacity-10` : 'text-slate-400 hover:bg-slate-50'}`}>
     <Icon className="w-3 h-3" />
   </button>
 );

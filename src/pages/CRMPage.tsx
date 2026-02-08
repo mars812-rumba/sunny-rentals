@@ -20,7 +20,18 @@ import {
   CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
-import { MarkerType } from '@/types/crm';
+import { MarkerType, MARKER_CONFIGS, STATUS_CONFIG as STATUS_CONFIG_TYPES } from '@/types/crm';
+
+// Используем конфиги из types/crm.ts
+const STATUS_CONFIG = STATUS_CONFIG_TYPES;
+
+// Конфигурация маркеров (новые типы)
+const MARKER_OPTIONS: { value: MarkerType; label: string; emoji: string }[] = [
+  { value: 'need_offer', label: 'Нужен оффер', emoji: '💰' },
+  { value: 'offer_sent', label: 'Оффер отправлен', emoji: '📤' },
+  { value: 'follow_up', label: 'Follow-up', emoji: '🔔' },
+  { value: 'need_new', label: 'Нужны данные', emoji: '❓' },
+];
 
 // TypeScript интерфейсы для работы с диалогами
 interface DialogEvent {
@@ -72,14 +83,15 @@ interface User {
   marker?: string | null;
 }
 
-const MAIN_STATUSES = ['new', 'interested', 'in_work', 'pending'];
+// Новые статусы: new → in_work → pre_booking → confirmed
+const MAIN_STATUSES = ['new', 'in_work', 'pre_booking', 'confirmed'];
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  'new': { label: 'Холодные', color: '#64748b', bg: 'bg-slate-100' },
-  'interested': { label: 'Теплые', color: '#2563eb', bg: 'bg-blue-50' },
+  'new': { label: 'Новые', color: '#64748b', bg: 'bg-slate-100' },
   'in_work': { label: 'В работе', color: '#7c3aed', bg: 'bg-purple-50' },
-  'pending': { label: 'Заявки', color: '#ea580c', bg: 'bg-orange-50' },
-  'confirmed': { label: 'Бронь', color: '#10b981', bg: 'bg-emerald-50' },
+  'pre_booking': { label: 'Предбронь', color: '#ea580c', bg: 'bg-orange-50' },
+  'confirmed': { label: 'Подтверждено', color: '#10b981', bg: 'bg-emerald-50' },
   'completed': { label: 'Завершен', color: '#059669', bg: 'bg-green-100' },
+  'cancelled': { label: 'Отменен', color: '#ef4444', bg: 'bg-red-100' },
   'archive': { label: 'Архив', color: '#94a3b8', bg: 'bg-slate-200' }
 };
 
@@ -721,8 +733,15 @@ const handleQuickSaveNote = async (userId) => {
   }
 };
 
-// Управление маркерами
+// Управление маркерами (только для status === 'in_work')
 const handleMarkerChange = async (userId: number, marker: MarkerType | null) => {
+  // Проверяем что пользователь в статусе in_work
+  const user = users.find(u => u.user_id === userId);
+  if (user && user.status !== 'in_work') {
+    console.warn('Маркеры можно устанавливать только для статуса "in_work"');
+    return;
+  }
+
   try {
     const response = await fetch('/api/crm/update_marker', {
       method: 'POST',
@@ -735,8 +754,8 @@ const handleMarkerChange = async (userId: number, marker: MarkerType | null) => 
 
     if (response.ok) {
       // Обновляем локальное состояние
-      setUsers(prev => prev.map(user =>
-        user.user_id === userId ? { ...user, marker } : user
+      setUsers(prev => prev.map(u =>
+        u.user_id === userId ? { ...u, marker } : u
       ));
       console.log(`Маркер для пользователя ${userId}:`, marker || 'сброшен');
     } else {
@@ -897,14 +916,14 @@ const handleUpdateNote = async () => {
   {/* РАЗДЕЛИТЕЛЬ (тонкая линия) */}
   <div className="h-px bg-slate-100 w-full mx-auto"></div>
 
-  {/* РЯД 2: Маркеры (Бизнес-логика) */}
+  {/* РЯД 2: Маркеры (Бизнес-логика) - только для in_work */}
   <div className="flex gap-1.5 bg-slate-100/30 p-1 rounded-xl w-fit">
     {[
       { id: 'all', icon: Filter, color: 'text-slate-400' },
-      { id: 'unprocessed', icon: CirclePlus, color: 'text-blue-500' },
-      { id: 'in_progress', icon: CircleDollarSign, color: 'text-green-500' },
-      { id: 'ready', icon: CircleCheckBig, color: 'text-emerald-500' },
-      { id: 'rejected', icon: CircleMinus, color: 'text-red-500' },
+      { id: 'need_offer', icon: CircleDollarSign, color: 'text-amber-500' },
+      { id: 'offer_sent', icon: CircleCheckBig, color: 'text-blue-500' },
+      { id: 'follow_up', icon: CirclePlus, color: 'text-purple-500' },
+      { id: 'need_new', icon: MessageSquare, color: 'text-gray-500' },
     ].map(m => (
       <Button
         key={m.id}
@@ -937,17 +956,22 @@ const handleUpdateNote = async () => {
     // ЛОГИКА ПОДСВЕТКИ: если последний ответил юзер - нужно внимание
     const needsReply = dialog?.last_message_from === 'user';
     const aiActive = dialog?.claude_status === 'active';
-    // 1. ОПРЕДЕЛЯЕМ ФОН В ЗАВИСИМОСТИ ОТ МАРКЕРА
+
+    // Маркеры работают только для status === 'in_work'
+    const canHaveMarker = user.status === 'in_work';
+
+    // 1. ОПРЕДЕЛЯЕМ ФОН В ЗАВИСИМОСТИ ОТ МАРКЕРА (новые типы)
     const markerStyles: Record<string, string> = {
-      'unprocessed': 'bg-blue-50/60 border-blue-100', // Интересующийся (+) -> Синий
-      'in_progress': 'bg-green-50/60 border-green-100', // В работе ($) -> Зеленый
-      'ready': 'bg-purple-50/60 border-purple-100',     // Выполненный (checkmark) -> Фиолетовый
-      'rejected': 'bg-red-50/40 border-red-100',        // Отказ (-) -> Красный (опционально)
+      'need_offer': 'bg-amber-50/60 border-amber-200',   // 💰 Нужен оффер -> Жёлтый
+      'offer_sent': 'bg-blue-50/60 border-blue-100',     // 📤 Оффер отправлен -> Синий
+      'follow_up': 'bg-purple-50/60 border-purple-100',  // 🔔 Follow-up -> Фиолетовый
+      'need_new': 'bg-gray-50/60 border-gray-200',       // ❓ Нужны данные -> Серый
     };
 
-    // Приоритет: если есть маркер — красим в его цвет. Если нет и нужен ответ — красим в янтарный. Иначе — белый.
-    const cardBgClass = user.marker && markerStyles[user.marker] 
-      ? markerStyles[user.marker] 
+    // Приоритет: маркер → нужет ответ → белый
+    // Маркеры работают только когда status === 'in_work'
+    const cardBgClass = (canHaveMarker && user.marker && markerStyles[user.marker])
+      ? markerStyles[user.marker]
       : (needsReply ? 'bg-amber-50/60 border-amber-200' : 'bg-white');
 
     return (
@@ -1019,10 +1043,11 @@ const handleUpdateNote = async () => {
 {/* СТРОКА 3: Интерактивная заметка с адаптивной логикой цветов */}
 <div
   className={`flex items-center gap-1.5 rounded px-2 py-1 border transition-colors cursor-text min-h-[24px] ${
-    user.marker === 'unprocessed' ? 'bg-blue-100/50 border-blue-200/50' :
-    user.marker === 'in_progress' ? 'bg-green-100/50 border-green-200/50' :
-    user.marker === 'ready'       ? 'bg-purple-100/50 border-purple-200/50' :
-    user.last_note                ? 'bg-[#f8b515]/10 border-[#f8b515]/30 hover:bg-[#f8b515]/20' : 
+    user.marker === 'need_offer' ? 'bg-amber-100/50 border-amber-200/50' :
+    user.marker === 'offer_sent' ? 'bg-blue-100/50 border-blue-200/50' :
+    user.marker === 'follow_up'  ? 'bg-purple-100/50 border-purple-200/50' :
+    user.marker === 'need_new'   ? 'bg-gray-100/50 border-gray-200/50' :
+    user.last_note                ? 'bg-[#f8b515]/10 border-[#f8b515]/30 hover:bg-[#f8b515]/20' :
                                     'bg-slate-50 border-slate-100 hover:bg-white hover:border-blue-200'
   }`}
   onClick={(e) => {
@@ -1032,9 +1057,10 @@ const handleUpdateNote = async () => {
   }}
 >
   <StickyNote className={`w-2.5 h-2.5 shrink-0 ${
-    user.marker === 'unprocessed' ? 'text-blue-600' :
-    user.marker === 'in_progress' ? 'text-green-600' :
-    user.marker === 'ready'       ? 'text-purple-600' :
+    user.marker === 'need_offer' ? 'text-amber-600' :
+    user.marker === 'offer_sent' ? 'text-blue-600' :
+    user.marker === 'follow_up'  ? 'text-purple-600' :
+    user.marker === 'need_new'   ? 'text-gray-600' :
     user.last_note                ? 'text-[#f8b515]' : 'text-slate-400'
   }`} />
   
@@ -1042,10 +1068,11 @@ const handleUpdateNote = async () => {
     <input
       autoFocus
       className={`text-[8px] bg-transparent outline-none w-full font-bold ${
-        user.marker === 'unprocessed' ? 'text-blue-800' :
-        user.marker === 'in_progress' ? 'text-green-800' :
-        user.marker === 'ready'       ? 'text-purple-800' :
-        user.last_note                ? 'text-[#8a650d]' : 'text-blue-600'
+        user.marker === 'need_offer' ? 'text-amber-800' :
+        user.marker === 'offer_sent' ? 'text-blue-800' :
+        user.marker === 'follow_up'  ? 'text-purple-800' :
+        user.marker === 'need_new'   ? 'text-gray-800' :
+        user.last_note               ? 'text-[#8a650d]' : 'text-blue-600'
       }`}
       value={tempNote}
       onChange={(e) => setTempNote(e.target.value)}
@@ -1055,9 +1082,10 @@ const handleUpdateNote = async () => {
     />
   ) : (
     <p className={`text-[8px] truncate w-full italic tracking-tight ${
-      user.marker === 'unprocessed' ? 'text-blue-700' :
-      user.marker === 'in_progress' ? 'text-green-700' :
-      user.marker === 'ready'       ? 'text-purple-700' :
+      user.marker === 'need_offer' ? 'text-amber-700' :
+      user.marker === 'offer_sent' ? 'text-blue-700' :
+      user.marker === 'follow_up'  ? 'text-purple-700' :
+      user.marker === 'need_new'   ? 'text-gray-700' :
       user.last_note                ? 'text-[#8a650d]' : 'text-slate-400'
     }`}>
       {user.last_note || "Добавить заметку..."}
@@ -1069,70 +1097,74 @@ const handleUpdateNote = async () => {
     <div className="flex items-center justify-between pt-1">
       {/* Лево: Маркеры и Индикаторы чата */}
       <div className="flex items-center gap-2">
-        {/* Маркеры - 4 иконки */}
+        {/* Маркеры - 4 иконки (только для in_work) */}
         <div className="flex items-center gap-0.5">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              const newMarker = user.marker === 'unprocessed' ? null : 'unprocessed';
+              const newMarker = user.marker === 'need_offer' ? null : 'need_offer';
               handleMarkerChange(user.user_id, newMarker);
             }}
             className={`p-0.5 rounded transition-colors ${
-              user.marker === 'unprocessed'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-400 hover:text-blue-500 hover:bg-blue-50'
+              user.marker === 'need_offer'
+                ? 'text-amber-600 bg-amber-50'
+                : canHaveMarker ? 'text-slate-400 hover:text-amber-500 hover:bg-amber-50' : 'text-slate-200 cursor-not-allowed'
             }`}
-            title="Интересный лид - обработать позже"
-          >
-            <CirclePlus className="w-3 h-3" />
-          </button>
-          
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              const newMarker = user.marker === 'in_progress' ? null : 'in_progress';
-              handleMarkerChange(user.user_id, newMarker);
-            }}
-            className={`p-0.5 rounded transition-colors ${
-              user.marker === 'in_progress'
-                ? 'text-green-600 bg-green-50'
-                : 'text-slate-400 hover:text-green-500 hover:bg-green-50'
-            }`}
-            title="В работе"
+            title="💰 Нужен оффер"
+            disabled={!canHaveMarker}
           >
             <CircleDollarSign className="w-3 h-3" />
           </button>
-          
+
           <button
             onClick={(e) => {
               e.stopPropagation();
-              const newMarker = user.marker === 'rejected' ? null : 'rejected';
+              const newMarker = user.marker === 'offer_sent' ? null : 'offer_sent';
               handleMarkerChange(user.user_id, newMarker);
             }}
             className={`p-0.5 rounded transition-colors ${
-              user.marker === 'rejected'
-                ? 'text-red-600 bg-red-50'
-                : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
+              user.marker === 'offer_sent'
+                ? 'text-blue-600 bg-blue-50'
+                : canHaveMarker ? 'text-slate-400 hover:text-blue-500 hover:bg-blue-50' : 'text-slate-200 cursor-not-allowed'
             }`}
-            title="Отказ"
-          >
-            <CircleMinus className="w-3 h-3" />
-          </button>
-          
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              const newMarker = user.marker === 'ready' ? null : 'ready';
-              handleMarkerChange(user.user_id, newMarker);
-            }}
-            className={`p-0.5 rounded transition-colors ${
-              user.marker === 'ready'
-                ? 'text-emerald-600 bg-emerald-50'
-                : 'text-slate-400 hover:text-emerald-500 hover:bg-emerald-50'
-            }`}
-            title="Готово!"
+            title="📤 Оффер отправлен"
+            disabled={!canHaveMarker}
           >
             <CircleCheckBig className="w-3 h-3" />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const newMarker = user.marker === 'follow_up' ? null : 'follow_up';
+              handleMarkerChange(user.user_id, newMarker);
+            }}
+            className={`p-0.5 rounded transition-colors ${
+              user.marker === 'follow_up'
+                ? 'text-purple-600 bg-purple-50'
+                : canHaveMarker ? 'text-slate-400 hover:text-purple-500 hover:bg-purple-50' : 'text-slate-200 cursor-not-allowed'
+            }`}
+            title="🔔 Follow-up"
+            disabled={!canHaveMarker}
+          >
+            <CirclePlus className="w-3 h-3" />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const newMarker = user.marker === 'need_new' ? null : 'need_new';
+              handleMarkerChange(user.user_id, newMarker);
+            }}
+            className={`p-0.5 rounded transition-colors ${
+              user.marker === 'need_new'
+                ? 'text-gray-600 bg-gray-50'
+                : canHaveMarker ? 'text-slate-400 hover:text-gray-500 hover:bg-gray-50' : 'text-slate-200 cursor-not-allowed'
+            }`}
+            title="❓ Нужны данные"
+            disabled={!canHaveMarker}
+          >
+            <MessageSquare className="w-3 h-3" />
           </button>
         </div>
 
