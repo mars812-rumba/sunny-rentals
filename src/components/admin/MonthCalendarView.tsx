@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect, memo, useState } from 'react';
+import React, { useMemo, useCallback, useEffect, memo, useState, useRef } from 'react';
 import { 
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, 
   addDays, addMonths, isSameMonth, isToday 
@@ -220,18 +220,30 @@ export function MonthCalendarView({
     }
   }, [onBookingClick]);
 
+  // Защита от двойного переключения
+  const isAnimatingRef = useRef(false);
+
   useEffect(() => {
     if (!emblaApi) return;
-    const onSelect = () => {
+
+    const onSelect = async () => {
+      if (isAnimatingRef.current) return;
+
       const index = emblaApi.selectedScrollSnap();
       if (index === 0) {
+        isAnimatingRef.current = true;
         onDateChange(addMonths(currentDate, -1));
-        emblaApi.scrollTo(1, false);
+        // Ждём завершения анимации переключения на новый месяц
+        await emblaApi.scrollTo(1, true);
+        isAnimatingRef.current = false;
       } else if (index === 2) {
+        isAnimatingRef.current = true;
         onDateChange(addMonths(currentDate, 1));
-        emblaApi.scrollTo(1, false);
+        await emblaApi.scrollTo(1, true);
+        isAnimatingRef.current = false;
       }
     };
+
     emblaApi.on('select', onSelect);
     return () => { emblaApi.off('select', onSelect); };
   }, [emblaApi, currentDate, onDateChange]);
