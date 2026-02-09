@@ -305,21 +305,197 @@
     "created_at": "2026-02-08T10:00:42.611225"
   },
   {
-    "booking_id": "e973024d",
-    "user_id": "524583621",
+    "booking_id": "07915ed6",
+    "user_id": "web_user",
     "form_data": {
       "car": {
-        "id": "namo_suzuki_swift_2020",
-        "name": "Suzuki Swift 2020 White",
-        "brand": "Suzuki",
-        "model": "Swift",
-        "year": "2020",
+        "id": "toyota_veloz_2024_white",
+        "name": "Toyota VELOZ 2024 White",
+        "brand": "Toyota",
+        "model": "VELOZ",
+        "year": "2024",
         "color": "White"
       },
       "dates": {
-        "start": "2026-02-09T17:00:00.000Z",
-        "end": "2026-02-13T17:00:00.000Z",
+        "start": "2026-02-17T02:30:00.000Z",
+        "end": "2026-02-26T06:00:00.000Z",
+        "days": 9
+      },
+      "locations": {
+        "pickupLocation": "airport",
+        "returnLocation": "airport",
+        "pickupAddress": "",
+        "returnAddress": ""
+      },
+      "pricing": {
+        "dailyRate": 1198,
+        "totalRental": 10782,
+        "deposit": 10000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 0,
+        "grandTotal": 10782
+      },
+      "contact": {
+        "value": "Jopa",
+        "type": "telegram",
+        "name": "Jopa",
+        "phone": ""
+      },
+      "timestamp": "2026-02-08T22:52:11.926Z"
+    },
+    "status": "pre_booking",
+    "created_at": "2026-02-08T22:52:13.068711",
+    "source": "web_frontend"
+  },
+  {
+    "booking_id": "aa74cd0a",
+    "user_id": "web_user",
+    "form_data": {
+      "car": {
+        "id": "mazda_mazda2_2023_gray",
+        "name": "Mazda MAZDA2 2023 Gray",
+        "brand": "Mazda",
+        "model": "MAZDA2",
+        "year": "2023",
+        "color": "Gray"
+      },
+      "dates": {
+        "start": "2026-02-11T07:00:00.000Z",
+        "end": "2026-02-16T07:00:00.000Z",
         "days": 5
+      },
+      "locations": {
+        "pickupLocation": "hotel",
+        "returnLocation": "hotel",
+        "pickupAddress": "SRI PANWA",
+        "returnAddress": "SRI PANWA"
+      },
+      "pricing": {
+        "dailyRate": 931,
+        "totalRental": 4655,
+        "deposit": 5000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 5655
+      },
+      "contact": {
+        "value": "+79241046626",
+        "type": "whatsapp",
+        "name": "Яна",
+        "phone": ""
+      },
+      "timestamp": "2026-02-09T13:43:40.685Z"
+    },
+    "status": "pre_booking",
+    "created_at": "2026-02-09T13:43:42.070010",
+    "source": "web_frontend"
+  },
+  {
+    "booking_id": "8c409899",
+    "user_id": "web_user",
+    "form_data": {
+      "car": {
+        "id": "mazda_mazda2_2024_white",
+        "name": "Mazda MAZDA2 2024 White",
+        "brand": "Mazda",
+        "model": "MAZDA2",
+        "year": "2024",
+        "color": "White"
+      },
+      "dates": {
+        "start": "2026-02-13T06:00:00.000Z",
+        "end": "2026-02-18T06:00:00.000Z",
+        "days": 5
+      },
+      "locations": {
+        "pickupLocation": "airport",
+        "returnLocation": "airport",
+        "pickupAddress": "",
+        "returnAddress": ""
+      },
+      "pricing": {
+        "dailyRate": 858,
+        "totalRental": 4290,
+        "deposit": 5000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 0,
+        "grandTotal": 4290
+      },
+      "contact": {
+        "value": "45",
+        "type": "telegram",
+        "name": "вы",
+        "phone": ""
+      },
+      "timestamp": "2026-02-09T14:58:56.874Z"
+    },
+    "status": "pre_booking",
+    "created_at": "2026-02-09T14:58:57.031533",
+    "source": "web_frontend"
+  },
+  {
+    "booking_id": "cfeb576d",
+    "user_id": "web_user",
+    "form_data": {
+      "car": {
+        "id": "toyota_yaris_2023_blue",
+        "name": "Toyota YARIS Hb 2023 Blue",
+        "brand": "Toyota",
+        "model": "YARIS",
+        "year": "2023",
+        "color": "Blue"
+      },
+      "dates": {
+        "start": "2026-02-19T06:00:00.000Z",
+        "end": "2026-02-28T06:00:00.000Z",
+        "days": 9
+      },
+      "locations": {
+        "pickupLocation": "airport",
+        "returnLocation": "airport",
+        "pickupAddress": "",
+        "returnAddress": ""
+      },
+      "pricing": {
+        "dailyRate": 798,
+        "totalRental": 7182,
+        "deposit": 5000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 0,
+        "grandTotal": 7182
+      },
+      "contact": {
+        "value": "Ововт",
+        "type": "telegram",
+        "name": "Воово",
+        "phone": ""
+      },
+      "timestamp": "2026-02-09T15:00:41.642Z"
+    },
+    "status": "pre_booking",
+    "created_at": "2026-02-09T15:00:41.882376",
+    "source": "web_frontend"
+  },
+  {
+    "booking_id": "0c1a9e99",
+    "user_id": "web_session_ml7egnzi_olfru4g4l_4nv37f",
+    "form_data": {
+      "car": {
+        "id": "toyota_yaris_2023_blue",
+        "name": "Toyota YARIS Hb 2023 Blue",
+        "brand": "Toyota",
+        "model": "YARIS",
+        "year": "2023",
+        "color": "Blue"
+      },
+      "dates": {
+        "start": "2026-02-14T17:00:00.000Z",
+        "end": "2026-02-26T17:00:00.000Z",
+        "days": 13
       },
       "locations": {
         "pickupLocation": "hotel",
@@ -327,22 +503,21 @@
       },
       "pricing": {
         "season": "high_season",
-        "dailyRate": 769,
-        "totalRental": 3845,
+        "dailyRate": 798,
+        "totalRental": 10374,
         "deposit": 5000,
         "deliveryPickup": 500,
         "deliveryReturn": 500,
         "totalDelivery": 1000,
-        "grandTotal": 4845
+        "grandTotal": 11374
       },
       "contact": {
-        "value": "@yana_notess",
-        "type": "telegram"
+        "value": "777",
+        "type": "whatsapp"
       },
-      "timestamp": "2026-02-08T10:13:12.637Z"
+      "timestamp": "2026-02-09T15:47:19.534Z"
     },
-    "status": "pre_booking",
-    "source": "telegram_webapp",
-    "created_at": "2026-02-08T10:13:15.210123"
+    "status": "new",
+    "created_at": "2026-02-09T15:47:20.307892"
   }
 ]

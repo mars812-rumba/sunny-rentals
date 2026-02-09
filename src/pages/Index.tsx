@@ -482,11 +482,7 @@ if (!cars || cars.length === 0) {
         onClose={() => setIsSendBookFormOpen(false)}
         car={selectedCar}
         filters={filters}
-        onBookingSubmit={handleBookingSubmit}
-        isSubmitting={isSubmittingBooking}
         requireWhatsApp={!window.Telegram?.WebApp?.initDataUnsafe?.user?.username}
-        isSubmitted={isBookingSubmitted}
-        bookingId={bookingId}
       />
     </div>
   );

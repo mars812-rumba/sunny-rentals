@@ -317,7 +317,7 @@ export function SchedulerCalendar({
                         onMouseLeave={() => setHoveredBooking(null)}
                       >
                         {booking.status === 'pre_booking' && (
-                          <div className="absolute top-[1px] right-[2px] text-[6px] px-[2px] rounded-[1px] bg-gray-400/70 text-white font-semibold uppercase pointer-events-none">
+                          <div className="absolute bottom-[1px] right-[6px] text-[6px] px-[2px] rounded-[1px] bg-gray-400/70 text-white font-semibold uppercase pointer-events-none">
                             ПРЕДБРОНЬ
                           </div>
                         )}

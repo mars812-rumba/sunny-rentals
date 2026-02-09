@@ -110,10 +110,10 @@ const MonthGrid = memo(({
                         <div 
                           key={idx}
                           className={cn(
-                            "w-full px-1 py-0.5 text-[6px] font-bold border shadow-sm cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all",
+                            "w-full h-[13px] px-1 text-[7px] font-bold border shadow-sm cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all",
                             ev.type === 'pickup' 
-                              ? "bg-green-500 text-black border-green-200"
-                              : "bg-yellow-500 text-black border-yellow-200"
+                              ? "bg-green-400 text-gray-800 border-green-50"
+                              : "bg-yellow-400 text-gray-800 border-yellow-50"
                           )}
                           style={{
                             clipPath: "polygon(3px 0%, 100% 0%, calc(100% - 3px) 100%, 0% 100%)"

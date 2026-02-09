@@ -291,11 +291,22 @@ export async function fetchBookings(userId?: string): Promise<Booking[]> {
 }
 
 // Submit a new booking or update existing
-export async function submitBooking(formData: BookingFormData, bookingId?: string, isPreBooking: boolean = true) {
-  // ✅ ИСПРАВЛЕНИЕ: Используем разные эндпоинты в зависимости от типа брони
-  const endpoint = isPreBooking ?
-    `${API_BASE_URL}/api/bookings/web-create` :
-    `${API_BASE_URL}/api/admin/bookings`;
+export async function submitBooking(formData: BookingFormData, bookingId?: string, bookingSource: 'web' | 'admin' | 'telegram' = 'web') {
+  // ✅ ИСПРАВЛЕНИЕ: Используем разные эндпоинты в зависимости от источника
+  let endpoint: string;
+  
+  switch (bookingSource) {
+    case 'admin':
+      endpoint = `${API_BASE_URL}/api/admin/bookings`;
+      break;
+    case 'telegram':
+      endpoint = `${API_BASE_URL}/api/bookings/telegram_webapp`;
+      break;
+    case 'web':
+    default:
+      endpoint = `${API_BASE_URL}/api/bookings/web-create`;
+      break;
+  }
     
   const response = await fetch(endpoint, {
     method: 'POST',
