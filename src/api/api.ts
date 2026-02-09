@@ -144,6 +144,7 @@ export interface Booking {
   user_id: string | number;
   form_data: BookingFormData;
   status: string;
+  source: BookingSource;
   created_at: string;
 }
 
@@ -444,4 +445,30 @@ export function isHighSeason(date: Date = new Date()): boolean {
 export function getDeliveryPrice(locationId: string): number {
   const location = PICKUP_LOCATIONS.find(l => l.id === locationId);
   return location?.price ?? 500;
+}
+
+// Booking source type
+export type BookingSource = 'telegram_webapp' | 'web_browser' | 'manager';
+
+// Fetch owners list for filter dropdown
+export async function fetchOwnersList(): Promise<{ id: string; name: string }[]> {
+  const response = await fetch(`${API_BASE_URL}/api/car-owners`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch owners list');
+  }
+  const data = await response.json();
+  const owners = data.owners || [];
+
+  return owners.map((owner: any) => ({
+    id: owner.id,
+    name: owner.name
+  }));
+}
+
+// Helper to determine booking source
+export function getBookingSource(): BookingSource {
+  if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
+    return 'telegram_webapp';
+  }
+  return 'web_browser';
 }
