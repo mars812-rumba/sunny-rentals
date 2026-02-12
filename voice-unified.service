@@ -1,0 +1,19 @@
+[Unit]
+Description=Unified Voice Transcription System
+After=network.target
+
+[Service]
+Type=simple
+User=openclawbot
+WorkingDirectory=/home/openclawbot
+ExecStart=/usr/bin/python3 /home/openclawbot/voice_unified.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/tmp/voice_unified.log
+StandardError=append:/tmp/voice_unified.log
+
+# Environment
+Environment=OPENAI_API_KEY=%-env:OPENAI_API_KEY%
+
+[Install]
+WantedBy=multi-user.target
