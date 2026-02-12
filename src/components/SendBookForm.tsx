@@ -260,16 +260,14 @@ export const SendBookForm: React.FC<SendBookFormProps> = ({
       // ✅ Трекаем отправку брони
       await trackLeadEvent('booking_submitted', formData);
 
-      // Create actual booking with pre_booking status
-      const newBookingId = 'bk_' + Date.now();
-      
       // ✅ ОПРЕДЕЛЯЕМ ИСТОЧНИК: Telegram WebApp vs обычный браузер
       const isTelegram = typeof window !== 'undefined' && window.Telegram?.WebApp;
       const bookingSource = isTelegram ? 'telegram' : 'web';
       
       try {
-        await submitBooking(formData, newBookingId, bookingSource);
-        setBookingId(newBookingId);
+        // ✅ Получаем booking_id от backend
+        const result = await submitBooking(formData, null, bookingSource);
+        setBookingId(result.booking_id);  // Используем ID от backend
         setIsBookingSubmitted(true);
       } catch (error) {
         console.error('Failed to create booking:', error);
