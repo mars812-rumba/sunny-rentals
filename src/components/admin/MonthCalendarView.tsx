@@ -106,14 +106,20 @@ const MonthGrid = memo(({
                   
                   <div className="space-y-0.5 overflow-hidden font-sans">
                     {events.slice(0, 5).map((ev, idx) => {
+                      // Цвет в зависимости от статуса брони
+                      const isPreBooking = ev.bookingStatus === 'pre_booking';
+                      const bgClass = isPreBooking
+                        ? "bg-gray-400 text-gray-700 border-gray-300"
+                        : ev.type === 'pickup' 
+                          ? "bg-green-400 text-gray-800 border-green-50"
+                          : "bg-yellow-400 text-gray-800 border-yellow-50";
+                      
                       return (
                         <div 
                           key={idx}
                           className={cn(
                             "w-full h-[13px] px-1 text-[7px] font-bold border shadow-sm cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all",
-                            ev.type === 'pickup' 
-                              ? "bg-green-400 text-gray-800 border-green-50"
-                              : "bg-yellow-400 text-gray-800 border-yellow-50"
+                            bgClass
                           )}
                           style={{
                             clipPath: "polygon(3px 0%, 100% 0%, calc(100% - 3px) 100%, 0% 100%)"
@@ -178,15 +184,16 @@ export function MonthCalendarView({
       // значит она удалена — игнорируем её для календаря
       if (!fullBooking) return; 
 
-      // Дополнительная проверка на статус, если статус есть в объекте
-      if (fullBooking.status === 'cancelled') return;
+      // Фильтруем отмененные и отклоненные брони
+      if (fullBooking.status === 'cancelled' || fullBooking.status === 'rejected') return;
 
       const baseEvent = {
         carName: item.car_name,
         clientName: item.client_name,
         location: item.location || 'Не указано',
         booking_id: item.booking_id,
-        booking: fullBooking
+        booking: fullBooking,
+        bookingStatus: fullBooking.status  // для определения цвета
       };
 
       const pDate = new Date(item.pickup_date);
