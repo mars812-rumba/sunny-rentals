@@ -262,8 +262,13 @@ export const SendBookForm: React.FC<SendBookFormProps> = ({
 
       // Create actual booking with pre_booking status
       const newBookingId = 'bk_' + Date.now();
+      
+      // ✅ ОПРЕДЕЛЯЕМ ИСТОЧНИК: Telegram WebApp vs обычный браузер
+      const isTelegram = typeof window !== 'undefined' && window.Telegram?.WebApp;
+      const bookingSource = isTelegram ? 'telegram' : 'web';
+      
       try {
-        await submitBooking(formData, newBookingId);
+        await submitBooking(formData, newBookingId, bookingSource);
         setBookingId(newBookingId);
         setIsBookingSubmitted(true);
       } catch (error) {

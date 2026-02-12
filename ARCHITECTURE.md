@@ -1,328 +1,372 @@
-# 🏎️ Sunny Rentals — Архитектура проекта
+# Sunny Rentals — Архитектура проекта
 
-## 📂 Структура файлов
+## 📁 Структура проекта
 
 ```
-/root/tgbot/
-├── webapp/                          # ⭐ Этот репозиторий (фронтенд + бэкенд для веба)
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── Index.tsx            # 🌐 Клиентский фронтенд (витрина)
-│   │   │   ├── AdminPanel.tsx       # Админ панель
-│   │   │   ├── CRMPage.tsx          # CRM лиды (77 KB)
-│   │   │   ├── CarsPage.tsx         # Управление автопарком (56 KB)
-│   │   │   ├── AdminScheduler.tsx   # Календарь бронирований
-│   │   │   ├── LoginPage.tsx        # Авторизация
-│   │   │   └── Site.tsx             # Публичный сайт
-│   │   ├── components/
-│   │   │   ├── admin/
-│   │   │   │   ├── CRM/             # Компоненты CRM
-│   │   │   │   │   ├── LeadCard.tsx
-│   │   │   │   │   ├── LeadDetailModal.tsx
-│   │   │   │   │   └── BottomFilters.tsx
-│   │   │   │   ├── SchedulerCalendar.tsx  # Gantt календарь
-│   │   │   │   ├── MonthCalendarView.tsx  # Месячный вид
-│   │   │   │   └── BookingFormDialog.tsx
-│   │   │   └── ui/                  # UI kit (shadcn/ui)
-│   │   ├── api/
-│   │   │   └── api.ts               # API клиент
-│   │   ├── types/
-│   │   │   └── crm.ts               # TypeScript типы
-│   │   ├── contexts/                # React Context
-│   │   ├── hooks/                   # Кастомные хуки
-│   │   └── locales/                 # Локализация
-│   ├── backend/
-│   │   ├── telegram_bot.py          # 🤖 Telegram бот (порт 5001)
-│   │   └── web_integration.py       # 🌐 Web API (порт 5000)
-│   ├── public/                      # Статические файлы
-│   └── package.json                 # Зависимости (React + Vite)
-│
-└── backend/                         # Внешний бэкенд (отдельная папка на VPS)
-    └── (FastAPI приложение)
+sunny-rentals/
+├── backend/
+│   ├── telegram_bot.py          # Telegram бот (входная точка)
+│   ├── web_integration.py       # FastAPI основной бэкенд
+│   ├── admin_commands.py        # Admin команды
+│   ├── data/
+│   │   ├── bookings.json        # Брони
+│   │   ├── user_data.json       # Клиенты/лиды
+│   │   ├── car_owners.json      # Владельцы авто
+│   │   └── chat_logs.jsonl      # Логи чатов
+│   └── media/                   # Медиа файлы
+├── src/
+│   ├── pages/
+│   │   ├── Index.tsx            # Витрина (sunny-rentals.online)
+│   │   ├── CRMPage.tsx          # CRM для менеджеров
+│   │   ├── AdminScheduler.tsx   # Админ календарь
+│   │   ├── CarsPage.tsx         # Управление автопарком
+│   │   └── LoginPage.tsx        # Авторизация
+│   ├── components/
+│   │   ├── SendBookForm.tsx     # ✅ Форма брони (клиент)
+│   │   ├── admin/
+│   │   │   ├── SchedulerCalendar.tsx  # Gantt диаграмма
+│   │   │   ├── MonthCalendar.tsx      # Доставки/возвраты
+│   │   │   └── BookingFormDialog.tsx  # Создание брони (админ)
+│   │   └── site/                # Компоненты витрины
+│   └── api/
+│       └── api.ts               # API клиент
+└── public/images_web/           # Фото авто
 ```
 
 ---
 
-## 🔗 Как работает система
+## 🔄 Потоки данных (3 источника брони)
 
+### Источник 1: Telegram WebApp → SendBookForm.tsx
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Telegram Bot                             │
-│                   /root/tgbot/webapp/backend/                   │
-│                      telegram_bot.py (port 5001)                │
-│                                                                 │
-│  Клиент нажимает /start или кнопку в боте                       │
-│         ↓                                                       │
-│  Бот отвечает ссылкой на webapp                                │
-│  https://sunny-rentals.online/app                               │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-                              ↓ (клиент переходит по ссылке)
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                     Web App (Frontend)                          │
-│                  /root/tgbot/webapp/src/pages/                   │
-│                                                                 │
-│  ┌────────────────┐    ┌────────────────┐    ┌──────────────┐  │
-│  │   Index.tsx    │    │  AdminPanel.tsx│    │ CRMPage.tsx  │  │
-│  │  (Клиентская   │    │   (Админка)    │    │   (CRM)      │  │
-│  │   витрина)     │    │                │    │              │  │
-│  └────────────────┘    └────────────────┘    └──────────────┘  │
-│                                                                 │
-│  Клиент выбирает авто, даты → отправляет форму                 │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-                              ↓ (REST API)
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                     Web API                                     │
-│                  /root/tgbot/webapp/backend/                    │
-│                 web_integration.py (port 5000)                  │
-│                                                                 │
-│  Эндпоинты:                                                    │
-│  POST /api/admin/bookings      # Создать/обновить бронь        │
-│  GET  /api/cars                 # Список машин                  │
-│  GET  /api/bookings             # Список броней                 │
-│  GET  /api/bookings/logistics   # Логистика (пикапы/возвраты)  │
-│  GET  /api/crm/users            # Лиды CRM                      │
-│  POST /api/crm/message          # Сообщение в чате              │
-│  POST /api/crm/update_marker    # Обновить маркер               │
-│  POST /api/leads/track          # Трекинг лидов                 │
-│                                                                 │
-│  ⚠️  ВНИМАНИЕ: Claude AI интеграция встроена в этот файл       │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-                              ↓ (внутренние вызовы)
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                     Внешний Backend                             │
-│                   /root/tgbot/backend/ (FastAPI)                │
-│                                                                 │
-│  PostgreSQL база данных                                        │
-│  Все бизнес-данные: пользователи, брони, машины                 │
-└─────────────────────────────────────────────────────────────────┘
+Пользователь в Telegram
+        ↓
+telegram_bot.py (кнопка "Арендовать")
+        ↓
+Открывается WebApp (Telegram Mini App)
+        ↓
+Index.tsx → SendBookForm.tsx
+        ↓
+POST /api/bookings/telegram_webapp
+        ↓
+web_integration.py → telegram_webapp_create_booking()
+        ↓
+bookings.json + user_data.json
 ```
+
+**Эндпоинт:** `POST /api/bookings/telegram_webapp`
+**Source:** `telegram_webapp`
+**User ID:** `telegram_user`
 
 ---
 
-## 🎯 Страницы (src/pages/)
+### Источник 2: Admin Scheduler → BookingFormDialog.tsx
+```
+Менеджер в AdminScheduler.tsx
+        ↓
+BookingFormDialog.tsx / BookingModal.tsx
+        ↓
+POST /api/admin/bookings
+        ↓
+web_integration.py → admin_create_booking()
+        ↓
+bookings.json + user_data.json
+```
 
-| Страница | Файл | Назначение | Размер |
-|----------|------|------------|--------|
-| **Клиентская витрина** | `Index.tsx` | Выбор авто, калькулятор цен, форма брони | 19 KB |
-| **CRM** | `CRMPage.tsx` | Лиды, чат, маркеры, управление менеджером | 77 KB |
-| **Автопарк** | `CarsPage.tsx` | CRUD машин, владельцы, цены | 56 KB |
-| **Календарь** | `AdminScheduler.tsx` | Гант/месяц, фильтры, создание броней | 11 KB |
-| **Админка** | `AdminPanel.tsx` | Главная админки | 57 KB |
-| **Логин** | `LoginPage.tsx` | Авторизация | 3 KB |
+**Эндпоинт:** `POST /api/admin/bookings`
+**Source:** `admin_panel`
+**User ID:** `admin`
 
 ---
 
-## 🔧 Ключевые компоненты
+### Источник 3: sunny-rentals.online → Index.tsx
+```
+Клиент на сайте sunny-rentals.online
+        ↓
+Index.tsx → SendBookForm.tsx
+        ↓
+POST /api/bookings/web-create
+        ↓
+web_integration.py → web_create_booking()
+        ↓
+bookings.json + user_data.json
+```
 
-### CRM (`src/components/admin/CRM/`)
-```
-CRM/
-├── LeadCard.tsx            # Карточка лида в списке
-├── LeadDetailModal.tsx     # Детали + чат + действия
-├── BottomFilters.tsx       # Фильтры (статус, маркеры, поиск)
-└── StatusBar.tsx           # Строка с количеством лидов по статусам
-```
-
-### Календарь (`src/components/admin/`)
-```
-admin/
-├── SchedulerCalendar.tsx   # Gantt-вид (строки машин, дни)
-├── MonthCalendarView.tsx   # Месячный календарь (embla carousel)
-├── DayDetailsModal.tsx     # Детали дня + создание броней
-└── BookingFormDialog.tsx   # Форма создания/редактирования брони
-```
+**Эндпоинт:** `POST /api/bookings/web-create`
+**Source:** `web_frontend`
+**User ID:** `web_user`
 
 ---
 
-## 📡 API (web_integration.py)
+## 📊 Модели данных (Pydantic)
 
-```python
-# === БРОНИРОВАНИЯ ===
-POST /api/admin/bookings    # Создать/обновить бронь
-GET  /api/bookings          # Список броней
-GET  /api/bookings/logistics # Пикапы и возвраты (для календаря)
-DELETE /api/admin/bookings/{id} # Удалить бронь
-
-# === АВТОПАРК ===
-GET  /api/cars              # Список машин
-GET  /api/available-cars    # Доступные на даты
-POST /api/admin/cars        # Добавить машину
-PUT  /api/admin/cars/{id}   # Обновить машину
-GET  /api/car-owners        # Список владельцев
-
-# === CRM ===
-GET  /api/crm/users         # Лиды (фильтр по status, period)
-GET  /api/crm/chats/{userId} # История чата
-POST /api/crm/message       # Отправить сообщение
-POST /api/crm/update_marker # Обновить маркер (+, $, -, ✓)
-POST /api/crm/claude/toggle # Включить/выключить Claude AI
-POST /api/crm/notes         # Добавить заметку
-
-# === ЛИДЫ ===
-POST /api/leads/track       # Трекинг событий
-```
-
----
-
-## 📊 Типы данных (src/types/crm.ts)
-
+### Booking (бронирование)
 ```typescript
-// Лид в CRM
-interface User {
-  user_id: number;
-  status: 'new' | 'interested' | 'in_work' | 'pending' | 'confirmed' | 'completed' | 'archive';
-  marker?: 'unprocessed' | 'in_progress' | 'ready' | 'rejected';
-  dialog_status: {
+interface Booking {
+  booking_id: string;           // "bk_1700000000"
+  user_id: string;              // Telegram ID или "admin" или "web_user"
+  form_data: {
+    car: {
+      id: string;               // "Toyota_Veloz_2024"
+      name: string;
+      brand: string;
+      model: string;
+      year: string;
+      color: string;
+    };
+    dates: {
+      start: string;            // ISO date
+      end: string;
+      days: number;
+    };
+    locations: {
+      pickupLocation: string;   // "airport" | "hotel" | "villa"
+      returnLocation: string;
+      pickupAddress?: string;
+      returnAddress?: string;
+    };
+    pricing: {
+      dailyRate: number;
+      totalRental: number;
+      deposit: number;
+      deliveryPickup: number;
+      deliveryReturn: number;
+      totalDelivery: number;
+      grandTotal: number;
+    };
+    contact: {
+      value: string;            // WhatsApp или @username
+      type: "whatsapp" | "telegram";
+      name?: string;
+      phone?: string;
+    };
+    timestamp: string;
+  };
+  status: "new" | "pre_booking" | "confirmed" | "cancelled";
+  source: "telegram_webapp" | "admin" | "web_frontend";
+  created_at: string;
+  updated_at?: string;
+  confirmed_at?: string;
+}
+```
+
+### UserData (клиент/лид)
+```typescript
+interface UserData {
+  user_id: string;              // Telegram ID
+  username?: string;
+  created_at: string;
+  updated_at?: string;
+  status: "new" | "interested" | "in_work" | "pending" | "archived";
+  final_status: string;         // Для сортировки в CRM
+  form_started: boolean;
+  booking_submitted: boolean;
+  car_interested?: string;
+  category_interested?: string;
+  dates_selected?: {
+    start: string;
+    end: string;
+    days: number;
+  };
+  notes: Array<{
+    note_id: string;
+    text: string;
+    timestamp: string;
+    action?: string;
+  }>;
+  source: "telegram" | "web" | "restored";
+  marker: "ready" | "in_progress" | "selling" | "refuse" | null;
+  last_note?: string;
+  dialog_status?: {
     active: boolean;
     has_new_messages: boolean;
-    last_message_from: 'user' | 'manager' | 'claude';
-    claude_status: 'active' | 'paused' | 'stopped';
+    last_message_from: "user" | "manager" | "claude";
     message_count: number;
   };
-  car_interested?: string;
-  dates_selected?: { start: string; end: string; days: number };
-  notes: string[];
-  last_note?: string;
-}
-
-// Бронь
-interface Booking {
-  booking_id: string;
-  user_id: number;
-  status: string;  // pending, confirmed, etc.
-  source: 'telegram_webapp' | 'web_browser' | 'manager';
-  form_data: {
-    car: Car;
-    dates: { start: string; end: string; days: number };
-    locations: { pickupLocation: string; returnLocation: string };
-    pricing: { grandTotal: number; deposit: number };
-  };
-}
-
-// Машина
-interface Car {
-  id: string;
-  name: string;
-  class: 'compact' | 'sedan' | 'suv' | '7s' | 'bikes';
-  brand: string;
-  model: string;
-  year: string;
-  available: boolean;
-  pricing: {
-    low_season: { price_1_6: number; price_7_14: number; price_15_29: number; price_30: number };
-    high_season: { ... };
-    deposit: number;
-  };
 }
 ```
 
 ---
 
-## 🛠 Технологический стек
+## 🎯 Статусы брони
 
-| Компонент | Технология |
-|-----------|-----------|
-| **Frontend** | React 18 + TypeScript |
-| **Build** | Vite 5 |
-| **Styling** | Tailwind CSS + shadcn/ui |
-| **State** | React Query (@tanstack) |
-| **Router** | React Router 6 |
-| **Calendar** | date-fns + embla-carousel |
-| **Animations** | Framer Motion |
-| **Forms** | React Hook Form + Zod |
-| **Telegram Bot** | python-telegram-bot |
-| **Web API** | Flask / FastAPI (web_integration.py) |
+| Статус | Описание | Откуда приходит |
+|--------|----------|-----------------|
+| `new` | Новая заявка | Клиент отправил форму |
+| `pre_booking` | Предварительная бронь | После создания, ждёт подтверждения |
+| `confirmed` | Подтверждённая бронь | Менеджер подтвердил |
+| `cancelled` | Отменена | Клиент или менеджер отменил |
+
+**Важно:** Все брони создаются со статусом `pre_booking`
 
 ---
 
-## 🔄 Потоки данных
+## 🏷️ Маркеры лидов (CRM)
 
-### Клиент бронирует авто
+| Маркер | Описание | Цвет |
+|--------|----------|------|
+| `ready` | Готов к сделке | Зелёный |
+| `in_progress` | В процессе | Синий |
+| `selling` | На этапе продажи | Оранжевый |
+| `refuse` | Отказ | Красный |
+| `null` | Без маркера | Серый |
+
+---
+
+## 📡 API Эндпоинты (web_integration.py)
+
+### Бронирования
+
+| Метод | Endpoint | Source | Описание |
+|-------|----------|--------|----------|
+| POST | `/api/bookings/telegram_webapp` | telegram_webapp | Создать бронь из Telegram WebApp |
+| POST | `/api/bookings/web-create` | web_frontend | Создать бронь с сайта |
+| POST | `/api/admin/bookings` | admin_panel | Создать бронь из админки |
+| GET | `/api/bookings` | - | Получить все брони |
+| GET | `/api/bookings/{booking_id}` | - | Получить бронь по ID |
+| GET | `/api/bookings/logistics` | - | Логистика (доставки/возвраты) |
+| POST | `/api/admin/bookings/{id}/confirm` | - | Подтвердить бронь |
+
+### Клиенты/Лиды
+
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| GET | `/api/leads` | Получить лидов |
+| POST | `/api/lead-track` | Отслеживание событий |
+| PATCH | `/api/admin/user/{id}/status` | Обновить статус |
+| PATCH | `/api/admin/user/{id}/marker` | Установить маркер |
+| POST | `/api/admin/user/{id}/note` | Добавить заметку |
+
+### Автопарк
+
+| Метод | Endpoint | Описание |
+|-------|----------|----------|
+| GET | `/api/cars` | Получить авто |
+| POST | `/api/admin/cars` | Добавить авто |
+| PUT | `/api/admin/cars/{id}` | Обновить авто |
+| DELETE | `/api/admin/cars/{id}` | Удалить авто |
+
+---
+
+## 🔗 Связи Frontend → Backend
+
 ```
-Index.tsx (витрина)
-    ↓ form submit
-POST /api/admin/bookings
+SendBookForm.tsx
     ↓
-web_integration.py
-    ↓ сохраняет в БД
-    ↓ возвращает booking_id
-    ↓ отправляет уведомление менеджеру в CRM
+    submitBooking(formData, bookingId, 'web'|'telegram')
+    ↓
+api.ts → POST /api/bookings/web-create | POST /api/bookings/telegram_webapp
+    ↓
+web_integration.py → web_create_booking() | telegram_webapp_create_booking()
+    ↓
+bookings.json + user_data.json
 ```
 
-### Менеджер обрабатывает лида
 ```
 CRMPage.tsx
-    ↓ fetchUsers(status='new')
-GET /api/crm/users
     ↓
-LeadDetailModal.tsx
-    ↓ клик на лида
-GET /api/crm/chats/{userId}
+    fetchLeads(), updateStatus(), addNote()
     ↓
-Менеджер отправляет сообщение
+api.ts → GET /api/leads, PATCH /api/admin/user/{id}/status
     ↓
-POST /api/crm/message
+web_integration.py → get_leads(), update_user_status()
     ↓
-Claude AI может автоматически отвечать (если claude_status='active')
+user_data.json
 ```
 
-### Календарь обновляется
 ```
 AdminScheduler.tsx
-    ↓ fetchBookings(), fetchBookingsLogistics()
-GET /api/bookings + GET /api/bookings/logistics
     ↓
-MonthCalendarView / SchedulerCalendar рендерят
+    fetchBookings(), fetchCars(), createBooking()
+    ↓
+api.ts → GET /api/bookings, GET /api/cars, POST /api/admin/bookings
+    ↓
+web_integration.py → list_bookings(), admin_create_booking()
+    ↓
+bookings.json + web_cars.json
 ```
 
 ---
 
-## 📱 Адаптивность
+## ⚠️ Потенциальные конфликты и баги
 
-- **Мобильная версия:** `daysToShow = 14` в календаре
-- **Десктоп:** `daysToShow = 30`
-- Брейкпоинт: `768px`
+### 1. SendBookForm.tsx — НЕПРАВИЛЬНЫЙ SOURCE при бронировании из Telegram
 
----
+**Проблема (🔴 КРИТИЧЕСКИЙ БАГ):**
+```typescript
+// SendBookForm.tsx:266
+await submitBooking(formData, newBookingId);  // ❌ bookingSource не передан!
+// По умолчанию использует 'web', даже если пользователь в Telegram!
+```
 
-## 🚀 Запуск
+**Симптомы:**
+- Брони из Telegram WebApp помечаются как `source: "web_frontend"` вместо `source: "telegram_webapp"`
+- User ID = `"web_user"` вместо реального Telegram ID
+- Путаница в аналитике источников
 
-```bash
-# Frontend (из /root/tgbot/webapp)
-cd /root/tgbot/webapp
-npm install
-npm run dev          # Vite dev server
+**Решение:**
+```typescript
+// SendBookForm.tsx → handleBookingSubmit()
+const isTelegram = typeof window !== 'undefined' && window.Telegram?.WebApp;
+const bookingSource = isTelegram ? 'telegram' : 'web';
 
-# Telegram Bot (из /root/tgbot/webapp/backend)
-cd /root/tgbot/webapp/backend
-python telegram_bot.py --port 5001
-
-# Web API (из /root/tgbot/webapp/backend)
-cd /root/tgbot/webapp/backend
-python web_integration.py --port 5000
+await submitBooking(formData, newBookingId, bookingSource);
 ```
 
 ---
 
-## 📝 Порты
+### 2. LeadTrack vs SendBookForm
 
-| Порт | Сервис | Файл | Назначение |
-|------|--------|------|------------|
-| 5000 | Web API | `web_integration.py` | REST API для фронтенда |
-| 5001 | Telegram Bot | `telegram_bot.py` | Telegram бот (вход для клиентов) |
-| 3000 | Vite Dev | `npm run dev` | Frontend dev server |
+**Проблема:** LeadTrack может обрабатывать данные параллельно с созданием брони.
+
+**Решение:** Проверить порядок вызова и гарантировать идемпотентность.
 
 ---
 
-## ⚠️ Важные замечания
+### 3. Overlap проверка (pre_booking)
 
-1. **Claude AI встроен в `web_integration.py`** — не отдельный сервис
-2. **Два источника данных:** Telegram бот и веб-фронтенд
-3. **API токен:** настраивается через `VITE_AUTH_TOKEN`
-4. **Есть несколько версий CRM:** CRMPage(OLD).tsx, CRMPage_debug_fixes.tsx, CrmPage_new.tsx
+**Проблема:** `pre_booking` не блокирует слоты при проверке:
+```python
+# web_integration.py
+if booking.get('status') == 'pre_booking':
+    continue  # ❌ Игнорируем pre_booking
+```
+
+**Решение:** Проверить бизнес-логику — должны ли `pre_booking` учитываться.
+
+---
+
+### 3. Статусы лидов
+```typescript
+// CRMPage.tsx
+const STATUS_CONFIG = {
+  'new': 'Холодные',
+  'interested': 'Теплые',
+  'in_work': 'В работе',
+  'pending': 'Заявки',
+  'confirmed': 'Бронь',
+  // ...
+};
+```
+
+**Проверить:** `status` vs `final_status` — как они используются и не противоречат ли друг другу.
+
+---
+
+## 📋 Файлы для проверки
+
+1. ✅ **`src/components/SendBookForm.tsx`** — БАГ: не передаёт bookingSource
+2. ⬜ **`src/pages/Index.tsx`** — дублирование логики с SendBookForm
+3. ⬜ **`web_integration.py:check_booking_overlap()`** — логика `pre_booking`
+4. ⬜ **`api.ts`** — все вызовы эндпоинтов
+5. ⬜ **`user_data.json`** — структура маркеров
+
+---
+
+## 🚀 Следующие шаги
+
+1. ✅ Создать этот документ
+2. ✅ **ИСПРАВИТЬ SendBookForm.tsx** — передавать `bookingSource` в `submitBooking`
+3. ⬜ Валидировать эндпоинты в web_integration.py
+4. ⬜ Проверить бизнес-логику `pre_booking` overlap
+5. ⬜ Унифицировать названия источников (telegram_webapp / web_frontend)
