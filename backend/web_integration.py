@@ -4011,6 +4011,70 @@ async def confirm_booking(booking_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post(API_PREFIX + "/admin/bookings/{booking_id}/reject")
+async def reject_booking(booking_id: str, data: dict = None):
+    """Отклонить бронь и архивировать лида"""
+    try:
+        print(f"=== START reject_booking for {booking_id} ===")
+        
+        bookings = load_bookings()
+        users_data = load_json(USER_DATA_JSON)
+        
+        # Находим бронь
+        booking_found = False
+        user_id = None
+        for booking in bookings:
+            if booking.get('booking_id') == booking_id:
+                if booking.get('status') not in ['pre_booking', 'new']:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Бронь {booking_id} имеет статус {booking.get('status')}, нельзя отклонить"
+                    )
+                
+                # Отклоняем бронь
+                booking['status'] = 'rejected'
+                booking['rejected_at'] = datetime.utcnow().isoformat()
+                booking['updated_at'] = datetime.utcnow().isoformat()
+                user_id = booking.get('user_id')
+                booking_found = True
+                
+                print(f"✓ Отклонена бронь {booking_id} для пользователя {user_id}")
+                break
+        
+        if not booking_found:
+            raise HTTPException(status_code=404, detail=f"Бронь {booking_id} не найдена")
+        
+        # Архивируем лида (user status = archived)
+        if user_id:
+            for user in users_data:
+                if str(user.get('user_id')) == str(user_id):
+                    user['status'] = 'archived'
+                    user['archived_at'] = datetime.utcnow().isoformat()
+                    user['updated_at'] = datetime.utcnow().isoformat()
+                    print(f"✓ Архивирован лид {user_id}")
+                    break
+        
+        # Сохраняем
+        with _lock:
+            save_json(BOOKINGS_FILE, bookings)
+            save_json(USER_DATA_JSON, users_data)
+        print("✓ Bookings and users saved to JSON")
+        
+        return {
+            "status": "ok",
+            "booking_id": booking_id,
+            "message": "Бронь отклонена, лид архивирован"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"!!! FATAL ERROR in reject_booking: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.delete(API_PREFIX + "/admin/bookings/{booking_id}")
 async def admin_delete_booking(booking_id: str):
     """Удаление брони из админ-панели"""

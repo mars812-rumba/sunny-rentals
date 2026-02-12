@@ -826,6 +826,43 @@ const handleUpdateNote = async () => {
     }
   };
 
+  // Отклонить бронь и архивировать лида
+  const rejectBooking = async (bookingId: string) => {
+    if (!window.confirm('Отклонить заявку и архивировать лида?')) return;
+    
+    setLoadingAction(prev => ({ ...prev, [`reject_${bookingId}`]: true }));
+    
+    try {
+      const response = await fetch(`/api/admin/bookings/${bookingId}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        // Удаляем бронь из списка (или помечаем rejected)
+        setBookings(prev => prev.filter(b => b.booking_id !== bookingId));
+        
+        // Обновляем статус пользователя на archived
+        if (selectedUser) {
+          setUsers(prev => prev.map(u =>
+            u.user_id === selectedUser.user_id
+              ? { ...u, status: 'archived', archived_at: new Date().toISOString() }
+              : u
+          ));
+        }
+        
+        console.log('✅ Заявка отклонена, лид архивирован');
+      } else {
+        const error = await response.json();
+        console.error('❌ Ошибка отклонения:', error.message);
+      }
+    } catch (e) {
+      console.error('❌ Ошибка сети:', e);
+    } finally {
+      setLoadingAction(prev => ({ ...prev, [`reject_${bookingId}`]: false }));
+    }
+  };
+
   useEffect(() => { loadMainData(); }, [loadMainData]);
 
   // Auto-refresh chat when user is selected
@@ -1418,16 +1455,27 @@ const handleUpdateNote = async () => {
                       <span className="text-lg font-black text-slate-900 tracking-tight">
                         {b.form_data?.pricing?.grandTotal ? `${b.form_data.pricing.grandTotal.toLocaleString()} ฿` : '0 ฿'}
                       </span>
-                      {/* Кнопка подтверждения для pre_booking */}
+                      {/* Кнопки для pre_booking */}
                       {b.status === 'pre_booking' && (
-                        <Button
-                          size="sm"
-                          className="mt-2 bg-green-500 hover:bg-green-600 text-white text-xs"
-                          onClick={() => confirmBooking(b.booking_id)}
-                          disabled={loadingAction[`confirm_${b.booking_id}`]}
-                        >
-                          {loadingAction[`confirm_${b.booking_id}`] ? 'Подтверждаю...' : 'Подтвердить'}
-                        </Button>
+                        <div className="flex gap-2 mt-2">
+                          <Button
+                            size="sm"
+                            className="bg-green-500 hover:bg-green-600 text-white text-xs"
+                            onClick={() => confirmBooking(b.booking_id)}
+                            disabled={loadingAction[`confirm_${b.booking_id}`]}
+                          >
+                            {loadingAction[`confirm_${b.booking_id}`] ? '...' : '✓'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="bg-red-500 hover:bg-red-600 text-white text-xs"
+                            onClick={() => rejectBooking(b.booking_id)}
+                            disabled={loadingAction[`reject_${b.booking_id}`]}
+                          >
+                            {loadingAction[`reject_${b.booking_id}`] ? '...' : '✕'}
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </div>
