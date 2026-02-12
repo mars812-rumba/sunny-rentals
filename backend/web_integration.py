@@ -1901,7 +1901,7 @@ def track_lead_event(request: LeadTrackRequest):
                 "booking_id": booking_id,
                 "user_id": str(user_id),
                 "form_data": event_data,
-                "status": "new",
+                "status": "pre_booking",  # ✅ ИСПРАВЛЕНО: было "new"
                 "created_at": datetime.utcnow().isoformat()
             }
             bookings.append(booking_record)
