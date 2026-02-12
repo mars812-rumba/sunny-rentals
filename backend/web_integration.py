@@ -3808,11 +3808,18 @@ async def web_create_booking(booking_data: AdminBookingRequest):
         
         # ✅ Уведомляем Telegram бота о новой предварительной брони
         try:
+            # Получаем username из user_data.json
+            users_data = load_json(USER_DATA_JSON)
+            user_record = next((u for u in users_data if str(u.get("user_id")) == str(user_id)), None)
+            display_name = user_record.get("username") if user_record else None
+            if not display_name:
+                display_name = booking_data.form_data.contact.name if booking_data.form_data.contact.name else str(user_id)
+            
             notify_telegram_bot_about_booking(
                 booking_id=booking_id,
-                user_id=booking_data.form_data.contact.phone or "web_user",
+                user_id=user_id,
                 form_data=form_data_dict,
-                username=None
+                username=display_name
             )
         except Exception as e:
             print(f"Warning: Failed to notify bot about booking: {e}")
@@ -3921,11 +3928,18 @@ async def telegram_webapp_create_booking(booking_data: AdminBookingRequest):
         
         # ✅ Уведомляем Telegram бота о новой предварительной брони
         try:
+            # Получаем username из user_data.json
+            users_data = load_json(USER_DATA_JSON)
+            user_record = next((u for u in users_data if str(u.get("user_id")) == str(user_id)), None)
+            display_name = user_record.get("username") if user_record else None
+            if not display_name:
+                display_name = booking_data.form_data.contact.name if booking_data.form_data.contact.name else str(user_id)
+            
             notify_telegram_bot_about_booking(
                 booking_id=booking_id,
-                user_id=booking_data.form_data.contact.phone or "telegram_user",
+                user_id=user_id,
                 form_data=form_data_dict,
-                username=None
+                username=display_name
             )
         except Exception as e:
             print(f"Warning: Failed to notify bot about booking: {e}")
