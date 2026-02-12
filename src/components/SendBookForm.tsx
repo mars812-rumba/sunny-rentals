@@ -155,7 +155,7 @@ const BookingConfirmationContent = ({
   );
 };
 
-const ThankYouContent = ({ car, onClose }: { car: any; onClose: () => void }) => {
+const ThankYouContent = ({ car, bookingId, formData, onClose }: { car: any; bookingId: string; formData: any; onClose: () => void }) => {
   const { t } = useLanguage();
   
   const handleCloseWebApp = () => {
@@ -168,12 +168,40 @@ const ThankYouContent = ({ car, onClose }: { car: any; onClose: () => void }) =>
     }
   };
 
+  const carName = car ? `${car.brand || ''} ${car.model || ''} ${car.year || ''}`.trim() : '';
+  const dates = formData?.dates ? `${formData.dates.start} — ${formData.dates.end}` : '';
+  const days = formData?.dates?.days ? `(${formData.dates.days} дн.)` : '';
+
   return (
     <div className="p-6 text-center space-y-4">
       <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
       <h2 className="text-2xl font-bold">{t('application_accepted')}</h2>
-      {car.bookingId && <p className="text-muted-foreground">{t('application_number', { bookingId: car.bookingId })}</p>}
-      <p className="text-sm text-muted-foreground px-4">{t('manager_contact_message')}</p>
+      {bookingId && <p className="text-muted-foreground">№{bookingId}</p>}
+      
+      {/* Заявка */}
+      {carName && (
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-left">
+          <p className="font-medium">{carName}</p>
+          {dates && <p className="text-sm text-muted-foreground">{dates} {days}</p>}
+          {formData?.contact?.name && <p className="text-sm text-muted-foreground">{formData.contact.name}</p>}
+          {formData?.contact?.phone && <p className="text-sm text-muted-foreground">{formData.contact.phone}</p>}
+        </div>
+      )}
+      
+      {/* Ссылка на менеджера */}
+      <a 
+        href="https://t.me/mars_rent" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="block w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+      >
+        💬 Связаться с менеджером
+      </a>
+      
+      <p className="text-xs text-muted-foreground">
+        Если долго не отвечаем — пишите напрямую
+      </p>
+      
       <Button 
         onClick={handleCloseWebApp} 
         className="w-full bg-green-500 hover:bg-green-600 text-white"
@@ -206,6 +234,7 @@ export const SendBookForm: React.FC<SendBookFormProps> = ({
   const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
   const [isBookingSubmitted, setIsBookingSubmitted] = useState(false);
   const [bookingId, setBookingId] = useState<string | null>(null);
+  const [bookingFormData, setBookingFormData] = useState<any>(null);
 
   // Self-contained booking submission logic
   const handleBookingSubmit = async (contact: { value: string; type: string }) => {
@@ -267,7 +296,8 @@ export const SendBookForm: React.FC<SendBookFormProps> = ({
       try {
         // ✅ Получаем booking_id от backend
         const result = await submitBooking(formData, null, bookingSource);
-        setBookingId(result.booking_id);  // Используем ID от backend
+        setBookingId(result.booking_id);
+        setBookingFormData(formData);  // Сохраняем данные заявки
         setIsBookingSubmitted(true);
       } catch (error) {
         console.error('Failed to create booking:', error);
@@ -291,7 +321,7 @@ export const SendBookForm: React.FC<SendBookFormProps> = ({
     <Car className="w-5 h-5 text-primary" />;
 
   const content = isBookingSubmitted ? (
-    <ThankYouContent car={{...car, bookingId}} onClose={onClose} />
+    <ThankYouContent car={car} bookingId={bookingId || ''} formData={bookingFormData} onClose={onClose} />
   ) : (
     <BookingConfirmationContent
       car={car}
