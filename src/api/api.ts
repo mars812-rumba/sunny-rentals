@@ -295,6 +295,12 @@ export async function submitBooking(formData: BookingFormData, bookingId?: strin
   // ✅ ИСПРАВЛЕНИЕ: Используем разные эндпоинты в зависимости от источника
   let endpoint: string;
   
+  // Получаем user_id для Telegram
+  let userId = null;
+  if (bookingSource === 'telegram' && typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) {
+    userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+  }
+  
   switch (bookingSource) {
     case 'admin':
       endpoint = `${API_BASE_URL}/api/admin/bookings`;
@@ -316,6 +322,7 @@ export async function submitBooking(formData: BookingFormData, bookingId?: strin
     },
     body: JSON.stringify({
       booking_id: bookingId,
+      user_id: userId,
       form_data: formData
     })
   });

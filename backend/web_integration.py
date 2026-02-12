@@ -325,6 +325,7 @@ class FormData(BaseModel):
 class AdminBookingRequest(BaseModel):
     form_data: FormData
     booking_id: Optional[str] = None
+    user_id: Optional[Union[int, str]] = None
     
 class LeadTrackRequest(BaseModel):
     user_id: Union[int, str] = Field(..., description="Telegram user ID (int) or web session ID (str)")
@@ -3787,15 +3788,18 @@ async def web_create_booking(booking_data: AdminBookingRequest):
             booking_id = str(uuid.uuid4())[:8]
             print(f"Creating new booking: {booking_id}")
             
+            # Используем user_id из запроса или fallback
+            user_id = booking_data.user_id if booking_data.user_id else "web_user"
+            
             bookings.append({
                 "booking_id": booking_id,
-                "user_id": "web_user",
+                "user_id": str(user_id),
                 "form_data": form_data_dict,
-                "status": "pre_booking",  # ✅ КЛЮЧЕВОЕ ОТЛИЧИЕ: создаем как предварительную бронь
+                "status": "pre_booking",
                 "created_at": datetime.utcnow().isoformat(),
                 "source": "web_frontend"
             })
-            print(f"✓ Created pre_booking {booking_id}")
+            print(f"✓ Created pre_booking {booking_id} for user {user_id}")
         
         # Сохраняем
         with _lock:
@@ -3897,15 +3901,18 @@ async def telegram_webapp_create_booking(booking_data: AdminBookingRequest):
             booking_id = str(uuid.uuid4())[:8]
             print(f"Creating new booking: {booking_id}")
             
+            # Используем user_id из запроса или fallback
+            user_id = booking_data.user_id if booking_data.user_id else "telegram_user"
+            
             bookings.append({
                 "booking_id": booking_id,
-                "user_id": "telegram_user",
+                "user_id": str(user_id),  # ✅ Сохраняем реальный user_id
                 "form_data": form_data_dict,
-                "status": "pre_booking",  # ✅ КЛЮЧЕВОЕ ОТЛИЧИЕ: создаем как предварительную бронь
+                "status": "pre_booking",
                 "created_at": datetime.utcnow().isoformat(),
                 "source": "telegram_webapp"
             })
-            print(f"✓ Created pre_booking {booking_id}")
+            print(f"✓ Created pre_booking {booking_id} for user {user_id}")
         
         # Сохраняем
         with _lock:
