@@ -1780,7 +1780,6 @@ def track_lead_event(request: LeadTrackRequest):
         print(f"🔍 User ID analysis: isinstance(user_id, int)={isinstance(user_id, int)}, isinstance(user_id, str)={isinstance(user_id, str)}")
         
         users_data = load_json(USER_DATA_JSON)
-        bookings = load_bookings()
         
         # Log existing user data analysis
         print(f"📊 User database analysis:")
@@ -1894,25 +1893,6 @@ def track_lead_event(request: LeadTrackRequest):
                     "end": event_data["dates"].get("end"),
                     "days": event_data["dates"].get("days", 1)
                 }
-
-            # Создаем запись о бронировании
-            booking_id = str(uuid.uuid4())[:8]
-            booking_record = {
-                "booking_id": booking_id,
-                "user_id": str(user_id),
-                "form_data": event_data,
-                "status": "pre_booking",  # ✅ ИСПРАВЛЕНО: было "new"
-                "created_at": datetime.utcnow().isoformat()
-            }
-            bookings.append(booking_record)
-            save_json(BOOKINGS_FILE, bookings)
-            
-            print(f"📋 Создано бронирование: {booking_id}")
-            
-            # ДИАГНОСТИКА: Отправляем уведомления для всех типов пользователей
-            print(f"🔍 DIAGNOSTIC: booking_submitted для пользователя {user_id} (тип: {type(user_id).__name__})")
-            notify_result = notify_telegram_bot_about_booking(booking_id, user_id, event_data, username)
-            print(f"🔍 DIAGNOSTIC: Результат уведомления booking_submitted: {notify_result}")
 
         # Обновляем запись пользователя
         if user_index is not None:
