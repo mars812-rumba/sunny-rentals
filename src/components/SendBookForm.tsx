@@ -258,17 +258,23 @@ export const SendBookForm: React.FC<SendBookFormProps> = ({
       };
 
       // ✅ Трекаем отправку брони
+      console.log('📝 Submitting booking...', { car: car.name, bookingSource: 'web' });
       await trackLeadEvent('booking_submitted', formData);
 
       // Create actual booking with pre_booking status
       const newBookingId = 'bk_' + Date.now();
       try {
-        await submitBooking(formData, newBookingId);
+        console.log('🔄 Calling submitBooking API...', { bookingId: newBookingId });
+        const result = await submitBooking(formData, newBookingId, 'web');
+        console.log('✅ Booking created successfully!', result);
         setBookingId(newBookingId);
         setIsBookingSubmitted(true);
+        console.log('📺 State updated - ThankYouContent should now display');
       } catch (error) {
-        console.error('Failed to create booking:', error);
-        throw error; // Re-throw to be caught by outer catch block
+        console.error('❌ Failed to create booking:', error);
+        // Don't throw - let the UI show error state instead of silently failing
+        alert('Не удалось создать бронь. Пожалуйста, попробуйте снова.');
+        return;
       }
 
     } catch (error) {

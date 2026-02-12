@@ -54,9 +54,8 @@ const Index = () => {
   const [selectedCar, setSelectedCar] = useState(null);
   const [isSendBookFormOpen, setIsSendBookFormOpen] = useState(false);
   const isMobile = useIsMobile();
-  const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
-  const [isBookingSubmitted, setIsBookingSubmitted] = useState(false);
-  const [bookingId, setBookingId] = useState(null);
+  // ✅ Состояния для CarList - SendBookForm теперь самостоятельный
+  const [isSubmittingBooking, setIsSubmittingBooking] = useState(false); // Для совместимости с CarList
 
   const [availableCars, setAvailableCars] = useState(0);
   const [bookedToday, setBookedToday] = useState(0);
@@ -166,87 +165,11 @@ const Index = () => {
     }
     setSelectedCar(car);
     setIsSendBookFormOpen(true);
-    setIsBookingSubmitted(false);
-    setBookingId(null);
+    // ✅ УДАЛЕНЫ: состояния теперь в SendBookForm
   };
 
-const handleBookingSubmit = async (contact: { value: string, type: string }) => {
-  if (!selectedCar || !filters.startDate || !filters.endDate) {
-    console.error('Missing data:', { selectedCar, filters });
-    toast({ 
-      title: 'Ошибка', 
-      description: 'Выберите даты аренды',
-      variant: "destructive" 
-    });
-    return;
-  }
-
-  setIsSubmittingBooking(true);
-
-    try {
-      const dailyPrice = getPriceForPeriod(selectedCar.pricing, filters.days, filters.startDate);
-      const totalRentalPrice = dailyPrice * filters.days;
-      const pickupDelivery = getDeliveryPrice(filters.pickupLocation);
-      const returnDelivery = getDeliveryPrice(filters.returnLocation);
-      const totalDelivery = pickupDelivery + returnDelivery;
-      const grandTotal = totalRentalPrice + totalDelivery;
-
-      const season = determineSeason(filters.startDate);
-      const formData = {
-        car: { 
-          id: selectedCar.id, 
-          name: selectedCar.name, 
-          brand: selectedCar.brand, 
-          model: selectedCar.model, 
-          year: selectedCar.year, 
-          color: selectedCar.color 
-        },
-        dates: { 
-          start: filters.startDate.toISOString(), 
-          end: filters.endDate.toISOString(), 
-          days: filters.days 
-        },
-        locations: { 
-          pickup: filters.pickupLocation, 
-          return: filters.returnLocation 
-        },
-        pricing: {
-          season: season,
-          dailyRate: dailyPrice,
-          totalRental: totalRentalPrice,
-          deposit: selectedCar.pricing.deposit,
-          deliveryPickup: pickupDelivery,
-          deliveryReturn: returnDelivery,
-          totalDelivery: totalDelivery,
-          grandTotal: grandTotal
-        },
-        contact: contact,
-        timestamp: new Date().toISOString(),
-      };
-
-      // ✅ Трекаем отправку брони
-      await trackLeadEvent('booking_submitted', formData);
-
-      const booking_id = 'bk_' + Date.now();
-      setBookingId(booking_id);
-      setIsBookingSubmitted(true);
-
-      toast({
-        title: t('toast_booking_success') || 'Бронь отправлена!',
-        description: t('toast_booking_success_description') || 'Скоро с вами свяжутся',
-      });
-
-    } catch (error) {
-      console.error('Booking submission failed:', error);
-      toast({
-        title: t('toast_booking_error'),
-        description: error.message || t('toast_booking_error_description'),
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmittingBooking(false);
-    }
-  };
+// ✅ УДАЛЕНА: дублирующая функция - теперь используется SendBookForm
+// Логика бронирования перенесена в SendBookForm для изоляции
 
   const renderBottomContent = () => {
     if (!showResults) {

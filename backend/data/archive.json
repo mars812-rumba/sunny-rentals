@@ -12971,5 +12971,271 @@
     "source": "telegram_webapp",
     "archived_at": "2026-02-09T13:28:59.536861",
     "archived": true
+  },
+  {
+    "user_id": "490270825",
+    "username": "Den123ee",
+    "created_at": "2026-02-08T10:24:38.634838",
+    "updated_at": "2026-02-08T10:24:38.634861",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp",
+    "archived_at": "2026-02-11T08:44:27.106542",
+    "archived": true
+  },
+  {
+    "user_id": 490270825,
+    "username": null,
+    "created_at": "2026-02-09T18:41:02.492936",
+    "updated_at": "2026-02-09T18:41:02.511951",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "system",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-02-09T18:41:02.490402",
+      "last_message_from": "user",
+      "message_count": 1,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-02-09T18:41:02.511936",
+    "archived_at": "2026-02-11T08:44:27.106578",
+    "archived": true
+  },
+  {
+    "user_id": "410812780",
+    "username": "Denis_Merinov",
+    "created_at": "2026-02-08T09:58:25.851344",
+    "updated_at": "2026-02-11T23:56:42.041077",
+    "status": "pending",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Mazda MAZDA2 2024 White",
+    "category_interested": "sedan",
+    "dates_selected": {
+      "start": "2026-02-07T17:00:00.000Z",
+      "end": "2026-02-19T17:00:00.000Z",
+      "days": 13
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "last_note": "Гашел у других я опоздал",
+    "marker": "rejected",
+    "archived_at": "2026-02-11T23:56:44.857896",
+    "archived": true
+  },
+  {
+    "user_id": 410812780,
+    "username": null,
+    "created_at": "2026-02-08T19:27:58.873530",
+    "updated_at": "2026-02-08T19:27:58.890245",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "system",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-02-08T19:27:58.872260",
+      "last_message_from": "user",
+      "message_count": 1,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-02-08T19:27:58.890223",
+    "archived_at": "2026-02-11T23:56:44.857925",
+    "archived": true
+  },
+  {
+    "user_id": "448007070",
+    "username": "Kirillovich555",
+    "created_at": "2026-02-08T10:26:40.921314",
+    "updated_at": "2026-02-08T10:28:44.796228",
+    "status": "pending",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Ford RAPTOR 2024 Gray",
+    "category_interested": null,
+    "dates_selected": {
+      "start": "2026-02-07T17:00:00.000Z",
+      "end": "2026-02-20T17:00:00.000Z",
+      "days": 14
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "archived_at": "2026-02-11T23:56:54.295942",
+    "archived": true
+  },
+  {
+    "user_id": 1097844047,
+    "username": "scrrrr_rrr",
+    "created_at": "2026-02-07T08:41:57.961241",
+    "updated_at": "2026-02-07T08:50:05.237357",
+    "status": "interested",
+    "form_started": true,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": "sedan",
+    "dates_selected": {
+      "start": "2026-02-07T17:00:00.000Z",
+      "end": "2026-02-16T17:00:00.000Z",
+      "days": 10
+    },
+    "notes": [],
+    "source": "system",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-02-07T08:48:27.219461",
+      "last_message_from": "user",
+      "message_count": 2,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-02-07T08:48:27.235685",
+    "marker": "in_progress",
+    "final_status": "in_work",
+    "last_note": "2 дня с 08.02",
+    "archived_at": "2026-02-12T00:05:21.389107",
+    "archived": true
+  },
+  {
+    "user_id": 7553360348,
+    "username": null,
+    "created_at": "2026-02-05T06:07:55.566895",
+    "updated_at": "2026-02-12T04:35:08.729181",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "system",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-02-07T08:26:36.458537",
+      "last_message_from": "user",
+      "message_count": 5,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-02-07T08:26:36.477038",
+    "final_status": "in_work",
+    "last_note": "9-14.02 econom",
+    "marker": "rejected",
+    "archived_at": "2026-02-12T04:35:10.955714",
+    "archived": true
+  },
+  {
+    "user_id": "web_session_ml7egnzi_olfru4g4l_4nv37f",
+    "username": null,
+    "created_at": "2026-02-08T09:51:52.001191",
+    "updated_at": "2026-02-11T23:57:00.335078",
+    "status": "pending",
+    "form_started": false,
+    "booking_submitted": true,
+    "car_interested": "Toyota YARIS 2024 Gray",
+    "category_interested": null,
+    "dates_selected": {
+      "start": "2026-02-16T17:00:00.000Z",
+      "end": "2026-03-14T17:00:00.000Z",
+      "days": 27
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "marker": "unprocessed",
+    "last_note": "Отправил запрос",
+    "archived_at": "2026-02-12T04:36:22.730601",
+    "archived": true
+  },
+  {
+    "user_id": "460037065",
+    "username": "sergejs3",
+    "created_at": "2026-02-06T08:30:48.544273",
+    "updated_at": "2026-02-12T00:24:16.600562",
+    "status": "interested",
+    "form_started": true,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": "compact",
+    "dates_selected": {
+      "start": "2026-02-09T22:00:00.000Z",
+      "end": "2026-03-17T22:00:00.000Z",
+      "days": 1
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "marker": "in_progress",
+    "final_status": "in_work",
+    "last_note": "Отправил оффер",
+    "archived_at": "2026-02-12T05:25:55.726720",
+    "archived": true
+  },
+  {
+    "user_id": 460037065,
+    "username": null,
+    "created_at": "2026-02-06T16:31:38.678402",
+    "updated_at": "2026-02-12T00:07:15.615931",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "system",
+    "dialog": {
+      "active": false,
+      "has_new_messages": true,
+      "last_message_at": "2026-02-07T13:13:07.760587",
+      "last_message_from": "user",
+      "message_count": 9,
+      "claude": {
+        "enabled": false,
+        "status": "stopped",
+        "started_at": null,
+        "paused_at": null
+      }
+    },
+    "last_message_at": "2026-02-07T13:13:07.779318",
+    "marker": "in_progress",
+    "last_note": "10.02-18.03 . City and Ativ 21,600. Я проебалмя",
+    "final_status": "in_work",
+    "archived_at": "2026-02-12T05:25:55.726737",
+    "archived": true
   }
 ]
