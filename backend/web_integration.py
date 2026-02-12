@@ -367,13 +367,13 @@ class UserData(BaseModel):
     
 # Модель для возврата дат логистики
 class LogisticsDate(BaseModel):
-    booking_id: str
-    car_id: str
-    car_name: str
-    pickup_date: str
-    return_date: str
-    client_name: str
-    location: str
+    booking_id: str = ""
+    car_id: str = ""
+    car_name: str = "Авто"
+    pickup_date: str = ""
+    return_date: str = ""
+    client_name: str = "Клиент"
+    location: str = ""
 
 class LogActionRequest(BaseModel):
     user_id: Union[int, str]
@@ -1693,17 +1693,17 @@ async def get_bookings_logistics():
             car_id = car_info.get('id', '')
             
             # Извлекаем информацию о клиенте
-            client_name = booking.get('form_data', {}).get('contact', {}).get('name', 'Клиент')
-            location = booking.get('form_data', {}).get('locations', {}).get('pickupLocation', '')
+            client_name = booking.get('form_data', {}).get('contact', {}).get('name') or 'Клиент'
+            location = booking.get('form_data', {}).get('locations', {}).get('pickupLocation') or ''
             
             logistics_data.append({
-                'booking_id': booking.get('booking_id', ''),
-                'car_id': car_id,
-                'car_name': car_name,
-                'pickup_date': start_date,
-                'return_date': end_date,
-                'client_name': client_name,
-                'location': location
+                'booking_id': booking.get('booking_id', '') or '',
+                'car_id': car_id or '',
+                'car_name': car_name or 'Авто',
+                'pickup_date': start_date or '',
+                'return_date': end_date or '',
+                'client_name': client_name or 'Клиент',
+                'location': location or ''
             })
         
         return logistics_data
