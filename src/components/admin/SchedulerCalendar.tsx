@@ -295,7 +295,9 @@ export function SchedulerCalendar({
                     const bgColor =
                       booking.status === 'confirmed'
                         ? 'rgba(74, 227, 69, 0.9)'
-                        : 'rgba(226, 221, 233, 0.89)';
+                        : booking.status === 'rejected'
+                          ? 'rgba(239, 68, 68, 0.15)'  // Очень прозрачный красный
+                          : 'rgba(226, 221, 233, 0.89)';  // pre_booking - серый
 
                     return (
                       <div
@@ -319,6 +321,11 @@ export function SchedulerCalendar({
                         {booking.status === 'pre_booking' && (
                           <div className="absolute bottom-[1px] right-[6px] text-[6px] px-[2px] rounded-[1px] bg-gray-400/70 text-white font-semibold uppercase pointer-events-none">
                             ПРЕДБРОНЬ
+                          </div>
+                        )}
+                        {booking.status === 'rejected' && (
+                          <div className="absolute bottom-[1px] right-[6px] text-[6px] px-[2px] rounded-[1px] bg-red-500/30 text-red-600 font-semibold uppercase pointer-events-none">
+                            ОТКЛОНЕН
                           </div>
                         )}
 
