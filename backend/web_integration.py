@@ -2129,21 +2129,40 @@ def get_crm_stats(period: str = Query("all")):
         }
         
         # Собираем user_id последних сообщений от пользователей
-        unread_by_user = {}  # user_id -> True если последнее сообщение от user
+        unread_by_user = {}  # user_id -> {has_unread: bool, status: str}
         try:
-            cmd = ["tail", "-n", "10000", str(CHAT_LOGS_JSONL)]
+            cmd = ["tail", "-n", "50000", str(CHAT_LOGS_JSONL)]
             lines = subprocess.check_output(cmd).decode('utf-8').splitlines()
             for line in lines:
                 try:
                     ev = json.loads(line.strip())
                     uid = str(ev.get("user_id"))
-                    # Если последнее сообщение от юзера - значит непрочитанное
+                    # Запоминаем последний статус для каждого user_id
+                    # Если последнее сообщение от user - значит непрочитанное
                     if ev.get("role") == "user":
-                        unread_by_user[uid] = True
+                        # Ищем статус пользователя в user_data
+                        user_record = next((u for u in users_data if str(u.get("user_id")) == uid), None)
+                        if user_record:
+                            user_status = user_record.get("final_status") or user_record.get("status")
+                            # Маппинг старых статусов
+                            if user_status == "in_progress": user_status = "in_work"
+                            elif user_status in ["hot", "booked", "pending"]: user_status = "pre_booking"
+                            elif user_status == "interested": user_status = "new"
+                            
+                            if user_status in ["new", "in_work", "pre_booking"]:
+                                unread_by_user[uid] = {
+                                    "has_unread": True,
+                                    "status": user_status
+                                }
                 except:
                     pass
         except:
             pass
+        
+        # Считаем непрочитанные по статусам
+        for uid, data in unread_by_user.items():
+            if data["status"] in stats["unread_by_status"]:
+                stats["unread_by_status"][data["status"]] += 1
 
         for user in users_data:
             # Парсим дату обновления (чтобы показывать только активных пользователей)
@@ -2169,11 +2188,6 @@ def get_crm_stats(period: str = Query("all")):
                     
                     if user_status in stats:
                         stats[user_status] += 1
-                    
-                    # Считаем непрочитанные
-                    user_id_str = str(user.get("user_id"))
-                    if user_status in ["new", "in_work", "pre_booking"] and unread_by_user.get(user_id_str):
-                        stats["unread_by_status"][user_status] += 1
 
         return {
             "status": "ok",
