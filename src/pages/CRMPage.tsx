@@ -17,7 +17,8 @@ import {
   Calendar, Car, StickyNote , MessageSquare, Plus, Pencil, Trash2, Phone,
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus,UserRoundMinus,UserRoundCheck,
   Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
-  CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download
+  CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download,
+  Clock, FileQuestion
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { MarkerType } from '@/types/crm';
@@ -72,15 +73,12 @@ interface User {
   marker?: string | null;
 }
 
-const MAIN_STATUSES = ['new', 'interested', 'in_work', 'pending'];
+const MAIN_STATUSES = ['new', 'in_work', 'pre_booking', 'archive'];
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  'new': { label: 'Холодные', color: '#64748b', bg: 'bg-slate-100' },
-  'interested': { label: 'Теплые', color: '#2563eb', bg: 'bg-blue-50' },
-  'in_work': { label: 'В работе', color: '#7c3aed', bg: 'bg-green-50' },
-  'pending': { label: 'Заявки', color: '#ea580c', bg: 'bg-orange-50' },
-  'confirmed': { label: 'Бронь', color: '#10b981', bg: 'bg-emerald-50' },
-  'completed': { label: 'Завершен', color: '#059669', bg: 'bg-green-100' },
-  'archive': { label: 'Архив', color: '#94a3b8', bg: 'bg-slate-200' }
+  'new': { label: 'NEW', color: '#64748b', bg: 'bg-slate-100' },
+  'in_work': { label: 'IN WORK', color: '#7c3aed', bg: 'bg-green-50' },
+  'pre_booking': { label: 'PREBOOK', color: '#ea580c', bg: 'bg-orange-50' },
+  'archive': { label: 'ARCHIVE', color: '#94a3b8', bg: 'bg-slate-200' }
 };
 
 const CRMPage: React.FC = () => {
