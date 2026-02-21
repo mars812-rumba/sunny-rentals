@@ -183,7 +183,8 @@
     },
     "notes": [],
     "source": "telegram_webapp",
-    "marker": "unprocessed"
+    "marker": "unprocessed",
+    "final_status": "new"
   },
   {
     "user_id": "75607252",
@@ -232,7 +233,8 @@
     },
     "notes": [],
     "source": "telegram_webapp",
-    "marker": "unprocessed"
+    "marker": "unprocessed",
+    "final_status": "new"
   },
   {
     "user_id": 374897465,
@@ -265,7 +267,8 @@
       }
     },
     "last_message_at": "2026-02-06T19:40:09.638937",
-    "marker": "in_progress"
+    "marker": "in_progress",
+    "final_status": "pre_booking"
   },
   {
     "user_id": 460037065,
@@ -315,7 +318,8 @@
     },
     "notes": [],
     "source": "telegram_webapp",
-    "marker": "unprocessed"
+    "marker": "unprocessed",
+    "final_status": "new"
   },
   {
     "user_id": "941646871",
@@ -348,7 +352,8 @@
     },
     "notes": [],
     "source": "telegram_webapp",
-    "marker": "unprocessed"
+    "marker": "unprocessed",
+    "final_status": "new"
   },
   {
     "user_id": "121221856",
@@ -366,7 +371,8 @@
       "days": 1
     },
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "final_status": "new"
   },
   {
     "user_id": "133081361",
@@ -461,7 +467,8 @@
       "days": 12
     },
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "final_status": "new"
   },
   {
     "user_id": "1047130071",
@@ -479,7 +486,8 @@
       "days": 8
     },
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "final_status": "new"
   },
   {
     "user_id": "1946409889",
@@ -497,7 +505,8 @@
       "days": 10
     },
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "final_status": "new"
   },
   {
     "user_id": "web_session_ml79gpi2_2pzoc31ql_62x1g8",
@@ -557,7 +566,8 @@
       "days": 7
     },
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "final_status": "new"
   },
   {
     "user_id": "web_session_ml7egnzi_olfru4g4l_4nv37f",
@@ -575,7 +585,8 @@
       "days": 13
     },
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "final_status": "pre_booking"
   },
   {
     "user_id": "410812780",
@@ -593,7 +604,8 @@
       "days": 13
     },
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "final_status": "pre_booking"
   },
   {
     "user_id": "524583621",
@@ -611,7 +623,8 @@
       "days": 5
     },
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "final_status": "new"
   },
   {
     "user_id": "490270825",
@@ -643,7 +656,8 @@
       "days": 14
     },
     "notes": [],
-    "source": "telegram_webapp"
+    "source": "telegram_webapp",
+    "final_status": "pre_booking"
   },
   {
     "user_id": "1260325430",
