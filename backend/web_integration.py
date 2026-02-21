@@ -624,7 +624,7 @@ def restore_from_archive(user_id: int):
         
         # Восстанавливаем в user_data со статусом "В работе"
         for record in user_records:
-            record['final_status'] = 'in_progress'
+            record['final_status'] = 'in_work'
             record['restored_at'] = datetime.utcnow().isoformat()
             if 'archived_at' in record:
                 del record['archived_at']
@@ -677,8 +677,8 @@ def auto_archive_old_records():
             
             if current_status == 'new' and age_days > 14:
                 should_archive = True  # Новые > 2 недели
-            elif current_status == 'interested' and age_days > 30:
-                should_archive = True  # Теплые > 1 месяц
+            elif current_status == 'new' and age_days > 30:
+                should_archive = True  # NEW > 1 месяц
             elif current_status in ['rejected', 'new']:
                 should_archive = True  # Отказы и холодные сразу
             elif current_status == 'completed':
@@ -1839,7 +1839,7 @@ def track_lead_event(request: LeadTrackRequest):
         elif event_type == "filters_used":
             print(f"🌡️ Пользователь {user_id} использовал фильтры")
             user_record["form_started"] = True
-            user_record["status"] = "interested"
+            user_record["status"] = "new"
             user_record["updated_at"] = datetime.utcnow().isoformat()
             
             # Сохраняем категорию интереса
@@ -1865,7 +1865,7 @@ def track_lead_event(request: LeadTrackRequest):
         elif event_type == "booking_submitted":
             print(f"🔥 Пользователь {user_id} отправил бронирование")
             user_record["booking_submitted"] = True
-            user_record["status"] = "pending"
+            user_record["status"] = "pre_booking"
             user_record["updated_at"] = datetime.utcnow().isoformat()
             
             # Сохраняем информацию о машине
@@ -2115,16 +2115,11 @@ def get_crm_stats(period: str = Query("all")):
         else: # "all"
             start_date = datetime(2000, 1, 1)
 
-        # Инициализируем счетчики (согласно src/types/crm.ts)
+        # Инициализируем счетчики (согласно новой воронке)
         stats = {
             "new": 0,
-            "interested": 0,
             "in_work": 0,
-            "pending": 0,
-            "confirmed": 0,
-            "completed": 0,
-            "cancelled": 0,
-            "no_response": 0,
+            "pre_booking": 0,
             "archive": 0
         }
 
@@ -2146,8 +2141,9 @@ def get_crm_stats(period: str = Query("all")):
                     user_status = user.get("final_status") or user.get("status")
                     
                     # Маппинг на случай, если в базе остались старые статусы
-                    if user_status == "in_progress": user_status = "interested"
-                    if user_status in ["hot", "booked"]: user_status = "pending"
+                    if user_status == "in_progress": user_status = "in_work"
+                    if user_status in ["hot", "booked", "pending"]: user_status = "pre_booking"
+                    if user_status == "interested": user_status = "new"
                     
                     if user_status in stats:
                         stats[user_status] += 1
