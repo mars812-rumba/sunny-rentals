@@ -641,16 +641,49 @@ const openUserChat = (user: any) => {
       });
 
       if (response.ok) {
-        // Обновляем локальное состояние
         setUsers(prev => prev.map(user =>
           user.user_id === userId ? { ...user, status: newStatus } : user
         ));
-        console.log(`Статус пользователя ${userId} изменен на: ${newStatus}`);
-      } else {
-        console.error('Ошибка обновления статуса');
+        console.log(`Статус ${userId} → ${newStatus}`);
       }
     } catch (e) {
-      console.error('Ошибка обновления статуса:', e);
+      console.error('Ошибка статуса:', e);
+    }
+  };
+
+  // Воронка: NEW → IN_WORK → PREBOOKING → ARCHIVE
+  const STATUS_FLOW: Record<string, string> = {
+    'new': 'in_work',
+    'in_work': 'pre_booking',
+    'pre_booking': 'archive'
+  };
+
+  const STATUS_REVERSE: Record<string, string> = {
+    'in_work': 'new',
+    'pre_booking': 'in_work',
+    'archive': 'pre_booking'
+  };
+
+  const handleMoveForward = async (userId: number) => {
+    const user = users.find(u => u.user_id === userId);
+    if (!user) return;
+    const currentStatus = user.status || user.final_status;
+    const nextStatus = STATUS_FLOW[currentStatus];
+    if (nextStatus) {
+      await handleStatusChange(userId, nextStatus);
+      // Переключить на новую вкладку
+      setActiveStatus(nextStatus);
+    }
+  };
+
+  const handleMoveBack = async (userId: number) => {
+    const user = users.find(u => u.user_id === userId);
+    if (!user) return;
+    const currentStatus = user.status || user.final_status;
+    const prevStatus = STATUS_REVERSE[currentStatus];
+    if (prevStatus) {
+      await handleStatusChange(userId, prevStatus);
+      setActiveStatus(prevStatus);
     }
   };
 
@@ -911,17 +944,27 @@ const handleUpdateNote = async () => {
       </nav>
 
 <main className="p-4 max-w-[1600px] mx-auto w-full space-y-6">
-  {/* Stats Section - Более чистый вид */}
+  {/* Stats Section */}
   <div className="grid grid-cols-4 gap-4">
-    {MAIN_STATUSES.map(key => (
-      <Card key={key} onClick={() => setActiveStatus(key)} 
-        className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' : 'hover:bg-white/50 opacity-80'}`}>
-        <CardContent className="p-3 flex flex-col items-center justify-center">
-          <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400 mb-1">{STATUS_CONFIG[key].label}</span>
-          <span className="text-2xl font-black text-slate-800 leading-none">{stats?.[key] || 0}</span>
-        </CardContent>
-      </Card>
-    ))}
+    {MAIN_STATUSES.map(key => {
+      const count = stats?.[key] || 0;
+      const hasUnread = users.some(u => {
+        const status = u.final_status || u.status;
+        return status === key && u.dialog_status?.has_new_messages;
+      });
+      return (
+        <Card key={key} onClick={() => setActiveStatus(key)} 
+          className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' : 'hover:bg-white/50 opacity-80'}`}>
+          <CardContent className="p-3 flex flex-row items-center justify-center gap-2 relative">
+            {hasUnread && (
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.6)]"></div>
+            )}
+            <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
+            <span className="text-2xl font-black text-slate-800 leading-none">{count}</span>
+          </CardContent>
+        </Card>
+      );
+    })}
   </div>
 
   <div className="flex flex-col gap-2 p-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 sticky top-[60px] z-40 mb-4">
@@ -1134,70 +1177,70 @@ const handleUpdateNote = async () => {
     <div className="flex items-center justify-between pt-1">
       {/* Лево: Маркеры и Индикаторы чата */}
       <div className="flex items-center gap-2">
-        {/* Маркеры - 4 иконки */}
+        {/* Маркеры - 4 иконки (только в IN_WORK) */}
         <div className="flex items-center gap-0.5">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              const newMarker = user.marker === 'unprocessed' ? null : 'unprocessed';
+              const newMarker = user.marker === 'offer_sent' ? null : 'offer_sent';
               handleMarkerChange(user.user_id, newMarker);
             }}
             className={`p-0.5 rounded transition-colors ${
-              user.marker === 'unprocessed'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-400 hover:text-blue-500 hover:bg-blue-50'
+              user.marker === 'offer_sent'
+                ? 'text-amber-600 bg-amber-50'
+                : 'text-slate-400 hover:text-amber-500 hover:bg-amber-50'
             }`}
-            title="Интересный лид - обработать позже"
+            title="Оффер отправлен"
           >
-            <CirclePlus className="w-3 h-3" />
+            <Send className="w-3 h-3" />
           </button>
           
           <button
             onClick={(e) => {
               e.stopPropagation();
-              const newMarker = user.marker === 'in_progress' ? null : 'in_progress';
+              const newMarker = user.marker === 'waiting' ? null : 'waiting';
               handleMarkerChange(user.user_id, newMarker);
             }}
             className={`p-0.5 rounded transition-colors ${
-              user.marker === 'in_progress'
-                ? 'text-green-600 bg-green-50'
-                : 'text-slate-400 hover:text-green-500 hover:bg-green-50'
+              user.marker === 'waiting'
+                ? 'text-purple-600 bg-purple-50'
+                : 'text-slate-400 hover:text-purple-500 hover:bg-purple-50'
             }`}
-            title="В работе"
+            title="Клиент думает"
           >
-            <CircleDollarSign className="w-3 h-3" />
+            <Clock className="w-3 h-3" />
           </button>
           
           <button
             onClick={(e) => {
               e.stopPropagation();
-              const newMarker = user.marker === 'rejected' ? null : 'rejected';
+              const newMarker = user.marker === 'need_info' ? null : 'need_info';
               handleMarkerChange(user.user_id, newMarker);
             }}
             className={`p-0.5 rounded transition-colors ${
-              user.marker === 'rejected'
+              user.marker === 'need_info'
+                ? 'text-cyan-600 bg-cyan-50'
+                : 'text-slate-400 hover:text-cyan-500 hover:bg-cyan-50'
+            }`}
+            title="Нужна инфо"
+          >
+            <FileQuestion className="w-3 h-3" />
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const newMarker = user.marker === 'follow_up' ? null : 'follow_up';
+              handleMarkerChange(user.user_id, newMarker);
+            }}
+            className={`p-0.5 rounded transition-colors ${
+              user.marker === 'follow_up'
                 ? 'text-red-600 bg-red-50'
                 : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
             }`}
-            title="Отказ"
+            title="Follow-up"
           >
-            <CircleMinus className="w-3 h-3" />
-          </button>
-          
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              const newMarker = user.marker === 'ready' ? null : 'ready';
-              handleMarkerChange(user.user_id, newMarker);
-            }}
-            className={`p-0.5 rounded transition-colors ${
-              user.marker === 'ready'
-                ? 'text-emerald-600 bg-emerald-50'
-                : 'text-slate-400 hover:text-emerald-500 hover:bg-emerald-50'
-            }`}
-            title="Готово!"
-          >
-            <CircleCheckBig className="w-3 h-3" />
+            <RefreshCw className="w-3 h-3" />
           </button>
         </div>
 
@@ -1230,15 +1273,27 @@ const handleUpdateNote = async () => {
 
       {/* Право: Пульт управления */}
       <div className="flex gap-1.5">
-        {/* 0. Кнопка Изменить статус на "В работе" */}
-        {currentStatus !== 'in_work' && (
+        {/* Кнопка НАЗАД < */}
+        {currentStatus !== 'new' && (
+          <Button
+            size="icon" variant="ghost"
+            className="h-7 w-7 rounded-md bg-slate-50 text-slate-500 hover:bg-slate-200 border border-slate-100"
+            onClick={(e) => { e.stopPropagation(); handleMoveBack(user.user_id); }}
+            title="Назад"
+          >
+            <span className="text-sm font-bold leading-none">←</span>
+          </Button>
+        )}
+
+        {/* Кнопка ВПЕРЁД > */}
+        {currentStatus !== 'archive' && (
           <Button
             size="icon" variant="ghost"
             className="h-7 w-7 rounded-md bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-100"
-            onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, 'in_work'); }}
-            title="Перевести в работу"
+            onClick={(e) => { e.stopPropagation(); handleMoveForward(user.user_id); }}
+            title="Вперёд"
           >
-            <CircleDollarSign className="w-3.5 h-3.5" />
+            <span className="text-sm font-bold leading-none">→</span>
           </Button>
         )}
 
