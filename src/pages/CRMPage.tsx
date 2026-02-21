@@ -1064,9 +1064,9 @@ const handleUpdateNote = async () => {
         className={`group border-none shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden h-[115px] flex flex-col 
           ${cardBgClass} ${needsReply ? 'ring-1 ring-amber-300/50' : ''}`}
       >
-        {/* Бейдж статуса */}
+        {/* Бейдж статуса (NEW, IN_WORK, PREBOOK) */}
         <div className="absolute top-1.5 right-2 flex gap-0.5">
-          {MAIN_STATUSES.map(s => (
+          {['new', 'in_work', 'pre_booking'].map(s => (
             <button
               key={s}
               onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, s); }}
@@ -1264,62 +1264,24 @@ const handleUpdateNote = async () => {
 
         {/* Разделитель */}
         <div className="w-px h-4 bg-slate-200 mx-1"></div>
-        
-        {/* Индикаторы чата */}
-        <div className="flex items-center gap-1 text-slate-400 relative">
-          <MessageSquare className="w-2.5 h-2.5" />
-          <span className="text-[8px] font-bold">{dialog?.message_count || 0}</span>
-          {(dialog?.active || aiActive) && (
-            <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-green-500 rounded-full animate-ping opacity-50"></div>
-          )}
-        </div>
-        
-        {/* Media indicators */}
-        <div className="flex items-center gap-1">
-          {dialog?.has_media_messages && (
-            <div className="flex items-center gap-0.5">
-              <Image className="w-2.5 h-2.5 text-blue-500" />
-              <span className="text-[7px] font-bold text-blue-600">📎</span>
-            </div>
-          )}
-        </div>
-        
-        {dialog?.has_new_messages && (
-          <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_4px_red]"></div>
-        )}
       </div>
 
       {/* Право: Пульт управления */}
       <div className="flex gap-1.5">
-        {/* Кнопка НАЗАД < */}
-        {/* 1. Кнопка Архивация */}
-        <Button
-          size="icon" variant="ghost"
-          className="h-7 w-7 rounded-md bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 border border-slate-100"
-          onClick={(e) => { e.stopPropagation(); handleArchiveAction(user.user_id); }}
-          title="Архивировать лид"
-        >
-          <Trash2 className="w-3 h-3" />
-        </Button>
-
-        {/* 2. Кнопка Claude
-        <Button
-          size="icon" variant="ghost"
-          className="h-7 w-7 rounded-md bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-100"
-          onClick={(e) => { e.stopPropagation(); handleClaudeAction(user.user_id, 'start'); }}
-        >
-          <Play className="w-3 h-3 fill-current" />
-        </Button>
-        */}
-
-        {/* 3. Кнопка Внутренний Чат */}
-        <Button
-          size="icon" variant="ghost"
-          className="h-7 w-7 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100"
-          onClick={(e) => { e.stopPropagation(); openUserChat(user); }}
-        >
-          <MessageCircle className="w-3.5 h-3.5" />
-        </Button>
+        {/* Кнопка Чат (с индикатором новых сообщений) */}
+        <div className="relative">
+          {dialog?.has_new_messages && (
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping opacity-70"></div>
+          )}
+          <Button
+            size="icon" variant="ghost"
+            className={`h-7 w-7 rounded-md border ${dialog?.has_new_messages ? 'bg-red-50 border-red-200 text-red-600' : 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100'}`}
+            onClick={(e) => { e.stopPropagation(); openUserChat(user); }}
+            title="Чат CRM"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+          </Button>
+        </div>
 
         {/* 4. Кнопка Telegram (внешняя) */}
         <Button
