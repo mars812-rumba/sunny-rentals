@@ -941,7 +941,7 @@ def get_all_dialog_statuses():
                 if uid not in statuses:
                     statuses[uid] = {
                         "claude_status": "stopped",
-                        "unread": False,
+                        "has_new_messages": False,
                         "last_note": "",
                         "last_action_at": ev.get("timestamp")
                     }
@@ -959,9 +959,9 @@ def get_all_dialog_statuses():
 
                 # 2. ЛОГИКА СООБЩЕНИЙ (Подсветка новых)
                 elif action == "user_message_received":
-                    entry["unread"] = True # Нужно ответить!
+                    entry["has_new_messages"] = True # Нужно ответить!
                 elif action in ["manager_message_sent", "messages_marked_read"]:
-                    entry["unread"] = False # Ответили или прочитали
+                    entry["has_new_messages"] = False # Ответили или прочитали
 
                 # 3. ЛОГИКА ЗАМЕТОК (То самое "как статус в WhatsApp")
                 elif action == "note_added":
@@ -2030,7 +2030,7 @@ def get_fast_dialog_map():
                 ev = json.loads(line.strip())
                 uid = str(ev.get("user_id"))
                 if uid not in statuses:
-                    statuses[uid] = {"claude_status": "stopped", "unread": False, "message_count": 0}
+                    statuses[uid] = {"claude_status": "stopped", "has_new_messages": False, "message_count": 0}
                 
                 entry = statuses[uid]
                 
@@ -2039,7 +2039,7 @@ def get_fast_dialog_map():
                     entry["last_message_from"] = ev.get("role")
                     entry["last_message_at"] = ev.get("timestamp")
                     # Если последнее сообщение от юзера — значит не прочитано
-                    entry["unread"] = (ev.get("role") == "user")
+                    entry["has_new_messages"] = (ev.get("role") == "user")
                 else:
                     # Логика событий (Claude)
                     action = ev.get("action")
@@ -2050,7 +2050,7 @@ def get_fast_dialog_map():
                     elif action == "claude_stopped":
                         entry["claude_status"] = "stopped"
                     elif action == "messages_marked_read":
-                        entry["unread"] = False
+                        entry["has_new_messages"] = False
             except: continue
 
     process_file(CHAT_LOGS_JSONL, is_chat=True)
@@ -2087,7 +2087,7 @@ def get_crm_users(status: str, period: str = "all"):
                     user_copy.update(fast_map[u_id])
                 else:
                     user_copy["claude_status"] = "stopped"
-                    user_copy["unread"] = False
+                    user_copy["has_new_messages"] = False
                 
                 filtered.append(user_copy)
 
