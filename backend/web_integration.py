@@ -2058,7 +2058,11 @@ def get_fast_dialog_map():
     return statuses
 
 @app.get(API_PREFIX + "/crm/users")
-def get_crm_users(status: str, period: str = "all"):
+def get_crm_users(status: str = None, period: str = "all"):
+    """
+    Получить пользователей CRM.
+    Если status не указан — возвращаем ВСЕХ пользователей (нужно для подсчёта непрочитанных во вкладках).
+    """
     try:
         users_data = load_json(USER_DATA_JSON)
         # Получаем карту состояний ОДИН раз
@@ -2076,7 +2080,11 @@ def get_crm_users(status: str, period: str = "all"):
             # ИСПОЛЬЗУЕМ updated_at для фильтра (чтобы показывать недавних пользователей)
             u_at = u.get("updated_at") or u.get("created_at")
             
-            if not u_at or u_status != status: continue
+            # Если status указан — фильтруем по нему
+            if status and u_status != status:
+                continue
+            
+            if not u_at: continue
             
             u_date = datetime.fromisoformat(u_at.replace('Z', ''))
             

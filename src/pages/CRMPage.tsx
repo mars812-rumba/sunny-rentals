@@ -83,6 +83,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
 
 const CRMPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]); // Все пользователи для индикаторов
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeStatus, setActiveStatus] = useState('new');
@@ -221,6 +222,14 @@ const CRMPage: React.FC = () => {
   const loadMainData = useCallback(async () => {
     setLoading(true);
     try {
+      // Загружаем всех пользователей для подсчёта непрочитанных во вкладках
+      const allUsersRes = await fetch(`/api/crm/users?period=${period}`);
+      const allUsersData = await allUsersRes.json();
+      if (allUsersData.status === 'ok') {
+        setAllUsers(allUsersData.users); // Все пользователи для индикаторов
+      }
+      
+      // Загружаем только текущую вкладку для отображения
       const [uRes, sRes] = await Promise.all([
         fetch(`/api/crm/users?status=${activeStatus}&period=${period}`),
         fetch(`/api/crm/stats?period=${period}`)
@@ -229,7 +238,6 @@ const CRMPage: React.FC = () => {
       const sData = await sRes.json();
       if (uData.status === 'ok') {
         setUsers(uData.users);
-        // После загрузки пользователей обновляем статусы диалогов
         setTimeout(() => refreshAllDialogStatuses(), 1000);
       }
       if (sData.status === 'ok') setStats(sData.stats);
@@ -948,18 +956,17 @@ const handleUpdateNote = async () => {
   <div className="grid grid-cols-4 gap-4">
     {MAIN_STATUSES.map(key => {
       const count = stats?.[key] || 0;
-      const hasUnreadInStats = stats?.unread_by_status?.[key] > 0;
-      // Для активной вкладки дополнительно проверяем локально
-      const hasUnreadLocal = activeStatus === key && users.some(u => 
-        u.dialog_status?.has_new_messages || u.dialog_status?.last_message_from === 'user'
-      );
-      const showUnread = hasUnreadInStats || hasUnreadLocal;
+      // Считаем непрочитанных из всех загруженных пользователей
+      const hasUnread = (allUsers || []).filter(u => {
+        const status = u.final_status || u.status;
+        return status === key && (u.dialog_status?.has_new_messages || u.dialog_status?.last_message_from === 'user');
+      }).length > 0;
       
       return (
         <Card key={key} onClick={() => setActiveStatus(key)} 
           className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' : 'hover:bg-white/50 opacity-80'}`}>
           <CardContent className="p-3 flex flex-row items-center justify-center gap-2 relative">
-            {showUnread && (
+            {hasUnread && (
               <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.6)]"></div>
             )}
             <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
