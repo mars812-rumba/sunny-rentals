@@ -1047,10 +1047,10 @@ const handleUpdateNote = async () => {
     const aiActive = dialog?.claude_status === 'active';
     // 1. ОПРЕДЕЛЯЕМ ФОН В ЗАВИСИМОСТИ ОТ МАРКЕРА
     const markerStyles: Record<string, string> = {
-      'unprocessed': 'bg-blue-50/60 border-blue-100', // Интересующийся (+) -> Синий
-      'in_progress': 'bg-green-50/60 border-green-100', // В работе ($) -> Зеленый
-      'ready': 'bg-green-50/60 border-green-100',     // Выполненный (checkmark) -> Фиолетовый
-      'rejected': 'bg-red-50/40 border-red-100',        // Отказ (-) -> Красный (опционально)
+      'offer_sent': 'bg-amber-50/60 border-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.3)]',   // Оффер - янтарный
+      'waiting': 'bg-purple-50/60 border-purple-200 shadow-[0_0_12px_rgba(168,85,247,0.3)]',     // Клиент думает - фиолетовый
+      'need_info': 'bg-cyan-50/60 border-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.3)]',       // Нужна инфо - циан
+      'follow_up': 'bg-red-50/60 border-red-200 shadow-[0_0_12px_rgba(239,68,68,0.3)]',         // Follow-up - красный
     };
 
     // Приоритет: если есть маркер — красим в его цвет. Если нет и нужен ответ — красим в янтарный. Иначе — белый.
@@ -1064,6 +1064,24 @@ const handleUpdateNote = async () => {
         className={`group border-none shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden h-[115px] flex flex-col 
           ${cardBgClass} ${needsReply ? 'ring-1 ring-amber-300/50' : ''}`}
       >
+        {/* Бейдж статуса */}
+        <div className="absolute top-1.5 right-2 flex gap-0.5">
+          {MAIN_STATUSES.map(s => (
+            <button
+              key={s}
+              onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, s); }}
+              className={`px-1.5 py-0.5 rounded text-[7px] font-bold uppercase transition-all ${
+                currentStatus === s 
+                  ? 'text-white shadow-sm' 
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+              style={currentStatus === s ? { backgroundColor: STATUS_CONFIG[s]?.color } : {}}
+            >
+              {STATUS_CONFIG[s]?.label}
+            </button>
+          ))}
+        </div>
+
         {/* Индикатор статуса сверху */}
         <div className="absolute top-0 left-0 w-full h-[2px]" style={{ backgroundColor: STATUS_CONFIG[currentStatus]?.color }}></div>
 
@@ -1274,29 +1292,6 @@ const handleUpdateNote = async () => {
       {/* Право: Пульт управления */}
       <div className="flex gap-1.5">
         {/* Кнопка НАЗАД < */}
-        {currentStatus !== 'new' && (
-          <Button
-            size="icon" variant="ghost"
-            className="h-7 w-7 rounded-md bg-slate-50 text-slate-500 hover:bg-slate-200 border border-slate-100"
-            onClick={(e) => { e.stopPropagation(); handleMoveBack(user.user_id); }}
-            title="Назад"
-          >
-            <span className="text-sm font-bold leading-none">←</span>
-          </Button>
-        )}
-
-        {/* Кнопка ВПЕРЁД > */}
-        {currentStatus !== 'archive' && (
-          <Button
-            size="icon" variant="ghost"
-            className="h-7 w-7 rounded-md bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-100"
-            onClick={(e) => { e.stopPropagation(); handleMoveForward(user.user_id); }}
-            title="Вперёд"
-          >
-            <span className="text-sm font-bold leading-none">→</span>
-          </Button>
-        )}
-
         {/* 1. Кнопка Архивация */}
         <Button
           size="icon" variant="ghost"
