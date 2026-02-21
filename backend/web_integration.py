@@ -2120,8 +2120,30 @@ def get_crm_stats(period: str = Query("all")):
             "new": 0,
             "in_work": 0,
             "pre_booking": 0,
-            "archive": 0
+            "archive": 0,
+            "unread_by_status": {
+                "new": 0,
+                "in_work": 0,
+                "pre_booking": 0
+            }
         }
+        
+        # Собираем user_id последних сообщений от пользователей
+        unread_by_user = {}  # user_id -> True если последнее сообщение от user
+        try:
+            cmd = ["tail", "-n", "5000", str(CHAT_LOGS_JSONL)]
+            lines = subprocess.check_output(cmd).decode('utf-8').splitlines()
+            for line in lines[-500:]:  # только последние 500 строк
+                try:
+                    ev = json.loads(line.strip())
+                    uid = str(ev.get("user_id"))
+                    # Если последнее сообщение от юзера - значит непрочитанное
+                    if ev.get("role") == "user":
+                        unread_by_user[uid] = True
+                except:
+                    pass
+        except:
+            pass
 
         for user in users_data:
             # Парсим дату обновления (чтобы показывать только активных пользователей)
@@ -2147,6 +2169,11 @@ def get_crm_stats(period: str = Query("all")):
                     
                     if user_status in stats:
                         stats[user_status] += 1
+                    
+                    # Считаем непрочитанные
+                    user_id_str = str(user.get("user_id"))
+                    if user_status in ["new", "in_work", "pre_booking"] and unread_by_user.get(user_id_str):
+                        stats["unread_by_status"][user_status] += 1
 
         return {
             "status": "ok",

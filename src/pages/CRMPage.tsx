@@ -948,11 +948,7 @@ const handleUpdateNote = async () => {
   <div className="grid grid-cols-4 gap-4">
     {MAIN_STATUSES.map(key => {
       const count = stats?.[key] || 0;
-      const unreadUsers = users.filter(u => {
-        const status = u.final_status || u.status;
-        return status === key && u.dialog_status?.has_new_messages;
-      });
-      const unreadCount = unreadUsers.length;
+      const unreadCount = stats?.unread_by_status?.[key] || 0;
       return (
         <Card key={key} onClick={() => setActiveStatus(key)} 
           className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' : 'hover:bg-white/50 opacity-80'}`}>
