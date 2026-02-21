@@ -2058,7 +2058,7 @@ def get_fast_dialog_map():
     return statuses
 
 @app.get(API_PREFIX + "/crm/users")
-def get_crm_users(status: str, period: str = "week"):
+def get_crm_users(status: str, period: str = "all"):
     try:
         users_data = load_json(USER_DATA_JSON)
         # Получаем карту состояний ОДИН раз
@@ -2098,7 +2098,7 @@ def get_crm_users(status: str, period: str = "week"):
         return {"status": "error", "message": str(e), "users": []}
     
 @app.get(API_PREFIX + "/crm/stats")
-def get_crm_stats(period: str = Query("week")):
+def get_crm_stats(period: str = Query("all")):
     try:
         users_data = load_json(USER_DATA_JSON)
         now = datetime.utcnow()

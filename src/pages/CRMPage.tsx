@@ -86,7 +86,7 @@ const CRMPage: React.FC = () => {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeStatus, setActiveStatus] = useState('new');
-  const [period, setPeriod] = useState('week');
+  const [period, setPeriod] = useState('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [chats, setChats] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
