@@ -2131,9 +2131,9 @@ def get_crm_stats(period: str = Query("all")):
         # Собираем user_id последних сообщений от пользователей
         unread_by_user = {}  # user_id -> True если последнее сообщение от user
         try:
-            cmd = ["tail", "-n", "5000", str(CHAT_LOGS_JSONL)]
+            cmd = ["tail", "-n", "10000", str(CHAT_LOGS_JSONL)]
             lines = subprocess.check_output(cmd).decode('utf-8').splitlines()
-            for line in lines[-500:]:  # только последние 500 строк
+            for line in lines:
                 try:
                     ev = json.loads(line.strip())
                     uid = str(ev.get("user_id"))
