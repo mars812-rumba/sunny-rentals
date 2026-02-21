@@ -2073,7 +2073,8 @@ def get_crm_users(status: str, period: str = "week"):
             # ФИКС АРХИВА: принудительно в строку
             u_id = str(u.get("user_id"))
             u_status = u.get("final_status") or u.get("status")
-            u_at = u.get("created_at")
+            # ИСПОЛЬЗУЕМ updated_at для фильтра (чтобы показывать недавних пользователей)
+            u_at = u.get("updated_at") or u.get("created_at")
             
             if not u_at or u_status != status: continue
             
@@ -2090,7 +2091,7 @@ def get_crm_users(status: str, period: str = "week"):
                 
                 filtered.append(user_copy)
 
-        filtered.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+        filtered.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
         return {"status": "ok", "users": filtered}
     except Exception as e:
         print(f"🔴 CRM Users Error: {e}")
@@ -2128,8 +2129,8 @@ def get_crm_stats(period: str = Query("week")):
         }
 
         for user in users_data:
-            # Парсим дату создания лида
-            user_date_str = user.get("created_at") or user.get("timestamp")
+            # Парсим дату обновления (чтобы показывать только активных пользователей)
+            user_date_str = user.get("updated_at") or user.get("created_at") or user.get("timestamp")
             if not user_date_str:
                 continue
                 
