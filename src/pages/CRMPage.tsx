@@ -948,15 +948,19 @@ const handleUpdateNote = async () => {
   <div className="grid grid-cols-4 gap-4">
     {MAIN_STATUSES.map(key => {
       const count = stats?.[key] || 0;
-      const unreadCount = stats?.unread_by_status?.[key] || 0;
+      const hasUnreadInStats = stats?.unread_by_status?.[key] > 0;
+      // Для активной вкладки дополнительно проверяем локально
+      const hasUnreadLocal = activeStatus === key && users.some(u => 
+        u.dialog_status?.has_new_messages || u.dialog_status?.last_message_from === 'user'
+      );
+      const showUnread = hasUnreadInStats || hasUnreadLocal;
+      
       return (
         <Card key={key} onClick={() => setActiveStatus(key)} 
           className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' : 'hover:bg-white/50 opacity-80'}`}>
           <CardContent className="p-3 flex flex-row items-center justify-center gap-2 relative">
-            {unreadCount > 0 && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.6)]">
-                <span className="text-[8px] font-bold text-white">{unreadCount}</span>
-              </div>
+            {showUnread && (
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.6)]"></div>
             )}
             <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
             <span className="text-2xl font-black text-slate-800 leading-none">{count}</span>
