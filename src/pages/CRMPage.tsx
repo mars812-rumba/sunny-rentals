@@ -1074,26 +1074,7 @@ const handleUpdateNote = async () => {
         className={`group border-none shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden h-[115px] flex flex-col 
           ${cardBgClass} ${needsReply ? 'ring-1 ring-amber-300/50' : ''}`}
       >
-        {/* Бейдж статуса (NEW, IN_WORK, PREBOOK) */}
-        <div className="absolute top-1.5 right-2 flex gap-0.5">
-          {['new', 'in_work', 'pre_booking'].map(s => (
-            <button
-              key={s}
-              onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, s); }}
-              className={`px-1.5 py-0.5 rounded text-[7px] font-bold uppercase transition-all ${
-                currentStatus === s 
-                  ? 'text-white shadow-sm' 
-                  : 'text-slate-400 hover:text-slate-600'
-              }`}
-              style={currentStatus === s ? { backgroundColor: STATUS_CONFIG[s]?.color } : {}}
-            >
-              {STATUS_CONFIG[s]?.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Индикатор статуса сверху */}
-        <div className="absolute top-0 left-0 w-full h-[2px]" style={{ backgroundColor: STATUS_CONFIG[currentStatus]?.color }}></div>
+   
 
         <CardContent className="p-2.5 flex flex-col justify-between h-full space-y-1">
 
@@ -1275,9 +1256,25 @@ const handleUpdateNote = async () => {
         {/* Разделитель */}
         <div className="w-px h-4 bg-slate-200 mx-1"></div>
       </div>
-
+{/* ПЕРЕНЕСЕННЫЕ СЮДА БЕЙДЖИ СТАТУСОВ */}
+          <div className="flex gap-0.5">
+            {['new', 'in_work', 'pre_booking'].map(s => (
+              <button
+                key={s}
+                onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, s); }}
+                className={`px-1.5 py-0.5 rounded text-[7px] font-bold uppercase transition-all ${
+                  currentStatus === s ? 'text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                }`}
+                style={currentStatus === s ? { backgroundColor: STATUS_CONFIG[s]?.color } : {}}
+              >
+                {STATUS_CONFIG[s]?.label}
+              </button>
+            ))}
+          </div>
       {/* Право: Пульт управления */}
       <div className="flex gap-1.5">
+        <Button size="icon" variant="ghost" className="h-7 w-7 rounded-md border border-slate-100 text-slate-300 hover:text-red-500 hover:bg-red-50"
+            onClick={(e) => { e.stopPropagation(); handleArchiveAction(user.user_id); }}><Trash2 className="w-3.5 h-3.5" /></Button>
         {/* Кнопка Чат */}
         <div className="relative">
           {/* Красная мигающая - есть непрочитанные */}

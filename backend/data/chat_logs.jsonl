@@ -1386,3 +1386,11 @@
 {"timestamp": "2026-02-09T04:05:19.938378", "user_id": 1063401070, "role": "user", "text": "Автомат", "username": "yulia_sun_tochka", "source": "telegram_bot"}
 {"timestamp": "2026-02-09T04:13:18.718Z", "user_id": 1063401070, "role": "manager", "text": "Вернусь скоро спредложением", "source": "crm_panel"}
 {"timestamp": "2026-02-09T04:13:28.435Z", "user_id": 1063401070, "role": "manager", "text": "🙏", "source": "crm_panel"}
+{"timestamp": "2026-02-21T16:21:40.998241", "user_id": 374897465, "role": "user", "text": "Чмоки в щеки", "username": "Marseloid", "source": "telegram_bot"}
+{"timestamp": "2026-02-21T16:31:09.471Z", "user_id": "791474867", "role": "manager", "text": "Добрый вечер!", "source": "crm_panel"}
+{"timestamp": "2026-02-21T16:31:24.424Z", "user_id": "791474867", "role": "manager", "text": "Нужна помощь с подбором транспорта?", "source": "crm_panel"}
+{"timestamp": "2026-02-21T23:54:40.310965", "user_id": 1496155975, "role": "user", "text": "Пока нет", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-02-21T23:54:55.248258", "user_id": 1496155975, "role": "user", "text": "С 21.03 по 10.04", "username": null, "source": "telegram_bot"}
+{"timestamp": "2026-02-22T03:05:15.336Z", "user_id": 1496155975, "role": "manager", "text": "На сколько человек подскажите пожалуйста. И по доставке", "source": "crm_panel"}
+{"timestamp": "2026-02-22T03:05:41.228Z", "user_id": 1496155975, "role": "manager", "text": "Аэропорт доставим бесплатно, по городу 500 бат", "source": "crm_panel"}
+{"timestamp": "2026-02-22T03:06:27.481Z", "user_id": "760037801", "role": "manager", "text": "Добрый день! Подскажите, нашли авто?", "source": "crm_panel"}
