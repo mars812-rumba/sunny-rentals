@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { format, differenceInDays, addDays } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { ru } from "date-fns/locale";
-import { ArrowLeft, Calendar, MapPin, CreditCard, Check, Copy } from "lucide-react";
+import { ArrowLeft, Calendar, CreditCard, Check, Copy, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import useEmblaCarousel from 'embla-carousel-react';
 
 // Определение сезона
 const determineSeason = (date: Date) => {
@@ -77,12 +78,17 @@ export default function OfferPage() {
   const carId = searchParams.get("car");
   const startDateStr = searchParams.get("start");
   const endDateStr = searchParams.get("end");
+  // Админ если есть ?admin=true или есть токен в localStorage
+  const isAdmin = searchParams.get("admin") === "true" || !!localStorage.getItem('authToken');
   
   const [car, setCar] = useState<CarData | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   
-  // Редактируемые поля
+  // Embla carousel
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  
+  // Редактируемые поля (только для админа)
   const [totalRental, setTotalRental] = useState("");
   const [totalDelivery, setTotalDelivery] = useState("");
   const [deposit, setDeposit] = useState("");
@@ -227,6 +233,19 @@ export default function OfferPage() {
     return `${API_URL}/images_web/${path}`;
   };
   
+  // Все фото для галереи
+  const allPhotos = useMemo(() => {
+    if (!car?.photos) return [];
+    const photos = [];
+    if (car.photos.main) photos.push(car.photos.main);
+    if (car.photos.gallery) {
+      car.photos.gallery.forEach((p: string) => {
+        if (p !== car.photos.main) photos.push(p);
+      });
+    }
+    return photos;
+  }, [car]);
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -246,21 +265,61 @@ export default function OfferPage() {
   
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Шапка с фото */}
+      {/* Фото галерея */}
       <div className="relative">
-        <div className="h-64 bg-gray-200 overflow-hidden">
-          {car.photos?.main ? (
-            <img
-              src={getImageUrl(car.photos.main)}
-              alt={car.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-300">
-              <span className="text-gray-500">Нет фото</span>
-            </div>
-          )}
+        <div className="overflow-hidden h-64" ref={emblaRef}>
+          <div className="flex">
+            {allPhotos.length > 0 ? (
+              allPhotos.map((photo: string, index: number) => (
+                <div key={index} className="flex-[0_0_100%] min-w-0">
+                  <img
+                    src={getImageUrl(photo)}
+                    alt={`${car.name} ${index + 1}`}
+                    className="w-full h-64 object-cover"
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="flex-[0_0_100%] h-64 bg-gray-300 flex items-center justify-center">
+                <span className="text-gray-500">Нет фото</span>
+              </div>
+            )}
+          </div>
         </div>
+        
+        {/* Навигация галереи */}
+        {allPhotos.length > 1 && (
+          <>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full opacity-80 hover:opacity-100"
+              onClick={() => emblaApi?.scrollPrev()}
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full opacity-80 hover:opacity-100"
+              onClick={() => emblaApi?.scrollNext()}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+            {/* Индикаторы */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1">
+              {allPhotos.map((_: any, index: number) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full ${
+                    index === 0 ? 'bg-white' : 'bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        
         <Button
           variant="secondary"
           size="icon"
@@ -341,13 +400,13 @@ export default function OfferPage() {
               <span className="font-semibold">Стоимость</span>
             </div>
             
-            {/* Цена за день (авто) */}
+            {/* Цена за день */}
             <div className="flex justify-between items-center py-2 border-b">
               <span className="text-gray-600">Цена за день ({days} дн.)</span>
               <span className="font-bold">{formatPrice(pricePerDay)}</span>
             </div>
             
-            {/* Итоговая аренда (редактируемая) */}
+            {/* Итоговая аренда */}
             <div className="space-y-1">
               <Label>Итоговая аренда</Label>
               <div className="relative">
@@ -356,12 +415,14 @@ export default function OfferPage() {
                   value={totalRental}
                   onChange={(e) => handleRentalChange(e.target.value)}
                   className="pr-16"
+                  readOnly={!isAdmin}
+                  disabled={!isAdmin}
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">฿</span>
               </div>
             </div>
             
-            {/* Доставка (редактируемая) */}
+            {/* Доставка */}
             <div className="space-y-1">
               <Label>Доставка</Label>
               <div className="grid grid-cols-2 gap-2">
@@ -369,6 +430,7 @@ export default function OfferPage() {
                   variant={totalDelivery === "0" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setTotalDelivery("0")}
+                  disabled={!isAdmin}
                 >
                   Аэропорт (0 ฿)
                 </Button>
@@ -376,6 +438,7 @@ export default function OfferPage() {
                   variant={totalDelivery === "500" ? "default" : "outline"}
                   size="sm"
                   onClick={() => setTotalDelivery("500")}
+                  disabled={!isAdmin}
                 >
                   Город (500 ฿)
                 </Button>
@@ -386,10 +449,12 @@ export default function OfferPage() {
                 onChange={(e) => setTotalDelivery(e.target.value)}
                 className="mt-2"
                 placeholder="Или своё значение"
+                readOnly={!isAdmin}
+                disabled={!isAdmin}
               />
             </div>
             
-            {/* Депозит (редактируемый) */}
+            {/* Депозит */}
             <div className="space-y-1">
               <Label>Депозит</Label>
               <div className="relative">
@@ -398,6 +463,8 @@ export default function OfferPage() {
                   value={deposit}
                   onChange={(e) => setDeposit(e.target.value)}
                   className="pr-16"
+                  readOnly={!isAdmin}
+                  disabled={!isAdmin}
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">฿</span>
               </div>
