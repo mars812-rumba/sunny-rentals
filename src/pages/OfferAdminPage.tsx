@@ -78,8 +78,8 @@ export default function OfferPage() {
   const carId = searchParams.get("car");
   const startDateStr = searchParams.get("start");
   const endDateStr = searchParams.get("end");
-  // Клиентская версия - всегда только чтение
-  const isAdmin = false;
+  // Админская версия - всегда редактируемые поля
+  const isAdmin = true;
   
   const [car, setCar] = useState<CarData | null>(null);
   const [loading, setLoading] = useState(true);
