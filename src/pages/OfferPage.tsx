@@ -132,12 +132,25 @@ export default function OfferPage() {
         const res = await fetch(`${API_URL}/api/cars`);
         const data = await res.json();
         const cars = data.cars || {};
-        const carData = cars[carId];
+        
+        // Ищем авто по ключу или по car.id / quick_id
+        let carData = cars[carId];
+        
+        if (!carData) {
+          // Ищем по всем ключам
+          for (const key of Object.keys(cars)) {
+            const c = cars[key];
+            if (c.id === carId || c.quick_id === carId || c.id === carId?.replace(/-/g, '_')) {
+              carData = c;
+              break;
+            }
+          }
+        }
         
         if (carData) {
           setCar(carData);
         } else {
-          console.error("Авто не найдено:", carId);
+          console.error("Авто не найдено:", carId, "доступные ключи:", Object.keys(cars).slice(0, 5));
         }
       } catch (error) {
         console.error("Ошибка загрузки авто:", error);
