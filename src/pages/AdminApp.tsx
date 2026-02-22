@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { Car, Calendar, Users } from "lucide-react";
+import AdminPanel from "./AdminPanel";
 
-const CarsPage = React.lazy(() => import("./CarsPage"));
 const CRMPage = React.lazy(() => import("./CRMPage"));
 const AdminScheduler = React.lazy(() => import("./AdminScheduler"));
 
@@ -38,7 +38,7 @@ export default function AdminApp() {
   }, [currentScreen]);
 
   const screens = [
-    { id: 0, name: "Авто", icon: Car, component: CarsPage },
+    { id: 0, name: "Авто", icon: Car, component: AdminPanel },
     { id: 1, name: "Календарь", icon: Calendar, component: AdminScheduler },
     { id: 2, name: "CRM", icon: Users, component: CRMPage },
   ];

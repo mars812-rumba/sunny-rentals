@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import LanguageSwitcher from "./components/LanguageSwitcher";
 import AdminPanel from "./pages/AdminPanel";
+import AdminApp from "./pages/AdminApp";
 import CarsPage from "./pages/CarsPage";
 import Site from "./pages/Site";
 import CRMPage from "@/pages/CRMPage";
@@ -54,8 +55,8 @@ const App = () => {
         <BrowserRouter>
           {/*<LanguageSwitcher />*/}
           <Routes>
-            {/* ✅ НОВЫЙ роут - единая панель со свайпами */}
-            <Route path="/admin/app" element={<Navigate to="/admin" replace />} />
+            {/* ✅ Админ панель - главная страница */}
+            <Route path="/admin/app" element={<AdminApp />} />
             
             {/* Основные роуты */}
             <Route path="/" element={<Site />} />
