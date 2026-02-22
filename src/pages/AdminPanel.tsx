@@ -1122,7 +1122,7 @@ const handleBulkPriceUpdate = async (updateData: any) => {
                       disabled={!startDate || !endDate}
                       onClick={() => {
                         if (startDate && endDate) {
-                          window.location.href = `/admin/offer?car=${car.id}&start=${startDate.toISOString()}&end=${endDate.toISOString()}`;
+                          window.location.href = `/offer?car=${car.id}&start=${startDate.toISOString()}&end=${endDate.toISOString()}`;
                         }
                       }}
                       title={startDate && endDate ? "Создать предложение" : "Выберите даты"}
