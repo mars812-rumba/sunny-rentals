@@ -797,16 +797,8 @@ const handleBulkPriceUpdate = async (updateData: any) => {
       result = result.filter(car => car.class === selectedCategory);
     }
 
-    // Фильтр по датам
-    if (startDate && endDate) {
-      result = result.filter(car => {
-        const ownerInfo = getOwnerForCar(car.id);
-        if (!ownerInfo?.carInfo?.available_until) return true;
-        
-        const availableUntil = new Date(ownerInfo.carInfo.available_until);
-        return availableUntil <= startDate;
-      });
-    }
+    // ❌ УБРАЛИ Фильтр по датам - показываем все авто, цена рассчитывается отдельно
+    // if (startDate && endDate) { ... }
 
     // ❌ УБРАЛИ ФИЛЬТР ПО ДОСТУПНОСТИ - он ломал брони!
     // result = result.filter(car => car.available === true);
