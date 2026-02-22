@@ -1114,16 +1114,21 @@ const handleBulkPriceUpdate = async (updateData: any) => {
                       <User className="h-3 w-3" />
                     </Button>
 
-                    {/* ✅ Кнопка "Предложение" */}
-                    {startDate && endDate && (
-                      <Link
-                        to={`/admin/offer?car=${car.id}&start=${startDate.toISOString()}&end=${endDate.toISOString()}`}
-                        className="flex-1 h-8 text-xs px-1 flex items-center justify-center bg-green-50 border border-green-200 rounded hover:bg-green-100 transition-colors"
-                        title="Создать предложение"
-                      >
-                        <span className="text-green-600 font-semibold">📤</span>
-                      </Link>
-                    )}
+                    {/* ✅ Кнопка "Предложение" - всегда видна */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className={`flex-1 h-8 text-xs px-1 ${!startDate || !endDate ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-green-50'}`}
+                      disabled={!startDate || !endDate}
+                      onClick={() => {
+                        if (startDate && endDate) {
+                          window.location.href = `/admin/offer?car=${car.id}&start=${startDate.toISOString()}&end=${endDate.toISOString()}`;
+                        }
+                      }}
+                      title={startDate && endDate ? "Создать предложение" : "Выберите даты"}
+                    >
+                      <span className={startDate && endDate ? "text-green-600" : "text-muted-foreground"}>📤</span>
+                    </Button>
                   </div>
 
                   {/* ✅ Депозит + Switch в одну строку */}
