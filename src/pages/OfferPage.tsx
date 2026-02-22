@@ -104,12 +104,7 @@ export default function OfferPage() {
   
   const basePricePerDay = useMemo(() => {
     if (!car?.pricing || !startDate || days === 0) return 0;
-    const month = startDate.getMonth() + 1;
-    const season = (month === 12 || month === 1 || month === 2) ? 'high_season' : 'low_season';
-    console.log(`[OfferPage] DEBUG: month=${month}, season=${season}, pricing=`, car.pricing);
-    const price = getPriceForPeriod(car.pricing, days, startDate);
-    console.log(`[OfferPage] DEBUG: days=${days}, pricePerDay=${price}`);
-    return price;
+    return getPriceForPeriod(car.pricing, days, startDate);
   }, [car, startDate, days]);
   
   const baseTotalRental = useMemo(() => {
