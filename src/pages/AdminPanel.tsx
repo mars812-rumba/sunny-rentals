@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,37 @@ import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import CarForm from "@/components/admin/CarForm";
 import { useCars } from "@/contexts/CarsContext";
+
+// Функции для расчёта цены аренды
+const determineSeason = (date: Date) => {
+  const month = date.getMonth() + 1;
+  if (month === 12 || month === 1 || month === 2) {
+    return 'high_season';
+  }
+  return 'low_season';
+};
+
+const getPriceForPeriod = (pricing: any, days: number, startDate: Date) => {
+  if (!pricing) return 0;
+  const season = determineSeason(startDate);
+  const seasonPrices = pricing[season];
+  if (!seasonPrices) return 0;
+  
+  if (days >= 30) return seasonPrices.price_30 || 0;
+  if (days >= 15) return seasonPrices.price_15_29 || 0;
+  if (days >= 7) return seasonPrices.price_7_14 || 0;
+  return seasonPrices.price_1_6 || 0;
+};
+
+const calculateTotalPrice = (car: any, startDate?: Date, endDate?: Date) => {
+  if (!startDate || !endDate) return null;
+  
+  const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  if (days <= 0) return null;
+  
+  const pricePerDay = getPriceForPeriod(car.pricing, days, startDate);
+  return pricePerDay * days;
+};
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
   // Утилита для получения токена (добавь в начало файла)
@@ -1022,6 +1053,14 @@ const handleBulkPriceUpdate = async (updateData: any) => {
                     <span>{price1_6}฿ • {price15_29}฿</span>
                   </div>
 
+                  {/* ✅ Рассчитанная цена на период */}
+                  {startDate && endDate && (
+                    <div className="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">
+                      <span>На {Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))} дн:</span>
+                      <span>{calculateTotalPrice(car, startDate, endDate)?.toLocaleString()}฿</span>
+                    </div>
+                  )}
+
                   {/* ✅ 3 кнопки */}
                   <div className="flex items-center gap-1">
                     {/* Кнопка Цены */}
@@ -1082,6 +1121,17 @@ const handleBulkPriceUpdate = async (updateData: any) => {
                     >
                       <User className="h-3 w-3" />
                     </Button>
+
+                    {/* ✅ Кнопка "Предложение" */}
+                    {startDate && endDate && (
+                      <Link
+                        to={`/admin/offer?car=${car.id}&start=${startDate.toISOString()}&end=${endDate.toISOString()}`}
+                        className="flex-1 h-8 text-xs px-1 flex items-center justify-center bg-green-50 border border-green-200 rounded hover:bg-green-100 transition-colors"
+                        title="Создать предложение"
+                      >
+                        <span className="text-green-600 font-semibold">📤</span>
+                      </Link>
+                    )}
                   </div>
 
                   {/* ✅ Депозит + Switch в одну строку */}
