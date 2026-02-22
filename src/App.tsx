@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import LanguageSwitcher from "./components/LanguageSwitcher";
@@ -12,7 +12,6 @@ import Site from "./pages/Site";
 import CRMPage from "@/pages/CRMPage";
 import React, { Suspense, useEffect } from 'react';
 import { trackLeadEvent } from '@/api/api';
-import AdminApp from "./pages/AdminApp";
 
 // ✅ Declare Telegram WebApp types
 declare global {
@@ -56,7 +55,7 @@ const App = () => {
           {/*<LanguageSwitcher />*/}
           <Routes>
             {/* ✅ НОВЫЙ роут - единая панель со свайпами */}
-            <Route path="/admin/app" element={<AdminApp />} />
+            <Route path="/admin/app" element={<Navigate to="/admin" replace />} />
             
             {/* Основные роуты */}
             <Route path="/" element={<Site />} />
