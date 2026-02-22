@@ -55,7 +55,7 @@ const App = () => {
         <BrowserRouter>
           {/*<LanguageSwitcher />*/}
           <Routes>
-            {/* ✅ Админ панель - главная страница */}
+            {/* ✅ Админ панель */}
             <Route path="/admin/app" element={<AdminApp />} />
             
             {/* Основные роуты */}
