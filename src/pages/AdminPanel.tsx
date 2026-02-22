@@ -859,7 +859,7 @@ const handleBulkPriceUpdate = async (updateData: any) => {
                   <Calendar
                     mode="single"
                     selected={startDate}
-                    onSelect={setStartDate}
+                    onSelect={(date) => { console.log('Start date selected:', date); setStartDate(date); }}
                     locale={ru}
                     initialFocus
                   />
@@ -877,7 +877,7 @@ const handleBulkPriceUpdate = async (updateData: any) => {
                   <Calendar
                     mode="single"
                     selected={endDate}
-                    onSelect={setEndDate}
+                    onSelect={(date) => { console.log('End date selected:', date); setEndDate(date); }}
                     locale={ru}
                     initialFocus
                     disabled={(date) => startDate ? date < startDate : false}
