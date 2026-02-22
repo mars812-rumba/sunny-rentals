@@ -78,8 +78,8 @@ export default function OfferPage() {
   const carId = searchParams.get("car");
   const startDateStr = searchParams.get("start");
   const endDateStr = searchParams.get("end");
-  // Админ если есть ?admin=true или есть токен в localStorage
-  const isAdmin = searchParams.get("admin") === "true" || !!localStorage.getItem('authToken');
+  // Админ если есть ?admin=true
+  const isAdmin = searchParams.get("admin") === "true";
   
   const [car, setCar] = useState<CarData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -185,18 +185,21 @@ export default function OfferPage() {
     return rental + delivery;
   }, [totalRental, totalDelivery]);
   
-  // Копировать ссылку
-  const copyLink = () => {
-    const url = window.location.href;
+  // Копировать ссылку для клиента (без admin)
+  const copyClientLink = () => {
+    const params = new URLSearchParams();
+    params.set('car', carId || '');
+    params.set('start', startDateStr || '');
+    params.set('end', endDateStr || '');
+    const url = `${window.location.origin}/offer?${params.toString()}`;
     navigator.clipboard.writeText(url);
-    toast.success("Ссылка скопирована!");
+    toast.success("Ссылка для клиента скопирована!");
   };
   
-  // Подтвердить (создать предбронь)
+  // Подтвердить
   const handleConfirm = async () => {
     setSubmitting(true);
     
-    // Имитация создания предброни
     const offerData = {
       car_id: carId,
       car_name: car?.name,
@@ -211,13 +214,19 @@ export default function OfferPage() {
       created_at: new Date().toISOString(),
     };
     
-    console.log("Создаём предбронь:", offerData);
+    if (isAdmin) {
+      // Админ просто подтверждает - пока уведомление
+      console.log("Подтверждено админом:", offerData);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      toast.success("Предложение подтверждено!");
+    } else {
+      // Клиент создаёт бронь
+      console.log("Создаём бронь от клиента:", offerData);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success("Заявка отправлена! Мы свяжемся с вами.");
+    }
     
-    // Пока просто показываем уведомление
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast.success("Предбронь создана!");
-    navigate(-1); // Возврат назад
+    navigate(-1);
     setSubmitting(false);
   };
   
@@ -486,27 +495,53 @@ export default function OfferPage() {
       {/* Кнопки */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
         <div className="flex gap-2">
-          <Button variant="outline" onClick={copyLink} className="flex-1">
-            <Copy className="h-4 w-4 mr-2" />
-            Копировать
-          </Button>
-          <Button 
-            onClick={handleConfirm} 
-            className="flex-1 bg-green-600 hover:bg-green-700"
-            disabled={submitting}
-          >
-            {submitting ? (
-              <span className="flex items-center gap-2">
-                <span className="animate-spin">⏳</span>
-                Создание...
-              </span>
-            ) : (
-              <>
-                <Check className="h-4 w-4 mr-2" />
-                Подтвердить
-              </>
-            )}
-          </Button>
+          {isAdmin ? (
+            <>
+              <Button variant="outline" onClick={copyClientLink} className="flex-1">
+                <Copy className="h-4 w-4 mr-2" />
+                Ссылка для клиента
+              </Button>
+              <Button 
+                onClick={handleConfirm} 
+                className="flex-1 bg-green-600 hover:bg-green-700"
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin">⏳</span>
+                  </span>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Подтвердить
+                  </>
+                )}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={() => navigator.clipboard.writeText(window.location.href)} className="flex-1">
+                <Copy className="h-4 w-4 mr-2" />
+                Копировать
+              </Button>
+              <Button 
+                onClick={handleConfirm} 
+                className="flex-1 bg-green-600 hover:bg-green-700"
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin">⏳</span>
+                  </span>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Забронировать
+                  </>
+                )}
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
