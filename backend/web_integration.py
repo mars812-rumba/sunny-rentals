@@ -1618,8 +1618,8 @@ def get_cars(category: Optional[str] = None):
 
 @app.get(API_PREFIX + "/available-cars")
 def get_available_cars(
-    start_date: str = Query(..., regex=r"^\d{4}-\d{2}-\d{2}$"),
-    end_date: str = Query(..., regex=r"^\d{4}-\d{2}-\d{2}$"),
+    start_date: str = Query(..., pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    end_date: str = Query(..., pattern=r"^\d{4}-\d{2}-\d{2}$"),
     category: Optional[str] = None
 ):
     sd = _parse_date(start_date)
