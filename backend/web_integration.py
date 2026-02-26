@@ -539,10 +539,10 @@ def load_bookings() -> List[Dict]:
     data = load_json(BOOKINGS_FILE)
     return data if isinstance(data, list) else []
 
-def get_user_latest_record(user_id: int, from_archive: bool = False):
+def get_user_latest_record(user_id: Union[int, str], from_archive: bool = False):
     json_file = ARCHIVE_JSON if from_archive else USER_DATA_JSON
     users_data = load_json(json_file)
-    user_records = [u for u in users_data if u.get('user_id') == user_id]
+    user_records = [u for u in users_data if str(u.get('user_id')) == str(user_id)]
     if not user_records:
         return None
     user_records.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
@@ -557,13 +557,13 @@ def update_all_user_records(user_id: int, updates: dict, in_archive: bool = Fals
     
     with open(json_file, "r", encoding="utf-8") as f:
         users_data = json.load(f)
-    
+
     updated = False
     for user in users_data:
-        if user.get('user_id') == user_id:
+        if str(user.get('user_id')) == str(user_id):
             user.update(updates)
             updated = True
-    
+
     if updated:
         with _lock:
             save_json(json_file, users_data)
@@ -612,9 +612,9 @@ def restore_from_archive(user_id: int):
         
         with open(ARCHIVE_JSON, "r", encoding="utf-8") as f:
             archive_data = json.load(f)
-        
+
         # Находим записи пользователя
-        user_records = [u for u in archive_data if u.get('user_id') == user_id]
+        user_records = [u for u in archive_data if str(u.get('user_id')) == str(user_id)]
         if not user_records:
             return False
         
@@ -796,8 +796,8 @@ def update_dialog_status(user_id: int, **kwargs):
         users_data = load_json(USER_DATA_JSON)
         
         # Найдем пользователя по user_id
-        user_index = next((i for i, u in enumerate(users_data) if u.get("user_id") == user_id), None)
-        
+        user_index = next((i for i, u in enumerate(users_data) if str(u.get("user_id")) == str(user_id)), None)
+
         if user_index is not None:
             user_record = users_data[user_index]
         else:
@@ -817,6 +817,8 @@ def update_dialog_status(user_id: int, **kwargs):
                 "notes": [],
                 "source": "system"
             }
+            # Дедупликация: удаляем старые записи с тем же user_id
+            users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
             users_data.append(user_record)
             user_index = len(users_data) - 1
         
@@ -1022,7 +1024,7 @@ def get_dialog_status_from_history(user_id: int):
                 for line in f:
                     try:
                         event = json.loads(line.strip())
-                        if event.get("user_id") == user_id:
+                        if str(event.get("user_id")) == str(user_id):
                             events.append(event)
                     except json.JSONDecodeError:
                         continue
@@ -1120,11 +1122,11 @@ def get_dialog_events(user_id: int, limit: int = 50):
                 for line in f:
                     try:
                         event = json.loads(line.strip())
-                        if event.get("user_id") == user_id:
+                        if str(event.get("user_id")) == str(user_id):
                             events.append(event)
                     except json.JSONDecodeError:
                         continue
-        
+
         # Сортируем по времени (новые сверху) и ограничиваем количество
         events.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
         events = events[:limit]
@@ -1142,7 +1144,7 @@ def get_dialog_status(user_id: int) -> dict:
     """
     try:
         users_data = load_json(USER_DATA_JSON)
-        user_record = next((u for u in users_data if u.get("user_id") == user_id), None)
+        user_record = next((u for u in users_data if str(u.get("user_id")) == str(user_id)), None)
         
         if not user_record or "dialog" not in user_record:
             return {
@@ -2263,11 +2265,11 @@ async def get_user_logs(user_id: int, limit: int = Query(50, ge=1, le=200)):
                 for line in f:
                     try:
                         log_entry = json.loads(line.strip())
-                        if log_entry.get('user_id') == user_id:
+                        if str(log_entry.get('user_id')) == str(user_id):
                             logs.append(log_entry)
                     except json.JSONDecodeError:
                         continue
-        
+
         # Сортируем по времени (новые сверху) и ограничиваем количество
         logs.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
         logs = logs[:limit]
@@ -2580,7 +2582,7 @@ async def get_user_notes(user_id: int):
         with open(history_file, "r", encoding="utf-8") as f:
             for line in f:
                 entry = json.loads(line)
-                if entry.get("user_id") == user_id:
+                if str(entry.get("user_id")) == str(user_id):
                     # Забираем заметки и из обычных добавлений, и из смены статусов
                     if entry.get("note"):
                         notes.append({
@@ -2686,11 +2688,11 @@ async def get_user_history(user_id: int):
                 for line in f:
                     try:
                         entry = json.loads(line.strip())
-                        if entry.get('user_id') == user_id:
+                        if str(entry.get('user_id')) == str(user_id):
                             history.append(entry)
                     except json.JSONDecodeError:
                         continue
-        
+
         history.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
         
         return {
@@ -2723,16 +2725,58 @@ async def trigger_auto_archive():
     """Запустить автоматическую архивацию старых записей"""
     try:
         result = auto_archive_old_records()
-        
+
         return {
             "status": "ok",
             "archived": result["archived"],
             "message": f"Архивировано записей: {result['archived']}"
         }
-        
+
     except Exception as e:
         print(f"❌ Error in trigger_auto_archive: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(API_PREFIX + "/crm/dedupe")
+async def run_dedupe(archive: bool = False):
+    """Удалить дубликаты пользователей - оставить только последнюю запись по updated_at"""
+    try:
+        json_file = ARCHIVE_JSON if archive else USER_DATA_JSON
+
+        if not json_file.exists():
+            return {"status": "ok", "removed": 0, "total": 0, "unique": 0}
+
+        with open(json_file, "r", encoding="utf-8") as f:
+            users_data = json.load(f)
+
+        original_count = len(users_data)
+
+        # Дедупликация: оставляем только последнюю запись по updated_at
+        users_dict = {}
+        for record in users_data:
+            uid = str(record.get("user_id"))
+            ts = record.get("updated_at") or record.get("created_at") or ""
+            if uid not in users_dict or ts > (users_dict[uid].get("updated_at") or users_dict[uid].get("created_at") or ""):
+                users_dict[uid] = record
+
+        cleaned_data = list(users_dict.values())
+        cleaned_data.sort(key=lambda x: x.get("updated_at") or x.get("created_at") or "", reverse=True)
+
+        with open(json_file, "w", encoding="utf-8") as f:
+            json.dump(cleaned_data, f, indent=2, ensure_ascii=False)
+
+        return {
+            "status": "ok",
+            "removed": original_count - len(cleaned_data),
+            "total": original_count,
+            "unique": len(cleaned_data),
+            "message": f"Удалено дубликатов: {original_count - len(cleaned_data)}"
+        }
+
+    except Exception as e:
+        print(f"❌ Error in run_dedupe: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # ==============================
 # ОБЪЕДИНЕННАЯ ЛОГИКА CLAUDE
@@ -2867,9 +2911,9 @@ def get_user_filters_from_db(user_id: int) -> dict:
     try:
         # Читаем данные пользователей
         users_data = load_json(USER_DATA_JSON)
-        
+
         # Ищем пользователя по user_id
-        user_data = next((u for u in users_data if u.get('user_id') == user_id), None)
+        user_data = next((u for u in users_data if str(u.get('user_id')) == str(user_id)), None)
         
         if user_data:
             # Извлекаем фильтры из данных пользователя
@@ -2963,8 +3007,8 @@ def sync_user_context(user_id):
         try:
             with open(USER_DATA_JSON, 'r', encoding='utf-8') as f:
                 users = json.load(f)
-                user_data = next((u for u in users if u.get('user_id') == user_id), None)
-                
+                user_data = next((u for u in users if str(u.get('user_id')) == str(user_id)), None)
+
                 if user_data:
                     # Переносим данные из БД в 'слой' фильтров для Клода
                     filters = {
@@ -3180,16 +3224,17 @@ async def receive_message_from_bot(request: Request):
         try:
             users_data = load_json(USER_DATA_JSON)
             user_updated = False
-            
+
             for user in users_data:
-                if user.get('user_id') == user_id:
+                if str(user.get('user_id')) == str(user_id):
                     user['last_message_at'] = datetime.utcnow().isoformat()
                     user['updated_at'] = datetime.utcnow().isoformat()
                     user_updated = True
                     break
-            
+
             if user_updated:
                 save_json(USER_DATA_JSON, users_data)
+                print(f"✅ Updated metadata for user {user_id}")
                 print(f"✅ Updated metadata for user {user_id}")
             else:
                 print(f"⚠️ User {user_id} not found in user_data, creating new record")
@@ -3209,6 +3254,8 @@ async def receive_message_from_bot(request: Request):
                     "source": "telegram_bot",
                     "last_message_at": datetime.utcnow().isoformat()
                 }
+                # Дедупликация: удаляем старые записи с тем же user_id
+                users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
                 users_data.append(new_user)
                 save_json(USER_DATA_JSON, users_data)
                 print(f"✅ Created new user record for {user_id}")
@@ -3272,14 +3319,14 @@ async def receive_media_from_bot(request: Request):
         try:
             users_data = load_json(USER_DATA_JSON)
             user_updated = False
-            
+
             for user in users_data:
-                if user.get('user_id') == user_id:
+                if str(user.get('user_id')) == str(user_id):
                     user['last_message_at'] = datetime.utcnow().isoformat()
                     user['updated_at'] = datetime.utcnow().isoformat()
                     user_updated = True
                     break
-            
+
             if user_updated:
                 save_json(USER_DATA_JSON, users_data)
                 print(f"✅ Updated metadata for user {user_id}")
@@ -3300,6 +3347,8 @@ async def receive_media_from_bot(request: Request):
                     "source": "telegram_bot",
                     "last_message_at": datetime.utcnow().isoformat()
                 }
+                # Дедупликация: удаляем старые записи с тем же user_id
+                users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
                 users_data.append(new_user)
                 save_json(USER_DATA_JSON, users_data)
                 print(f"✅ Created new user record for {user_id}")
