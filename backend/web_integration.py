@@ -1840,7 +1840,9 @@ def track_lead_event(request: LeadTrackRequest):
         elif event_type == "filters_used":
             print(f"🌡️ Пользователь {user_id} использовал фильтры")
             user_record["form_started"] = True
-            user_record["status"] = "new"
+            # НЕ сбрасываем статус на new если пользователь уже существует
+            if user_index is None:
+                user_record["status"] = "new"
             user_record["updated_at"] = datetime.utcnow().isoformat()
             
             # Сохраняем категорию интереса
@@ -1897,10 +1899,9 @@ def track_lead_event(request: LeadTrackRequest):
                 }
 
         # Обновляем запись пользователя
-        if user_index is not None:
-            users_data[user_index] = user_record
-        else:
-            users_data.append(user_record)
+        # Дедупликация: удаляем старые записи с тем же user_id перед сохранением
+        users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
+        users_data.append(user_record)
 
         # Сохраняем данные пользователей
         save_json(USER_DATA_JSON, users_data)
