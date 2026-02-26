@@ -885,7 +885,7 @@ const handleUpdateNote = async () => {
         if (selectedUser) {
           setUsers(prev => prev.map(u =>
             u.user_id === selectedUser.user_id
-              ? { ...u, status: 'archived', archived_at: new Date().toISOString() }
+              ? { ...u, status: 'archive', archived_at: new Date().toISOString() }
               : u
           ));
         }

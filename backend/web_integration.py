@@ -359,7 +359,7 @@ class UserData(BaseModel):
     user_id: Union[int, str]
     username: Optional[str] = None
     created_at: str  # Было timestamp
-    status: str      # Было final_status
+    status: str
     car_interested: Optional[str] = None
     category_interested: Optional[str] = None
     dates_selected: Optional[Dict[str, Any]] = None
@@ -624,7 +624,7 @@ def restore_from_archive(user_id: int):
         
         # Восстанавливаем в user_data со статусом "В работе"
         for record in user_records:
-            record['final_status'] = 'in_work'
+            record['status'] = 'in_work'
             record['restored_at'] = datetime.utcnow().isoformat()
             if 'archived_at' in record:
                 del record['archived_at']
@@ -669,8 +669,7 @@ def auto_archive_old_records():
                 continue
             
             age_days = (now - user_time).days
-            # PRIORITY STATUS LOGIC: final_status overrides status
-            current_status = user.get("final_status") or user.get("status")
+            current_status = user.get("status")
             
             # Правила:
             should_archive = False
@@ -2076,7 +2075,7 @@ def get_crm_users(status: str = None, period: str = "all"):
         for u in users_data:
             # ФИКС АРХИВА: принудительно в строку
             u_id = str(u.get("user_id"))
-            u_status = u.get("final_status") or u.get("status")
+            u_status = u.get("status")
             # ИСПОЛЬЗУЕМ updated_at для фильтра (чтобы показывать недавних пользователей)
             u_at = u.get("updated_at") or u.get("created_at")
             
@@ -2151,7 +2150,7 @@ def get_crm_stats(period: str = Query("all")):
                         # Ищем статус пользователя в user_data
                         user_record = next((u for u in users_data if str(u.get("user_id")) == uid), None)
                         if user_record:
-                            user_status = user_record.get("final_status") or user_record.get("status")
+                            user_status = user_record.get("status")
                             # Маппинг старых статусов
                             if user_status == "in_progress": user_status = "in_work"
                             elif user_status in ["hot", "booked", "pending"]: user_status = "pre_booking"
@@ -2186,8 +2185,7 @@ def get_crm_stats(period: str = Query("all")):
                 if user.get("archived") is True:
                     stats["archive"] += 1
                 else:
-                    # PRIORITY STATUS LOGIC: final_status overrides status
-                    user_status = user.get("final_status") or user.get("status")
+                    user_status = user.get("status")
                     
                     # Маппинг на случай, если в базе остались старые статусы
                     if user_status == "in_progress": user_status = "in_work"
@@ -2361,11 +2359,11 @@ async def update_user_status(update: StatusUpdate):
         if not current_user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        old_status = current_user.get('final_status', 'unknown')
-        
+        old_status = current_user.get('status', 'unknown')
+
         # Обновляем все записи пользователя
         updates = {
-            'final_status': new_status,
+            'status': new_status,
             'updated_at': datetime.utcnow().isoformat()
         }
         
@@ -4094,7 +4092,7 @@ async def reject_booking(booking_id: str, data: dict = None):
         if user_id:
             for user in users_data:
                 if str(user.get('user_id')) == str(user_id):
-                    user['status'] = 'archived'
+                    user['status'] = 'archive'
                     user['archived_at'] = datetime.utcnow().isoformat()
                     user['updated_at'] = datetime.utcnow().isoformat()
                     print(f"✓ Архивирован лид {user_id}")

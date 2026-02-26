@@ -49,7 +49,7 @@ class UserTracker:
         
         # Проверяем, что пользователь найден
         if user_data:
-            user_data['final_status'] = status
+            user_data['status'] = status
             user_data['last_note'] = note
             user_data['updated_at'] = datetime.now().isoformat()
             
@@ -93,7 +93,7 @@ class UserTracker:
                 "followup_help_needed": None,
                 "followup_reason": None,
                 
-                "final_status": "awaiting_followup"
+                "status": "awaiting_followup"
             }
             self.users.append(user_data)
             print(f"New user tracked: {user_id}")
@@ -137,7 +137,7 @@ class UserTracker:
             self.users[idx]["booking_submitted"] = True
             self.users[idx]["action"] = "booking_submitted"
             self.users[idx]["status"] = "hot"
-            self.users[idx]["final_status"] = "booked"
+            self.users[idx]["status"] = "booked"
             self.users[idx]["timestamp"] = datetime.now().isoformat()
             print(f"✓ Updated booking_submitted for user {user_id}")
             self._save_data()
@@ -170,7 +170,7 @@ class UserTracker:
         
         if idx is not None:
             self.users[idx]["booking_submitted"] = True
-            self.users[idx]["final_status"] = "booked"
+            self.users[idx]["status"] = "booked"
             self.users[idx]["action"] = "booking_submitted"
             print(f"Booking submitted for user {user_id}")
             self._save_data()
@@ -193,9 +193,9 @@ class UserTracker:
             self.users[idx]["followup_reason"] = reason
             
             if help_needed:
-                self.users[idx]["final_status"] = "helped"
+                self.users[idx]["status"] = "helped"
             elif reason:
-                self.users[idx]["final_status"] = "rejected_" + reason
+                self.users[idx]["status"] = "rejected_" + reason
             
             print(f"Followup response from user {user_id}: help={help_needed}, reason={reason}")
             self._save_data()
