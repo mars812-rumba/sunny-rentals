@@ -3234,8 +3234,10 @@ async def receive_message_from_bot(request: Request):
                     break
 
             if user_updated:
+                # Дедупликация: удаляем ВСЕ записи с этим user_id перед сохранением
+                users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
+                users_data.append(user)
                 save_json(USER_DATA_JSON, users_data)
-                print(f"✅ Updated metadata for user {user_id}")
                 print(f"✅ Updated metadata for user {user_id}")
             else:
                 print(f"⚠️ User {user_id} not found in user_data, creating new record")
@@ -3255,8 +3257,6 @@ async def receive_message_from_bot(request: Request):
                     "source": "telegram_bot",
                     "last_message_at": datetime.utcnow().isoformat()
                 }
-                # Дедупликация: удаляем старые записи с тем же user_id
-                users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
                 users_data.append(new_user)
                 save_json(USER_DATA_JSON, users_data)
                 print(f"✅ Created new user record for {user_id}")
@@ -3329,6 +3329,9 @@ async def receive_media_from_bot(request: Request):
                     break
 
             if user_updated:
+                # Дедупликация: удаляем ВСЕ записи с этим user_id перед сохранением
+                users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
+                users_data.append(user)
                 save_json(USER_DATA_JSON, users_data)
                 print(f"✅ Updated metadata for user {user_id}")
             else:
@@ -3348,8 +3351,6 @@ async def receive_media_from_bot(request: Request):
                     "source": "telegram_bot",
                     "last_message_at": datetime.utcnow().isoformat()
                 }
-                # Дедупликация: удаляем старые записи с тем же user_id
-                users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
                 users_data.append(new_user)
                 save_json(USER_DATA_JSON, users_data)
                 print(f"✅ Created new user record for {user_id}")
