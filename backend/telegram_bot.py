@@ -869,10 +869,10 @@ def handle_start(message):
 
         # Опционально: полное удаление сообщения через 3 минуты (если хочешь супер-чистоту)
         def delete_message_later():
-            time.sleep(3*60)
+            time.sleep(2*60)
             try:
                 bot.delete_message(chat_id, msg.message_id)
-                bot.send_message(chat_id,"👀 Менеджер подключается к чату...")
+                bot.send_message(chat_id,"Отправьте любое сообщение для начала диалога с менеджером, либо нажмите /start  для повторного открытия каталога.")
             except:
                 pass
         threading.Thread(target=delete_message_later, daemon=True).start()

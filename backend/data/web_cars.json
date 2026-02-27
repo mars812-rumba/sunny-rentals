@@ -22,16 +22,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 848,
-          "price_7_14": 743,
-          "price_15_29": 660,
-          "price_30": 576
+          "price_1_6": 850,
+          "price_7_14": 800,
+          "price_15_29": 700,
+          "price_30": 500
         },
         "high_season": {
-          "price_1_6": 882,
-          "price_7_14": 844,
-          "price_15_29": 763,
-          "price_30": 651
+          "price_1_6": 950,
+          "price_7_14": 895,
+          "price_15_29": 800,
+          "price_30": 600
         },
         "deposit": 5000
       },
@@ -45,7 +45,7 @@
       "quick_id": "toyota_yaris_2022_black",
       "rating": 4.5,
       "class_": "compact",
-      "updated_at": "2026-01-30T13:59:56.751449"
+      "updated_at": "2026-02-27T06:30:36.787469"
     },
     "toyota_yaris_2022_white": {
       "id": "toyota_yaris_2022_white",
@@ -73,10 +73,10 @@
           "price_30": 745
         },
         "high_season": {
-          "price_1_6": 882,
-          "price_7_14": 830,
-          "price_15_29": 740,
-          "price_30": 651
+          "price_1_6": 837,
+          "price_7_14": 788,
+          "price_15_29": 703,
+          "price_30": 618
         },
         "deposit": 5000
       },
@@ -90,7 +90,7 @@
       "quick_id": "yaris2022white",
       "rating": 4.5,
       "class_": "compact",
-      "updated_at": "2026-01-30T13:59:56.751508"
+      "updated_at": "2026-02-27T04:38:42.421614"
     },
     "toyota_yaris_2024_gray": {
       "id": "toyota_yaris_2024_gray",
@@ -113,16 +113,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 816,
-          "price_7_14": 725,
-          "price_15_29": 633,
-          "price_30": 559
+          "price_1_6": 850,
+          "price_7_14": 800,
+          "price_15_29": 700,
+          "price_30": 500
         },
         "high_season": {
-          "price_1_6": 810,
-          "price_7_14": 798,
-          "price_15_29": 708,
-          "price_30": 634
+          "price_1_6": 895,
+          "price_7_14": 795,
+          "price_15_29": 750,
+          "price_30": 599
         },
         "deposit": 5000
       },
@@ -136,7 +136,7 @@
       "quick_id": "yaris2024gray",
       "rating": 4.5,
       "class_": "compact",
-      "updated_at": "2026-01-30T13:59:56.751521"
+      "updated_at": "2026-02-27T04:43:06.974994"
     },
     "toyota_yaris_white_sedan": {
       "id": "toyota_yaris_white_sedan",
@@ -165,10 +165,10 @@
           "price_30": 576
         },
         "high_season": {
-          "price_1_6": 860,
-          "price_7_14": 798,
-          "price_15_29": 718,
-          "price_30": 644
+          "price_1_6": 817,
+          "price_7_14": 758,
+          "price_15_29": 682,
+          "price_30": 611
         },
         "deposit": 5000
       },
@@ -182,7 +182,7 @@
       "rating": 4.6,
       "available": true,
       "class_": "compact",
-      "updated_at": "2026-01-30T13:59:56.751531"
+      "updated_at": "2026-02-27T04:38:42.421630"
     },
     "toyota_yaris_2023_blue": {
       "id": "toyota_yaris_2023_blue",
@@ -212,10 +212,10 @@
           "price_30": 576
         },
         "high_season": {
-          "price_1_6": 810,
-          "price_7_14": 798,
-          "price_15_29": 733,
-          "price_30": 651
+          "price_1_6": 769,
+          "price_7_14": 758,
+          "price_15_29": 696,
+          "price_30": 618
         },
         "deposit": 5000
       },
@@ -229,7 +229,7 @@
       "quick_id": "yaris2023blue",
       "rating": 4.8,
       "class_": "compact",
-      "updated_at": "2026-01-30T13:59:56.751541"
+      "updated_at": "2026-02-27T04:38:42.421637"
     },
     "honda_civic_2024_black": {
       "id": "honda_civic_2024_black",
@@ -1460,10 +1460,10 @@
           "price_30": 605
         },
         "high_season": {
-          "price_1_6": 815,
-          "price_7_14": 732,
-          "price_15_29": 733,
-          "price_30": 680
+          "price_1_6": 774,
+          "price_7_14": 695,
+          "price_15_29": 696,
+          "price_30": 646
         },
         "deposit": 5000
       },
@@ -1476,7 +1476,7 @@
       "supplier": "namo",
       "quick_id": "namo_vios_white_2022",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.751863"
+      "updated_at": "2026-02-27T04:38:42.421648"
     },
     "ar_hrvrs_black_2024": {
       "id": "ar_hrvrs_black_2024",
@@ -1680,10 +1680,10 @@
           "price_30": 559
         },
         "high_season": {
-          "price_1_6": 769,
-          "price_7_14": 706,
-          "price_15_29": 684,
-          "price_30": 634
+          "price_1_6": 730,
+          "price_7_14": 670,
+          "price_15_29": 649,
+          "price_30": 602
         },
         "deposit": 5000
       },
@@ -1697,7 +1697,7 @@
       "quick_id": "Namoswift2020",
       "rating": 4.5,
       "class_": "compact",
-      "updated_at": "2026-01-30T13:59:56.751909"
+      "updated_at": "2026-02-27T04:38:42.421655"
     },
     "namo_city_sedan_white_2018": {
       "id": "namo_city_sedan_white_2018",
@@ -1726,10 +1726,10 @@
           "price_30": 576
         },
         "high_season": {
-          "price_1_6": 810,
-          "price_7_14": 737,
-          "price_15_29": 713,
-          "price_30": 651
+          "price_1_6": 769,
+          "price_7_14": 700,
+          "price_15_29": 677,
+          "price_30": 618
         },
         "deposit": 5000
       },
@@ -1742,7 +1742,7 @@
       "supplier": "namo",
       "quick_id": "city_sedan_white_2018",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.751919"
+      "updated_at": "2026-02-27T04:38:42.421662"
     },
     "namo_alphard_white_2024": {
       "id": "namo_alphard_white_2024",
@@ -1862,10 +1862,10 @@
           "price_30": 541
         },
         "high_season": {
-          "price_1_6": 810,
-          "price_7_14": 720,
-          "price_15_29": 708,
-          "price_30": 699
+          "price_1_6": 769,
+          "price_7_14": 684,
+          "price_15_29": 672,
+          "price_30": 664
         },
         "deposit": 5000
       },
@@ -1878,7 +1878,7 @@
       "supplier": "namo",
       "quick_id": "jazznamo2018",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.751946"
+      "updated_at": "2026-02-27T04:38:42.421688"
     },
     "namo_legender_2024": {
       "id": "namo_legender_2024",
@@ -2532,10 +2532,10 @@
           "price_30": 508
         },
         "high_season": {
-          "price_1_6": 776,
-          "price_7_14": 721,
-          "price_15_29": 718,
-          "price_30": 691
+          "price_1_6": 737,
+          "price_7_14": 684,
+          "price_15_29": 682,
+          "price_30": 656
         },
         "deposit": 5000
       },
@@ -2548,7 +2548,7 @@
       "supplier": "namo",
       "quick_id": "Nmyarissedangrey2024",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752088"
+      "updated_at": "2026-02-27T04:38:42.421697"
     },
     "PW_mazda_cx30_gray_2023": {
       "id": "PW_mazda_cx30_gray_2023",

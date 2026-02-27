@@ -11,15 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import useEmblaCarousel from 'embla-carousel-react';
 
-// Определение сезона (low: Апрель-Сентябрь, high: Октябрь-Март)
+// Определение сезона
 const determineSeason = (date: Date) => {
-  const month = date.getMonth(); // 0-11 (0=январь, 11=декабрь)
-  // Low season: Апрель (3) - Октябрь (9)
-  if (month >= 3 && month <= 9) {
-    return 'low_season';
+  const month = date.getMonth() + 1;
+  if (month === 12 || month === 1 || month === 2 || month === 3) {
+    return 'high_season';
   }
-  // High season: Ноябрь (10), Декабрь (11), Январь (0), Февраль (1), Март (2)
-  return 'high_season';
+  return 'low_season';
 };
 
 // Получение цены за период
@@ -106,12 +104,8 @@ export default function OfferPage() {
   
   const basePricePerDay = useMemo(() => {
     if (!car?.pricing || !startDate || days === 0) return 0;
-    // Сезон определяем по дате возврата (endDate), т.к. если возвращаем в марте - это уже low season
-    const seasonDate = endDate || startDate;
-    const price = getPriceForPeriod(car.pricing, days, seasonDate);
-    console.log('[OfferAdmin] basePricePerDay:', price, 'days:', days, 'season:', determineSeason(seasonDate));
-    return price;
-  }, [car, startDate, endDate, days]);
+    return getPriceForPeriod(car.pricing, days, startDate);
+  }, [car, startDate, days]);
   
   const baseTotalRental = useMemo(() => {
     return basePricePerDay * days;
@@ -122,9 +116,7 @@ export default function OfferPage() {
   // Инициализация полей при загрузке car и когда baseTotalRental готов
   useEffect(() => {
     if (!car) return;
-    console.log('[OfferAdmin] car loaded:', car.name, 'baseTotalRental:', baseTotalRental);
     if (baseTotalRental > 0 && !totalRental) {
-      console.log('[OfferAdmin] Setting totalRental:', baseTotalRental);
       setTotalRental(baseTotalRental.toString());
     }
     if (!totalDelivery) {
@@ -139,18 +131,14 @@ export default function OfferPage() {
   useEffect(() => {
     const fetchCar = async () => {
       if (!carId) {
-        console.log('[OfferAdmin] No carId, skipping');
         setLoading(false);
         return;
       }
-      
-      console.log('[OfferAdmin] Fetching car:', carId);
       
       try {
         const res = await fetch(`${API_URL}/api/cars`);
         const data = await res.json();
         const carsArray = Array.isArray(data.cars) ? data.cars : Object.values(data.cars || {});
-        console.log('[OfferAdmin] Total cars loaded:', carsArray.length);
         
         // Ищем авто в массиве по id или quick_id
         const carData = carsArray.find((c: any) => 
@@ -160,10 +148,9 @@ export default function OfferPage() {
         );
         
         if (carData) {
-          console.log('[OfferAdmin] Found car:', carData.name);
           setCar(carData);
         } else {
-          console.error('[OfferAdmin] Авто не найдено:', carId);
+          console.error("Авто не найдено:", carId);
         }
       } catch (error) {
         console.error("Ошибка загрузки авто:", error);

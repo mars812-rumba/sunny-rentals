@@ -180,90 +180,6 @@
     "updated_at": "2026-02-07T08:04:14.502706"
   },
   {
-    "booking_id": "41c2ddab",
-    "user_id": "374897465",
-    "form_data": {
-      "car": {
-        "id": "nmax155_2019_black",
-        "name": "Nmax155 2019 black",
-        "brand": "Nmax155",
-        "model": "2019",
-        "year": "black",
-        "color": ""
-      },
-      "dates": {
-        "start": "2026-02-14T17:00:00.000Z",
-        "end": "2026-02-27T17:00:00.000Z",
-        "days": 14
-      },
-      "locations": {
-        "pickup": "hotel",
-        "return": "hotel"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 298,
-        "totalRental": 4172,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 5172
-      },
-      "contact": {
-        "value": "@Marseloid",
-        "type": "telegram"
-      },
-      "timestamp": "2026-02-07T11:46:00.126Z"
-    },
-    "status": "pre_booking",
-    "source": "telegram_webapp",
-    "created_at": "2026-02-07T11:46:01.658968"
-  },
-  {
-    "booking_id": "b9428937",
-    "user_id": "374897465",
-    "form_data": {
-      "car": {
-        "id": "Nm_city_white_2022",
-        "name": "Honda City 2020 White",
-        "brand": "Honda",
-        "model": "City",
-        "year": "2020",
-        "color": "White"
-      },
-      "dates": {
-        "start": "2026-02-21T17:00:00.000Z",
-        "end": "2026-02-26T17:00:00.000Z",
-        "days": 6
-      },
-      "locations": {
-        "pickupLoc": "airport",
-        "returnLoc": "airport"
-      },
-      "pricing": {
-        "season": "high_season",
-        "dailyRate": 776,
-        "totalRental": 4656,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 4656
-      },
-      "contact": {
-        "value": "@Marseloid",
-        "type": "telegram"
-      },
-      "timestamp": "2026-02-07T19:17:34.674Z"
-    },
-    "status": "confirmed",
-    "source": "telegram_webapp",
-    "created_at": "2026-02-07T19:17:34.882862",
-    "confirmed_at": "2026-02-07T23:48:09.018283",
-    "updated_at": "2026-02-07T23:48:09.018327"
-  },
-  {
     "booking_id": "27498267",
     "user_id": "410812780",
     "form_data": {
@@ -300,53 +216,11 @@
       },
       "timestamp": "2026-02-08T10:00:41.799Z"
     },
-    "status": "pre_booking",
+    "status": "confirmed",
     "source": "telegram_webapp",
-    "created_at": "2026-02-08T10:00:42.611225"
-  },
-  {
-    "booking_id": "07915ed6",
-    "user_id": "web_user",
-    "form_data": {
-      "car": {
-        "id": "toyota_veloz_2024_white",
-        "name": "Toyota VELOZ 2024 White",
-        "brand": "Toyota",
-        "model": "VELOZ",
-        "year": "2024",
-        "color": "White"
-      },
-      "dates": {
-        "start": "2026-02-17T02:30:00.000Z",
-        "end": "2026-02-26T06:00:00.000Z",
-        "days": 9
-      },
-      "locations": {
-        "pickupLocation": "airport",
-        "returnLocation": "airport",
-        "pickupAddress": "",
-        "returnAddress": ""
-      },
-      "pricing": {
-        "dailyRate": 1198,
-        "totalRental": 10782,
-        "deposit": 10000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 10782
-      },
-      "contact": {
-        "value": "Jopa",
-        "type": "telegram",
-        "name": "Jopa",
-        "phone": ""
-      },
-      "timestamp": "2026-02-08T22:52:11.926Z"
-    },
-    "status": "pre_booking",
-    "created_at": "2026-02-08T22:52:13.068711",
-    "source": "web_frontend"
+    "created_at": "2026-02-08T10:00:42.611225",
+    "confirmed_at": "2026-02-27T08:37:52.861370",
+    "updated_at": "2026-02-27T08:37:52.861381"
   },
   {
     "booking_id": "aa74cd0a",
@@ -388,9 +262,11 @@
       },
       "timestamp": "2026-02-09T13:43:40.685Z"
     },
-    "status": "pre_booking",
+    "status": "confirmed",
     "created_at": "2026-02-09T13:43:42.070010",
-    "source": "web_frontend"
+    "source": "web_frontend",
+    "confirmed_at": "2026-02-27T08:37:35.812644",
+    "updated_at": "2026-02-27T08:37:35.812728"
   },
   {
     "booking_id": "8c409899",
@@ -432,26 +308,28 @@
       },
       "timestamp": "2026-02-09T14:58:56.874Z"
     },
-    "status": "pre_booking",
+    "status": "confirmed",
     "created_at": "2026-02-09T14:58:57.031533",
-    "source": "web_frontend"
+    "source": "web_frontend",
+    "confirmed_at": "2026-02-27T08:37:41.074711",
+    "updated_at": "2026-02-27T08:37:41.074725"
   },
   {
-    "booking_id": "cfeb576d",
-    "user_id": "web_user",
+    "booking_id": "67486aec",
+    "user_id": "1157783885",
     "form_data": {
       "car": {
-        "id": "toyota_yaris_2023_blue",
-        "name": "Toyota YARIS Hb 2023 Blue",
-        "brand": "Toyota",
-        "model": "YARIS",
-        "year": "2023",
-        "color": "Blue"
+        "id": "mazda_mazda2_2024_white",
+        "name": "Mazda MAZDA2 2024 White",
+        "brand": "Mazda",
+        "model": "MAZDA2",
+        "year": "2024",
+        "color": "White"
       },
       "dates": {
-        "start": "2026-02-19T06:00:00.000Z",
-        "end": "2026-02-28T06:00:00.000Z",
-        "days": 9
+        "start": "2026-04-15T04:00:00.000Z",
+        "end": "2026-05-02T04:00:00.000Z",
+        "days": 17
       },
       "locations": {
         "pickupLocation": "airport",
@@ -460,64 +338,118 @@
         "returnAddress": ""
       },
       "pricing": {
-        "dailyRate": 798,
-        "totalRental": 7182,
+        "dailyRate": 765,
+        "totalRental": 14694,
         "deposit": 5000,
         "deliveryPickup": 0,
         "deliveryReturn": 0,
         "totalDelivery": 0,
-        "grandTotal": 7182
+        "grandTotal": 14694
       },
       "contact": {
-        "value": "Ововт",
+        "value": "@Rushentsov",
         "type": "telegram",
-        "name": "Воово",
+        "name": "",
         "phone": ""
       },
-      "timestamp": "2026-02-09T15:00:41.642Z"
+      "timestamp": "2026-02-26T12:08:36.367Z"
     },
-    "status": "pre_booking",
-    "created_at": "2026-02-09T15:00:41.882376",
-    "source": "web_frontend"
+    "status": "confirmed",
+    "created_at": "2026-02-26T11:45:14.629271",
+    "source": "telegram_webapp",
+    "confirmed_at": "2026-02-26T11:46:29.352302",
+    "updated_at": "2026-02-26T12:08:37.819447"
   },
   {
-    "booking_id": "0c1a9e99",
-    "user_id": "web_session_ml7egnzi_olfru4g4l_4nv37f",
+    "booking_id": "acf68963",
+    "user_id": "374897465",
     "form_data": {
       "car": {
-        "id": "toyota_yaris_2023_blue",
-        "name": "Toyota YARIS Hb 2023 Blue",
+        "id": "toyota_yaris_2022_black",
+        "name": "Toyota YARIS 2022 Black",
         "brand": "Toyota",
         "model": "YARIS",
-        "year": "2023",
-        "color": "Blue"
+        "year": "2022",
+        "color": "Black"
       },
       "dates": {
-        "start": "2026-02-14T17:00:00.000Z",
-        "end": "2026-02-26T17:00:00.000Z",
-        "days": 13
+        "start": "2026-02-28T17:00:00.000Z",
+        "end": "2026-03-06T17:00:00.000Z",
+        "days": 7
+      },
+      "locations": {
+        "pickupLocation": "airport",
+        "returnLocation": "airport",
+        "pickupAddress": null,
+        "returnAddress": null
+      },
+      "pricing": {
+        "dailyRate": 844,
+        "totalRental": 5908,
+        "deposit": 5000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 0,
+        "grandTotal": 5908
+      },
+      "contact": {
+        "value": "@Marseloid",
+        "type": "telegram",
+        "name": null,
+        "phone": null
+      },
+      "timestamp": "2026-02-26T14:50:26.775Z"
+    },
+    "status": "rejected",
+    "created_at": "2026-02-26T14:50:31.022764",
+    "source": "telegram_webapp",
+    "rejected_at": "2026-02-26T14:51:36.201238",
+    "updated_at": "2026-02-26T14:51:36.201251"
+  },
+  {
+    "booking_id": "7b4d11c8",
+    "user_id": "277321286",
+    "form_data": {
+      "car": {
+        "id": "pcx160_2023_keyless",
+        "name": "Pcx160 2023 keyless",
+        "brand": "Pcx160",
+        "model": "2023",
+        "year": "keyless",
+        "color": ""
+      },
+      "dates": {
+        "start": "2026-02-26T17:00:00.000Z",
+        "end": "2026-02-28T17:00:00.000Z",
+        "days": 3
       },
       "locations": {
         "pickupLocation": "hotel",
-        "returnLocation": "hotel"
+        "returnLocation": "hotel",
+        "pickupAddress": null,
+        "returnAddress": null
       },
       "pricing": {
-        "season": "high_season",
-        "dailyRate": 798,
-        "totalRental": 10374,
+        "dailyRate": 367,
+        "totalRental": 1101,
         "deposit": 5000,
         "deliveryPickup": 500,
         "deliveryReturn": 500,
         "totalDelivery": 1000,
-        "grandTotal": 11374
+        "grandTotal": 2101
       },
       "contact": {
-        "value": "777",
-        "type": "whatsapp"
+        "value": "@belogolovy",
+        "type": "telegram",
+        "name": null,
+        "phone": null
       },
-      "timestamp": "2026-02-09T15:47:19.534Z"
+      "timestamp": "2026-02-27T03:39:21.355Z"
     },
-    "status": "new",
-    "created_at": "2026-02-09T15:47:20.307892"
+    "status": "rejected",
+    "created_at": "2026-02-27T03:39:21.847875",
+    "source": "telegram_webapp",
+    "rejected_at": "2026-02-27T04:03:26.217955",
+    "updated_at": "2026-02-27T04:03:26.217971"
   }
 ]
