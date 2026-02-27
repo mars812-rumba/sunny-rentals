@@ -18,13 +18,13 @@ import { ru } from "date-fns/locale";
 import CarForm from "@/components/admin/CarForm";
 import { useCars } from "@/contexts/CarsContext";
 
-// Функции для расчёта цены аренды
+// Функции для расчёта цены аренды (low: Апрель-Октябрь, high: остальное)
 const determineSeason = (date: Date) => {
-  const month = date.getMonth() + 1;
-  if (month === 12 || month === 1 || month === 2) {
-    return 'high_season';
+  const month = date.getMonth() + 1; // 1-12
+  if (month >= 4 && month <= 10) {
+    return 'low_season';
   }
-  return 'low_season';
+  return 'high_season';
 };
 
 const getPriceForPeriod = (pricing: any, days: number, startDate: Date) => {
@@ -959,10 +959,10 @@ const handleBulkPriceUpdate = async (updateData: any) => {
             const ownerInfo = getOwnerForCar(car.id);
             const deposit = car.pricing?.deposit || 0;
             
-            // ✅ Получаем текущий сезон
+            // ✅ Получаем текущий сезон (low: Апрель-Октябрь, high: остальное)
             const getCurrentSeason = () => {
-              const month = new Date().getMonth() + 1;
-              return (month >= 11 || month <= 3) ? 'high_season' : 'low_season';
+              const month = new Date().getMonth() + 1; // 1-12
+              return (month >= 4 && month <= 10) ? 'low_season' : 'high_season';
             };
             const currentSeason = getCurrentSeason();
             const seasonPrices = car.pricing?.[currentSeason] || {};

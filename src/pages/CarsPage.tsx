@@ -903,10 +903,10 @@ export default function CarsPage() {
             const ownerInfo = getOwnerForCar(car.id);
             const deposit = car.pricing?.deposit || 0;
             
-            // ✅ Получаем текущий сезон
+            // ✅ Получаем текущий сезон (low: Апрель-Октябрь, high: остальное)
             const getCurrentSeason = () => {
-              const month = new Date().getMonth() + 1;
-              return (month >= 11 || month <= 3) ? 'high_season' : 'low_season';
+              const month = new Date().getMonth() + 1; // 1-12
+              return (month >= 4 && month <= 10) ? 'low_season' : 'high_season';
             };
             const currentSeason = getCurrentSeason();
             const seasonPrices = car.pricing?.[currentSeason] || {};
