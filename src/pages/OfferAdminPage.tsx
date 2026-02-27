@@ -113,13 +113,19 @@ export default function OfferPage() {
   
   const baseDeposit = car?.pricing?.deposit || 5000;
   
-  // Инициализация полей при загрузке car
+  // Инициализация полей при загрузке car и когда baseTotalRental готов
   useEffect(() => {
     if (!car) return;
-    setTotalRental(prev => prev || (baseTotalRental > 0 ? baseTotalRental.toString() : ""));
-    setTotalDelivery(prev => prev || "0");
-    setDeposit(prev => prev || baseDeposit.toString());
-  }, [car, baseTotalRental, baseDeposit]);
+    if (baseTotalRental > 0 && !totalRental) {
+      setTotalRental(baseTotalRental.toString());
+    }
+    if (!totalDelivery) {
+      setTotalDelivery("0");
+    }
+    if (!deposit) {
+      setDeposit(baseDeposit.toString());
+    }
+  }, [car, baseTotalRental, baseDeposit, totalRental, totalDelivery, deposit]);
   
   // Загрузка данных авто
   useEffect(() => {

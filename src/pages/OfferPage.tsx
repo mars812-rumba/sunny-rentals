@@ -123,12 +123,16 @@ export default function OfferPage() {
     if (!car) return;
     if (customRental) {
       setTotalRental(customRental);
-    } else if (baseTotalRental > 0) {
+    } else if (baseTotalRental > 0 && !totalRental) {
       setTotalRental(baseTotalRental.toString());
     }
-    setTotalDelivery(prev => prev || (customDelivery || "0"));
-    setDeposit(prev => prev || (customDeposit || baseDeposit.toString()));
-  }, [car, baseTotalRental, baseDeposit, customRental, customDelivery, customDeposit]);
+    if (!totalDelivery) {
+      setTotalDelivery(customDelivery || "0");
+    }
+    if (!deposit) {
+      setDeposit(customDeposit || baseDeposit.toString());
+    }
+  }, [car, baseTotalRental, baseDeposit, customRental, customDelivery, customDeposit, totalRental, totalDelivery, deposit]);
   
   // Загрузка данных авто
   useEffect(() => {
