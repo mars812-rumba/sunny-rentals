@@ -11,10 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import useEmblaCarousel from 'embla-carousel-react';
 
-// Определение сезона
+// Определение сезона (high: Декабрь, Январь, Февраль)
 const determineSeason = (date: Date) => {
-  const month = date.getMonth() + 1;
-  if (month === 12 || month === 1 || month === 2) {
+  const month = date.getMonth(); // 0-11 (0=январь, 11=декабрь)
+  if (month === 11 || month === 0 || month === 1) {
     return 'high_season';
   }
   return 'low_season';

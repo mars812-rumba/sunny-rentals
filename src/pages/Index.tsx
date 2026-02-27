@@ -14,10 +14,10 @@ import { isValid } from 'date-fns';
 import { trackLeadEvent } from '@/api/api';
 
 // --- Pricing helpers ---
-const determineSeason = (startDate: Date) => {
-  const month = startDate.getMonth() + 1; // 1-12
-  // High season: December (12), January (1), February (2)
-  if (month === 12 || month === 1 || month === 2) {
+const determineSeason = (date: Date) => {
+  const month = date.getMonth(); // 0-11 (0=январь, 11=декабрь)
+  // High season: December (11), January (0), February (1)
+  if (month === 11 || month === 0 || month === 1) {
     return 'high_season';
   }
   return 'low_season';
