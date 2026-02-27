@@ -123,9 +123,13 @@ export default function OfferPage() {
   // Инициализация полей при загрузке (приоритет: URL > base)
   useEffect(() => {
     if (!car) return;
+    console.log('[OfferPage] Init - customRental:', customRental, 'customDelivery:', customDelivery, 'customDeposit:', customDeposit);
+    console.log('[OfferPage] Init - baseTotalRental:', baseTotalRental, 'baseDeposit:', baseDeposit);
     if (customRental) {
+      console.log('[OfferPage] Setting customRental:', customRental);
       setTotalRental(customRental);
     } else if (baseTotalRental > 0 && !totalRental) {
+      console.log('[OfferPage] Setting baseTotalRental:', baseTotalRental);
       setTotalRental(baseTotalRental.toString());
     }
     if (!totalDelivery) {
