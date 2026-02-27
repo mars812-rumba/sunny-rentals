@@ -520,5 +520,23 @@
     "dates_selected": null,
     "notes": [],
     "source": "telegram_webapp"
+  },
+  {
+    "user_id": "7450625375",
+    "username": "no_end_here",
+    "created_at": "2026-02-27T09:48:03.784897",
+    "updated_at": "2026-02-27T09:51:09.325223",
+    "status": "new",
+    "form_started": true,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": "sedan",
+    "dates_selected": {
+      "start": "2026-02-27T17:00:00.000Z",
+      "end": "2026-03-02T17:00:00.000Z",
+      "days": 4
+    },
+    "notes": [],
+    "source": "telegram_webapp"
   }
 ]
