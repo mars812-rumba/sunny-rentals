@@ -109,8 +109,10 @@ export default function OfferPage() {
   
   const basePricePerDay = useMemo(() => {
     if (!car?.pricing || !startDate || days === 0) return 0;
-    return getPriceForPeriod(car.pricing, days, startDate);
-  }, [car, startDate, days]);
+    // Сезон определяем по дате возврата (endDate), т.к. если возвращаем в марте - это уже low season
+    const seasonDate = endDate || startDate;
+    return getPriceForPeriod(car.pricing, days, seasonDate);
+  }, [car, startDate, endDate, days]);
   
   const baseTotalRental = useMemo(() => {
     return basePricePerDay * days;
