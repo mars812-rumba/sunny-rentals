@@ -126,16 +126,8 @@ export default function OfferPage() {
     } else if (baseTotalRental > 0) {
       setTotalRental(baseTotalRental.toString());
     }
-    if (customDelivery) {
-      setTotalDelivery(customDelivery);
-    } else if (!totalDelivery) {
-      setTotalDelivery("0"); // Аэропорт по умолчанию
-    }
-    if (customDeposit) {
-      setDeposit(customDeposit);
-    } else if (!deposit) {
-      setDeposit(baseDeposit.toString());
-    }
+    setTotalDelivery(prev => prev || (customDelivery || "0"));
+    setDeposit(prev => prev || (customDeposit || baseDeposit.toString()));
   }, [car, baseTotalRental, baseDeposit, customRental, customDelivery, customDeposit]);
   
   // Загрузка данных авто

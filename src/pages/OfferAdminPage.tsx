@@ -116,15 +116,9 @@ export default function OfferPage() {
   // Инициализация полей при загрузке car
   useEffect(() => {
     if (!car) return;
-    if (baseTotalRental > 0) {
-      setTotalRental(baseTotalRental.toString());
-    }
-    if (!totalDelivery) {
-      setTotalDelivery("0"); // Аэропорт по умолчанию
-    }
-    if (!deposit) {
-      setDeposit(baseDeposit.toString());
-    }
+    setTotalRental(prev => prev || (baseTotalRental > 0 ? baseTotalRental.toString() : ""));
+    setTotalDelivery(prev => prev || "0");
+    setDeposit(prev => prev || baseDeposit.toString());
   }, [car, baseTotalRental, baseDeposit]);
   
   // Загрузка данных авто
