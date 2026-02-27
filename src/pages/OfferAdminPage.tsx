@@ -104,7 +104,9 @@ export default function OfferPage() {
   
   const basePricePerDay = useMemo(() => {
     if (!car?.pricing || !startDate || days === 0) return 0;
-    return getPriceForPeriod(car.pricing, days, startDate);
+    const price = getPriceForPeriod(car.pricing, days, startDate);
+    console.log('[OfferAdmin] basePricePerDay:', price, 'days:', days, 'season:', determineSeason(startDate));
+    return price;
   }, [car, startDate, days]);
   
   const baseTotalRental = useMemo(() => {
@@ -116,7 +118,9 @@ export default function OfferPage() {
   // Инициализация полей при загрузке car и когда baseTotalRental готов
   useEffect(() => {
     if (!car) return;
+    console.log('[OfferAdmin] car loaded:', car.name, 'baseTotalRental:', baseTotalRental);
     if (baseTotalRental > 0 && !totalRental) {
+      console.log('[OfferAdmin] Setting totalRental:', baseTotalRental);
       setTotalRental(baseTotalRental.toString());
     }
     if (!totalDelivery) {
@@ -131,14 +135,18 @@ export default function OfferPage() {
   useEffect(() => {
     const fetchCar = async () => {
       if (!carId) {
+        console.log('[OfferAdmin] No carId, skipping');
         setLoading(false);
         return;
       }
+      
+      console.log('[OfferAdmin] Fetching car:', carId);
       
       try {
         const res = await fetch(`${API_URL}/api/cars`);
         const data = await res.json();
         const carsArray = Array.isArray(data.cars) ? data.cars : Object.values(data.cars || {});
+        console.log('[OfferAdmin] Total cars loaded:', carsArray.length);
         
         // Ищем авто в массиве по id или quick_id
         const carData = carsArray.find((c: any) => 
@@ -148,9 +156,10 @@ export default function OfferPage() {
         );
         
         if (carData) {
+          console.log('[OfferAdmin] Found car:', carData.name);
           setCar(carData);
         } else {
-          console.error("Авто не найдено:", carId);
+          console.error('[OfferAdmin] Авто не найдено:', carId);
         }
       } catch (error) {
         console.error("Ошибка загрузки авто:", error);
