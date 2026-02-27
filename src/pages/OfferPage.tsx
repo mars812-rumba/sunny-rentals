@@ -120,9 +120,10 @@ export default function OfferPage() {
   
   // Инициализация полей при загрузке (приоритет: URL > base)
   useEffect(() => {
+    if (!car) return;
     if (customRental) {
       setTotalRental(customRental);
-    } else if (baseTotalRental > 0 && !totalRental) {
+    } else if (baseTotalRental > 0) {
       setTotalRental(baseTotalRental.toString());
     }
     if (customDelivery) {
@@ -135,7 +136,7 @@ export default function OfferPage() {
     } else if (!deposit) {
       setDeposit(baseDeposit.toString());
     }
-  }, [baseTotalRental, baseDeposit, customRental, customDelivery, customDeposit]);
+  }, [car, baseTotalRental, baseDeposit, customRental, customDelivery, customDeposit]);
   
   // Загрузка данных авто
   useEffect(() => {
