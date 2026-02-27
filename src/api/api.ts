@@ -292,8 +292,30 @@ export async function fetchBookings(userId?: string): Promise<Booking[]> {
 }
 
 // Submit a new booking or update existing
-export async function submitBooking(formData: BookingFormData, bookingId?: string) {
-  const response = await fetch(`${API_BASE_URL}/api/admin/bookings`, {
+export async function submitBooking(formData: BookingFormData, bookingId?: string, bookingSource: 'web' | 'admin' | 'telegram' = 'web') {
+  // ✅ ИСПРАВЛЕНИЕ: Используем разные эндпоинты в зависимости от источника
+  let endpoint: string;
+  
+  // Получаем user_id для Telegram
+  let userId = null;
+  if (bookingSource === 'telegram' && typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) {
+    userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+  }
+  
+  switch (bookingSource) {
+    case 'admin':
+      endpoint = `${API_BASE_URL}/api/admin/bookings`;
+      break;
+    case 'telegram':
+      endpoint = `${API_BASE_URL}/api/bookings/telegram_webapp`;
+      break;
+    case 'web':
+    default:
+      endpoint = `${API_BASE_URL}/api/bookings/web-create`;
+      break;
+  }
+    
+  const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -301,6 +323,7 @@ export async function submitBooking(formData: BookingFormData, bookingId?: strin
     },
     body: JSON.stringify({
       booking_id: bookingId,
+      user_id: userId,
       form_data: formData
     })
   });
@@ -316,6 +339,23 @@ export async function submitBooking(formData: BookingFormData, bookingId?: strin
     
     // Другие ошибки
     throw new Error(errorData.detail || 'Failed to save booking');
+  }
+
+  return response.json();
+}
+
+// Confirm a pre_booking (convert to confirmed)
+export async function confirmBooking(bookingId: string) {
+  const response = await fetch(`${API_BASE_URL}/api/admin/bookings/${bookingId}/confirm`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${AUTH_TOKEN}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to confirm booking');
   }
 
   return response.json();

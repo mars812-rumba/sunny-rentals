@@ -189,57 +189,7 @@ useEffect(() => {
     
     
     
-      const handleBookingSubmit = async (contact: { value: string, type: string }) => {
-        if (!selectedCar) return;
-        setIsSubmittingBooking(true);
-        try {
-          const user = (window as any).Telegram?.WebApp?.initDataUnsafe?.user;
-          const dailyPrice = getPriceForPeriod(selectedCar.pricing, filters.days, filters.startDate);
-          const totalRentalPrice = dailyPrice * filters.days;
-          const pickupDelivery = getDeliveryPrice(filters.pickupLocation);
-          const returnDelivery = getDeliveryPrice(filters.returnLocation);
-          const totalDelivery = pickupDelivery + returnDelivery;
-          const grandTotal = totalRentalPrice + totalDelivery;
-
-          // Определяем сезон для сохранения в данных
-          const season = getSeason(filters.startDate);
-
-          // Ensure dates are valid before converting to ISO string
-          const startDateISO = filters.startDate && isValid(filters.startDate) ? filters.startDate.toISOString() : null;
-          const endDateISO = filters.endDate && isValid(filters.endDate) ? filters.endDate.toISOString() : null;
-
-          const payload = {
-            user_id: user?.id || 'unknown_user',
-            form_data: {
-              car: { id: selectedCar.id, name: selectedCar.name, brand: selectedCar.brand, model: selectedCar.model, year: selectedCar.year, color: selectedCar.color },
-              dates: { start: startDateISO, end: endDateISO, days: filters.days },
-              locations: { pickup: filters.pickupLocation, return: filters.returnLocation },
-              pricing: {
-                season,
-                dailyRate: dailyPrice,
-                totalRental: totalRentalPrice,
-                deposit: selectedCar.pricing.deposit,
-                deliveryPickup: pickupDelivery,
-                deliveryReturn: returnDelivery,
-                totalDelivery,
-                grandTotal
-              },
-              contact,
-              timestamp: new Date().toISOString(),
-            }
-          };
-    
-          const res = await fetch('/botapi/submit_form', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-          if (!res.ok) throw new Error((await res.json()).message || 'Ошибка');
-          const { booking_id } = await res.json();
-          setBookingId(booking_id);
-          setIsBookingSubmitted(true);
-        } catch (err: any) {
-          toast({ title: t('toast_booking_error'), description: err.message, variant: "destructive" });
-        } finally {
-          setIsSubmittingBooking(false);
-        }
-      };
+      // Booking functionality removed - only main app should handle bookings
    return (
     <>
 
@@ -319,9 +269,7 @@ useEffect(() => {
         onClose={() => setIsBookingModalOpen(false)}
         car={selectedCar}
         filters={filters}
-        onBookingSubmit={handleBookingSubmit}
-        isSubmitting={isSubmittingBooking}
-        requireWhatsApp={!(window as any).Telegram?.WebApp?.initDataUnsafe?.user?.username}
+        // Booking functionality removed - only main app should handle bookings
         isSubmitted={isBookingSubmitted}
         bookingId={bookingId}
       />

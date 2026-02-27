@@ -294,7 +294,7 @@ __________________
       };
 
       const bId = booking?.booking_id || booking?.id || null;
-      await submitBooking(formDataForApi as any, bId);
+      await submitBooking(formDataForApi as any, bId, 'admin'); // Admin создает брони через admin эндпоинт
 
       toast.success(isEditing ? "Обновлено" : "Создано");
       onSuccess();
@@ -322,6 +322,30 @@ __________________
     }
   };
 
+  const handleConfirm = async () => {
+    if (!booking?.booking_id) return;
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`/api/admin/bookings/${booking.booking_id}/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        toast.success('Бронирование подтверждено');
+        onSuccess();
+        onClose();
+      } else {
+        const error = await response.json();
+        toast.error(error.message || 'Ошибка подтверждения');
+      }
+    } catch (e: any) {
+      toast.error(e.message || 'Ошибка сети');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const categories = [
     { id: 'all', label: 'Все' },
     { id: 'compact', label: 'Compact' },
@@ -330,267 +354,457 @@ __________________
     { id: '7s', label: '7 seats' },
     { id: 'bikes', label: 'Bikes' }
   ];
+return (
+  <Dialog open={isOpen} onOpenChange={onClose}>
+    <DialogContent className="max-w-[100vw] w-screen h-screen m-0 rounded-none p-0 bg-white overflow-hidden flex flex-col border-none">
+      
+      {/* HEADER */}
+      <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white z-20">
+        <div className="flex items-center gap-3">
 
-  return (
-
-// ... (импорты и утилиты остаются прежними)
-<Dialog open={isOpen} onOpenChange={onClose}>
-  <DialogContent className="max-w-[100vw] w-screen h-screen m-0 rounded-none p-0 bg-[#f8fafc] overflow-hidden flex flex-col border-none">
-    
-    {/* 1. HEADER */}
-    <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-white z-20 shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className="bg-[#f8b515] p-2 rounded-xl text-white shadow-lg shadow-orange-100">
-          <CarIcon size={22} />
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 leading-none">
+              {isEditing ? 'Правка бронирования' : 'Новое бронирование'}
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">Phuket Management Terminal</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-xl font-black uppercase tracking-tight text-slate-800 leading-none">
-            {isEditing ? 'Правка бронирования' : 'Новое бронирование'}
-          </h2>
-          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Phuket Management Terminal</p>
-        </div>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onClose} 
+          className="rounded-lg hover:bg-gray-100"
+        >
+          <X size={20} />
+        </Button>
       </div>
-      <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-red-50 hover:text-red-500 transition-colors">
-        <X size={20} />
-      </Button>
-    </div>
 
-    {/* 2. ОСНОВНОЙ КОНТЕНТ (СКРОЛЛ-ЗОНА) */}
-    <div className="flex-1 overflow-y-auto custom-scrollbar">
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        
-        {/* GRID START */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      {/* MAIN CONTENT */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-6xl mx-auto px-6 py-6">
           
-          {/* --- ЛЕВАЯ КОЛОНКА: ТРАНСПОРТ --- */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-5">
-            <div className="flex items-center gap-2 mb-1">
-              <Settings2 size={18} className="text-[#f8b515]" />
-              <h3 className="font-black uppercase text-xs text-slate-700 tracking-wider">Выбор транспорта</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            {/* LEFT COLUMN: TRANSPORT */}
+            <div className="space-y-6">
+              
+              {/* Выбор транспорта */}
+              <div className="pb-6 border-b border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <Settings2 size={18} className="text-blue-700" />
+                  <h3 className="font-semibold text-sm text-gray-900">Выбор транспорта</h3>
+                </div>
+                
+                <Tabs value={selectedTab} onValueChange={(v: any) => setSelectedTab(v)} className="w-full">
+                  <TabsList className="bg-gray-100 p-1 rounded-lg w-full mb-4">
+                    <TabsTrigger 
+                      value="fleet" 
+                      className="flex-1 font-medium text-xs rounded-md py-2 data-[state=active]:bg-white data-[state=active]:text-gray-900"
+                    >
+                      Автопарк
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="manual" 
+                      className="flex-1 font-medium text-xs rounded-md py-2 data-[state=active]:bg-white data-[state=active]:text-gray-900"
+                    >
+                      Вручную
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="fleet" className="space-y-4 mt-0">
+                    {/* Filters */}
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map(cat => (
+                        <button
+                          key={cat.id}
+                          onClick={() => setCategoryFilter(cat.id)}
+                          className={cn(
+                            "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                            categoryFilter === cat.id 
+                              ? "bg-blue-900 text-white" 
+                              : "bg-gray-100 text-gray-600 hover:bg-blue-200"
+                          )}
+                        >
+                          {cat.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Search */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input 
+                          placeholder="Поиск..." 
+                          className="pl-9 text-sm h-10 rounded-lg bg-gray-50 border-gray-200" 
+                          value={searchQuery} 
+                          onChange={e => setSearchQuery(e.target.value)} 
+                        />
+                      </div>
+                      <Select value={ownerFilter} onValueChange={setOwnerFilter}>
+                        <SelectTrigger className="h-10 text-sm rounded-lg bg-gray-50 border-gray-200">
+                          <SelectValue placeholder="Владелец" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-lg">
+                          <SelectItem value="all" className="text-sm">Все</SelectItem>
+                          {owners.map(o => (
+                            <SelectItem key={o.id} value={o.id} className="text-sm">
+                              {o.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Vehicle List */}
+                    <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
+                      {vehicles
+                        .filter(v => 
+                          v.name.toLowerCase().includes(searchQuery.toLowerCase()) && 
+                          (categoryFilter === 'all' || v.class === categoryFilter)
+                        )
+                        .map(v => (
+                          <div
+                            key={v.id}
+                            onClick={() => setSelectedVehicleId(v.id)}
+                            className={cn(
+                              "p-3 rounded-lg border transition-all cursor-pointer flex items-center gap-3",
+                              selectedVehicleId === v.id 
+                                ? "border-gray-900 bg-gray-50" 
+                                : "border-gray-200 hover:border-gray-300"
+                            )}
+                          >
+                            <div className="relative w-16 h-12 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                              <div 
+                                className="w-full h-full" 
+                                style={{ 
+                                  backgroundImage: `url(${getPhotoUrl(v.photos?.main)})`, 
+                                  backgroundSize: 'cover', 
+                                  backgroundPosition: 'center' 
+                                }} 
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm text-gray-900 truncate">{v.name}</p>
+                              <p className="text-xs text-gray-500">Owner: {carOwnerMap[v.id] || 'Sunny'}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-semibold text-gray-900">
+                                {v.pricing?.low_season?.price_1_6 || 0}฿
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="manual" className="space-y-3 mt-0">
+                    <Input 
+                      placeholder="Марка и модель" 
+                      className="h-11 rounded-lg bg-gray-50 border-gray-200" 
+                      value={manualData.name} 
+                      onChange={e => setManualData({...manualData, name: e.target.value})} 
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Input 
+                        placeholder="Цена" 
+                        className="h-11 rounded-lg bg-gray-50 border-gray-200" 
+                        value={manualData.dailyRate} 
+                        onChange={e => setManualData({...manualData, dailyRate: e.target.value})} 
+                      />
+                      <Input 
+                        placeholder="Залог" 
+                        className="h-11 rounded-lg bg-gray-50 border-gray-200" 
+                        value={manualData.deposit} 
+                        onChange={e => setManualData({...manualData, deposit: e.target.value})} 
+                      />
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+
+              {/* Логистика */}
+              <div className="pb-6 border-b border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPinned size={18} className="text-blue-700" />
+                  <h3 className="font-semibold text-sm text-gray-900">Логистика</h3>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Start */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-gray-600">Старт</label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          className="w-full text-left-sm h-10 rounded-lg bg-gray-50 border-gray-200"
+                        >
+                          {startDate ? format(startDate, 'dd.MM.yyyy') : 'Выберите дату'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0 border-none shadow-lg rounded-xl">
+                        <CalendarComponent mode="single" selected={startDate} onSelect={setStartDate} />
+                      </PopoverContent>
+                    </Popover>
+                    <Select value={pickupTime} onValueChange={setPickupTime}>
+                      <SelectTrigger className="h-10 text-sm rounded-lg bg-gray-50 border-gray-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeOptions.map(t => (
+                          <SelectItem key={t} value={t} className="text-sm">{t}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* End */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-gray-600">Конец</label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          className="w-full text-left-sm h-10 rounded-lg bg-gray-50 border-gray-200"
+                        >
+                          {endDate ? format(endDate, 'dd.MM.yyyy') : 'Выберите дату'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0 border-none shadow-lg rounded-xl">
+                        <CalendarComponent mode="single" selected={endDate} onSelect={setEndDate} />
+                      </PopoverContent>
+                    </Popover>
+                    <Select value={returnTime} onValueChange={setReturnTime}>
+                      <SelectTrigger className="h-10 text-sm rounded-lg bg-gray-50 border-gray-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeOptions.map(t => (
+                          <SelectItem key={t} value={t} className="text-sm">{t}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Locations */}
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <div className="space-y-2">
+                    <Select value={pickupLocation} onValueChange={setPickupLocation}>
+                      <SelectTrigger className="text-sm h-10 rounded-lg bg-gray-50 border-gray-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PICKUP_LOCATIONS.map(l => (
+                          <SelectItem key={l.id} value={l.id} className="text-sm">
+                            {l.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input 
+                      placeholder="Адрес выдачи" 
+                      className="text-sm h-10 rounded-lg bg-gray-50 border-gray-200" 
+                      value={pickupAddress} 
+                      onChange={e => setPickupAddress(e.target.value)} 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Select value={returnLocation} onValueChange={setReturnLocation}>
+                      <SelectTrigger className="text-sm h-10 rounded-lg bg-gray-50 border-gray-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PICKUP_LOCATIONS.map(l => (
+                          <SelectItem key={l.id} value={l.id} className="text-sm">
+                            {l.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input 
+                      placeholder="Адрес возврата" 
+                      className="text-sm h-10 rounded-lg bg-gray-50 border-gray-200" 
+                      value={returnAddress} 
+                      onChange={e => setReturnAddress(e.target.value)} 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Клиент */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Contact2 size={18} className="text-blue-700" />
+                  <h3 className="font-semibold text-sm text-gray-900">Клиент</h3>
+                </div>
+                
+                <div className="space-y-3">
+                  <Input 
+                    placeholder="ФИО клиента" 
+                    className="text-sm h-11 rounded-lg bg-gray-50 border-gray-200" 
+                    value={customerName} 
+                    onChange={e => setCustomerName(e.target.value)} 
+                  />
+                  <div className="flex gap-2">
+                    <Select value={contactType} onValueChange={(v: any) => setContactType(v)}>
+                      <SelectTrigger className="w-[100px] text-sm h-11 rounded-lg bg-gray-50 border-gray-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="telegram">TG</SelectItem>
+                        <SelectItem value="whatsapp">WA</SelectItem>
+                        <SelectItem value="phone">PH</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input 
+                      placeholder="Контакт" 
+                      className="flex-1 text-sm h-11 rounded-lg bg-gray-50 border-gray-200" 
+                      value={customerContact} 
+                      onChange={e => setCustomerContact(e.target.value)} 
+                    />
+                  </div>
+                </div>
+              </div>
+
             </div>
 
-            <Tabs value={selectedTab} onValueChange={(v: any) => setSelectedTab(v)} className="w-full">
-              <TabsList className="bg-slate-100 p-1 rounded-xl w-full mb-4">
-                <TabsTrigger value="fleet" className="flex-1 font-black uppercase text-[10px] rounded-lg py-2.5 data-[state=active]:bg-white data-[state=active]:text-[#f8b515] data-[state=active]:shadow-sm">Автопарк</TabsTrigger>
-                <TabsTrigger value="manual" className="flex-1 font-black uppercase text-[10px] rounded-lg py-2.5 data-[state=active]:bg-white data-[state=active]:text-[#f8b515] data-[state=active]:shadow-sm">Вручную</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="fleet" className="space-y-4 mt-0">
-                <div className="flex flex-wrap gap-1.5">
-                  {categories.map(cat => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setCategoryFilter(cat.id)}
-                      className={cn(
-                        "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all border",
-                        categoryFilter === cat.id ? "bg-[#f8b515] border-[#f8b515] text-white shadow-md" : "border-slate-100 bg-white text-slate-400 hover:border-slate-200"
-                      )}
+            {/* RIGHT COLUMN: PRICING */}
+            <div>
+              <div className="sticky top-6">
+                {/* Расчет стоимости */}
+                <div className="p-6 bg-gray-50 rounded-xl border border-gray-200 relative">
+                  <div className="absolute top-4 right-4">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={copyToClipboard} 
+                      className="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-lg h-8 w-8"
                     >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-300" />
-                    <Input placeholder="ПОИСК..." className="pl-9 font-bold uppercase text-[10px] h-10 rounded-xl bg-slate-50 border-none" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+                      <Copy size={16} />
+                    </Button>
                   </div>
-                  <Select value={ownerFilter} onValueChange={setOwnerFilter}>
-                    <SelectTrigger className="h-10 text-[10px] font-bold rounded-xl bg-slate-50 border-none"><SelectValue placeholder="ВЛАДЕЛЕЦ" /></SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                      <SelectItem value="all" className="text-[10px] font-bold">ВСЕ</SelectItem>
-                      {owners.map(o => <SelectItem key={o.id} value={o.id} className="text-[10px] font-bold">{o.name.toUpperCase()}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
 
-                <div className="grid grid-cols-1 gap-2 max-h-[350px] overflow-y-auto pr-1 custom-scrollbar">
-                  {vehicles.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase()) && (categoryFilter === 'all' || v.class === categoryFilter)).map(v => (
-                    <div key={v.id} onClick={() => setSelectedVehicleId(v.id)} className={cn("p-3 rounded-2xl border transition-all cursor-pointer flex items-center gap-3 bg-white", selectedVehicleId === v.id ? "border-[#f8b515] bg-orange-50/20 shadow-sm" : "border-slate-50 hover:border-slate-100")}>
-                      <div className="relative w-14 h-10 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0 border border-slate-100">
-                        <div className="w-full h-full" style={{ backgroundImage: `url(${getPhotoUrl(v.photos?.main)})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-black text-[11px] uppercase text-slate-700 truncate leading-none mb-1">{v.name}</p>
-                        <p className="text-[9px] font-bold text-slate-400 uppercase">Owner: {carOwnerMap[v.id] || 'Sunny'}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs font-black text-slate-900 leading-none">{v.pricing?.low_season?.price_1_6 || 0}฿</p>
+                  <div className="flex items-center gap-3 mb-6">
+
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-900">ДЕТАЛИ БРОНИРОВАНИЯ</h3>
+                      <p className="text-xs font-semibold text-gray-600">Срок аренды  {pricing?.days} дн.</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {/* Авто */}
+                    <div className="flex items-end gap-2">
+                      <span className="text-sm text-gray-600">Авто</span>
+                      <div className="flex-1 border-b border-dotted border-gray-300 mb-1" />
+                      <span className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+                        {selectedTab === 'fleet' 
+                          ? vehicles.find(v => v.id === selectedVehicleId)?.name 
+                          : manualData.name || '---'}
+                      </span>
+                    </div>
+
+                    {/* Аренда */}
+                    <div className="flex items-end gap-2">
+                      <span className="text-sm text-gray-600">Аренда</span>
+                      <div className="flex-1 border-b border-dotted border-gray-300 mb-1" />
+                      <div className="flex items-center text-gray-900">
+                        <input 
+                          className="bg-transparent text-right font-medium text-sm w-20 outline-none focus:text-gray-700" 
+                          value={pricing?.totalRental} 
+                          onChange={(e) => setManualRental(e.target.value)} 
+                        />
+                        <span className="text-sm ml-1">฿</span>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </TabsContent>
 
-              <TabsContent value="manual" className="space-y-3 mt-0">
-                <Input placeholder="МАРКА И МОДЕЛЬ" className="font-bold h-12 rounded-xl bg-slate-50 border-none" value={manualData.name} onChange={e => setManualData({...manualData, name: e.target.value})} />
-                <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="ЦЕНА" className="font-bold h-12 rounded-xl bg-slate-50 border-none" value={manualData.dailyRate} onChange={e => setManualData({...manualData, dailyRate: e.target.value})} />
-                  <Input placeholder="ЗАЛОГ" className="font-bold h-12 rounded-xl bg-slate-50 border-none" value={manualData.deposit} onChange={e => setManualData({...manualData, deposit: e.target.value})} />
+                    {/* Доставка */}
+                    <div className="flex items-end gap-2">
+                      <span className="text-sm text-gray-600">Доставка</span>
+                      <div className="flex-1 border-b border-dotted border-gray-300 mb-1" />
+                      <div className="flex items-center text-gray-900">
+                        <input 
+                          className="bg-transparent text-right font-medium text-sm w-20 outline-none focus:text-gray-700" 
+                          value={pricing?.totalDelivery} 
+                          onChange={(e) => setManualDelivery(e.target.value)} 
+                        />
+                        <span className="text-sm ml-1">฿</span>
+                      </div>
+                    </div>
+
+                    {/* Депозит */}
+                    <div className="flex items-end gap-2">
+                      <span className="text-sm text-gray-600">Депозит</span>
+                      <div className="flex-1 border-b border-dotted border-gray-300 mb-1" />
+                      <div className="flex items-center text-gray-700">
+                        <input 
+                          className="bg-transparent text-right font-medium text-sm w-20 outline-none focus:text-gray-800" 
+                          value={pricing?.deposit} 
+                          onChange={(e) => setManualDeposit(e.target.value)} 
+                        />
+                        <span className="text-sm ml-1">฿</span>
+                      </div>
+                    </div>
+
+                    {/* Total */}
+                    <div className="mt-6 pt-5 border-t border-gray-200 flex justify-between items-end">
+                      <div>
+                        <p className="text-xs font-medium text-gray-600 mb-1">Итого к оплате</p>
+                        <p className="text-3xl font-bold text-gray-900">
+                          {pricing?.grandTotal.toLocaleString()} 
+                          <span className="text-xl text-gray-500 ml-1">฿</span>
+                        </p>
+                      </div>
+                      <Badge className="bg-green-100 text-green-700 border-none font-medium text-xs px-3 py-1">
+                        READY
+                      </Badge>
+                    </div>
+                  </div>
                 </div>
-              </TabsContent>
-            </Tabs>
+              </div>
+            </div>
+
           </div>
 
-          {/* --- ПРАВАЯ КОЛОНКА: ЛОГИСТИКА, КЛИЕНТ И ЧЕК --- */}
-          <div className="space-y-6">
+          {/* ACTION BUTTONS */}
+          <div className="mt-8 flex gap-3 max-w-6xl mx-auto">
+            {isEditing && (
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="h-12 px-6 border-gray-200 text-gray-700 hover:bg-gray-100 rounded-xl" 
+                disabled={isDeleting} 
+                onClick={handleDelete}
+              >
+                <Trash2 size={18} />
+              </Button>
+            )}
             
-            {/* БЛОК ЛОГИСТИКИ */}
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
-              <div className="flex items-center gap-2 mb-1">
-                <MapPinned size={18} className="text-blue-500" />
-                <h3 className="font-black uppercase text-xs text-slate-700 tracking-wider">Логистика</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-400 uppercase ml-1">Старт</label>
-                  <Popover>
-                    <PopoverTrigger asChild><Button variant="outline" className="w-full text-[11px] font-black h-10 rounded-xl bg-slate-50 border-none shadow-sm">{startDate ? format(startDate, 'dd.MM.yyyy') : '---'}</Button></PopoverTrigger>
-                    <PopoverContent className="p-0 border-none shadow-2xl rounded-2xl"><CalendarComponent mode="single" selected={startDate} onSelect={setStartDate} /></PopoverContent>
-                  </Popover>
-                  <Select value={pickupTime} onValueChange={setPickupTime}>
-                    <SelectTrigger className="h-10 text-[11px] font-black rounded-xl bg-slate-50 border-none"><SelectValue /></SelectTrigger>
-                    <SelectContent>{timeOptions.map(t => <SelectItem key={t} value={t} className="font-bold text-[11px]">{t}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[9px] font-black text-slate-400 uppercase ml-1">Конец</label>
-                  <Popover>
-                    <PopoverTrigger asChild><Button variant="outline" className="w-full text-[11px] font-black h-10 rounded-xl bg-slate-50 border-none shadow-sm">{endDate ? format(endDate, 'dd.MM.yyyy') : '---'}</Button></PopoverTrigger>
-                    <PopoverContent className="p-0 border-none shadow-2xl rounded-2xl"><CalendarComponent mode="single" selected={endDate} onSelect={setEndDate} /></PopoverContent>
-                  </Popover>
-                  <Select value={returnTime} onValueChange={setReturnTime}>
-                    <SelectTrigger className="h-10 text-[11px] font-black rounded-xl bg-slate-50 border-none"><SelectValue /></SelectTrigger>
-                    <SelectContent>{timeOptions.map(t => <SelectItem key={t} value={t} className="font-bold text-[11px]">{t}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                 <div className="space-y-2">
-                    <Select value={pickupLocation} onValueChange={setPickupLocation}>
-                      <SelectTrigger className="font-black uppercase text-[9px] h-9 rounded-lg bg-white border-none shadow-sm"><SelectValue /></SelectTrigger>
-                      <SelectContent>{PICKUP_LOCATIONS.map(l => <SelectItem key={l.id} value={l.id} className="text-[9px] font-black uppercase">{l.name}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Input placeholder="АДРЕС ВЫДАЧИ" className="text-[10px] font-bold h-9 rounded-lg bg-white border-none shadow-sm px-3" value={pickupAddress} onChange={e => setPickupAddress(e.target.value)} />
-                 </div>
-                 <div className="space-y-2">
-                    <Select value={returnLocation} onValueChange={setReturnLocation}>
-                      <SelectTrigger className="font-black uppercase text-[9px] h-9 rounded-lg bg-white border-none shadow-sm"><SelectValue /></SelectTrigger>
-                      <SelectContent>{PICKUP_LOCATIONS.map(l => <SelectItem key={l.id} value={l.id} className="text-[9px] font-black uppercase">{l.name}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Input placeholder="АДРЕС ВОЗВРАТА" className="text-[10px] font-bold h-9 rounded-lg bg-white border-none shadow-sm px-3" value={returnAddress} onChange={e => setReturnAddress(e.target.value)} />
-                 </div>
-              </div>
-            </div>
+            {isEditing && booking?.status === 'pre_booking' ? (
+              <Button
+                className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all"
+                disabled={isSubmitting}
+                onClick={handleConfirm}
+              >
+                {isSubmitting ? 'Обработка...' : 'Подтвердить'}
+              </Button>
+            ) : (
+              <Button
+                className="flex-1 h-12 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all"
+                disabled={isSubmitting}
+                onClick={handleSubmit}
+              >
+                {isSubmitting ? 'Обработка...' : isEditing ? 'Сохранить изменения' : 'Создать бронирование'}
+              </Button>
+            )}
+          </div>
 
-            {/* БЛОК КЛИЕНТА */}
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Contact2 size={18} className="text-green-500" />
-                <h3 className="font-black uppercase text-xs text-slate-700 tracking-wider">Клиент</h3>
-              </div>
-              <div className="space-y-3">
-                <Input placeholder="ФИО КЛИЕНТА" className="font-black uppercase text-[11px] h-11 px-4 rounded-xl bg-slate-50 border-none" value={customerName} onChange={e => setCustomerName(e.target.value)} />
-                <div className="flex gap-2">
-                  <Select value={contactType} onValueChange={(v: any) => setContactType(v)}>
-                    <SelectTrigger className="w-[100px] font-black text-[10px] h-11 rounded-xl bg-slate-50 border-none"><SelectValue /></SelectTrigger>
-                    <SelectContent><SelectItem value="telegram">TG</SelectItem><SelectItem value="whatsapp">WA</SelectItem><SelectItem value="phone">PH</SelectItem></SelectContent>
-                  </Select>
-                  <Input placeholder="КОНТАКТ" className="flex-1 font-bold text-[11px] h-11 rounded-xl bg-slate-50 border-none" value={customerContact} onChange={e => setCustomerContact(e.target.value)} />
-                </div>
-              </div>
-            </div>
-
-            {/* РАСЧЕТ СТОИМОСТИ (Light Violet Glass Style) */}
-            <div className="p-6 bg-violet-100/40 backdrop-blur-md rounded-[32px] border border-violet-200/50 relative overflow-hidden shadow-sm">
-              <div className="absolute top-4 right-4">
-                <Button variant="ghost" size="icon" onClick={copyToClipboard} className="text-violet-400 hover:text-violet-600 hover:bg-violet-200/50 rounded-full h-8 w-8">
-                  <Copy size={16} />
-                </Button>
-              </div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-9 h-9 rounded-xl bg-violet-500 flex items-center justify-center text-white shadow-md shadow-violet-200">
-                  <Receipt size={18} />
-                </div>
-                <div>
-                  <h3 className="text-[10px] font-black uppercase tracking-widest text-violet-400 leading-none mb-1">Детализация чека</h3>
-                  <p className="text-[11px] font-bold text-violet-600 uppercase tracking-tight">{pricing?.days} ДНЕЙ АРЕНДЫ</p>
-                </div>
-              </div>
-
-              <div className="space-y-3.5">
-                {/* Авто */}
-                <div className="flex items-end gap-2 group">
-                  <span className="text-[10px] font-black uppercase text-violet-400/80 whitespace-nowrap">Авто</span>
-                  <div className="flex-1 border-b border-dotted border-violet-300 mb-1 opacity-50" />
-                  <span className="text-xs font-black text-violet-900 uppercase truncate max-w-[180px]">
-                    {selectedTab === 'fleet' ? vehicles.find(v => v.id === selectedVehicleId)?.name : manualData.name || '---'}
-                  </span>
-                </div>
-                {/* Аренда */}
-                <div className="flex items-end gap-2">
-                  <span className="text-[10px] font-black uppercase text-violet-400/80 whitespace-nowrap">Аренда</span>
-                  <div className="flex-1 border-b border-dotted border-violet-300 mb-1 opacity-50" />
-                  <div className="flex items-center text-violet-900">
-                    <input className="bg-transparent text-right font-black text-xs w-20 outline-none focus:text-violet-600" value={pricing?.totalRental} onChange={(e) => setManualRental(e.target.value)} />
-                    <span className="text-[10px] font-bold ml-1">฿</span>
-                  </div>
-                </div>
-                {/* Доставка */}
-                <div className="flex items-end gap-2">
-                  <span className="text-[10px] font-black uppercase text-violet-400/80 whitespace-nowrap">Доставка</span>
-                  <div className="flex-1 border-b border-dotted border-violet-300 mb-1 opacity-50" />
-                  <div className="flex items-center text-violet-900">
-                    <input className="bg-transparent text-right font-black text-xs w-20 outline-none focus:text-violet-600" value={pricing?.totalDelivery} onChange={(e) => setManualDelivery(e.target.value)} />
-                    <span className="text-[10px] font-bold ml-1">฿</span>
-                  </div>
-                </div>
-                {/* Депозит */}
-                <div className="flex items-end gap-2">
-                  <span className="text-[10px] font-black uppercase text-violet-400/80 whitespace-nowrap">Депозит</span>
-                  <div className="flex-1 border-b border-dotted border-violet-300 mb-1 opacity-50" />
-                  <div className="flex items-center text-green-600">
-                    <input className="bg-transparent text-right font-black text-xs w-20 outline-none focus:text-green-700" value={pricing?.deposit} onChange={(e) => setManualDeposit(e.target.value)} />
-                    <span className="text-[10px] font-bold ml-1">฿</span>
-                  </div>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-violet-200/60 flex justify-between items-end">
-                  <div>
-                    <p className="text-[10px] font-black text-violet-500 uppercase mb-1">Итого к оплате</p>
-                    <p className="text-4xl font-black tracking-tighter text-violet-950">
-                      {pricing?.grandTotal.toLocaleString()} <span className="text-xl font-black text-violet-400">฿</span>
-                    </p>
-                  </div>
-                  <Badge className="bg-green-100 text-green-600 border-none font-black text-[9px] mb-2 px-2 py-0.5">READY</Badge>
-                </div>
-              </div>
-            </div>
-
-          </div> {/* CLOSE RIGHT COLUMN */}
-        </div> {/* CLOSE GRID */}
-
-        {/* 3. КНОПКИ ДЕЙСТВИЯ (ВНЕ СЕТКИ) */}
-        <div className="mt-8 flex gap-3 max-w-4xl mx-auto w-full">
-          {isEditing && (
-            <Button variant="outline" size="lg" className="h-14 px-6 border border-red-100 text-red-500 hover:bg-red-50 rounded-2xl" disabled={isDeleting} onClick={handleDelete}>
-              <Trash2 size={20} />
-            </Button>
-          )}
-          <Button 
-            className="flex-1 h-14 bg-[#f8b515] hover:bg-orange-500 text-white text-base font-black rounded-2xl shadow-lg shadow-orange-100 transition-all active:scale-[0.98]" 
-            disabled={isSubmitting} 
-            onClick={handleSubmit}
-          >
-            {isSubmitting ? '...' : isEditing ? 'СОХРАНИТЬ ИЗМЕНЕНИЯ' : 'СОЗДАТЬ БРОНИРОВАНИЕ'}
-          </Button>
+          <div className="h-6" />
         </div>
-        
-        <div className="h-6" />
-      </div> {/* CLOSE MAX-WIDTH-CONTAINER */}
-    </div> {/* CLOSE FLEX-1 (MAIN SCROLL) */}
-  </DialogContent>
-</Dialog>
-  );
+      </div>
+    </DialogContent>
+  </Dialog>
+);
 }

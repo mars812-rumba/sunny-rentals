@@ -102,36 +102,44 @@ const MonthGrid = memo(({
                     )}>
                       {format(day, 'd')}
                     </span>
-                  </div> 
-
- <div className="space-y-0.5 overflow-hidden font-sans">
-  {events.slice(0, 5).map((ev, idx) => {
-    return (
-      <div 
-        key={idx}
-        className={cn(
-          // Добавляем w-full, чтобы плашка тянулась на всю ширину ячейки
-          "w-full px-1 py-0.5 rounded-[4px] text-[7px] font-bold border shadow-sm cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all",
-          ev.type === 'pickup' 
-            ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
-            : "bg-amber-50 text-amber-700 border-amber-100"
-        )}
-        onClick={(e) => {
-          e.stopPropagation();
-          onBadgeClick(ev, e);
-        }}
-      >
-        {/* min-w-0 обязателен внутри flex, чтобы truncate понимал границы */}
-        <div className="flex items-center w-full gap-0.5">
-          <span className="truncate flex-1 tracking-tighter">
-            {ev.carName}
-          </span>
-        </div>
-      </div>
-    );
-  })}
+                  </div>
+                  
+                  <div className="space-y-0.5 overflow-hidden font-sans">
+                    {events.slice(0, 5).map((ev, idx) => {
+                      // Цвет в зависимости от статуса брони
+                      const isPreBooking = ev.bookingStatus === 'pre_booking';
+                      const bgClass = isPreBooking
+                        ? "bg-gray-400 text-gray-700 border-gray-300"
+                        : ev.type === 'pickup' 
+                          ? "bg-green-400 text-gray-800 border-green-50"
+                          : "bg-yellow-400 text-gray-800 border-yellow-50";
+                      
+                      return (
+                        <div 
+                          key={idx}
+                          className={cn(
+                            "w-full h-[13px] px-1 text-[7px] font-bold border shadow-sm cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all",
+                            bgClass
+                          )}
+                          style={{
+                            clipPath: "polygon(3px 0%, 100% 0%, calc(100% - 3px) 100%, 0% 100%)"
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onBadgeClick(ev, e);
+                          }}
+                        >
+                          <div className="flex items-center w-full gap-0.5">
+                            <span className="truncate flex-1 tracking-tighter">
+                              {ev.carName}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    
                     {events.length > 5 && (
-                      <div className="text-[7px] text-slate-400 font-bold pl-1 tracking-tighter">
+                      <div className="text-[5px] text-slate-400 font-bold pl-1 tracking-tighter">
                         + ещё {events.length - 5}
                       </div>
                     )}
@@ -164,45 +172,46 @@ export function MonthCalendarView({
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, startIndex: 1, duration: 30 });
 
- const eventsByDay = useMemo(() => {
-  const map = new Map<string, DayEvent[]>();
-  if (!logisticsData || !bookings) return map;
+  const eventsByDay = useMemo(() => {
+    const map = new Map<string, DayEvent[]>();
+    if (!logisticsData || !bookings) return map;
 
-  logisticsData.forEach((item) => {
-    // Ищем реальную бронь в массиве актуальных броней
-    const fullBooking = bookings.find(b => b.booking_id === item.booking_id);
+    logisticsData.forEach((item) => {
+      // Ищем реальную бронь в массиве актуальных броней
+      const fullBooking = bookings.find(b => b.booking_id === item.booking_id);
 
-    // КРИТИЧЕСКИЙ МОМЕНТ: Если брони нет в списке активных, 
-    // значит она удалена — игнорируем её для календаря
-    if (!fullBooking) return; 
+      // КРИТИЧЕСКИЙ МОМЕНТ: Если брони нет в списке активных, 
+      // значит она удалена — игнорируем её для календаря
+      if (!fullBooking) return; 
 
-    // Дополнительная проверка на статус, если статус есть в объекте
-    if (fullBooking.status === 'cancelled') return;
+      // Фильтруем отмененные и отклоненные брони
+      if (fullBooking.status === 'cancelled' || fullBooking.status === 'rejected') return;
 
-    const baseEvent = {
-      carName: item.car_name,
-      clientName: item.client_name,
-      location: item.location || 'Не указано',
-      booking_id: item.booking_id,
-      booking: fullBooking
-    };
+      const baseEvent = {
+        carName: item.car_name,
+        clientName: item.client_name,
+        location: item.location || 'Не указано',
+        booking_id: item.booking_id,
+        booking: fullBooking,
+        bookingStatus: fullBooking.status  // для определения цвета
+      };
 
-    const pDate = new Date(item.pickup_date);
-    const rDate = new Date(item.return_date);
-    if (isNaN(pDate.getTime())) return;
+      const pDate = new Date(item.pickup_date);
+      const rDate = new Date(item.return_date);
+      if (isNaN(pDate.getTime())) return;
 
-    const pKey = format(pDate, 'yyyy-MM-dd');
-    const rKey = format(rDate, 'yyyy-MM-dd');
+      const pKey = format(pDate, 'yyyy-MM-dd');
+      const rKey = format(rDate, 'yyyy-MM-dd');
 
-    if (!map.has(pKey)) map.set(pKey, []);
-    map.get(pKey)!.push({ ...baseEvent, type: 'pickup', time: format(pDate, 'HH:mm') });
+      if (!map.has(pKey)) map.set(pKey, []);
+      map.get(pKey)!.push({ ...baseEvent, type: 'pickup', time: format(pDate, 'HH:mm') });
 
-    if (!map.has(rKey)) map.set(rKey, []);
-    map.get(rKey)!.push({ ...baseEvent, type: 'return', time: format(rDate, 'HH:mm') });
-  });
+      if (!map.has(rKey)) map.set(rKey, []);
+      map.get(rKey)!.push({ ...baseEvent, type: 'return', time: format(rDate, 'HH:mm') });
+    });
 
-  return map;
-}, [logisticsData, bookings]);
+    return map;
+  }, [logisticsData, bookings]);
 
   const handleInnerDayClick = useCallback((date: Date, events: DayEvent[]) => {
     // Click on empty space - create booking immediately

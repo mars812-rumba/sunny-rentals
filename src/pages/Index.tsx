@@ -14,13 +14,14 @@ import { isValid } from 'date-fns';
 import { trackLeadEvent } from '@/api/api';
 
 // --- Pricing helpers ---
-const determineSeason = (startDate: Date) => {
-  const month = startDate.getMonth() + 1; // 1-12
-  // High season: December (12), January (1), February (2)
-  if (month === 12 || month === 1 || month === 2) {
-    return 'high_season';
+const determineSeason = (date: Date) => {
+  const month = date.getMonth(); // 0-11 (0=январь, 11=декабрь)
+  // Low season: Апрель (3) - Октябрь (9)
+  if (month >= 3 && month <= 9) {
+    return 'low_season';
   }
-  return 'low_season';
+  // High season: Ноябрь (10), Декабрь (11), Январь (0), Февраль (1), Март (2)
+  return 'high_season';
 };
 
 const getPriceForPeriod = (pricing, days, startDate: Date) => {
@@ -482,11 +483,7 @@ if (!cars || cars.length === 0) {
         onClose={() => setIsSendBookFormOpen(false)}
         car={selectedCar}
         filters={filters}
-        onBookingSubmit={handleBookingSubmit}
-        isSubmitting={isSubmittingBooking}
         requireWhatsApp={!window.Telegram?.WebApp?.initDataUnsafe?.user?.username}
-        isSubmitted={isBookingSubmitted}
-        bookingId={bookingId}
       />
     </div>
   );

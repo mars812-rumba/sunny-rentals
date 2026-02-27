@@ -15,7 +15,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import CarForm from "@/components/CarForm";
+import CarForm from "@/components/admin/CarForm";
 import { useCars } from "@/contexts/CarsContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";

@@ -325,6 +325,7 @@ class FormData(BaseModel):
 class AdminBookingRequest(BaseModel):
     form_data: FormData
     booking_id: Optional[str] = None
+    user_id: Optional[Union[int, str]] = None
     
 class LeadTrackRequest(BaseModel):
     user_id: Union[int, str] = Field(..., description="Telegram user ID (int) or web session ID (str)")
@@ -358,7 +359,7 @@ class UserData(BaseModel):
     user_id: Union[int, str]
     username: Optional[str] = None
     created_at: str  # Было timestamp
-    status: str      # Было final_status
+    status: str
     car_interested: Optional[str] = None
     category_interested: Optional[str] = None
     dates_selected: Optional[Dict[str, Any]] = None
@@ -367,13 +368,13 @@ class UserData(BaseModel):
     
 # Модель для возврата дат логистики
 class LogisticsDate(BaseModel):
-    booking_id: str
-    car_id: str
-    car_name: str
-    pickup_date: str
-    return_date: str
-    client_name: str
-    location: str
+    booking_id: str = ""
+    car_id: str = ""
+    car_name: str = "Авто"
+    pickup_date: str = ""
+    return_date: str = ""
+    client_name: str = "Клиент"
+    location: str = ""
 
 class LogActionRequest(BaseModel):
     user_id: Union[int, str]
@@ -413,6 +414,10 @@ def check_booking_overlap(
     
     for booking in bookings:
         if exclude_booking_id and booking.get('booking_id') == exclude_booking_id:
+            continue
+        
+        # 🔧 КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Игнорируем pre_booking
+        if booking.get('status') == 'pre_booking':
             continue
             
         form_data = booking.get('form_data', {})
@@ -534,10 +539,10 @@ def load_bookings() -> List[Dict]:
     data = load_json(BOOKINGS_FILE)
     return data if isinstance(data, list) else []
 
-def get_user_latest_record(user_id: int, from_archive: bool = False):
+def get_user_latest_record(user_id: Union[int, str], from_archive: bool = False):
     json_file = ARCHIVE_JSON if from_archive else USER_DATA_JSON
     users_data = load_json(json_file)
-    user_records = [u for u in users_data if u.get('user_id') == user_id]
+    user_records = [u for u in users_data if str(u.get('user_id')) == str(user_id)]
     if not user_records:
         return None
     user_records.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
@@ -552,13 +557,13 @@ def update_all_user_records(user_id: int, updates: dict, in_archive: bool = Fals
     
     with open(json_file, "r", encoding="utf-8") as f:
         users_data = json.load(f)
-    
+
     updated = False
     for user in users_data:
-        if user.get('user_id') == user_id:
+        if str(user.get('user_id')) == str(user_id):
             user.update(updates)
             updated = True
-    
+
     if updated:
         with _lock:
             save_json(json_file, users_data)
@@ -607,9 +612,9 @@ def restore_from_archive(user_id: int):
         
         with open(ARCHIVE_JSON, "r", encoding="utf-8") as f:
             archive_data = json.load(f)
-        
+
         # Находим записи пользователя
-        user_records = [u for u in archive_data if u.get('user_id') == user_id]
+        user_records = [u for u in archive_data if str(u.get('user_id')) == str(user_id)]
         if not user_records:
             return False
         
@@ -619,7 +624,7 @@ def restore_from_archive(user_id: int):
         
         # Восстанавливаем в user_data со статусом "В работе"
         for record in user_records:
-            record['final_status'] = 'in_progress'
+            record['status'] = 'in_work'
             record['restored_at'] = datetime.utcnow().isoformat()
             if 'archived_at' in record:
                 del record['archived_at']
@@ -664,16 +669,15 @@ def auto_archive_old_records():
                 continue
             
             age_days = (now - user_time).days
-            # PRIORITY STATUS LOGIC: final_status overrides status
-            current_status = user.get("final_status") or user.get("status")
+            current_status = user.get("status")
             
             # Правила:
             should_archive = False
             
             if current_status == 'new' and age_days > 14:
                 should_archive = True  # Новые > 2 недели
-            elif current_status == 'interested' and age_days > 30:
-                should_archive = True  # Теплые > 1 месяц
+            elif current_status == 'new' and age_days > 30:
+                should_archive = True  # NEW > 1 месяц
             elif current_status in ['rejected', 'new']:
                 should_archive = True  # Отказы и холодные сразу
             elif current_status == 'completed':
@@ -792,8 +796,8 @@ def update_dialog_status(user_id: int, **kwargs):
         users_data = load_json(USER_DATA_JSON)
         
         # Найдем пользователя по user_id
-        user_index = next((i for i, u in enumerate(users_data) if u.get("user_id") == user_id), None)
-        
+        user_index = next((i for i, u in enumerate(users_data) if str(u.get("user_id")) == str(user_id)), None)
+
         if user_index is not None:
             user_record = users_data[user_index]
         else:
@@ -813,6 +817,8 @@ def update_dialog_status(user_id: int, **kwargs):
                 "notes": [],
                 "source": "system"
             }
+            # Дедупликация: удаляем старые записи с тем же user_id
+            users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
             users_data.append(user_record)
             user_index = len(users_data) - 1
         
@@ -936,7 +942,7 @@ def get_all_dialog_statuses():
                 if uid not in statuses:
                     statuses[uid] = {
                         "claude_status": "stopped",
-                        "unread": False,
+                        "has_new_messages": False,
                         "last_note": "",
                         "last_action_at": ev.get("timestamp")
                     }
@@ -954,9 +960,9 @@ def get_all_dialog_statuses():
 
                 # 2. ЛОГИКА СООБЩЕНИЙ (Подсветка новых)
                 elif action == "user_message_received":
-                    entry["unread"] = True # Нужно ответить!
+                    entry["has_new_messages"] = True # Нужно ответить!
                 elif action in ["manager_message_sent", "messages_marked_read"]:
-                    entry["unread"] = False # Ответили или прочитали
+                    entry["has_new_messages"] = False # Ответили или прочитали
 
                 # 3. ЛОГИКА ЗАМЕТОК (То самое "как статус в WhatsApp")
                 elif action == "note_added":
@@ -1018,7 +1024,7 @@ def get_dialog_status_from_history(user_id: int):
                 for line in f:
                     try:
                         event = json.loads(line.strip())
-                        if event.get("user_id") == user_id:
+                        if str(event.get("user_id")) == str(user_id):
                             events.append(event)
                     except json.JSONDecodeError:
                         continue
@@ -1116,11 +1122,11 @@ def get_dialog_events(user_id: int, limit: int = 50):
                 for line in f:
                     try:
                         event = json.loads(line.strip())
-                        if event.get("user_id") == user_id:
+                        if str(event.get("user_id")) == str(user_id):
                             events.append(event)
                     except json.JSONDecodeError:
                         continue
-        
+
         # Сортируем по времени (новые сверху) и ограничиваем количество
         events.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
         events = events[:limit]
@@ -1138,7 +1144,7 @@ def get_dialog_status(user_id: int) -> dict:
     """
     try:
         users_data = load_json(USER_DATA_JSON)
-        user_record = next((u for u in users_data if u.get("user_id") == user_id), None)
+        user_record = next((u for u in users_data if str(u.get("user_id")) == str(user_id)), None)
         
         if not user_record or "dialog" not in user_record:
             return {
@@ -1612,8 +1618,8 @@ def get_cars(category: Optional[str] = None):
 
 @app.get(API_PREFIX + "/available-cars")
 def get_available_cars(
-    start_date: str = Query(..., regex=r"^\d{4}-\d{2}-\d{2}$"),
-    end_date: str = Query(..., regex=r"^\d{4}-\d{2}-\d{2}$"),
+    start_date: str = Query(..., pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    end_date: str = Query(..., pattern=r"^\d{4}-\d{2}-\d{2}$"),
     category: Optional[str] = None
 ):
     sd = _parse_date(start_date)
@@ -1689,17 +1695,17 @@ async def get_bookings_logistics():
             car_id = car_info.get('id', '')
             
             # Извлекаем информацию о клиенте
-            client_name = booking.get('form_data', {}).get('contact', {}).get('name', 'Клиент')
-            location = booking.get('form_data', {}).get('locations', {}).get('pickupLocation', '')
+            client_name = booking.get('form_data', {}).get('contact', {}).get('name') or 'Клиент'
+            location = booking.get('form_data', {}).get('locations', {}).get('pickupLocation') or ''
             
             logistics_data.append({
-                'booking_id': booking.get('booking_id', ''),
-                'car_id': car_id,
-                'car_name': car_name,
-                'pickup_date': start_date,
-                'return_date': end_date,
-                'client_name': client_name,
-                'location': location
+                'booking_id': booking.get('booking_id', '') or '',
+                'car_id': car_id or '',
+                'car_name': car_name or 'Авто',
+                'pickup_date': start_date or '',
+                'return_date': end_date or '',
+                'client_name': client_name or 'Клиент',
+                'location': location or ''
             })
         
         return logistics_data
@@ -1776,7 +1782,6 @@ def track_lead_event(request: LeadTrackRequest):
         print(f"🔍 User ID analysis: isinstance(user_id, int)={isinstance(user_id, int)}, isinstance(user_id, str)={isinstance(user_id, str)}")
         
         users_data = load_json(USER_DATA_JSON)
-        bookings = load_bookings()
         
         # Log existing user data analysis
         print(f"📊 User database analysis:")
@@ -1835,7 +1840,9 @@ def track_lead_event(request: LeadTrackRequest):
         elif event_type == "filters_used":
             print(f"🌡️ Пользователь {user_id} использовал фильтры")
             user_record["form_started"] = True
-            user_record["status"] = "interested"
+            # НЕ сбрасываем статус на new если пользователь уже существует
+            if user_index is None:
+                user_record["status"] = "new"
             user_record["updated_at"] = datetime.utcnow().isoformat()
             
             # Сохраняем категорию интереса
@@ -1861,7 +1868,7 @@ def track_lead_event(request: LeadTrackRequest):
         elif event_type == "booking_submitted":
             print(f"🔥 Пользователь {user_id} отправил бронирование")
             user_record["booking_submitted"] = True
-            user_record["status"] = "pending"
+            user_record["status"] = "pre_booking"
             user_record["updated_at"] = datetime.utcnow().isoformat()
             
             # Сохраняем информацию о машине
@@ -1891,30 +1898,10 @@ def track_lead_event(request: LeadTrackRequest):
                     "days": event_data["dates"].get("days", 1)
                 }
 
-            # Создаем запись о бронировании
-            booking_id = str(uuid.uuid4())[:8]
-            booking_record = {
-                "booking_id": booking_id,
-                "user_id": str(user_id),
-                "form_data": event_data,
-                "status": "new",
-                "created_at": datetime.utcnow().isoformat()
-            }
-            bookings.append(booking_record)
-            save_json(BOOKINGS_FILE, bookings)
-            
-            print(f"📋 Создано бронирование: {booking_id}")
-            
-            # ДИАГНОСТИКА: Отправляем уведомления для всех типов пользователей
-            print(f"🔍 DIAGNOSTIC: booking_submitted для пользователя {user_id} (тип: {type(user_id).__name__})")
-            notify_result = notify_telegram_bot_about_booking(booking_id, user_id, event_data, username)
-            print(f"🔍 DIAGNOSTIC: Результат уведомления booking_submitted: {notify_result}")
-
         # Обновляем запись пользователя
-        if user_index is not None:
-            users_data[user_index] = user_record
-        else:
-            users_data.append(user_record)
+        # Дедупликация: удаляем старые записи с тем же user_id перед сохранением
+        users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
+        users_data.append(user_record)
 
         # Сохраняем данные пользователей
         save_json(USER_DATA_JSON, users_data)
@@ -2045,7 +2032,7 @@ def get_fast_dialog_map():
                 ev = json.loads(line.strip())
                 uid = str(ev.get("user_id"))
                 if uid not in statuses:
-                    statuses[uid] = {"claude_status": "stopped", "unread": False, "message_count": 0}
+                    statuses[uid] = {"claude_status": "stopped", "has_new_messages": False, "message_count": 0}
                 
                 entry = statuses[uid]
                 
@@ -2054,7 +2041,7 @@ def get_fast_dialog_map():
                     entry["last_message_from"] = ev.get("role")
                     entry["last_message_at"] = ev.get("timestamp")
                     # Если последнее сообщение от юзера — значит не прочитано
-                    entry["unread"] = (ev.get("role") == "user")
+                    entry["has_new_messages"] = (ev.get("role") == "user")
                 else:
                     # Логика событий (Claude)
                     action = ev.get("action")
@@ -2065,7 +2052,7 @@ def get_fast_dialog_map():
                     elif action == "claude_stopped":
                         entry["claude_status"] = "stopped"
                     elif action == "messages_marked_read":
-                        entry["unread"] = False
+                        entry["has_new_messages"] = False
             except: continue
 
     process_file(CHAT_LOGS_JSONL, is_chat=True)
@@ -2073,7 +2060,11 @@ def get_fast_dialog_map():
     return statuses
 
 @app.get(API_PREFIX + "/crm/users")
-def get_crm_users(status: str, period: str = "week"):
+def get_crm_users(status: str = None, period: str = "all"):
+    """
+    Получить пользователей CRM.
+    Если status не указан — возвращаем ВСЕХ пользователей (нужно для подсчёта непрочитанных во вкладках).
+    """
     try:
         users_data = load_json(USER_DATA_JSON)
         # Получаем карту состояний ОДИН раз
@@ -2087,10 +2078,15 @@ def get_crm_users(status: str, period: str = "week"):
         for u in users_data:
             # ФИКС АРХИВА: принудительно в строку
             u_id = str(u.get("user_id"))
-            u_status = u.get("final_status") or u.get("status")
-            u_at = u.get("created_at")
+            u_status = u.get("status")
+            # ИСПОЛЬЗУЕМ updated_at для фильтра (чтобы показывать недавних пользователей)
+            u_at = u.get("updated_at") or u.get("created_at")
             
-            if not u_at or u_status != status: continue
+            # Если status указан — фильтруем по нему
+            if status and u_status != status:
+                continue
+            
+            if not u_at: continue
             
             u_date = datetime.fromisoformat(u_at.replace('Z', ''))
             
@@ -2101,18 +2097,18 @@ def get_crm_users(status: str, period: str = "week"):
                     user_copy.update(fast_map[u_id])
                 else:
                     user_copy["claude_status"] = "stopped"
-                    user_copy["unread"] = False
+                    user_copy["has_new_messages"] = False
                 
                 filtered.append(user_copy)
 
-        filtered.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+        filtered.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
         return {"status": "ok", "users": filtered}
     except Exception as e:
         print(f"🔴 CRM Users Error: {e}")
         return {"status": "error", "message": str(e), "users": []}
     
 @app.get(API_PREFIX + "/crm/stats")
-def get_crm_stats(period: str = Query("week")):
+def get_crm_stats(period: str = Query("all")):
     try:
         users_data = load_json(USER_DATA_JSON)
         now = datetime.utcnow()
@@ -2129,22 +2125,58 @@ def get_crm_stats(period: str = Query("week")):
         else: # "all"
             start_date = datetime(2000, 1, 1)
 
-        # Инициализируем счетчики (согласно src/types/crm.ts)
+        # Инициализируем счетчики (согласно новой воронке)
         stats = {
             "new": 0,
-            "interested": 0,
             "in_work": 0,
-            "pending": 0,
-            "confirmed": 0,
-            "completed": 0,
-            "cancelled": 0,
-            "no_response": 0,
-            "archive": 0
+            "pre_booking": 0,
+            "archive": 0,
+            "unread_by_status": {
+                "new": 0,
+                "in_work": 0,
+                "pre_booking": 0
+            }
         }
+        
+        # Собираем user_id последних сообщений от пользователей
+        unread_by_user = {}  # user_id -> {has_unread: bool, status: str}
+        try:
+            cmd = ["tail", "-n", "50000", str(CHAT_LOGS_JSONL)]
+            lines = subprocess.check_output(cmd).decode('utf-8').splitlines()
+            for line in lines:
+                try:
+                    ev = json.loads(line.strip())
+                    uid = str(ev.get("user_id"))
+                    # Запоминаем последний статус для каждого user_id
+                    # Если последнее сообщение от user - значит непрочитанное
+                    if ev.get("role") == "user":
+                        # Ищем статус пользователя в user_data
+                        user_record = next((u for u in users_data if str(u.get("user_id")) == uid), None)
+                        if user_record:
+                            user_status = user_record.get("status")
+                            # Маппинг старых статусов
+                            if user_status == "in_progress": user_status = "in_work"
+                            elif user_status in ["hot", "booked", "pending"]: user_status = "pre_booking"
+                            elif user_status == "interested": user_status = "new"
+                            
+                            if user_status in ["new", "in_work", "pre_booking"]:
+                                unread_by_user[uid] = {
+                                    "has_unread": True,
+                                    "status": user_status
+                                }
+                except:
+                    pass
+        except:
+            pass
+        
+        # Считаем непрочитанные по статусам
+        for uid, data in unread_by_user.items():
+            if data["status"] in stats["unread_by_status"]:
+                stats["unread_by_status"][data["status"]] += 1
 
         for user in users_data:
-            # Парсим дату создания лида
-            user_date_str = user.get("created_at") or user.get("timestamp")
+            # Парсим дату обновления (чтобы показывать только активных пользователей)
+            user_date_str = user.get("updated_at") or user.get("created_at") or user.get("timestamp")
             if not user_date_str:
                 continue
                 
@@ -2156,12 +2188,12 @@ def get_crm_stats(period: str = Query("week")):
                 if user.get("archived") is True:
                     stats["archive"] += 1
                 else:
-                    # PRIORITY STATUS LOGIC: final_status overrides status
-                    user_status = user.get("final_status") or user.get("status")
+                    user_status = user.get("status")
                     
                     # Маппинг на случай, если в базе остались старые статусы
-                    if user_status == "in_progress": user_status = "interested"
-                    if user_status in ["hot", "booked"]: user_status = "pending"
+                    if user_status == "in_progress": user_status = "in_work"
+                    if user_status in ["hot", "booked", "pending"]: user_status = "pre_booking"
+                    if user_status == "interested": user_status = "new"
                     
                     if user_status in stats:
                         stats[user_status] += 1
@@ -2234,11 +2266,11 @@ async def get_user_logs(user_id: int, limit: int = Query(50, ge=1, le=200)):
                 for line in f:
                     try:
                         log_entry = json.loads(line.strip())
-                        if log_entry.get('user_id') == user_id:
+                        if str(log_entry.get('user_id')) == str(user_id):
                             logs.append(log_entry)
                     except json.JSONDecodeError:
                         continue
-        
+
         # Сортируем по времени (новые сверху) и ограничиваем количество
         logs.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
         logs = logs[:limit]
@@ -2330,11 +2362,11 @@ async def update_user_status(update: StatusUpdate):
         if not current_user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        old_status = current_user.get('final_status', 'unknown')
-        
+        old_status = current_user.get('status', 'unknown')
+
         # Обновляем все записи пользователя
         updates = {
-            'final_status': new_status,
+            'status': new_status,
             'updated_at': datetime.utcnow().isoformat()
         }
         
@@ -2551,7 +2583,7 @@ async def get_user_notes(user_id: int):
         with open(history_file, "r", encoding="utf-8") as f:
             for line in f:
                 entry = json.loads(line)
-                if entry.get("user_id") == user_id:
+                if str(entry.get("user_id")) == str(user_id):
                     # Забираем заметки и из обычных добавлений, и из смены статусов
                     if entry.get("note"):
                         notes.append({
@@ -2657,11 +2689,11 @@ async def get_user_history(user_id: int):
                 for line in f:
                     try:
                         entry = json.loads(line.strip())
-                        if entry.get('user_id') == user_id:
+                        if str(entry.get('user_id')) == str(user_id):
                             history.append(entry)
                     except json.JSONDecodeError:
                         continue
-        
+
         history.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
         
         return {
@@ -2694,16 +2726,58 @@ async def trigger_auto_archive():
     """Запустить автоматическую архивацию старых записей"""
     try:
         result = auto_archive_old_records()
-        
+
         return {
             "status": "ok",
             "archived": result["archived"],
             "message": f"Архивировано записей: {result['archived']}"
         }
-        
+
     except Exception as e:
         print(f"❌ Error in trigger_auto_archive: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(API_PREFIX + "/crm/dedupe")
+async def run_dedupe(archive: bool = False):
+    """Удалить дубликаты пользователей - оставить только последнюю запись по updated_at"""
+    try:
+        json_file = ARCHIVE_JSON if archive else USER_DATA_JSON
+
+        if not json_file.exists():
+            return {"status": "ok", "removed": 0, "total": 0, "unique": 0}
+
+        with open(json_file, "r", encoding="utf-8") as f:
+            users_data = json.load(f)
+
+        original_count = len(users_data)
+
+        # Дедупликация: оставляем только последнюю запись по updated_at
+        users_dict = {}
+        for record in users_data:
+            uid = str(record.get("user_id"))
+            ts = record.get("updated_at") or record.get("created_at") or ""
+            if uid not in users_dict or ts > (users_dict[uid].get("updated_at") or users_dict[uid].get("created_at") or ""):
+                users_dict[uid] = record
+
+        cleaned_data = list(users_dict.values())
+        cleaned_data.sort(key=lambda x: x.get("updated_at") or x.get("created_at") or "", reverse=True)
+
+        with open(json_file, "w", encoding="utf-8") as f:
+            json.dump(cleaned_data, f, indent=2, ensure_ascii=False)
+
+        return {
+            "status": "ok",
+            "removed": original_count - len(cleaned_data),
+            "total": original_count,
+            "unique": len(cleaned_data),
+            "message": f"Удалено дубликатов: {original_count - len(cleaned_data)}"
+        }
+
+    except Exception as e:
+        print(f"❌ Error in run_dedupe: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # ==============================
 # ОБЪЕДИНЕННАЯ ЛОГИКА CLAUDE
@@ -2838,9 +2912,9 @@ def get_user_filters_from_db(user_id: int) -> dict:
     try:
         # Читаем данные пользователей
         users_data = load_json(USER_DATA_JSON)
-        
+
         # Ищем пользователя по user_id
-        user_data = next((u for u in users_data if u.get('user_id') == user_id), None)
+        user_data = next((u for u in users_data if str(u.get('user_id')) == str(user_id)), None)
         
         if user_data:
             # Извлекаем фильтры из данных пользователя
@@ -2934,8 +3008,8 @@ def sync_user_context(user_id):
         try:
             with open(USER_DATA_JSON, 'r', encoding='utf-8') as f:
                 users = json.load(f)
-                user_data = next((u for u in users if u.get('user_id') == user_id), None)
-                
+                user_data = next((u for u in users if str(u.get('user_id')) == str(user_id)), None)
+
                 if user_data:
                     # Переносим данные из БД в 'слой' фильтров для Клода
                     filters = {
@@ -3151,15 +3225,18 @@ async def receive_message_from_bot(request: Request):
         try:
             users_data = load_json(USER_DATA_JSON)
             user_updated = False
-            
+
             for user in users_data:
-                if user.get('user_id') == user_id:
+                if str(user.get('user_id')) == str(user_id):
                     user['last_message_at'] = datetime.utcnow().isoformat()
                     user['updated_at'] = datetime.utcnow().isoformat()
                     user_updated = True
                     break
-            
+
             if user_updated:
+                # Дедупликация: удаляем ВСЕ записи с этим user_id перед сохранением
+                users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
+                users_data.append(user)
                 save_json(USER_DATA_JSON, users_data)
                 print(f"✅ Updated metadata for user {user_id}")
             else:
@@ -3243,15 +3320,18 @@ async def receive_media_from_bot(request: Request):
         try:
             users_data = load_json(USER_DATA_JSON)
             user_updated = False
-            
+
             for user in users_data:
-                if user.get('user_id') == user_id:
+                if str(user.get('user_id')) == str(user_id):
                     user['last_message_at'] = datetime.utcnow().isoformat()
                     user['updated_at'] = datetime.utcnow().isoformat()
                     user_updated = True
                     break
-            
+
             if user_updated:
+                # Дедупликация: удаляем ВСЕ записи с этим user_id перед сохранением
+                users_data = [u for u in users_data if str(u.get("user_id")) != str(user_id)]
+                users_data.append(user)
                 save_json(USER_DATA_JSON, users_data)
                 print(f"✅ Updated metadata for user {user_id}")
             else:
@@ -3709,11 +3789,11 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
                 "booking_id": booking_id,
                 "user_id": "admin",
                 "form_data": form_data_dict,
-                "status": "confirmed",
+                "status": "pre_booking",  # ✅ ВСЕ брони начинаются как предварительные
                 "created_at": datetime.utcnow().isoformat(),
                 "source": "admin_panel"
             })
-            print(f"✓ Created booking {booking_id}")
+            print(f"✓ Created pre_booking {booking_id}")
         
         # Сохраняем
         with _lock:
@@ -3730,6 +3810,361 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
         raise
     except Exception as e:
         print(f"!!! FATAL ERROR in admin_create_booking: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(API_PREFIX + "/bookings/web-create")
+async def web_create_booking(booking_data: AdminBookingRequest):
+    """Создание брони с веб-интерфейса (предварительная бронь)"""
+    try:
+        print("=== START web_create_booking ===")
+        print(f"Successfully parsed request data: {booking_data}")
+        
+        form_data = booking_data.form_data
+        print(f"Form data parsed successfully: {form_data}")
+        
+        booking_id = booking_data.booking_id
+        
+        if not form_data:
+            print("ERROR: form_data is missing")
+            raise HTTPException(status_code=400, detail="form_data is missing")
+        
+        # ✅ НОВАЯ ПРОВЕРКА: Проверяем пересечение дат
+        car_id = form_data.car.id
+        start_date = form_data.dates.start
+        end_date = form_data.dates.end
+        
+        overlap_check = check_booking_overlap(
+            car_id=car_id,
+            start_date=start_date,
+            end_date=end_date,
+            exclude_booking_id=booking_id  # При редактировании исключаем текущую бронь
+        )
+        
+        if not overlap_check["available"]:
+            conflicts = overlap_check["conflicting_bookings"]
+            # ✅ Красивое сообщение
+            conflict_messages = []
+            for c in conflicts:
+                conflict_messages.append(
+                    f"• {c['customer_name']}: {c['start']} - {c['end']}"
+                )
+            
+            conflict_info = "\n".join(conflict_messages)  # ✅ Добавлены отступы
+            raise HTTPException(                           # ✅ Добавлены отступы
+                status_code=409,
+                detail=f"Машина уже забронирована на эти даты:\n{conflict_info}"
+            )
+        
+        # Конвертируем Pydantic в dict
+        form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
+        
+        bookings = load_bookings()
+        
+        if booking_id:
+            # Редактирование
+            print(f"Updating existing booking: {booking_id}")
+            found = False
+            for booking in bookings:
+                if booking.get('booking_id') == booking_id:
+                    booking['form_data'] = form_data_dict
+                    booking['updated_at'] = datetime.utcnow().isoformat()
+                    found = True
+                    print(f"✓ Updated booking {booking_id}")
+                    break
+            
+            if not found:
+                print(f"ERROR: Booking {booking_id} not found")
+                raise HTTPException(status_code=404, detail="Booking not found")
+        else:
+            # Создание
+            booking_id = str(uuid.uuid4())[:8]
+            print(f"Creating new booking: {booking_id}")
+            
+            # Используем user_id из запроса или fallback
+            user_id = booking_data.user_id if booking_data.user_id else "web_user"
+            
+            bookings.append({
+                "booking_id": booking_id,
+                "user_id": str(user_id),
+                "form_data": form_data_dict,
+                "status": "pre_booking",
+                "created_at": datetime.utcnow().isoformat(),
+                "source": "web_frontend"
+            })
+            print(f"✓ Created pre_booking {booking_id} for user {user_id}")
+        
+        # Сохраняем
+        with _lock:
+            save_json(BOOKINGS_FILE, bookings)
+        print("✓ Bookings saved to JSON")
+        
+        # ✅ Уведомляем Telegram бота о новой предварительной брони
+        try:
+            # Получаем username из user_data.json
+            users_data = load_json(USER_DATA_JSON)
+            user_record = next((u for u in users_data if str(u.get("user_id")) == str(user_id)), None)
+            display_name = user_record.get("username") if user_record else None
+            if not display_name:
+                display_name = booking_data.form_data.contact.name if booking_data.form_data.contact.name else str(user_id)
+            
+            notify_telegram_bot_about_booking(
+                booking_id=booking_id,
+                user_id=user_id,
+                form_data=form_data_dict,
+                username=display_name
+            )
+        except Exception as e:
+            print(f"Warning: Failed to notify bot about booking: {e}")
+        
+        print("=== SUCCESS ===")
+        return {
+            "status": "ok",
+            "booking_id": booking_id,
+            "message": "Предварительная бронь создана успешно"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"!!! FATAL ERROR in web_create_booking: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(API_PREFIX + "/bookings/telegram_webapp")
+async def telegram_webapp_create_booking(booking_data: AdminBookingRequest):
+    """Создание брони из Telegram WebApp (предварительная бронь)"""
+    try:
+        print("=== START telegram_webapp_create_booking ===")
+        print(f"Successfully parsed request data: {booking_data}")
+        
+        form_data = booking_data.form_data
+        print(f"Form data parsed successfully: {form_data}")
+        
+        booking_id = booking_data.booking_id
+        
+        if not form_data:
+            print("ERROR: form_data is missing")
+            raise HTTPException(status_code=400, detail="form_data is missing")
+        
+        # ✅ НОВАЯ ПРОВЕРКА: Проверяем пересечение дат
+        car_id = form_data.car.id
+        start_date = form_data.dates.start
+        end_date = form_data.dates.end
+        
+        overlap_check = check_booking_overlap(
+            car_id=car_id,
+            start_date=start_date,
+            end_date=end_date,
+            exclude_booking_id=booking_id  # При редактировании исключаем текущую бронь
+        )
+        
+        if not overlap_check["available"]:
+            conflicts = overlap_check["conflicting_bookings"]
+            # ✅ Красивое сообщение
+            conflict_messages = []
+            for c in conflicts:
+                conflict_messages.append(
+                    f"• {c['customer_name']}: {c['start']} - {c['end']}"
+                )
+            
+            conflict_info = "\n".join(conflict_messages)  # ✅ Добавлены отступы
+            raise HTTPException(                           # ✅ Добавлены отступы
+                status_code=409,
+                detail=f"Машина уже забронирована на эти даты:\n{conflict_info}"
+            )
+        
+        # Конвертируем Pydantic в dict
+        form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
+        
+        bookings = load_bookings()
+        
+        if booking_id:
+            # Редактирование
+            print(f"Updating existing booking: {booking_id}")
+            found = False
+            for booking in bookings:
+                if booking.get('booking_id') == booking_id:
+                    booking['form_data'] = form_data_dict
+                    booking['updated_at'] = datetime.utcnow().isoformat()
+                    found = True
+                    print(f"✓ Updated booking {booking_id}")
+                    break
+            
+            if not found:
+                print(f"ERROR: Booking {booking_id} not found")
+                raise HTTPException(status_code=404, detail="Booking not found")
+        else:
+            # Создание
+            booking_id = str(uuid.uuid4())[:8]
+            print(f"Creating new booking: {booking_id}")
+            
+            # Используем user_id из запроса или fallback
+            user_id = booking_data.user_id if booking_data.user_id else "telegram_user"
+            
+            bookings.append({
+                "booking_id": booking_id,
+                "user_id": str(user_id),  # ✅ Сохраняем реальный user_id
+                "form_data": form_data_dict,
+                "status": "pre_booking",
+                "created_at": datetime.utcnow().isoformat(),
+                "source": "telegram_webapp"
+            })
+            print(f"✓ Created pre_booking {booking_id} for user {user_id}")
+        
+        # Сохраняем
+        with _lock:
+            save_json(BOOKINGS_FILE, bookings)
+        print("✓ Bookings saved to JSON")
+        
+        # ✅ Уведомляем Telegram бота о новой предварительной брони
+        try:
+            # Получаем username из user_data.json
+            users_data = load_json(USER_DATA_JSON)
+            user_record = next((u for u in users_data if str(u.get("user_id")) == str(user_id)), None)
+            display_name = user_record.get("username") if user_record else None
+            if not display_name:
+                display_name = booking_data.form_data.contact.name if booking_data.form_data.contact.name else str(user_id)
+            
+            notify_telegram_bot_about_booking(
+                booking_id=booking_id,
+                user_id=user_id,
+                form_data=form_data_dict,
+                username=display_name
+            )
+        except Exception as e:
+            print(f"Warning: Failed to notify bot about booking: {e}")
+        
+        print("=== SUCCESS ===")
+        return {
+            "status": "ok",
+            "booking_id": booking_id,
+            "message": "Предварительная бронь создана успешно"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"!!! FATAL ERROR in telegram_webapp_create_booking: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(API_PREFIX + "/admin/bookings/{booking_id}/confirm")
+async def confirm_booking(booking_id: str):
+    """Подтвердить предварительную бронь (convert pre_booking to confirmed)"""
+    try:
+        print(f"=== START confirm_booking for {booking_id} ===")
+        
+        bookings = load_bookings()
+        
+        # Находим бронь
+        booking_found = False
+        for booking in bookings:
+            if booking.get('booking_id') == booking_id:
+                if booking.get('status') != 'pre_booking':
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Бронь {booking_id} уже подтверждена или имеет статус {booking.get('status')}"
+                    )
+                
+                # Подтверждаем бронь
+                booking['status'] = 'confirmed'
+                booking['confirmed_at'] = datetime.utcnow().isoformat()
+                booking['updated_at'] = datetime.utcnow().isoformat()
+                booking_found = True
+                
+                print(f"✓ Подтверждена бронь {booking_id}")
+                break
+        
+        if not booking_found:
+            raise HTTPException(status_code=404, detail=f"Бронь {booking_id} не найдена")
+        
+        # Сохраняем
+        with _lock:
+            save_json(BOOKINGS_FILE, bookings)
+        print("✓ Bookings saved to JSON")
+        
+        print("=== SUCCESS ===")
+        return {
+            "status": "ok",
+            "booking_id": booking_id,
+            "message": "Бронь успешно подтверждена"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"!!! FATAL ERROR in confirm_booking: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(API_PREFIX + "/admin/bookings/{booking_id}/reject")
+async def reject_booking(booking_id: str, data: dict = None):
+    """Отклонить бронь и архивировать лида"""
+    try:
+        print(f"=== START reject_booking for {booking_id} ===")
+        
+        bookings = load_bookings()
+        users_data = load_json(USER_DATA_JSON)
+        
+        # Находим бронь
+        booking_found = False
+        user_id = None
+        for booking in bookings:
+            if booking.get('booking_id') == booking_id:
+                if booking.get('status') not in ['pre_booking', 'new']:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Бронь {booking_id} имеет статус {booking.get('status')}, нельзя отклонить"
+                    )
+                
+                # Отклоняем бронь
+                booking['status'] = 'rejected'
+                booking['rejected_at'] = datetime.utcnow().isoformat()
+                booking['updated_at'] = datetime.utcnow().isoformat()
+                user_id = booking.get('user_id')
+                booking_found = True
+                
+                print(f"✓ Отклонена бронь {booking_id} для пользователя {user_id}")
+                break
+        
+        if not booking_found:
+            raise HTTPException(status_code=404, detail=f"Бронь {booking_id} не найдена")
+        
+        # Архивируем лида (user status = archived)
+        if user_id:
+            for user in users_data:
+                if str(user.get('user_id')) == str(user_id):
+                    user['status'] = 'archive'
+                    user['archived_at'] = datetime.utcnow().isoformat()
+                    user['updated_at'] = datetime.utcnow().isoformat()
+                    print(f"✓ Архивирован лид {user_id}")
+                    break
+        
+        # Сохраняем
+        with _lock:
+            save_json(BOOKINGS_FILE, bookings)
+            save_json(USER_DATA_JSON, users_data)
+        print("✓ Bookings and users saved to JSON")
+        
+        return {
+            "status": "ok",
+            "booking_id": booking_id,
+            "message": "Бронь отклонена, лид архивирован"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"!!! FATAL ERROR in reject_booking: {e}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

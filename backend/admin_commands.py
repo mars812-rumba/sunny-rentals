@@ -26,7 +26,7 @@ class AdminCommands:
             username = user.get('username', 'unknown')
             user_id = user.get('user_id')
             timestamp = user.get('timestamp', '')
-            status = user.get('final_status', 'unknown')
+            status = user.get('status', 'unknown')
             booking = "✅" if user.get('booking_submitted') else "❌"
             
             # Format timestamp

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import FilterForm from '@/components/FilterForm';
 import CarListLoader from '@/components/CarListLoader';
 import CarList from '@/components/CarList';
-import BookingModal from '@/components/BookingModal';
+import BookingModal from '@/components/site/BookingModal';
 import CarTeaserPlaceholder from '@/components/site/CarTeaserPlaceholder';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCars } from '@/contexts/CarsContext';
@@ -159,61 +159,7 @@ export const HeroSectionWithFilters = () => {
     setBookingId(null);
   };
 
-  const handleBookingSubmit = async (contact: { value: string, type: string }) => {
-    if (!selectedCar) return;
-    setIsSubmittingBooking(true);
-    try {
-      // @ts-ignore
-      const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
-      const dailyPrice = getPriceForPeriod(selectedCar.pricing, filters.days);
-      const totalRentalPrice = dailyPrice * filters.days;
-      const pickupDelivery = getDeliveryPrice(filters.pickupLocation);
-      const returnDelivery = getDeliveryPrice(filters.returnLocation);
-      const totalDelivery = pickupDelivery + returnDelivery;
-      const grandTotal = totalRentalPrice + totalDelivery;
-
-      const formData = {
-        car: { id: selectedCar.id, name: selectedCar.name, brand: selectedCar.brand, model: selectedCar.model, year: selectedCar.year, color: selectedCar.color },
-        dates: { start: filters.startDate.toISOString(), end: filters.endDate.toISOString(), days: filters.days },
-        locations: { pickup: filters.pickupLocation, return: filters.returnLocation },
-        pricing: {
-          dailyRate: dailyPrice,
-          totalRental: totalRentalPrice,
-          deposit: selectedCar.pricing.deposit,
-          deliveryPickup: pickupDelivery,
-          deliveryReturn: returnDelivery,
-          totalDelivery: totalDelivery,
-          grandTotal: grandTotal
-        },
-        contact,
-        timestamp: new Date().toISOString(),
-      };
-
-      const payload = { user_id: user ? user.id : 'unknown_user', form_data: formData };
-      const response = await fetch('/botapi/submit_form', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Booking failed: ${response.status}`);
-      }
-      const { booking_id } = await response.json();
-      setBookingId(booking_id);
-      setIsBookingSubmitted(true);
-    } catch (error: any) {
-      console.error('Booking submission failed:', error);
-      toast({
-        title: t('toast_booking_error'),
-        description: error.message || t('toast_booking_error_description'),
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmittingBooking(false);
-    }
-  };
+  // Booking functionality removed - only main app should handle bookings
 
   
 
@@ -335,9 +281,6 @@ export const HeroSectionWithFilters = () => {
         onClose={() => setIsBookingModalOpen(false)}
         car={selectedCar}
         filters={filters}
-        onBookingSubmit={handleBookingSubmit}
-        isSubmitting={isSubmittingBooking}
-        requireWhatsApp={!(window as any).Telegram?.WebApp?.initDataUnsafe?.user?.username}
         isSubmitted={isBookingSubmitted}
         bookingId={bookingId}
       />

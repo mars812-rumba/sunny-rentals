@@ -17,7 +17,8 @@ import {
   Calendar, Car, StickyNote , MessageSquare, Plus, Pencil, Trash2, Phone,
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus,UserRoundMinus,UserRoundCheck,
   Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
-  CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download
+  CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download,
+  Clock, FileQuestion
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { MarkerType } from '@/types/crm';
@@ -72,23 +73,21 @@ interface User {
   marker?: string | null;
 }
 
-const MAIN_STATUSES = ['new', 'interested', 'in_work', 'pending'];
+const MAIN_STATUSES = ['new', 'in_work', 'pre_booking', 'archive'];
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  'new': { label: 'Холодные', color: '#64748b', bg: 'bg-slate-100' },
-  'interested': { label: 'Теплые', color: '#2563eb', bg: 'bg-blue-50' },
-  'in_work': { label: 'В работе', color: '#7c3aed', bg: 'bg-purple-50' },
-  'pending': { label: 'Заявки', color: '#ea580c', bg: 'bg-orange-50' },
-  'confirmed': { label: 'Бронь', color: '#10b981', bg: 'bg-emerald-50' },
-  'completed': { label: 'Завершен', color: '#059669', bg: 'bg-green-100' },
-  'archive': { label: 'Архив', color: '#94a3b8', bg: 'bg-slate-200' }
+  'new': { label: 'NEW', color: '#64748b', bg: 'bg-slate-100' },
+  'in_work': { label: 'IN WORK', color: '#7c3aed', bg: 'bg-green-50' },
+  'pre_booking': { label: 'PREBOOK', color: '#ea580c', bg: 'bg-orange-50' },
+  'archive': { label: 'ARCHIVE', color: '#94a3b8', bg: 'bg-slate-200' }
 };
 
 const CRMPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]); // Все пользователи для индикаторов
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeStatus, setActiveStatus] = useState('new');
-  const [period, setPeriod] = useState('week');
+  const [period, setPeriod] = useState('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [chats, setChats] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
@@ -223,6 +222,14 @@ const CRMPage: React.FC = () => {
   const loadMainData = useCallback(async () => {
     setLoading(true);
     try {
+      // Загружаем всех пользователей для подсчёта непрочитанных во вкладках
+      const allUsersRes = await fetch(`/api/crm/users?period=${period}`);
+      const allUsersData = await allUsersRes.json();
+      if (allUsersData.status === 'ok') {
+        setAllUsers(allUsersData.users); // Все пользователи для индикаторов
+      }
+      
+      // Загружаем только текущую вкладку для отображения
       const [uRes, sRes] = await Promise.all([
         fetch(`/api/crm/users?status=${activeStatus}&period=${period}`),
         fetch(`/api/crm/stats?period=${period}`)
@@ -231,7 +238,6 @@ const CRMPage: React.FC = () => {
       const sData = await sRes.json();
       if (uData.status === 'ok') {
         setUsers(uData.users);
-        // После загрузки пользователей обновляем статусы диалогов
         setTimeout(() => refreshAllDialogStatuses(), 1000);
       }
       if (sData.status === 'ok') setStats(sData.stats);
@@ -643,16 +649,49 @@ const openUserChat = (user: any) => {
       });
 
       if (response.ok) {
-        // Обновляем локальное состояние
         setUsers(prev => prev.map(user =>
           user.user_id === userId ? { ...user, status: newStatus } : user
         ));
-        console.log(`Статус пользователя ${userId} изменен на: ${newStatus}`);
-      } else {
-        console.error('Ошибка обновления статуса');
+        console.log(`Статус ${userId} → ${newStatus}`);
       }
     } catch (e) {
-      console.error('Ошибка обновления статуса:', e);
+      console.error('Ошибка статуса:', e);
+    }
+  };
+
+  // Воронка: NEW → IN_WORK → PREBOOKING → ARCHIVE
+  const STATUS_FLOW: Record<string, string> = {
+    'new': 'in_work',
+    'in_work': 'pre_booking',
+    'pre_booking': 'archive'
+  };
+
+  const STATUS_REVERSE: Record<string, string> = {
+    'in_work': 'new',
+    'pre_booking': 'in_work',
+    'archive': 'pre_booking'
+  };
+
+  const handleMoveForward = async (userId: number) => {
+    const user = users.find(u => u.user_id === userId);
+    if (!user) return;
+    const currentStatus = user.status || user.final_status;
+    const nextStatus = STATUS_FLOW[currentStatus];
+    if (nextStatus) {
+      await handleStatusChange(userId, nextStatus);
+      // Переключить на новую вкладку
+      setActiveStatus(nextStatus);
+    }
+  };
+
+  const handleMoveBack = async (userId: number) => {
+    const user = users.find(u => u.user_id === userId);
+    if (!user) return;
+    const currentStatus = user.status || user.final_status;
+    const prevStatus = STATUS_REVERSE[currentStatus];
+    if (prevStatus) {
+      await handleStatusChange(userId, prevStatus);
+      setActiveStatus(prevStatus);
     }
   };
 
@@ -796,6 +835,73 @@ const handleUpdateNote = async () => {
     console.error("Ошибка обновления:", e);
   }
 };
+
+  const confirmBooking = async (bookingId: string) => {
+    setLoadingAction(prev => ({ ...prev, [`confirm_${bookingId}`]: true }));
+    
+    try {
+      const response = await fetch(`/api/admin/bookings/${bookingId}/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        // Update local bookings list
+        setBookings(prev => prev.map(b =>
+          b.booking_id === bookingId
+            ? { ...b, status: 'confirmed', confirmed_at: new Date().toISOString() }
+            : b
+        ));
+        
+        console.log('✅ Бронирование подтверждено');
+      } else {
+        const error = await response.json();
+        console.error('❌ Ошибка подтверждения:', error.message);
+      }
+    } catch (e) {
+      console.error('❌ Ошибка сети:', e);
+    } finally {
+      setLoadingAction(prev => ({ ...prev, [`confirm_${bookingId}`]: false }));
+    }
+  };
+
+  // Отклонить бронь и архивировать лида
+  const rejectBooking = async (bookingId: string) => {
+    if (!window.confirm('Отклонить заявку и архивировать лида?')) return;
+    
+    setLoadingAction(prev => ({ ...prev, [`reject_${bookingId}`]: true }));
+    
+    try {
+      const response = await fetch(`/api/admin/bookings/${bookingId}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        // Удаляем бронь из списка (или помечаем rejected)
+        setBookings(prev => prev.filter(b => b.booking_id !== bookingId));
+        
+        // Обновляем статус пользователя на archived
+        if (selectedUser) {
+          setUsers(prev => prev.map(u =>
+            u.user_id === selectedUser.user_id
+              ? { ...u, status: 'archive', archived_at: new Date().toISOString() }
+              : u
+          ));
+        }
+        
+        console.log('✅ Заявка отклонена, лид архивирован');
+      } else {
+        const error = await response.json();
+        console.error('❌ Ошибка отклонения:', error.message);
+      }
+    } catch (e) {
+      console.error('❌ Ошибка сети:', e);
+    } finally {
+      setLoadingAction(prev => ({ ...prev, [`reject_${bookingId}`]: false }));
+    }
+  };
+
   useEffect(() => { loadMainData(); }, [loadMainData]);
 
   // Auto-refresh chat when user is selected
@@ -846,17 +952,29 @@ const handleUpdateNote = async () => {
       </nav>
 
 <main className="p-4 max-w-[1600px] mx-auto w-full space-y-6">
-  {/* Stats Section - Более чистый вид */}
+  {/* Stats Section */}
   <div className="grid grid-cols-4 gap-4">
-    {MAIN_STATUSES.map(key => (
-      <Card key={key} onClick={() => setActiveStatus(key)} 
-        className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' : 'hover:bg-white/50 opacity-80'}`}>
-        <CardContent className="p-3 flex flex-col items-center justify-center">
-          <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400 mb-1">{STATUS_CONFIG[key].label}</span>
-          <span className="text-2xl font-black text-slate-800 leading-none">{stats?.[key] || 0}</span>
-        </CardContent>
-      </Card>
-    ))}
+    {MAIN_STATUSES.map(key => {
+      const count = stats?.[key] || 0;
+      // Считаем непрочитанных из всех загруженных пользователей
+      const hasUnread = (allUsers || []).filter(u => {
+        const status = u.final_status || u.status;
+        return status === key && (u.dialog_status?.has_new_messages || u.dialog_status?.last_message_from === 'user');
+      }).length > 0;
+      
+      return (
+        <Card key={key} onClick={() => setActiveStatus(key)} 
+          className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' : 'hover:bg-white/50 opacity-80'}`}>
+          <CardContent className="p-3 flex flex-row items-center justify-center gap-2 relative">
+            {hasUnread && (
+              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.6)]"></div>
+            )}
+            <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
+            <span className="text-2xl font-black text-slate-800 leading-none">{count}</span>
+          </CardContent>
+        </Card>
+      );
+    })}
   </div>
 
   <div className="flex flex-col gap-2 p-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 sticky top-[60px] z-40 mb-4">
@@ -939,10 +1057,10 @@ const handleUpdateNote = async () => {
     const aiActive = dialog?.claude_status === 'active';
     // 1. ОПРЕДЕЛЯЕМ ФОН В ЗАВИСИМОСТИ ОТ МАРКЕРА
     const markerStyles: Record<string, string> = {
-      'unprocessed': 'bg-blue-50/60 border-blue-100', // Интересующийся (+) -> Синий
-      'in_progress': 'bg-green-50/60 border-green-100', // В работе ($) -> Зеленый
-      'ready': 'bg-purple-50/60 border-purple-100',     // Выполненный (checkmark) -> Фиолетовый
-      'rejected': 'bg-red-50/40 border-red-100',        // Отказ (-) -> Красный (опционально)
+      'offer_sent': 'bg-amber-50/60 border-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.3)]',   // Оффер - янтарный
+      'waiting': 'bg-purple-50/60 border-purple-200 shadow-[0_0_12px_rgba(168,85,247,0.3)]',     // Клиент думает - фиолетовый
+      'need_info': 'bg-cyan-50/60 border-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.3)]',       // Нужна инфо - циан
+      'follow_up': 'bg-red-50/60 border-red-200 shadow-[0_0_12px_rgba(239,68,68,0.3)]',         // Follow-up - красный
     };
 
     // Приоритет: если есть маркер — красим в его цвет. Если нет и нужен ответ — красим в янтарный. Иначе — белый.
@@ -956,8 +1074,7 @@ const handleUpdateNote = async () => {
         className={`group border-none shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden h-[115px] flex flex-col 
           ${cardBgClass} ${needsReply ? 'ring-1 ring-amber-300/50' : ''}`}
       >
-        {/* Индикатор статуса сверху */}
-        <div className="absolute top-0 left-0 w-full h-[2px]" style={{ backgroundColor: STATUS_CONFIG[currentStatus]?.color }}></div>
+   
 
         <CardContent className="p-2.5 flex flex-col justify-between h-full space-y-1">
 
@@ -1021,7 +1138,7 @@ const handleUpdateNote = async () => {
   className={`flex items-center gap-1.5 rounded px-2 py-1 border transition-colors cursor-text min-h-[24px] ${
     user.marker === 'unprocessed' ? 'bg-blue-100/50 border-blue-200/50' :
     user.marker === 'in_progress' ? 'bg-green-100/50 border-green-200/50' :
-    user.marker === 'ready'       ? 'bg-purple-100/50 border-purple-200/50' :
+    user.marker === 'ready'       ? 'bg-green-100/50 border-green-200/50' :
     user.last_note                ? 'bg-[#f8b515]/10 border-[#f8b515]/30 hover:bg-[#f8b515]/20' : 
                                     'bg-slate-50 border-slate-100 hover:bg-white hover:border-blue-200'
   }`}
@@ -1034,7 +1151,7 @@ const handleUpdateNote = async () => {
   <StickyNote className={`w-2.5 h-2.5 shrink-0 ${
     user.marker === 'unprocessed' ? 'text-blue-600' :
     user.marker === 'in_progress' ? 'text-green-600' :
-    user.marker === 'ready'       ? 'text-purple-600' :
+    user.marker === 'ready'       ? 'text-green-600' :
     user.last_note                ? 'text-[#f8b515]' : 'text-slate-400'
   }`} />
   
@@ -1044,7 +1161,7 @@ const handleUpdateNote = async () => {
       className={`text-[8px] bg-transparent outline-none w-full font-bold ${
         user.marker === 'unprocessed' ? 'text-blue-800' :
         user.marker === 'in_progress' ? 'text-green-800' :
-        user.marker === 'ready'       ? 'text-purple-800' :
+        user.marker === 'ready'       ? 'text-green-800' :
         user.last_note                ? 'text-[#8a650d]' : 'text-blue-600'
       }`}
       value={tempNote}
@@ -1057,7 +1174,7 @@ const handleUpdateNote = async () => {
     <p className={`text-[8px] truncate w-full italic tracking-tight ${
       user.marker === 'unprocessed' ? 'text-blue-700' :
       user.marker === 'in_progress' ? 'text-green-700' :
-      user.marker === 'ready'       ? 'text-purple-700' :
+      user.marker === 'ready'       ? 'text-green-700' :
       user.last_note                ? 'text-[#8a650d]' : 'text-slate-400'
     }`}>
       {user.last_note || "Добавить заметку..."}
@@ -1069,142 +1186,116 @@ const handleUpdateNote = async () => {
     <div className="flex items-center justify-between pt-1">
       {/* Лево: Маркеры и Индикаторы чата */}
       <div className="flex items-center gap-2">
-        {/* Маркеры - 4 иконки */}
+        {/* Маркеры - 4 иконки (только в IN_WORK) */}
         <div className="flex items-center gap-0.5">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              const newMarker = user.marker === 'unprocessed' ? null : 'unprocessed';
+              const newMarker = user.marker === 'offer_sent' ? null : 'offer_sent';
               handleMarkerChange(user.user_id, newMarker);
             }}
             className={`p-0.5 rounded transition-colors ${
-              user.marker === 'unprocessed'
-                ? 'text-blue-600 bg-blue-50'
-                : 'text-slate-400 hover:text-blue-500 hover:bg-blue-50'
+              user.marker === 'offer_sent'
+                ? 'text-amber-600 bg-amber-50'
+                : 'text-slate-400 hover:text-amber-500 hover:bg-amber-50'
             }`}
-            title="Интересный лид - обработать позже"
+            title="Оффер отправлен"
           >
-            <CirclePlus className="w-3 h-3" />
+            <Send className="w-3 h-3" />
           </button>
           
           <button
             onClick={(e) => {
               e.stopPropagation();
-              const newMarker = user.marker === 'in_progress' ? null : 'in_progress';
+              const newMarker = user.marker === 'waiting' ? null : 'waiting';
               handleMarkerChange(user.user_id, newMarker);
             }}
             className={`p-0.5 rounded transition-colors ${
-              user.marker === 'in_progress'
-                ? 'text-green-600 bg-green-50'
-                : 'text-slate-400 hover:text-green-500 hover:bg-green-50'
+              user.marker === 'waiting'
+                ? 'text-purple-600 bg-purple-50'
+                : 'text-slate-400 hover:text-purple-500 hover:bg-purple-50'
             }`}
-            title="В работе"
+            title="Клиент думает"
           >
-            <CircleDollarSign className="w-3 h-3" />
+            <Clock className="w-3 h-3" />
           </button>
           
           <button
             onClick={(e) => {
               e.stopPropagation();
-              const newMarker = user.marker === 'rejected' ? null : 'rejected';
+              const newMarker = user.marker === 'need_info' ? null : 'need_info';
               handleMarkerChange(user.user_id, newMarker);
             }}
             className={`p-0.5 rounded transition-colors ${
-              user.marker === 'rejected'
+              user.marker === 'need_info'
+                ? 'text-cyan-600 bg-cyan-50'
+                : 'text-slate-400 hover:text-cyan-500 hover:bg-cyan-50'
+            }`}
+            title="Нужна инфо"
+          >
+            <FileQuestion className="w-3 h-3" />
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const newMarker = user.marker === 'follow_up' ? null : 'follow_up';
+              handleMarkerChange(user.user_id, newMarker);
+            }}
+            className={`p-0.5 rounded transition-colors ${
+              user.marker === 'follow_up'
                 ? 'text-red-600 bg-red-50'
                 : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
             }`}
-            title="Отказ"
+            title="Follow-up"
           >
-            <CircleMinus className="w-3 h-3" />
-          </button>
-          
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              const newMarker = user.marker === 'ready' ? null : 'ready';
-              handleMarkerChange(user.user_id, newMarker);
-            }}
-            className={`p-0.5 rounded transition-colors ${
-              user.marker === 'ready'
-                ? 'text-emerald-600 bg-emerald-50'
-                : 'text-slate-400 hover:text-emerald-500 hover:bg-emerald-50'
-            }`}
-            title="Готово!"
-          >
-            <CircleCheckBig className="w-3 h-3" />
+            <RefreshCw className="w-3 h-3" />
           </button>
         </div>
 
         {/* Разделитель */}
         <div className="w-px h-4 bg-slate-200 mx-1"></div>
-        
-        {/* Индикаторы чата */}
-        <div className="flex items-center gap-1 text-slate-400 relative">
-          <MessageSquare className="w-2.5 h-2.5" />
-          <span className="text-[8px] font-bold">{dialog?.message_count || 0}</span>
-          {(dialog?.active || aiActive) && (
-            <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-green-500 rounded-full animate-ping opacity-50"></div>
-          )}
-        </div>
-        
-        {/* Media indicators */}
-        <div className="flex items-center gap-1">
-          {dialog?.has_media_messages && (
-            <div className="flex items-center gap-0.5">
-              <Image className="w-2.5 h-2.5 text-blue-500" />
-              <span className="text-[7px] font-bold text-blue-600">📎</span>
-            </div>
-          )}
-        </div>
-        
-        {dialog?.has_new_messages && (
-          <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_4px_red]"></div>
-        )}
       </div>
-
+{/* ПЕРЕНЕСЕННЫЕ СЮДА БЕЙДЖИ СТАТУСОВ */}
+          <div className="flex gap-0.5">
+            {['new', 'in_work', 'pre_booking'].map(s => (
+              <button
+                key={s}
+                onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, s); }}
+                className={`px-1.5 py-0.5 rounded text-[7px] font-bold uppercase transition-all ${
+                  currentStatus === s ? 'text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'
+                }`}
+                style={currentStatus === s ? { backgroundColor: STATUS_CONFIG[s]?.color } : {}}
+              >
+                {STATUS_CONFIG[s]?.label}
+              </button>
+            ))}
+          </div>
       {/* Право: Пульт управления */}
       <div className="flex gap-1.5">
-        {/* 0. Кнопка Изменить статус на "В работе" */}
-        {currentStatus !== 'in_work' && (
+        <Button size="icon" variant="ghost" className="h-7 w-7 rounded-md border border-slate-100 text-slate-300 hover:text-red-500 hover:bg-red-50"
+            onClick={(e) => { e.stopPropagation(); handleArchiveAction(user.user_id); }}><Trash2 className="w-3.5 h-3.5" /></Button>
+        {/* Кнопка Чат */}
+        <div className="relative">
+          {/* Красная мигающая - есть непрочитанные */}
+          {dialog?.has_new_messages && (
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping opacity-70"></div>
+          )}
           <Button
             size="icon" variant="ghost"
-            className="h-7 w-7 rounded-md bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white border border-purple-100"
-            onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, 'in_work'); }}
-            title="Перевести в работу"
+            className={`h-7 w-7 rounded-md border ${
+              dialog?.has_new_messages 
+                ? 'bg-red-50 border-red-200 text-red-600'  // Красная - есть непрочитанные
+                : (dialog?.message_count > 0 
+                    ? 'bg-green-50 border-green-200 text-green-600'  // Зелёная - есть сообщения
+                    : 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100')  // Синяя - нет сообщений
+            }`}
+            onClick={(e) => { e.stopPropagation(); openUserChat(user); }}
+            title={dialog?.message_count ? `Чат (${dialog.message_count} сообщений)` : 'Чат CRM'}
           >
-            <CircleDollarSign className="w-3.5 h-3.5" />
+            <MessageCircle className="w-3.5 h-3.5" />
           </Button>
-        )}
-
-        {/* 1. Кнопка Архивация */}
-        <Button
-          size="icon" variant="ghost"
-          className="h-7 w-7 rounded-md bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 border border-slate-100"
-          onClick={(e) => { e.stopPropagation(); handleArchiveAction(user.user_id); }}
-          title="Архивировать лид"
-        >
-          <Trash2 className="w-3 h-3" />
-        </Button>
-
-        {/* 2. Кнопка Claude
-        <Button
-          size="icon" variant="ghost"
-          className="h-7 w-7 rounded-md bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-100"
-          onClick={(e) => { e.stopPropagation(); handleClaudeAction(user.user_id, 'start'); }}
-        >
-          <Play className="w-3 h-3 fill-current" />
-        </Button>
-        */}
-
-        {/* 3. Кнопка Внутренний Чат */}
-        <Button
-          size="icon" variant="ghost"
-          className="h-7 w-7 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100"
-          onClick={(e) => { e.stopPropagation(); openUserChat(user); }}
-        >
-          <MessageCircle className="w-3.5 h-3.5" />
-        </Button>
+        </div>
 
         {/* 4. Кнопка Telegram (внешняя) */}
         <Button
@@ -1349,8 +1440,8 @@ const handleUpdateNote = async () => {
                       </div>
                     </div>
                     <Badge className={`text-[9px] font-black uppercase border-none px-2 py-0.5 rounded-md ${
-                      b.status === 'confirmed' ? 'bg-green-500 text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]' : 
-                      b.status === 'pending' ? 'bg-orange-500 text-white' : 'bg-slate-400 text-white'
+                      b.status === 'confirmed' ? 'bg-green-500 text-white shadow-[0_0_8px_rgba(147,51,234,0.4)]' :
+                      b.status === 'pre_booking' ? 'bg-gray-500 text-white' : 'bg-slate-400 text-white'
                     }`}>
                       {b.status || 'new'}
                     </Badge>
@@ -1388,6 +1479,28 @@ const handleUpdateNote = async () => {
                       <span className="text-lg font-black text-slate-900 tracking-tight">
                         {b.form_data?.pricing?.grandTotal ? `${b.form_data.pricing.grandTotal.toLocaleString()} ฿` : '0 ฿'}
                       </span>
+                      {/* Кнопки для pre_booking */}
+                      {b.status === 'pre_booking' && (
+                        <div className="flex gap-2 mt-2">
+                          <Button
+                            size="sm"
+                            className="bg-green-500 hover:bg-green-600 text-white text-xs"
+                            onClick={() => confirmBooking(b.booking_id)}
+                            disabled={loadingAction[`confirm_${b.booking_id}`]}
+                          >
+                            {loadingAction[`confirm_${b.booking_id}`] ? '...' : '✓'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="bg-red-500 hover:bg-red-600 text-white text-xs"
+                            onClick={() => rejectBooking(b.booking_id)}
+                            disabled={loadingAction[`reject_${b.booking_id}`]}
+                          >
+                            {loadingAction[`reject_${b.booking_id}`] ? '...' : '✕'}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -1403,14 +1516,14 @@ const handleUpdateNote = async () => {
         {/* Documents from User */}
         <div className="space-y-4">
           <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
-            <Paperclip size={14} className="text-purple-500" />
+            <Paperclip size={14} className="text-green-500" />
             Документы клиента ({userDocuments?.length || 0})
           </h3>
           
           {userDocuments && userDocuments.length > 0 ? (
             <div className="grid grid-cols-2 gap-3">
               {userDocuments.map((doc, index) => (
-                <Card key={index} className="border-none bg-slate-50/50 shadow-none ring-1 ring-slate-100 overflow-hidden hover:ring-purple-200 transition-all">
+                <Card key={index} className="border-none bg-slate-50/50 shadow-none ring-1 ring-slate-100 overflow-hidden hover:ring-green-200 transition-all">
                   <CardContent className="p-3">
                     {doc.content_type?.startsWith('image/') ? (
                       // Image preview with download
@@ -1646,7 +1759,7 @@ const handleUpdateNote = async () => {
 
             <Button
                 size="sm" variant="ghost"
-                className="flex-1 h-8 text-[7px] font-bold bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200"
+                className="flex-1 h-8 text-[7px] font-bold bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
                 onClick={() => handleClaudeAction(selectedUser?.user_id, 'resume')}
                 disabled={loadingAction[`claude_${selectedUser?.user_id}_resume`]}
             >

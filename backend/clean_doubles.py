@@ -89,7 +89,7 @@ def cleanup_user_data():
     for i, user in enumerate(cleaned_data[:10], 1):
         user_id = user.get("user_id")
         username = user.get("username", "Unknown")
-        status = user.get("final_status", "unknown")
+        status = user.get("status", "unknown")
         timestamp = user.get("timestamp", "")
         
         # Форматируем дату
