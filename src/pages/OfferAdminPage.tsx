@@ -191,6 +191,10 @@ export default function OfferPage() {
     params.set('car', carId || '');
     params.set('start', startDateStr || '');
     params.set('end', endDateStr || '');
+    // Передаем отредактированные цены
+    params.set('rental', totalRental || baseTotalRental.toString());
+    params.set('delivery', totalDelivery || '0');
+    params.set('deposit', deposit || baseDeposit.toString());
     const url = `${window.location.origin}/offer?${params.toString()}`;
     navigator.clipboard.writeText(url);
     toast.success("Ссылка для клиента скопирована!");

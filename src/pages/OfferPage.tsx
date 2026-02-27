@@ -89,6 +89,11 @@ export default function OfferPage() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   
   // Редактируемые поля (только для админа)
+  // Читаем кастомные цены из URL (если переданы админом)
+  const customRental = searchParams.get("rental");
+  const customDelivery = searchParams.get("delivery");
+  const customDeposit = searchParams.get("deposit");
+  
   const [totalRental, setTotalRental] = useState("");
   const [totalDelivery, setTotalDelivery] = useState("");
   const [deposit, setDeposit] = useState("");
@@ -113,18 +118,24 @@ export default function OfferPage() {
   
   const baseDeposit = car?.pricing?.deposit || 5000;
   
-  // Инициализация полей при загрузке
+  // Инициализация полей при загрузке (приоритет: URL > base)
   useEffect(() => {
-    if (baseTotalRental > 0 && !totalRental) {
+    if (customRental) {
+      setTotalRental(customRental);
+    } else if (baseTotalRental > 0 && !totalRental) {
       setTotalRental(baseTotalRental.toString());
     }
-    if (!totalDelivery) {
+    if (customDelivery) {
+      setTotalDelivery(customDelivery);
+    } else if (!totalDelivery) {
       setTotalDelivery("0"); // Аэропорт по умолчанию
     }
-    if (!deposit) {
+    if (customDeposit) {
+      setDeposit(customDeposit);
+    } else if (!deposit) {
       setDeposit(baseDeposit.toString());
     }
-  }, [baseTotalRental, baseDeposit]);
+  }, [baseTotalRental, baseDeposit, customRental, customDelivery, customDeposit]);
   
   // Загрузка данных авто
   useEffect(() => {
