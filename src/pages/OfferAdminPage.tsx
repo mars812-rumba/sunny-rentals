@@ -11,13 +11,15 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import useEmblaCarousel from 'embla-carousel-react';
 
-// Определение сезона (high: Декабрь, Январь, Февраль)
+// Определение сезона (low: Апрель-Сентябрь, high: Октябрь-Март)
 const determineSeason = (date: Date) => {
   const month = date.getMonth(); // 0-11 (0=январь, 11=декабрь)
-  if (month === 11 || month === 0 || month === 1) {
-    return 'high_season';
+  // Low season: Апрель (3) - Октябрь (9)
+  if (month >= 3 && month <= 9) {
+    return 'low_season';
   }
-  return 'low_season';
+  // High season: Ноябрь (10), Декабрь (11), Январь (0), Февраль (1), Март (2)
+  return 'high_season';
 };
 
 // Получение цены за период

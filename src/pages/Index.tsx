@@ -16,11 +16,12 @@ import { trackLeadEvent } from '@/api/api';
 // --- Pricing helpers ---
 const determineSeason = (date: Date) => {
   const month = date.getMonth(); // 0-11 (0=январь, 11=декабрь)
-  // High season: December (11), January (0), February (1)
-  if (month === 11 || month === 0 || month === 1) {
-    return 'high_season';
+  // Low season: Апрель (3) - Октябрь (9)
+  if (month >= 3 && month <= 9) {
+    return 'low_season';
   }
-  return 'low_season';
+  // High season: Ноябрь (10), Декабрь (11), Январь (0), Февраль (1), Март (2)
+  return 'high_season';
 };
 
 const getPriceForPeriod = (pricing, days, startDate: Date) => {
