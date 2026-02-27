@@ -29,7 +29,7 @@
         },
         "high_season": {
           "price_1_6": 950,
-          "price_7_14": 895,
+          "price_7_14": 850,
           "price_15_29": 800,
           "price_30": 600
         },
@@ -45,7 +45,7 @@
       "quick_id": "toyota_yaris_2022_black",
       "rating": 4.5,
       "class_": "compact",
-      "updated_at": "2026-02-27T06:30:36.787469"
+      "updated_at": "2026-02-27T10:40:35.097288"
     },
     "toyota_yaris_2022_white": {
       "id": "toyota_yaris_2022_white",

@@ -11,14 +11,15 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import useEmblaCarousel from 'embla-carousel-react';
 
-// Определение сезона
+// Функции для расчёта цены аренды (low: Апрель-Октябрь, high: остальное)
 const determineSeason = (date: Date) => {
-  const month = date.getMonth() + 1;
-  if (month === 12 || month === 1 || month === 2 || month === 3) {
-    return 'high_season';
+  const month = date.getMonth() + 1; // 1-12
+  if (month >= 4 && month <= 10) {
+    return 'low_season';
   }
-  return 'low_season';
+  return 'high_season';
 };
+
 
 // Получение цены за период
 const getPriceForPeriod = (pricing: any, days: number, startDate: Date) => {
@@ -497,7 +498,7 @@ export default function OfferPage() {
             <>
               <Button variant="outline" onClick={copyClientLink} className="flex-1">
                 <Copy className="h-4 w-4 mr-2" />
-                Ссылка для клиента
+                Диплинк
               </Button>
               <Button 
                 onClick={handleConfirm} 
