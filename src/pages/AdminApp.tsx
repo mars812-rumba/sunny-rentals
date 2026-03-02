@@ -24,19 +24,6 @@ export default function AdminApp() {
     }
   }, [user]);
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft" && currentScreen > 0) setCurrentScreen(s => s - 1);
-      if (e.key === "ArrowRight" && currentScreen < 2) setCurrentScreen(s => s + 1);
-      if (e.key === "1") setCurrentScreen(0);
-      if (e.key === "2") setCurrentScreen(1);
-      if (e.key === "3") setCurrentScreen(2);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [currentScreen]);
-
   const screens = [
     { id: 0, name: "Авто", icon: Car, component: AdminPanel },
     { id: 1, name: "Календарь", icon: Calendar, component: AdminScheduler },
