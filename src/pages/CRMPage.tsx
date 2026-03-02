@@ -87,7 +87,7 @@ const CRMPage: React.FC = () => {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeStatus, setActiveStatus] = useState('new');
-  const [period, setPeriod] = useState('all');
+  const [period, setPeriod] = useState('week');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [chats, setChats] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
@@ -179,6 +179,14 @@ const CRMPage: React.FC = () => {
   const getFilteredUsers = (users: User[]): User[] => {
     return users.filter(user => {
       const dialog = user.dialog_status;
+      const userId = String(user.user_id);
+      const userStatus = user.final_status || user.status;
+
+      // Фильтр: WebBrowser лиды показываем только если статус pre_booking
+      const isWebBrowser = userId.toLowerCase() === 'webbrowser';
+      if (isWebBrowser && userStatus !== 'pre_booking') {
+        return false;
+      }
 
       // Фильтр по диалогам
       if (dialogFilter === 'new') {
