@@ -179,14 +179,6 @@ const CRMPage: React.FC = () => {
   const getFilteredUsers = (users: User[]): User[] => {
     return users.filter(user => {
       const dialog = user.dialog_status;
-      const userId = String(user.user_id);
-      const userStatus = user.final_status || user.status;
-
-      // Фильтр: WebBrowser лиды показываем только если статус pre_booking
-      const isWebBrowser = userId.toLowerCase() === 'webbrowser';
-      if (isWebBrowser && userStatus !== 'pre_booking') {
-        return false;
-      }
 
       // Фильтр по диалогам
       if (dialogFilter === 'new') {

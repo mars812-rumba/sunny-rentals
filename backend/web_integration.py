@@ -2082,6 +2082,17 @@ def get_crm_users(status: str = None, period: str = "all"):
             # ИСПОЛЬЗУЕМ updated_at для фильтра (чтобы показывать недавних пользователей)
             u_at = u.get("updated_at") or u.get("created_at")
             
+            # Фильтр: web_session показываем только если статус pre_booking
+            if u_id.startswith("web_session") and u_status != "pre_booking":
+                continue
+            
+            # Остальные - только если user_id числовой
+            if not u_id.startswith("web_session"):
+                try:
+                    int(u_id)
+                except ValueError:
+                    continue
+            
             # Если status указан — фильтруем по нему
             if status and u_status != status:
                 continue
