@@ -6,7 +6,7 @@ const CRMPage = React.lazy(() => import("./CRMPage"));
 const AdminScheduler = React.lazy(() => import("./AdminScheduler"));
 
 export default function AdminApp() {
-  const [currentScreen, setCurrentScreen] = useState(1); // Начинаем с Calendar
+  const [currentScreen, setCurrentScreen] = useState(2); // Начинаем с CRM
   const tg = window.Telegram?.WebApp;
   const user = tg?.initDataUnsafe?.user;
   const [carOwnersMap, setCarOwnersMap] = useState<Record<string, object>>({});
