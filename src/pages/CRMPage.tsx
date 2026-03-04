@@ -534,8 +534,21 @@ const openUserChat = (user: any) => {
       if (result.status === 'success') {
         console.log(`✅ Claude ${action} для пользователя ${userId}:`, result.message);
         
-        // Вместо локального обновления статуса, запрашиваем актуальное состояние с сервера
-        await refreshSingleDialogStatus(userId);
+        // Получаем актуальный статус и обновляем ОБА списка: users И selectedUser
+        const newStatus = await fetchDialogStatus(userId);
+        
+        // Обновляем users
+        setUsers(prev => prev.map(user => {
+          if (user.user_id === userId) {
+            return { ...user, dialog_status: newStatus };
+          }
+          return user;
+        }));
+        
+        // Обновляем selectedUser если это текущий пользователь
+        if (selectedUser?.user_id === userId) {
+          setSelectedUser(prev => prev ? { ...prev, dialog_status: newStatus } : null);
+        }
         
       } else {
         console.error(`❌ Ошибка ${action} Claude:`, result.message || result);
