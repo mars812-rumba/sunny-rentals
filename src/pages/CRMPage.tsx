@@ -94,7 +94,6 @@ const CRMPage: React.FC = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [note, setNote] = useState('');
   const [managerMessage, setManagerMessage] = useState('');
-  const [claudeStatuses, setClaudeStatuses] = useState<Record<number, string>>({});
   const [loadingAction, setLoadingAction] = useState<Record<string, boolean>>({});
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
