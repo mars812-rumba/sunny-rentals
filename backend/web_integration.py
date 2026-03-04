@@ -2853,13 +2853,16 @@ async def api_start_claude(user_id: int):
     try:
         print(f"🤖 Starting Claude for user {user_id}")
         
-        # 1. Сообщаем боту, чтобы он включил хэндлер Клода
+        # 1. Обновляем статус в базе данных СРАЗУ
+        update_dialog_status(user_id, claude_status="active")
+        
+        # 2. Сообщаем боту, чтобы он включил хэндлер Клода
         notify_bot_status_sync(user_id, "active")
         
-        # 2. Записываем событие (для красоты в CRM)
+        # 3. Записываем событие (для красоты в CRM)
         log_dialog_event(user_id, "claude_started", {"by": "manager"})
         
-        # 3. Запускаем квалификацию
+        # 4. Запускаем квалификацию
         threading.Thread(target=handle_claude_best_options, args=(user_id,)).start()
         
         return {"status": "success", "message": f"Claude started for user {user_id}"}
@@ -2873,8 +2876,13 @@ async def api_stop_claude(user_id: int):
     try:
         print(f"⏹️ Stopping Claude for user {user_id}")
         
-        # Сообщаем боту выключить Клода
+        # 1. Обновляем статус в базе данных СРАЗУ
+        update_dialog_status(user_id, claude_status="stopped")
+        
+        # 2. Сообщаем боту выключить Клода
         notify_bot_status_sync(user_id, "idle")
+        
+        # 3. Записываем событие
         log_dialog_event(user_id, "claude_stopped", {"by": "manager"})
         
         return {"status": "success", "message": f"Claude stopped for user {user_id}"}
@@ -2888,7 +2896,13 @@ async def api_pause_claude(user_id: int):
     try:
         print(f"⏸️ Pausing Claude for user {user_id}")
         
+        # 1. Обновляем статус в базе данных СРАЗУ
+        update_dialog_status(user_id, claude_status="paused")
+        
+        # 2. Уведомляем бота
         notify_bot_status_sync(user_id, "paused")
+        
+        # 3. Записываем событие
         log_dialog_event(user_id, "claude_paused", {"by": "manager"})
         
         return {"status": "success", "message": f"Claude paused for user {user_id}"}
@@ -2902,7 +2916,13 @@ async def api_resume_claude(user_id: int):
     try:
         print(f"▶️ Resuming Claude for user {user_id}")
         
+        # 1. Обновляем статус в базе данных СРАЗУ
+        update_dialog_status(user_id, claude_status="active")
+        
+        # 2. Уведомляем бота
         notify_bot_status_sync(user_id, "active")
+        
+        # 3. Записываем событие
         log_dialog_event(user_id, "claude_resumed", {"by": "manager"})
         
         return {"status": "success", "message": f"Claude resumed for user {user_id}"}
