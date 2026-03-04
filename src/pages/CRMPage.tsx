@@ -325,7 +325,17 @@ const loadUserDetails = async (user: any) => {
   const fetchDialogStatus = async (userId: number): Promise<DialogStatus> => {
     const response = await fetch(`/api/crm/dialog/${userId}/status`);
     const data = await response.json();
-    return data.dialog;
+    // Преобразуем вложенную структуру dialog.claude.status в плоский claude_status
+    const dialog = data.dialog || data;
+    return {
+      active: dialog.active || false,
+      has_new_messages: dialog.has_new_messages || false,
+      has_media_messages: dialog.has_media_messages,
+      last_message_at: dialog.last_message_at || null,
+      last_message_from: dialog.last_message_from || null,
+      message_count: dialog.message_count || 0,
+      claude_status: dialog.claude?.status || 'stopped'
+    };
   };
 
   const fetchDialogEvents = async (userId: number, limit: number = 50): Promise<DialogEvent[]> => {
