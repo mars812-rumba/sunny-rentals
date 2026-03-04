@@ -359,12 +359,17 @@ const loadUserDetails = async (user: any) => {
   const refreshSingleDialogStatus = async (userId: number) => {
     try {
       const dialogStatus = await fetchDialogStatus(userId);
+      // Обновляем users
       setUsers(prev => prev.map(user => {
         if (user.user_id === userId) {
           return { ...user, dialog_status: dialogStatus };
         }
         return user;
       }));
+      // Обновляем selectedUser если это текущий пользователь
+      if (selectedUser?.user_id === userId) {
+        setSelectedUser(prev => prev ? { ...prev, dialog_status: dialogStatus } : null);
+      }
     } catch (e) {
       console.error(`Ошибка обновления статуса диалога для пользователя ${userId}:`, e);
     }
@@ -548,6 +553,15 @@ const openUserChat = (user: any) => {
         if (selectedUser?.user_id === userId) {
           setSelectedUser(prev => prev ? { ...prev, dialog_status: newStatus } : null);
         }
+        
+        // Показываем alert об успехе
+        const actionLabels: Record<string, string> = {
+          start: 'Claude запущен',
+          pause: 'Claude приостановлен',
+          resume: 'Claude возобновлён',
+          stop: 'Claude остановлен'
+        };
+        alert(actionLabels[action] || `Действие "${action}" выполнено`);
         
       } else {
         console.error(`❌ Ошибка ${action} Claude:`, result.message || result);
