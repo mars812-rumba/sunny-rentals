@@ -1362,15 +1362,33 @@ def process_claude_message(user_id, user_input):
         print(f"🤖 Model: {CLAUDE_MODEL}")
         
         try:
-            response = claude_client.messages.create(
-                model=CLAUDE_MODEL,
-                max_tokens=max_tokens,
-                system=system_prompt,
-                messages=conversation_history
+            # Прямой HTTP вызов к API Anthropic (для SDK 0.75.0)
+            headers = {
+                "x-api-key": ANTHROPIC_API_KEY,
+                "Content-Type": "application/json",
+                "anthropic-version": "2023-06-01",
+                "anthropic-dangerous-direct-access": "true"
+            }
+            
+            data = {
+                "model": CLAUDE_MODEL,
+                "max_tokens": max_tokens,
+                "system": system_prompt,
+                "messages": conversation_history
+            }
+            
+            response = requests.post(
+                "https://api.anthropic.com/v1/messages",
+                headers=headers,
+                json=data,
+                timeout=30
             )
-            print(f"🤖 Response type: {type(response)}")
-            print(f"🤖 Response content: {response.content}")
-            claude_response_raw = response.content[0].text
+            response.raise_for_status()
+            result = response.json()
+            
+            print(f"🤖 Response type: {type(result)}")
+            print(f"🤖 Response content: {result}")
+            claude_response_raw = result["content"][0]["text"]
         except Exception as e:
             print(f"❌ Claude API Error: {e}")
             print(f"❌ Error type: {type(e)}")
