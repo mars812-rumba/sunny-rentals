@@ -451,5 +451,97 @@
     "source": "telegram_webapp",
     "rejected_at": "2026-02-27T04:03:26.217955",
     "updated_at": "2026-02-27T04:03:26.217971"
+  },
+  {
+    "booking_id": "8c6caefb",
+    "user_id": "admin",
+    "form_data": {
+      "car": {
+        "id": "toyota_yaris_2024_gray",
+        "name": "Toyota YARIS 2024 Gray",
+        "brand": "Toyota",
+        "model": "YARIS",
+        "year": "2024",
+        "color": "Gray"
+      },
+      "dates": {
+        "start": "2026-03-04T02:00:00.000Z",
+        "end": "2026-03-12T02:00:00.000Z",
+        "days": 8
+      },
+      "locations": {
+        "pickupLocation": "hotel",
+        "returnLocation": "hotel",
+        "pickupAddress": "",
+        "returnAddress": ""
+      },
+      "pricing": {
+        "dailyRate": 840,
+        "totalRental": 6720,
+        "deposit": 5000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 7720
+      },
+      "contact": {
+        "value": "Зигмунд",
+        "type": "telegram",
+        "name": "Мудень",
+        "phone": ""
+      },
+      "timestamp": "2026-03-02T13:10:48.423Z"
+    },
+    "status": "confirmed",
+    "created_at": "2026-03-02T13:10:49.726613",
+    "source": "admin_panel",
+    "confirmed_at": "2026-03-02T13:11:06.520938",
+    "updated_at": "2026-03-02T13:11:06.520950"
+  },
+  {
+    "booking_id": "fea56248",
+    "user_id": "725664451",
+    "form_data": {
+      "car": {
+        "id": "Ar_city_rs_black_2025",
+        "name": "Honda City RS 2025 Black",
+        "brand": "Honda",
+        "model": "City RS",
+        "year": "2025",
+        "color": "Black"
+      },
+      "dates": {
+        "start": "2026-03-18T21:00:00.000Z",
+        "end": "2026-03-26T21:00:00.000Z",
+        "days": 9
+      },
+      "locations": {
+        "pickupLocation": "hotel",
+        "returnLocation": "hotel",
+        "pickupAddress": null,
+        "returnAddress": null
+      },
+      "pricing": {
+        "dailyRate": 900,
+        "totalRental": 8100,
+        "deposit": 5000,
+        "deliveryPickup": 500,
+        "deliveryReturn": 500,
+        "totalDelivery": 1000,
+        "grandTotal": 9100
+      },
+      "contact": {
+        "value": "@Gleb_Baula",
+        "type": "telegram",
+        "name": null,
+        "phone": null
+      },
+      "timestamp": "2026-03-04T09:21:32.856Z"
+    },
+    "status": "rejected",
+    "created_at": "2026-03-04T09:21:33.201969",
+    "source": "telegram_webapp",
+    "rejected_at": "2026-03-04T09:38:32.468355",
+    "updated_at": "2026-03-04T09:38:32.468367"
   }
 ]
