@@ -451,9 +451,7 @@ def handle_claude_start(user_id: int):
         # Обновляем статус диалога
         update_dialog_status(
             user_id=user_id,
-            claude_enabled=True,
-            claude_status="active",
-            claude_started_at=datetime.now().isoformat()
+            claude_status="active"
         )
 
         # Логируем событие
@@ -475,9 +473,7 @@ def handle_claude_pause(user_id: int):
         # Обновляем статус диалога
         update_dialog_status(
             user_id=user_id,
-            claude_enabled=False,
-            claude_status="paused",
-            claude_paused_at=datetime.now().isoformat()
+            claude_status="paused"
         )
 
         # Логируем событие
@@ -499,7 +495,6 @@ def handle_claude_resume(user_id: int):
         # Обновляем статус диалога
         update_dialog_status(
             user_id=user_id,
-            claude_enabled=True,
             claude_status="active"
         )
 
@@ -523,7 +518,6 @@ def handle_claude_stop(user_id: int):
         update_dialog_status(
             user_id=user_id,
             active=False,
-            claude_enabled=False,
             claude_status="stopped"
         )
 
