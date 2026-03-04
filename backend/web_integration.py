@@ -1153,15 +1153,19 @@ def get_dialog_status(user_id: int) -> dict:
                 "last_message_at": None,
                 "last_message_from": None,
                 "message_count": 0,
-                "claude": {
-                    "enabled": False,
-                    "status": "stopped",
-                    "started_at": None,
-                    "paused_at": None
-                }
+                "claude_status": "stopped"
             }
         
-        return user_record["dialog"]
+        dialog = user_record["dialog"]
+        # Возвращаем плоскую структуру с claude_status для совместимости с фронтендом
+        return {
+            "active": dialog.get("active", False),
+            "has_new_messages": dialog.get("has_new_messages", False),
+            "last_message_at": dialog.get("last_message_at"),
+            "last_message_from": dialog.get("last_message_from"),
+            "message_count": dialog.get("message_count", 0),
+            "claude_status": dialog.get("claude", {}).get("status", "stopped")
+        }
         
     except Exception as e:
         print(f"❌ Error getting dialog status for user {user_id}: {e}")
