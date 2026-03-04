@@ -784,10 +784,7 @@ def update_dialog_status(user_id: int, **kwargs):
     - last_message_at: str (ISO datetime)
     - last_message_from: str ("user" | "manager" | "claude")
     - message_count_increment: int
-    - claude_enabled: bool
     - claude_status: str ("active" | "paused" | "stopped")
-    - claude_started_at: str
-    - claude_paused_at: str
     """
     try:
         print(f"🔄 Updating dialog status for user {user_id}: {kwargs}")
@@ -830,15 +827,19 @@ def update_dialog_status(user_id: int, **kwargs):
                 "last_message_at": datetime.utcnow().isoformat(),
                 "last_message_from": "user",
                 "message_count": 0,
-                "claude": {
-                    "enabled": False,
-                    "status": "stopped",
-                    "started_at": None,
-                    "paused_at": None
-                }
+                "claude_status": "stopped"
             }
         
         dialog = user_record["dialog"]
+        
+        # Миграция: если есть старая структура dialog.claude.status, переносим в claude_status
+        if "claude" in dialog and "status" in dialog.get("claude", {}):
+            old_status = dialog["claude"]["status"]
+            if "claude_status" not in dialog:
+                dialog["claude_status"] = old_status
+                print(f"🔄 Миграция: dialog.claude.status -> dialog.claude_status = {old_status}")
+            # Удаляем старую структуру
+            del dialog["claude"]
         
         # Обновляем нужные поля из kwargs
         if "active" in kwargs:
@@ -856,17 +857,9 @@ def update_dialog_status(user_id: int, **kwargs):
         if "message_count_increment" in kwargs:
             dialog["message_count"] = dialog.get("message_count", 0) + kwargs["message_count_increment"]
         
-        if "claude_enabled" in kwargs:
-            dialog["claude"]["enabled"] = kwargs["claude_enabled"]
-        
         if "claude_status" in kwargs:
-            dialog["claude"]["status"] = kwargs["claude_status"]
-        
-        if "claude_started_at" in kwargs:
-            dialog["claude"]["started_at"] = kwargs["claude_started_at"]
-        
-        if "claude_paused_at" in kwargs:
-            dialog["claude"]["paused_at"] = kwargs["claude_paused_at"]
+            dialog["claude_status"] = kwargs["claude_status"]
+            print(f"✅ Claude status updated to: {kwargs['claude_status']}")
         
         # Обновляем updated_at
         user_record["updated_at"] = datetime.utcnow().isoformat()
@@ -1153,15 +1146,27 @@ def get_dialog_status(user_id: int) -> dict:
                 "last_message_at": None,
                 "last_message_from": None,
                 "message_count": 0,
-                "claude": {
-                    "enabled": False,
-                    "status": "stopped",
-                    "started_at": None,
-                    "paused_at": None
-                }
+                "claude_status": "stopped"
             }
         
-        return user_record["dialog"]
+        dialog = user_record["dialog"]
+        
+        # Миграция: если есть старая структура dialog.claude.status, переносим
+        if "claude" in dialog and "status" in dialog.get("claude", {}):
+            dialog["claude_status"] = dialog["claude"]["status"]
+            del dialog["claude"]
+            # Сохраняем мигрированные данные
+            save_json(USER_DATA_JSON, users_data)
+        
+        # Возвращаем с claude_status в плоской структуре
+        return {
+            "active": dialog.get("active", False),
+            "has_new_messages": dialog.get("has_new_messages", False),
+            "last_message_at": dialog.get("last_message_at"),
+            "last_message_from": dialog.get("last_message_from"),
+            "message_count": dialog.get("message_count", 0),
+            "claude_status": dialog.get("claude_status", "stopped")
+        }
         
     except Exception as e:
         print(f"❌ Error getting dialog status for user {user_id}: {e}")

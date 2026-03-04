@@ -325,7 +325,7 @@ const loadUserDetails = async (user: any) => {
   const fetchDialogStatus = async (userId: number): Promise<DialogStatus> => {
     const response = await fetch(`/api/crm/dialog/${userId}/status`);
     const data = await response.json();
-    // Преобразуем вложенную структуру dialog.claude.status в плоский claude_status
+    // Бэкенд возвращает dialog.claude_status напрямую
     const dialog = data.dialog || data;
     return {
       active: dialog.active || false,
@@ -334,7 +334,7 @@ const loadUserDetails = async (user: any) => {
       last_message_at: dialog.last_message_at || null,
       last_message_from: dialog.last_message_from || null,
       message_count: dialog.message_count || 0,
-      claude_status: dialog.claude?.status || 'stopped'
+      claude_status: dialog.claude_status || 'stopped'
     };
   };
 
