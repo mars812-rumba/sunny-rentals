@@ -1346,6 +1346,8 @@ def process_claude_message(user_id, user_input):
         system_prompt += """
 
 ПРАВИЛА ОТПРАВКИ ФОТО:
+- ВСЕГДА используй формат [image:путь] для отправки фото
+- НЕ используй markdown-разметку типа ![alt](image:path) - это НЕ РАБОТАЕТ
 - Для первого показа машины: используй ГЛАВНОЕ фото [image:main_photo]
 - Если клиент просит "ещё фото", "покажи больше фото", "хочу все фото" - используй фото из галереи
 - Можешь отправить 2-6 фото одной машины если клиент просит
@@ -1414,23 +1416,28 @@ def process_claude_message(user_id, user_input):
         # Убираем **
         claude_response_raw = claude_response_raw.replace('**', '')
         
-        # Парсим фото
+        # Парсим фото - поддерживаем оба формата: [image:path] и ![alt](image:path)
         photos_to_send = []
         text_to_send = claude_response_raw
         
-        if '[image:' in claude_response_raw:
+        if '[image:' in claude_response_raw or '](image:' in claude_response_raw:
             import re
+            # Ищем оба формата: [image:path] и ![alt](image:path)
             image_matches = re.findall(r'\[image:([^\]]+)\]', claude_response_raw)
+            markdown_matches = re.findall(r'!\[[^\]]*\]\((image:[^)]+)\)', claude_response_raw)
+            all_matches = image_matches + markdown_matches
             
             # Убираем дубликаты но сохраняем порядок
             seen = set()
             photos_to_send = []
-            for p in image_matches:
+            for p in all_matches:
                 if p not in seen:
                     seen.add(p)
                     photos_to_send.append(p)
             
-            text_to_send = re.sub(r'\[image:[^\]]+\]', '', claude_response_raw).strip()
+            # Удаляем оба формата из текста
+            text_to_send = re.sub(r'\[image:[^\]]+\]', '', claude_response_raw)
+            text_to_send = re.sub(r'!\[[^\]]*\]\([^)]+\)', '', text_to_send).strip()
             print(f"📸 Found {len(photos_to_send)} unique photos to send")
 
         # Сохраняем в историю
