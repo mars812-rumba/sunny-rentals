@@ -177,7 +177,7 @@ const CRMPage: React.FC = () => {
 
   const getFilteredUsers = (users: User[]): User[] => {
     return users.filter(user => {
-      const dialog = user.dialog_status;
+      const dialog = user.dialog_status || user.dialog;
 
       // Фильтр по диалогам
       if (dialogFilter === 'new') {
@@ -230,7 +230,13 @@ const CRMPage: React.FC = () => {
       const allUsersRes = await fetch(`/api/crm/users?period=${period}`);
       const allUsersData = await allUsersRes.json();
       if (allUsersData.status === 'ok') {
-        setAllUsers(allUsersData.users); // Все пользователи для индикаторов
+        // Преобразуем dialog в dialog_status для совместимости
+        const processedAllUsers = allUsersData.users.map((user: any) => ({
+          ...user,
+          dialog_status: user.dialog_status || user.dialog || null,
+          dialog: user.dialog || user.dialog_status || null
+        }));
+        setAllUsers(processedAllUsers); // Все пользователи для индикаторов
       }
       
       // Загружаем только текущую вкладку для отображения
@@ -241,7 +247,13 @@ const CRMPage: React.FC = () => {
       const uData = await uRes.json();
       const sData = await sRes.json();
       if (uData.status === 'ok') {
-        setUsers(uData.users);
+        // Преобразуем dialog в dialog_status для совместимости
+        const processedUsers = uData.users.map((user: any) => ({
+          ...user,
+          dialog_status: user.dialog_status || user.dialog || null,
+          dialog: user.dialog || user.dialog_status || null
+        }));
+        setUsers(processedUsers);
         setTimeout(() => refreshAllDialogStatuses(), 1000);
       }
       if (sData.status === 'ok') setStats(sData.stats);
@@ -448,8 +460,18 @@ const loadUserDetails = async (user: any) => {
         // Также локально обновляем message_count для индикации
         const targetUserId = String(selectedUser.user_id);
         setUsers(prev => prev.map(user =>
-          String(user.user_id) === targetUserId && user.dialog_status
-            ? { ...user, dialog_status: { ...user.dialog_status, message_count: (user.dialog_status.message_count || 0) + 1 } }
+          String(user.user_id) === targetUserId && (user.dialog_status || user.dialog)
+            ? { 
+                ...user, 
+                dialog_status: { 
+                  ...(user.dialog_status || user.dialog || {}), 
+                  message_count: ((user.dialog_status?.message_count) || (user.dialog?.message_count) || 0) + 1 
+                },
+                dialog: {
+                  ...(user.dialog || user.dialog_status || {}),
+                  message_count: ((user.dialog?.message_count) || (user.dialog_status?.message_count) || 0) + 1
+                }
+              }
             : user
         ));
       }
@@ -629,8 +651,18 @@ const openUserChat = (user: any) => {
         // Локально обновляем message_count для индикации
         const targetUserIdStr = String(userId);
         setUsers(prev => prev.map(user =>
-          String(user.user_id) === targetUserIdStr && user.dialog_status
-            ? { ...user, dialog_status: { ...user.dialog_status, message_count: (user.dialog_status.message_count || 0) + 1 } }
+          String(user.user_id) === targetUserIdStr && (user.dialog_status || user.dialog)
+            ? { 
+                ...user, 
+                dialog_status: { 
+                  ...(user.dialog_status || user.dialog || {}), 
+                  message_count: ((user.dialog_status?.message_count) || (user.dialog?.message_count) || 0) + 1 
+                },
+                dialog: {
+                  ...(user.dialog || user.dialog_status || {}),
+                  message_count: ((user.dialog?.message_count) || (user.dialog_status?.message_count) || 0) + 1
+                }
+              }
             : user
         ));
       } else {
@@ -1107,7 +1139,7 @@ const handleUpdateNote = async () => {
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
   {getFilteredUsers(users).map(user => {
     const days = getDaysCount(user.dates_selected?.start, user.dates_selected?.end);
-    const dialog = user.dialog_status;
+    const dialog = user.dialog_status || user.dialog;
     
     // PRIORITY STATUS LOGIC: final_status overrides status
     const currentStatus = user.final_status || user.status;
