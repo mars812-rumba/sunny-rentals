@@ -4408,6 +4408,10 @@ def get_dialog_events_endpoint(user_id: int, limit: int = Query(50, ge=1, le=200
 def mark_dialog_read(user_id: int):
     """Сбросить флаг новых сообщений когда менеджер открыл чат"""
     try:
+        # Обновляем флаг в базе
+        update_dialog_status(user_id, has_new_messages=False)
+        
+        # Логируем событие
         log_dialog_event(
             user_id=user_id,
             action="messages_marked_read",
