@@ -4737,13 +4737,13 @@ async def get_user_chats_fast(user_id: str):
                             continue
                         # Дедупликация: пропускаем если уже видели этот filename
                         media = entry.get('media', {})
-                            filename = media.get('filename') if media else None
-                            if not filename:
-                                # Проверяем в content.media
-                                content = entry.get('content', {})
-                                if isinstance(content, dict):
-                                    media = content.get('media', {})
-                                    filename = media.get('filename') if media else None
+                        filename = media.get('filename') if media else None
+                        if not filename:
+                            # Проверяем в content.media
+                            content = entry.get('content', {})
+                            if isinstance(content, dict):
+                                media = content.get('media', {})
+                                filename = media.get('filename') if media else None
                             
                             if filename and filename in seen_filenames:
                                 print(f"📊 [DEBUG] Skipping duplicate media: {filename}")
