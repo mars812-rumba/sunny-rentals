@@ -438,6 +438,13 @@ const loadUserDetails = async (user: any) => {
 
         // Refresh dialog statuses to update active dialog indicators
         await refreshAllDialogStatuses();
+
+        // Также локально обновляем message_count для индикации
+        setUsers(prev => prev.map(user =>
+          user.user_id === selectedUser.user_id && user.dialog_status
+            ? { ...user, dialog_status: { ...user.dialog_status, message_count: (user.dialog_status.message_count || 0) + 1 } }
+            : user
+        ));
       }
     } catch (e) {
       console.error("Ошибка отправки:", e);
@@ -612,6 +619,12 @@ const openUserChat = (user: any) => {
             timestamp: new Date().toISOString()
           }]);
         }
+        // Локально обновляем message_count для индикации
+        setUsers(prev => prev.map(user =>
+          user.user_id === userId && user.dialog_status
+            ? { ...user, dialog_status: { ...user.dialog_status, message_count: (user.dialog_status.message_count || 0) + 1 } }
+            : user
+        ));
       } else {
         console.error('Ошибка отправки сообщения Claude:', result.message || result);
       }
