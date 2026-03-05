@@ -974,23 +974,6 @@ def handle_photo_message(message):
                 parse_mode="HTML"
             )
         
-        # Отправляем информацию о медиа на бэкенд
-        try:
-            webhook_data = {
-                "user_id": user_id,
-                "media": media_info,
-                "username": username,
-                "timestamp": datetime.now().isoformat()
-            }
-            
-            response = requests.post("http://localhost:5000/api/internal/receive-media", json=webhook_data, timeout=5)
-            if response.status_code == 200:
-                print(f"✅ Media info sent to backend for user {user_id}")
-            else:
-                print(f"⚠️ Backend returned status {response.status_code} for media info")
-        except Exception as webhook_error:
-            print(f"⚠️ Error sending media info to backend: {webhook_error}")
-        
         print(f"✅ Фотография сохранена: {file_path}")
         
     except Exception as e:
