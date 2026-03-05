@@ -516,6 +516,13 @@ const loadUserDetails = async (user: any) => {
         } catch (allUsersError) {
           console.error("Не удалось обновить allUsers:", allUsersError);
         }
+        
+        // Локально помечаем что есть новое сообщение от менеджера (чтобы сразу показать индикацию)
+        setAllUsers(prev => prev.map(u =>
+          String(u.user_id) === String(selectedUser.user_id)
+            ? { ...u, dialog_status: { ...u.dialog_status, has_new_messages: false, last_message_from: 'manager' } }
+            : u
+        ));
       }
     } catch (e) {
       console.error("Ошибка отправки:", e);
