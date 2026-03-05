@@ -1450,6 +1450,12 @@ def process_claude_message(user_id, user_input):
         
         print(f"✅ Message processed for {user_id}")
         
+        # Обновляем message_count для индикации
+        try:
+            update_dialog_status(user_id, message_count_increment=1)
+        except Exception as update_error:
+            print(f"⚠️ Failed to update dialog status: {update_error}")
+        
         return {
             "status": "success",
             "message": "Сообщение обработано",
@@ -3179,6 +3185,12 @@ async def send_message_to_user(msg_request: SendMessageRequest):
             "message_length": len(msg_request.text),
             "timestamp": msg_request.timestamp
         })
+        
+        # Обновляем message_count в диалоге
+        try:
+            update_dialog_status(msg_request.user_id, message_count_increment=1)
+        except Exception as update_error:
+            print(f"⚠️ Failed to update dialog status: {update_error}")
         
         # 3. Отправляем сообщение через внутренний endpoint telegram бота
         try:
