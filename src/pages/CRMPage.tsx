@@ -1677,10 +1677,10 @@ const handleUpdateNote = async () => {
       return (
         <div
           key={`msg-${i}-${msg.timestamp || Date.now()}`}
-          className={`flex flex-col ${msg.role === 'user' ? 'items-start' : 'items-end'}`}
+          className={`flex flex-col ${msg.role === 'user' ? 'items-start' : 'items-end'} max-w-full overflow-hidden`}
         >
           <div
-            className={`max-w-[70%] p-3 rounded-2xl text-[10px] shadow-sm break-words ${
+            className={`max-w-[85%] sm:max-w-[70%] p-3 rounded-2xl text-[10px] shadow-sm break-words overflow-wrap-anywhere ${
               msg.role === 'user'
                 ? 'bg-white text-slate-800 rounded-bl-none'
                 : 'bg-blue-600 text-white rounded-br-none'
@@ -1688,14 +1688,15 @@ const handleUpdateNote = async () => {
           >
             {/* ===== MEDIA MESSAGE ===== */}
             {media && media.download_url ? (
-              <div className="space-y-2">
+              <div className="space-y-2 max-w-full overflow-hidden">
                 {media.content_type?.startsWith('image/') ? (
                   /* IMAGE */
                   <div className="space-y-2">
                     <img
                       src={media.download_url}
                       alt={media.filename || 'image'}
-                      className="max-w-xs rounded cursor-pointer border border-white/20"
+                      className="max-w-full h-auto rounded cursor-pointer border border-white/20 object-contain"
+                      style={{ maxWidth: '100%', height: 'auto' }}
                       onClick={() => window.open(media.download_url, '_blank')}
                       onError={(e) => {
                         console.error(`❌ Image failed:`, media.download_url);
@@ -1725,7 +1726,7 @@ const handleUpdateNote = async () => {
                       }}
                     />
                     {messageText && messageText !== '[Медиафайл]' && messageText !== '[Фотография]' && (
-                      <p className="text-[10px]">{messageText}</p>
+                      <p className="text-[10px] break-words">{messageText}</p>
                     )}
                   </div>
                 ) : (
@@ -1747,14 +1748,14 @@ const handleUpdateNote = async () => {
                       <Download className="w-4 h-4 opacity-50" />
                     </div>
                     {messageText && messageText !== '[Медиафайл]' && (
-                      <p className="text-[10px]">{messageText}</p>
+                      <p className="text-[10px] break-words">{messageText}</p>
                     )}
                   </div>
                 )}
               </div>
             ) : (
               /* ===== TEXT ONLY MESSAGE ===== */
-              <p>{messageText}</p>
+              <p className="break-words overflow-wrap-anywhere">{messageText}</p>
             )}
           </div>
 
