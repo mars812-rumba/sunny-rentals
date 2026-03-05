@@ -2052,44 +2052,45 @@ async def internal_send_message(request: Request):
         print(f"❌ Error in internal_send_message: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
-@bot.message_handler(content_types=['photo'])
-def handle_photo(message):
-    try:
-        print(f"📸 Incoming photo from {message.chat.id}")
-
-        # Получаем файл от Telegram
-        file_info = bot.get_file(message.photo[-1].file_id)
-        file_bytes = bot.download_file(file_info.file_path)
-
-        # Определяем имя файла
-        filename = file_info.file_path.split("/")[-1]
-        content_type = "image/jpeg"  # Telegram всегда отдаёт jpg для фото
-
-        # Готовим multipart запрос в CRM
-        files = {
-            "file": (filename, BytesIO(file_bytes), content_type)
-        }
-        data = {
-            "user_id": message.chat.id,
-            "message": message.caption or ""
-        }
-
-        crm_url = os.getenv("CRM_BACKEND_URL", "http://localhost:8000")
-
-        response = requests.post(
-            f"{crm_url}/api/crm/receive_media",
-            files=files,
-            data=data,
-            timeout=30
-        )
-
-        if response.status_code == 200:
-            print("✅ Photo forwarded to CRM")
-        else:
-            print(f"❌ CRM error: {response.status_code} {response.text}")
-
-    except Exception as e:
-        print("❌ Failed to forward photo:", e)
+# === ДУБЛИРУЮЩИЙ ОБРАБОТЧИК - ЗАКОММЕНТИРОВАН (дублировал фото на порт 8000)
+# @bot.message_handler(content_types=['photo'])
+# def handle_photo(message):
+#     try:
+#         print(f"📸 Incoming photo from {message.chat.id}")
+#
+#         # Получаем файл от Telegram
+#         file_info = bot.get_file(message.photo[-1].file_id)
+#         file_bytes = bot.download_file(file_info.file_path)
+#
+#         # Определяем имя файла
+#         filename = file_info.file_path.split("/")[-1]
+#         content_type = "image/jpeg"  # Telegram всегда отдаёт jpg для фото
+#
+#         # Готовим multipart запрос в CRM
+#         files = {
+#             "file": (filename, BytesIO(file_bytes), content_type)
+#         }
+#         data = {
+#             "user_id": message.chat.id,
+#             "message": message.caption or ""
+#         }
+#
+#         crm_url = os.getenv("CRM_BACKEND_URL", "http://localhost:8000")
+#
+#         response = requests.post(
+#             f"{crm_url}/api/crm/receive_media",
+#             files=files,
+#             data=data,
+#             timeout=30
+#         )
+#
+#         if response.status_code == 200:
+#             print("✅ Photo forwarded to CRM")
+#         else:
+#             print(f"❌ CRM error: {response.status_code} {response.text}")
+#
+#     except Exception as e:
+#         print("❌ Failed to forward photo:", e)
 
 @app.post("/internal/send_media")
 async def internal_send_media(
