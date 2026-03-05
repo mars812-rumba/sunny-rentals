@@ -1646,9 +1646,9 @@ const handleUpdateNote = async () => {
 
           {/* ВКЛАДКА ЧАТ (CORRECTED MEDIA RENDERING) */}
 <TabsContent value="chat" className="m-0 h-full flex flex-col bg-slate-100 overflow-hidden w-full max-w-full">
-    {/* Чат занимает всё свободное место */}
-<ScrollArea className="flex-1 p-2 w-full h-full overflow-x-hidden">
-  <div className="w-full max-w-[calc(100vw-40px)] mx-auto space-y-3 pb-4 box-border overflow-x-hidden">
+    {/* Чат занимает всё свободное место - обычный div вместо ScrollArea */}
+    <div className="flex-1 p-2 w-full h-full overflow-y-auto overflow-x-hidden" style={{ maxWidth: '100vw' }}>
+  <div className="w-full max-w-[100vw] mx-auto space-y-3 pb-4 box-border overflow-x-hidden">
     {chats.map((msg, i) => {
       // ✅ ЗАЩИТА ОТ NULL
       if (!msg) return null;
@@ -1771,7 +1771,7 @@ const handleUpdateNote = async () => {
 
     <div ref={chatEndRef} />
   </div>
-</ScrollArea>
+</div>
 
 {/* Единый компактный блок управления и ввода */}
 <div className="bg-white border-t border-slate-200 shrink-0 p-3 w-full box-border">
