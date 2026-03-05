@@ -895,6 +895,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = BASE_DIR / "backend" / "media"
 
 # === НОВЫЕ ХЭНДЛЕРЫ ДЛЯ МУЛЬТИМЕДИА ===
+# Хранилище для уже обработанных file_id (защита от дубликатов)
+_processed_photo_ids = set()
+
 @bot.message_handler(content_types=['photo'])
 def handle_photo_message(message):
     """Обработка входящих фотографий от пользователей"""
@@ -906,12 +909,22 @@ def handle_photo_message(message):
         if is_admin_user(user_id):
             return
             
-        print(f"📸 Получена фотография от пользователя {user_id}")
-        
         # Получаем лучшее качество фото
         photo = message.photo[-1]  # Последний элемент - самое высокое разрешение
         file_id = photo.file_id
         file_size = photo.file_size
+        
+        # Защита от дубликатов - проверяем не обрабатывали ли уже это фото
+        if file_id in _processed_photo_ids:
+            print(f"⚠️ Фото {file_id[:20]}... уже обработано, пропускаем")
+            return
+        _processed_photo_ids.add(file_id)
+        
+        # Очищаем старые записи (чтобы не копить бесконечно)
+        if len(_processed_photo_ids) > 1000:
+            _processed_photo_ids = set(list(_processed_photo_ids)[-500:])
+        
+        print(f"📸 Получена фотография от пользователя {user_id}, file_id: {file_id[:30]}...")
         
         # Создаем директорию для пользователя если не существует
         from pathlib import Path
