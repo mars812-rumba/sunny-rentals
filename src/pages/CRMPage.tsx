@@ -270,6 +270,9 @@ const loadUserDetails = async (user: any) => {
   setBookings([]);
   
   try {
+    // Сбрасываем флаг непрочитанных сообщений при открытии чата
+    markDialogAsRead(user.user_id);
+    
     console.log("📡 [DEBUG] Loading critical data first (bookings)");
     
     // Load critical data first (bookings), then chat data
@@ -1088,8 +1091,8 @@ const handleUpdateNote = async () => {
     // PRIORITY STATUS LOGIC: final_status overrides status
     const currentStatus = user.final_status || user.status;
     
-    // ЛОГИКА ПОДСВЕТКИ: если последний ответил юзер - нужно внимание
-    const needsReply = dialog?.last_message_from === 'user';
+    // ЛОГИКА ПОДСВЕТКИ: если есть непрочитанное сообщение от юзера - нужно внимание
+    const needsReply = dialog?.has_new_messages && dialog?.last_message_from === 'user';
     const aiActive = dialog?.claude_status === 'active';
     // 1. ОПРЕДЕЛЯЕМ ФОН В ЗАВИСИМОСТИ ОТ МАРКЕРА
     const markerStyles: Record<string, string> = {
