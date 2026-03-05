@@ -18,7 +18,7 @@ import {
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus,UserRoundMinus,UserRoundCheck,
   Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
   CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download,
-  Clock, FileQuestion
+  Clock, FileQuestion, CircleArrowRight, Hourglass, Info, AlertCircle
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { MarkerType } from '@/types/crm';
@@ -1153,10 +1153,10 @@ const handleUpdateNote = async () => {
   <div className="flex gap-1.5 bg-slate-100/30 p-1 rounded-xl w-fit">
     {[
       { id: 'all', icon: Filter, color: 'text-slate-400' },
-      { id: 'unprocessed', icon: CirclePlus, color: 'text-blue-500' },
-      { id: 'in_progress', icon: CircleDollarSign, color: 'text-green-500' },
-      { id: 'ready', icon: CircleCheckBig, color: 'text-emerald-500' },
-      { id: 'rejected', icon: CircleMinus, color: 'text-red-500' },
+      { id: 'offer_sent', icon: CircleArrowRight, color: 'text-amber-500' },
+      { id: 'waiting', icon: Hourglass, color: 'text-purple-500' },
+      { id: 'need_info', icon: Info, color: 'text-cyan-500' },
+      { id: 'follow_up', icon: AlertCircle, color: 'text-red-500' },
     ].map(m => (
       <Button
         key={m.id}
@@ -1270,9 +1270,10 @@ const handleUpdateNote = async () => {
 {/* СТРОКА 3: Интерактивная заметка с адаптивной логикой цветов */}
 <div
   className={`flex items-center gap-1.5 rounded px-2 py-1 border transition-colors cursor-text min-h-[24px] ${
-    user.marker === 'unprocessed' ? 'bg-blue-100/50 border-blue-200/50' :
-    user.marker === 'in_progress' ? 'bg-green-100/50 border-green-200/50' :
-    user.marker === 'ready'       ? 'bg-green-100/50 border-green-200/50' :
+    user.marker === 'offer_sent' ? 'bg-amber-100/50 border-amber-200/50' :
+    user.marker === 'waiting' ? 'bg-purple-100/50 border-purple-200/50' :
+    user.marker === 'need_info' ? 'bg-cyan-100/50 border-cyan-200/50' :
+    user.marker === 'follow_up' ? 'bg-red-100/50 border-red-200/50' :
     user.last_note                ? 'bg-[#f8b515]/10 border-[#f8b515]/30 hover:bg-[#f8b515]/20' : 
                                     'bg-slate-50 border-slate-100 hover:bg-white hover:border-blue-200'
   }`}
@@ -1283,9 +1284,10 @@ const handleUpdateNote = async () => {
   }}
 >
   <StickyNote className={`w-2.5 h-2.5 shrink-0 ${
-    user.marker === 'unprocessed' ? 'text-blue-600' :
-    user.marker === 'in_progress' ? 'text-green-600' :
-    user.marker === 'ready'       ? 'text-green-600' :
+    user.marker === 'offer_sent' ? 'text-amber-600' :
+    user.marker === 'waiting' ? 'text-purple-600' :
+    user.marker === 'need_info' ? 'text-cyan-600' :
+    user.marker === 'follow_up' ? 'text-red-600' :
     user.last_note                ? 'text-[#f8b515]' : 'text-slate-400'
   }`} />
   
@@ -1293,9 +1295,10 @@ const handleUpdateNote = async () => {
     <input
       autoFocus
       className={`text-[8px] bg-transparent outline-none w-full font-bold ${
-        user.marker === 'unprocessed' ? 'text-blue-800' :
-        user.marker === 'in_progress' ? 'text-green-800' :
-        user.marker === 'ready'       ? 'text-green-800' :
+        user.marker === 'offer_sent' ? 'text-amber-800' :
+        user.marker === 'waiting' ? 'text-purple-800' :
+        user.marker === 'need_info' ? 'text-cyan-800' :
+        user.marker === 'follow_up' ? 'text-red-800' :
         user.last_note                ? 'text-[#8a650d]' : 'text-blue-600'
       }`}
       value={tempNote}
@@ -1306,9 +1309,10 @@ const handleUpdateNote = async () => {
     />
   ) : (
     <p className={`text-[8px] truncate w-full italic tracking-tight ${
-      user.marker === 'unprocessed' ? 'text-blue-700' :
-      user.marker === 'in_progress' ? 'text-green-700' :
-      user.marker === 'ready'       ? 'text-green-700' :
+      user.marker === 'offer_sent' ? 'text-amber-700' :
+      user.marker === 'waiting' ? 'text-purple-700' :
+      user.marker === 'need_info' ? 'text-cyan-700' :
+      user.marker === 'follow_up' ? 'text-red-700' :
       user.last_note                ? 'text-[#8a650d]' : 'text-slate-400'
     }`}>
       {user.last_note || "Добавить заметку..."}
