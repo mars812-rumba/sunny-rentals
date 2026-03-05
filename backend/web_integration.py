@@ -3015,18 +3015,17 @@ def get_user_filters_from_db(user_id: int) -> dict:
 
 @app.get("/api/claude/status/{user_id}")
 async def api_get_claude_status(user_id: int):
-    """Получает статус, вычисленный из ЛОГОВ (Source of Truth)"""
+    """Получает статус из базы данных"""
     try:
-        # Теперь мы не верим только памяти, а смотрим в историю
-        computed_data = get_dialog_status_from_history(user_id)
+        dialog_status = get_dialog_status(user_id)
         
         return JSONResponse(content={
             "status": "success",
             "data": {
                 "user_id": user_id,
-                "claude_status": computed_data["claude_status"],
-                "last_message_from": computed_data["last_message_from"],
-                "message_count": computed_data["message_count"]
+                "claude_status": dialog_status["claude_status"],
+                "last_message_from": dialog_status["last_message_from"],
+                "message_count": dialog_status["message_count"]
             }
         })
     except Exception as e:
@@ -3129,12 +3128,12 @@ async def api_get_active_dialogs():
     """Список активных диалогов на основе вычислений"""
     try:
         # Для этого эндпоинта придется пробежаться по всем юзерам 
-        # и вычислить их статусы. Это гарантирует точность.
+        # и взять статусы из базы данных.
         users = load_all_users() # загружаем список ID
         active_dialogs = []
         
         for u_id in users:
-            status_info = get_dialog_status_from_history(u_id)
+            status_info = get_dialog_status(u_id)
             if status_info["claude_status"] == "active":
                 active_dialogs.append({
                     "user_id": u_id,
@@ -4385,11 +4384,11 @@ def bulk_update_prices(update: BulkPriceUpdate):
 # ==============================
 
 @app.get("/api/crm/dialog/{user_id}/status")
-async def get_dialog_status(user_id: str):  # Ставим str, так как Union в путях FastAPI иногда капризничает
+async def get_dialog_status_endpoint(user_id: str):  # Ставим str, так как Union в путях FastAPI иногда капризничает
     # Внутри функции вы уже можете попробовать сконвертировать в int, если нужно
     target_id = int(user_id) if user_id.isdigit() else user_id
     try:
-        dialog_status = get_dialog_status_from_history(user_id)
+        dialog_status = get_dialog_status(target_id)
         return {"dialog": dialog_status}
     except Exception as e:
         print(f"❌ Error getting dialog status for user {user_id}: {e}")
@@ -4452,7 +4451,7 @@ def get_active_dialogs():
         active_dialogs = []
         for user_id, dialog_data in user_dialogs.items():
             try:
-                status = get_dialog_status_from_history(user_id)
+                status = get_dialog_status(int(user_id) if user_id.isdigit() else user_id)
                 if status["active"]:
                     active_dialogs.append({
                         "user_id": user_id,
