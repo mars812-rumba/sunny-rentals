@@ -976,7 +976,7 @@ const handleUpdateNote = async () => {
   }, [users.length]);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-hidden">
       {/* Nav */}
       <nav className="bg-white border-b px-4 py-2 flex justify-between items-center sticky top-0 z-40 shadow-sm">
         <img src={logo} alt="Sunny Rentals" className="h-7 w-auto" />
@@ -1355,7 +1355,7 @@ const handleUpdateNote = async () => {
 </main>
 
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-  <DialogContent className="max-w-none w-screen h-screen m-0 p-0 flex flex-col border-none rounded-none overflow-hidden">
+  <DialogContent className="max-w-none w-full max-w-[100vw] h-screen m-0 p-0 flex flex-col border-none rounded-none overflow-hidden">
     
     <div className="sr-only">
       <DialogTitle>Карточка клиента @{selectedUser?.username}</DialogTitle>
