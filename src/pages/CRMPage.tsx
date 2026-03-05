@@ -1645,10 +1645,10 @@ const handleUpdateNote = async () => {
 </TabsContent>
 
           {/* ВКЛАДКА ЧАТ (CORRECTED MEDIA RENDERING) */}
-<TabsContent value="chat" className="m-0 h-full flex flex-col bg-slate-100 overflow-hidden">
+<TabsContent value="chat" className="m-0 h-full flex flex-col bg-slate-100 overflow-hidden w-full max-w-full">
     {/* Чат занимает всё свободное место */}
-<ScrollArea className="flex-1 p-2 w-full">
-  <div className="w-full max-w-full mx-auto space-y-3 pb-4 box-border overflow-hidden">
+<ScrollArea className="flex-1 p-2 w-full h-full overflow-x-hidden">
+  <div className="w-full max-w-[calc(100vw-40px)] mx-auto space-y-3 pb-4 box-border overflow-x-hidden">
     {chats.map((msg, i) => {
       // ✅ ЗАЩИТА ОТ NULL
       if (!msg) return null;
