@@ -218,6 +218,11 @@ const CRMPage: React.FC = () => {
     return date.format('DD.MM.YY');
   };
 
+  // Вспомогательная функция для сравнения user_id (приводит к строке для избежания проблем с типами)
+  const compareUserIds = (id1: number | string, id2: number | string): boolean => {
+    return String(id1) === String(id2);
+  };
+
   const loadMainData = useCallback(async () => {
     setLoading(true);
     try {
@@ -244,7 +249,7 @@ const CRMPage: React.FC = () => {
     finally { setLoading(false); }
   }, [activeStatus, period]);
 
-const fetchChatHistory = async (userId: number, silent: boolean = false) => {
+const fetchChatHistory = async (userId: number | string, silent: boolean = false) => {
   try {
     const response = await fetch(`/api/crm/chats/${userId}`);
     const data = await response.json();
@@ -325,8 +330,8 @@ const loadUserDetails = async (user: any) => {
   }
 };
 
-  const fetchDialogStatus = async (userId: number): Promise<DialogStatus> => {
-    const response = await fetch(`/api/crm/dialog/${userId}/status`);
+  const fetchDialogStatus = async (userId: number | string): Promise<DialogStatus> => {
+    const response = await fetch(`/api/crm/dialog/${String(userId)}/status`);
     const data = await response.json();
     // Бэкенд возвращает dialog.claude_status напрямую
     const dialog = data.dialog || data;
@@ -341,15 +346,15 @@ const loadUserDetails = async (user: any) => {
     };
   };
 
-  const fetchDialogEvents = async (userId: number, limit: number = 50): Promise<DialogEvent[]> => {
-    const response = await fetch(`/api/crm/dialog/${userId}/events?limit=${limit}`);
+  const fetchDialogEvents = async (userId: number | string, limit: number = 50): Promise<DialogEvent[]> => {
+    const response = await fetch(`/api/crm/dialog/${String(userId)}/events?limit=${limit}`);
     const data = await response.json();
     return data.events;
   };
 
-  const markDialogAsRead = async (userId: number) => {
+  const markDialogAsRead = async (userId: number | string) => {
     try {
-      const response = await fetch(`/api/crm/dialog/${userId}/mark-read`, {
+      const response = await fetch(`/api/crm/dialog/${String(userId)}/mark-read`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -359,7 +364,7 @@ const loadUserDetails = async (user: any) => {
       if (response.ok) {
         // Обновляем локальное состояние
         setUsers(prev => prev.map(user =>
-          user.user_id === userId && user.dialog_status
+          compareUserIds(user.user_id, userId) && user.dialog_status
             ? { ...user, dialog_status: { ...user.dialog_status, has_new_messages: false } }
             : user
         ));
@@ -374,13 +379,13 @@ const loadUserDetails = async (user: any) => {
       const dialogStatus = await fetchDialogStatus(userId);
       // Обновляем users
       setUsers(prev => prev.map(user => {
-        if (user.user_id === userId) {
+        if (compareUserIds(user.user_id, userId)) {
           return { ...user, dialog_status: dialogStatus };
         }
         return user;
       }));
       // Обновляем selectedUser если это текущий пользователь
-      if (selectedUser?.user_id === userId) {
+      if (compareUserIds(selectedUser?.user_id, userId)) {
         setSelectedUser(prev => prev ? { ...prev, dialog_status: dialogStatus } : null);
       }
     } catch (e) {
@@ -400,8 +405,9 @@ const loadUserDetails = async (user: any) => {
         }
       });
       const results = await Promise.allSettled(promises);
+      const userIdStr = String(user.user_id);
       setUsers(prev => prev.map(user => {
-        const result = results.find(r => r.status === 'fulfilled' && r.value.userId === user.user_id);
+        const result = results.find(r => r.status === 'fulfilled' && String(r.value.userId) === String(user.user_id));
         if (result && result.status === 'fulfilled' && result.value.dialogStatus) {
           return { ...user, dialog_status: result.value.dialogStatus };
         }
@@ -440,8 +446,9 @@ const loadUserDetails = async (user: any) => {
         await refreshAllDialogStatuses();
 
         // Также локально обновляем message_count для индикации
+        const targetUserId = String(selectedUser.user_id);
         setUsers(prev => prev.map(user =>
-          user.user_id === selectedUser.user_id && user.dialog_status
+          String(user.user_id) === targetUserId && user.dialog_status
             ? { ...user, dialog_status: { ...user.dialog_status, message_count: (user.dialog_status.message_count || 0) + 1 } }
             : user
         ));
@@ -563,14 +570,14 @@ const openUserChat = (user: any) => {
         
         // Обновляем users
         setUsers(prev => prev.map(user => {
-          if (user.user_id === userId) {
+          if (compareUserIds(user.user_id, userId)) {
             return { ...user, dialog_status: newStatus };
           }
           return user;
         }));
         
         // Обновляем selectedUser если это текущий пользователь
-        if (selectedUser?.user_id === userId) {
+        if (compareUserIds(selectedUser?.user_id, userId)) {
           setSelectedUser(prev => prev ? { ...prev, dialog_status: newStatus } : null);
         }
         
@@ -620,8 +627,9 @@ const openUserChat = (user: any) => {
           }]);
         }
         // Локально обновляем message_count для индикации
+        const targetUserIdStr = String(userId);
         setUsers(prev => prev.map(user =>
-          user.user_id === userId && user.dialog_status
+          String(user.user_id) === targetUserIdStr && user.dialog_status
             ? { ...user, dialog_status: { ...user.dialog_status, message_count: (user.dialog_status.message_count || 0) + 1 } }
             : user
         ));
@@ -644,7 +652,7 @@ const openUserChat = (user: any) => {
       if (result.status === 'success') {
         // Обновляем статус в основном списке пользователей
         setUsers(prev => prev.map(user => {
-          if (user.user_id === userId && user.dialog_status) {
+          if (compareUserIds(user.user_id, userId) && user.dialog_status) {
             return {
               ...user,
               dialog_status: {
@@ -702,7 +710,7 @@ const openUserChat = (user: any) => {
 
       if (response.ok) {
         setUsers(prev => prev.map(user =>
-          user.user_id === userId ? { ...user, status: newStatus } : user
+          compareUserIds(user.user_id, userId) ? { ...user, status: newStatus } : user
         ));
         console.log(`Статус ${userId} → ${newStatus}`);
       }
@@ -725,7 +733,7 @@ const openUserChat = (user: any) => {
   };
 
   const handleMoveForward = async (userId: number) => {
-    const user = users.find(u => u.user_id === userId);
+    const user = users.find(u => compareUserIds(u.user_id, userId));
     if (!user) return;
     const currentStatus = user.status || user.final_status;
     const nextStatus = STATUS_FLOW[currentStatus];
@@ -737,7 +745,7 @@ const openUserChat = (user: any) => {
   };
 
   const handleMoveBack = async (userId: number) => {
-    const user = users.find(u => u.user_id === userId);
+    const user = users.find(u => compareUserIds(u.user_id, userId));
     if (!user) return;
     const currentStatus = user.status || user.final_status;
     const prevStatus = STATUS_REVERSE[currentStatus];
@@ -773,7 +781,7 @@ const openUserChat = (user: any) => {
 
       // 2. !!! ОБЯЗАТЕЛЬНО: Обновляем этот же объект в основном списке пользователей
       setUsers(prevUsers => prevUsers.map(u => 
-        u.user_id === selectedUser.user_id 
+        compareUserIds(u.user_id, selectedUser.user_id) 
           ? { ...u, last_note: newNote, notes: [...(u.notes || []), newNote] }
           : u
       ));
@@ -789,12 +797,12 @@ const handleQuickSaveNote = async (userId) => {
   setEditingNoteId(null);
   
   // Если текст не изменился, ничего не делаем
-  const currentUser = users.find(u => u.user_id === userId);
+  const currentUser = users.find(u => compareUserIds(u.user_id, userId));
   if (tempNote.trim() === (currentUser?.last_note || '')) return;
 
   // Оптимистичное обновление UI
   setUsers(prev => prev.map(u =>
-    u.user_id === userId ? { ...u, last_note: tempNote.trim() } : u
+    compareUserIds(u.user_id, userId) ? { ...u, last_note: tempNote.trim() } : u
   ));
 
   try {
@@ -827,7 +835,7 @@ const handleMarkerChange = async (userId: number, marker: MarkerType | null) => 
     if (response.ok) {
       // Обновляем локальное состояние
       setUsers(prev => prev.map(user =>
-        user.user_id === userId ? { ...user, marker } : user
+        compareUserIds(user.user_id, userId) ? { ...user, marker } : user
       ));
       console.log(`Маркер для пользователя ${userId}:`, marker || 'сброшен');
     } else {
@@ -936,7 +944,7 @@ const handleUpdateNote = async () => {
         // Обновляем статус пользователя на archived
         if (selectedUser) {
           setUsers(prev => prev.map(u =>
-            u.user_id === selectedUser.user_id
+            compareUserIds(u.user_id, selectedUser.user_id)
               ? { ...u, status: 'archive', archived_at: new Date().toISOString() }
               : u
           ));
@@ -1207,7 +1215,7 @@ const handleUpdateNote = async () => {
     user.last_note                ? 'text-[#f8b515]' : 'text-slate-400'
   }`} />
   
-  {editingNoteId === user.user_id ? (
+  {compareUserIds(editingNoteId, user.user_id) ? (
     <input
       autoFocus
       className={`text-[8px] bg-transparent outline-none w-full font-bold ${
