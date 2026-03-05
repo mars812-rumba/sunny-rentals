@@ -949,16 +949,25 @@ def handle_photo_message(message):
             "timestamp": datetime.now().isoformat(),
             "download_url": f"/api/crm/media/{user_id}/{filename}"
         }
-
         
         # Обновляем статус диалога
         handle_dialog_user_message(user_id, "[Фотография]")
         
-        # Логируем в историю чата
-        log_chat_to_file(user_id, "user", {
-            "content": "[Фотография]",
-            "media": media_info
-        })
+        # Только webhook на бэкенд — бот максимально минимальный
+        try:
+            webhook_data = {
+                "user_id": user_id,
+                "media": media_info,
+                "username": username,
+                "timestamp": datetime.now().isoformat()
+            }
+            response = requests.post("http://localhost:5000/api/internal/receive-media", json=webhook_data, timeout=5)
+            if response.status_code == 200:
+                print(f"✅ Media info sent to backend for user {user_id}")
+            else:
+                print(f"⚠️ Backend returned status {response.status_code}")
+        except Exception as webhook_error:
+            print(f"⚠️ Error sending media to backend: {webhook_error}")
         
         # Отправляем уведомление в группу активных диалогов
         if ACTIVE_DIALOGS_CHAT_ID:
