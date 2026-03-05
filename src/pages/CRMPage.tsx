@@ -474,6 +474,22 @@ const loadUserDetails = async (user: any) => {
               }
             : user
         ));
+
+        // Принудительно обновляем данные всех пользователей с сервера
+        try {
+          const uRes = await fetch(`/api/crm/users?status=${activeStatus}&period=${period}`);
+          const uData = await uRes.json();
+          if (uData.status === 'ok') {
+            const processedUsers = uData.users.map((user: any) => ({
+              ...user,
+              dialog_status: user.dialog_status || user.dialog || null,
+              dialog: user.dialog || user.dialog_status || null
+            }));
+            setUsers(processedUsers);
+          }
+        } catch (refreshError) {
+          console.error("Не удалось обновить данные:", refreshError);
+        }
       }
     } catch (e) {
       console.error("Ошибка отправки:", e);
@@ -665,6 +681,22 @@ const openUserChat = (user: any) => {
               }
             : user
         ));
+
+        // Принудительно обновляем данные с сервера
+        try {
+          const uRes = await fetch(`/api/crm/users?status=${activeStatus}&period=${period}`);
+          const uData = await uRes.json();
+          if (uData.status === 'ok') {
+            const processedUsers = uData.users.map((user: any) => ({
+              ...user,
+              dialog_status: user.dialog_status || user.dialog || null,
+              dialog: user.dialog || user.dialog_status || null
+            }));
+            setUsers(processedUsers);
+          }
+        } catch (refreshError) {
+          console.error("Не удалось обновить данные:", refreshError);
+        }
       } else {
         console.error('Ошибка отправки сообщения Claude:', result.message || result);
       }
