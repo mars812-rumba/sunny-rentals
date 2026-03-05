@@ -908,9 +908,14 @@ def handle_photo_message(message):
         # Пропускаем админов (они не отправляют фото как клиенты)
         if is_admin_user(user_id):
             return
-            
-        # Получаем лучшее качество фото
-        photo = message.photo[-1]  # Последний элемент - самое высокое разрешение
+        
+        # Логируем ВСЕ размеры фото для отладки
+        print(f"📸 DEBUG: Получено {len(message.photo)} фото от {user_id}")
+        for i, photo in enumerate(message.photo):
+            print(f"   [{i}] file_id={photo.file_id[:25]}... size={photo.file_size}")
+        
+        # Получаем лучшее качество фото (последний в массиве)
+        photo = message.photo[-1]
         file_id = photo.file_id
         file_size = photo.file_size
         
@@ -920,11 +925,11 @@ def handle_photo_message(message):
             return
         _processed_photo_ids.add(file_id)
         
-        # Очищаем старые записи (чтобы не копить бесконечно)
+        # Очищаем старые записи
         if len(_processed_photo_ids) > 1000:
             _processed_photo_ids = set(list(_processed_photo_ids)[-500:])
         
-        print(f"📸 Получена фотография от пользователя {user_id}, file_id: {file_id[:30]}...")
+        print(f"📸 Обрабатываем фото от {user_id}, file_id: {file_id[:30]}...")
         
         # Создаем директорию для пользователя если не существует
         from pathlib import Path
