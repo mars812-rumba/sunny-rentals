@@ -1090,19 +1090,11 @@ const handleUpdateNote = async () => {
   <div className="grid grid-cols-4 gap-4">
     {MAIN_STATUSES.map(key => {
       const count = stats?.[key] || 0;
-      // Считаем непрочитанных из всех загруженных пользователей
-      const hasUnread = (allUsers || []).filter(u => {
-        const status = u.final_status || u.status;
-        return status === key && (u.dialog_status?.has_new_messages || u.dialog_status?.last_message_from === 'user');
-      }).length > 0;
       
       return (
         <Card key={key} onClick={() => setActiveStatus(key)} 
           className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' : 'hover:bg-white/50 opacity-80'}`}>
           <CardContent className="p-3 flex flex-row items-center justify-center gap-2 relative">
-            {hasUnread && (
-              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_6px_rgba(239,68,68,0.6)]"></div>
-            )}
             <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
             <span className="text-2xl font-black text-slate-800 leading-none">{count}</span>
           </CardContent>
@@ -1415,12 +1407,18 @@ const handleUpdateNote = async () => {
             onClick={(e) => { e.stopPropagation(); handleArchiveAction(user.user_id); }}><Trash2 className="w-3.5 h-3.5" /></Button>
         {/* Кнопка Чат */}
         <div className="relative">
+          {/* Красная мигающая - есть непрочитанные */}
+          {dialog?.has_new_messages && (
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping opacity-70"></div>
+          )}
           <Button
             size="icon" variant="ghost"
             className={`h-7 w-7 rounded-md border ${
-              dialog?.message_count > 0 
-                ? 'bg-green-50 border-green-200 text-green-600'  // Зелёная - есть сообщения
-                : 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100'  // Синяя - нет сообщений
+              dialog?.has_new_messages 
+                ? 'bg-red-50 border-red-200 text-red-600'  // Красная - есть непрочитанные
+                : (dialog?.message_count > 0 
+                    ? 'bg-green-50 border-green-200 text-green-600'  // Зелёная - есть сообщения
+                    : 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100')  // Синяя - нет сообщений
             }`}
             onClick={(e) => { e.stopPropagation(); openUserChat(user); }}
             title={dialog?.message_count ? `Чат (${dialog.message_count} сообщений)` : 'Чат CRM'}
