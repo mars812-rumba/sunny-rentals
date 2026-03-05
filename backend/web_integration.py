@@ -4735,32 +4735,30 @@ async def get_user_chats_fast(user_id: str):
                             print(f"📤 [DEBUG] Checking entry: entry_uid={entry_uid}, t_id={t_id}, match={entry_uid == t_id}")
                         if entry_uid != t_id:
                             continue
+                        
                         # Дедупликация: пропускаем если уже видели этот filename
-                        media = entry.get('media', {})
+                        # Проверяем media и в top-level и в content.media
+                        top_media = entry.get('media', {})
+                        content = entry.get('content', {})
+                        content_media = content.get('media', {}) if isinstance(content, dict) else {}
+                        
+                        # Берем media из content если есть, иначе из top-level
+                        media = content_media or top_media
                         filename = media.get('filename') if media else None
-                        if not filename:
-                            # Проверяем в content.media
-                            content = entry.get('content', {})
-                            if isinstance(content, dict):
-                                media = content.get('media', {})
-                                filename = media.get('filename') if media else None
-                            
-                            if filename and filename in seen_filenames:
-                                print(f"📊 [DEBUG] Skipping duplicate media: {filename}")
-                                continue
-                            if filename:
-                                seen_filenames.add(filename)
-                            # Debug logging for chat data structure
-                            if len(chats) < 3:  # Only log first 3 entries
-                                print(f"📊 [DEBUG] Chat entry structure for user {user_id}:", {
-                                    'has_media': 'media' in entry,
-                                    'has_content': 'content' in entry,
-                                    'media_keys': list(entry.get('media', {}).keys()) if entry.get('media') else None,
-                                    'content_keys': list(entry.get('content', {}).keys()) if entry.get('content') else None,
-                                    'role': entry.get('role'),
-                                    'sample_entry': {k: v for k, v in entry.items() if k != 'media' and k != 'content'}
-                                })
-                            chats.append(entry)
+                        
+                        if filename and filename in seen_filenames:
+                            print(f"📊 [DEBUG] Skipping duplicate media: {filename}")
+                            continue
+                        if filename:
+                            seen_filenames.add(filename)
+                        
+                        # Если media в content - переносим в top-level для совместимости
+                        if content_media and not top_media:
+                            entry['media'] = content_media
+                        
+                        if len(chats) < 3:  # Debug logging for first 3 entries
+                            print(f"📊 [DEBUG] Chat entry: has_media={'media' in entry}, filename={filename}")
+                        chats.append(entry)
                     except: continue
         except Exception as e:
             print(f"⚠️ Ошибка чтения файла чатов: {e}")
