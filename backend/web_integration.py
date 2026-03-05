@@ -4714,6 +4714,8 @@ async def get_user_chats_fast(user_id: str):
 
         # Читаем только последние 500 строк, чтобы не вешать сервер
         try:
+            # Дедупликация по filename
+            seen_filenames = set()
             with open(CHAT_LOGS_JSONL, 'r', encoding='utf-8') as f:
                 # Читаем хвост файла
                 lines = f.readlines()[-500:]
@@ -4721,6 +4723,14 @@ async def get_user_chats_fast(user_id: str):
                     try:
                         entry = json.loads(line.strip())
                         if str(entry.get('user_id')) == t_id:
+                            # Дедупликация: пропускаем если уже видели такой filename
+                            media = entry.get('media', {})
+                            filename = media.get('filename') if media else None
+                            if filename and filename in seen_filenames:
+                                print(f"📊 [DEBUG] Skipping duplicate media: {filename}")
+                                continue
+                            if filename:
+                                seen_filenames.add(filename)
                             # Debug logging for chat data structure
                             if len(chats) < 3:  # Only log first 3 entries
                                 print(f"📊 [DEBUG] Chat entry structure for user {user_id}:", {
