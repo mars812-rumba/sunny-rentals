@@ -1407,12 +1407,18 @@ const handleUpdateNote = async () => {
             onClick={(e) => { e.stopPropagation(); handleArchiveAction(user.user_id); }}><Trash2 className="w-3.5 h-3.5" /></Button>
         {/* Кнопка Чат */}
         <div className="relative">
+          {/* Красная мигающая - есть непрочитанные */}
+          {dialog?.has_new_messages && (
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping opacity-70"></div>
+          )}
           <Button
             size="icon" variant="ghost"
             className={`h-7 w-7 rounded-md border ${
-              dialog?.message_count > 0 
-                ? 'bg-green-50 border-green-200 text-green-600'  // Зелёная - есть сообщения
-                : 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100'  // Синяя - нет сообщений
+              dialog?.has_new_messages 
+                ? 'bg-red-50 border-red-200 text-red-600'  // Красная - есть непрочитанные
+                : (dialog?.message_count > 0 
+                    ? 'bg-green-50 border-green-200 text-green-600'  // Зелёная - есть сообщения
+                    : 'bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100')  // Синяя - нет сообщений
             }`}
             onClick={(e) => { e.stopPropagation(); openUserChat(user); }}
             title={dialog?.message_count ? `Чат (${dialog.message_count} сообщений)` : 'Чат CRM'}
