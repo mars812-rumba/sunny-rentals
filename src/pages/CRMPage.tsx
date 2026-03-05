@@ -500,6 +500,22 @@ const loadUserDetails = async (user: any) => {
         } catch (refreshError) {
           console.error("Не удалось обновить данные:", refreshError);
         }
+        
+        // Также обновляем allUsers для корректной индикации
+        try {
+          const allUsersRes = await fetch(`/api/crm/users?period=${period}`);
+          const allUsersData = await allUsersRes.json();
+          if (allUsersData.status === 'ok') {
+            const processedAllUsers = allUsersData.users.map((user: any) => ({
+              ...user,
+              dialog_status: user.dialog_status || user.dialog || null,
+              dialog: user.dialog || user.dialog_status || null
+            }));
+            setAllUsers(processedAllUsers);
+          }
+        } catch (allUsersError) {
+          console.error("Не удалось обновить allUsers:", allUsersError);
+        }
       }
     } catch (e) {
       console.error("Ошибка отправки:", e);
@@ -706,6 +722,22 @@ const openUserChat = (user: any) => {
           }
         } catch (refreshError) {
           console.error("Не удалось обновить данные:", refreshError);
+        }
+        
+        // Также обновляем allUsers для корректной индикации
+        try {
+          const allUsersRes = await fetch(`/api/crm/users?period=${period}`);
+          const allUsersData = await allUsersRes.json();
+          if (allUsersData.status === 'ok') {
+            const processedAllUsers = allUsersData.users.map((user: any) => ({
+              ...user,
+              dialog_status: user.dialog_status || user.dialog || null,
+              dialog: user.dialog || user.dialog_status || null
+            }));
+            setAllUsers(processedAllUsers);
+          }
+        } catch (allUsersError) {
+          console.error("Не удалось обновить allUsers:", allUsersError);
         }
       } else {
         console.error('Ошибка отправки сообщения Claude:', result.message || result);
