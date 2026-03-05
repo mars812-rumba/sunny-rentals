@@ -1647,8 +1647,8 @@ const handleUpdateNote = async () => {
           {/* ВКЛАДКА ЧАТ (CORRECTED MEDIA RENDERING) */}
 <TabsContent value="chat" className="m-0 h-full flex flex-col bg-slate-100 overflow-hidden">
     {/* Чат занимает всё свободное место */}
-<ScrollArea className="flex-1 p-2">
-  <div className="max-w-2xl mx-auto space-y-3 pb-4">
+<ScrollArea className="flex-1 p-2 w-full">
+  <div className="w-full max-w-full mx-auto space-y-3 pb-4 box-border overflow-hidden">
     {chats.map((msg, i) => {
       // ✅ ЗАЩИТА ОТ NULL
       if (!msg) return null;
@@ -1774,8 +1774,8 @@ const handleUpdateNote = async () => {
 </ScrollArea>
 
 {/* Единый компактный блок управления и ввода */}
-<div className="bg-white border-t border-slate-200 shrink-0 p-3">
-    <div className="max-w-2xl mx-auto">
+<div className="bg-white border-t border-slate-200 shrink-0 p-3 w-full box-border">
+    <div className="w-full max-w-full mx-auto box-border">
         
         {/* РЯД 1: Кнопки контроля Claude */}
         <div className="flex justify-between gap-1 mb-3">
