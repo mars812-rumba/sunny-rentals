@@ -3360,7 +3360,11 @@ async def receive_media_from_bot(request: Request):
         if not user_id or not media_info:
             raise HTTPException(status_code=400, detail="user_id and media are required")
         
-        print(f"📸 Received media from bot: user {user_id}, type: {media_info.get('type')}")
+        print(f"📸 [RECEIVE-MEDIA] user_id={user_id} (type={type(user_id).__name__}), filename={media_info.get('filename')}")
+        
+        # Приводим user_id к строке для консистентности
+        user_id = str(user_id)
+        print(f"📸 [RECEIVE-MEDIA] normalized user_id={user_id}")
         
         # Log media message to chat history
         try:
@@ -4709,7 +4713,10 @@ async def get_user_chats_fast(user_id: str):
         chats = []
         t_id = str(user_id)
         
+        print(f"📤 [GET-CHATS] user_id={user_id} (type={type(user_id).__name__}), t_id={t_id}")
+        
         if not CHAT_LOGS_JSONL.exists():
+            print(f"📤 [GET-CHATS] chat_logs.jsonl не найден")
             return {"status": "ok", "chats": []}
 
         # Читаем только последних 500 строк, чтобы не вешать сервер
@@ -4722,9 +4729,14 @@ async def get_user_chats_fast(user_id: str):
                 for line in lines:
                     try:
                         entry = json.loads(line.strip())
-                        if str(entry.get('user_id')) == t_id:
-                            # Дедупликация: пропускаем если уже видели этот filename
-                            media = entry.get('media', {})
+                        entry_uid = str(entry.get('user_id', ''))
+                        # Debug для первых 10 записей
+                        if len(chats) < 10:
+                            print(f"📤 [DEBUG] Checking entry: entry_uid={entry_uid}, t_id={t_id}, match={entry_uid == t_id}")
+                        if entry_uid != t_id:
+                            continue
+                        # Дедупликация: пропускаем если уже видели этот filename
+                        media = entry.get('media', {})
                             filename = media.get('filename') if media else None
                             if not filename:
                                 # Проверяем в content.media
