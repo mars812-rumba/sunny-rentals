@@ -4712,10 +4712,10 @@ async def get_user_chats_fast(user_id: str):
         if not CHAT_LOGS_JSONL.exists():
             return {"status": "ok", "chats": []}
 
-        # Читаем только последние 500 строк, чтобы не вешать сервер
+        # Читаем только последних 500 строк, чтобы не вешать сервер
         try:
-            # Дедупликация по filename
-            seen_filenames = set()
+            # Дедупликация по filename + timestamp (ключ = filename + timestamp)
+            seen_media_keys = set()
             with open(CHAT_LOGS_JSONL, 'r', encoding='utf-8') as f:
                 # Читаем хвост файла
                 lines = f.readlines()[-500:]
@@ -4723,14 +4723,17 @@ async def get_user_chats_fast(user_id: str):
                     try:
                         entry = json.loads(line.strip())
                         if str(entry.get('user_id')) == t_id:
-                            # Дедупликация: пропускаем если уже видели такой filename
+                            # Дедупликация: создаём ключ из filename + timestamp
                             media = entry.get('media', {})
                             filename = media.get('filename') if media else None
-                            if filename and filename in seen_filenames:
-                                print(f"📊 [DEBUG] Skipping duplicate media: {filename}")
+                            timestamp = entry.get('timestamp', '')
+                            media_key = f"{filename}_{timestamp}" if filename else None
+                            
+                            if media_key and media_key in seen_media_keys:
+                                print(f"📊 [DEBUG] Skipping duplicate media: {media_key}")
                                 continue
-                            if filename:
-                                seen_filenames.add(filename)
+                            if media_key:
+                                seen_media_keys.add(media_key)
                             # Debug logging for chat data structure
                             if len(chats) < 3:  # Only log first 3 entries
                                 print(f"📊 [DEBUG] Chat entry structure for user {user_id}:", {
