@@ -114,6 +114,8 @@ const CRMPage: React.FC = () => {
   const userDocuments = React.useMemo(() => {
     if (!chats || chats.length === 0) return [];
     
+    // Дедупликация по filename
+    const seenFilenames = new Set<string>();
     const documents = [];
     
     for (const msg of chats) {
@@ -125,6 +127,14 @@ const CRMPage: React.FC = () => {
       if (media && typeof media === 'object') {
         // Build correct download URL - photos are stored directly in user directory
         const filename = media.filename || media.file_name || media.original_filename || 'unknown';
+        
+        // Пропускаем дубликаты по filename
+        if (seenFilenames.has(filename)) {
+          console.log(`📁 [DEBUG] Skipping duplicate: ${filename}`);
+          continue;
+        }
+        seenFilenames.add(filename);
+        
         const downloadUrl = `/api/crm/media/${selectedUser?.user_id}/${encodeURIComponent(filename)}`;
         
         documents.push({
