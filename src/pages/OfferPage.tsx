@@ -4,13 +4,14 @@ import { format, differenceInDays } from "date-fns";
 import { ru } from "date-fns/locale";
 import {
   ArrowLeft, Calendar, CreditCard, Check, Copy,
-  Fuel, Settings, Zap, Gauge, Loader2, ArrowRight
+  Fuel, Settings, Zap, Gauge, Loader2, ArrowRight, Phone
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import useEmblaCarousel from 'embla-carousel-react';
 
@@ -83,6 +84,7 @@ export default function OfferPage() {
   const [car, setCar] = useState<CarData | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // Embla carousel — swipe only, no arrows
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -216,14 +218,18 @@ export default function OfferPage() {
 
       const result = await response.json();
       console.log("Создаём бронь от клиента:", bookingData);
-      toast.success("Заявка отправлена! Мы свяжемся с вами.");
-      navigate(-1);
+      setShowSuccessDialog(true);
     } catch (error) {
       console.error('Ошибка создания брони:', error);
       toast.error("Ошибка при отправке заявки");
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleSuccessClose = () => {
+    setShowSuccessDialog(false);
+    navigate(-1);
   };
 
   const formatPrice = (price: number) => price.toLocaleString() + " ฿";
@@ -455,6 +461,32 @@ export default function OfferPage() {
           )}
         </Button>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="max-w-sm text-center">
+          <DialogHeader>
+            <DialogTitle className="flex flex-col items-center gap-3">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <Check className="w-8 h-8 text-green-600" />
+              </div>
+              <span>Заявка принята!</span>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="text-center space-y-4">
+            <p className="text-muted-foreground">
+              Ваша заявка принята в работу.<br />
+              Менеджер свяжется с вами в ближайшее время.
+            </p>
+            <Button 
+              onClick={handleSuccessClose}
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+            >
+              ОК
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
