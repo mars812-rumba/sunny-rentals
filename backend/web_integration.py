@@ -1719,6 +1719,15 @@ async def create_offer_booking(request: Request):
         total_delivery = data.get('total_delivery', 0)
         deposit = data.get('deposit', 0)
         source = data.get('source', 'offer_page')
+        
+        # Дополнительные поля
+        brand = data.get('brand', '')
+        model = data.get('model', '')
+        year = data.get('year', '')
+        color = data.get('color', '')
+        daily_rate = data.get('price_per_day', 0)
+        pickup_location = data.get('pickup_location', 'airport')
+        return_location = data.get('return_location', 'airport')
 
         if (not user_id or user_id == "") or not car_id or not start_date or not end_date:
             raise HTTPException(status_code=400, detail="Missing required fields: user_id, car_id, start_date, end_date")
@@ -1726,7 +1735,7 @@ async def create_offer_booking(request: Request):
         # Генерируем booking_id
         booking_id = gen_booking_id()
 
-        # Формируем booking запись
+        # Формируем booking запись (полная структура)
         booking = {
             "booking_id": booking_id,
             "user_id": user_id,
@@ -1734,22 +1743,37 @@ async def create_offer_booking(request: Request):
             "form_data": {
                 "car": {
                     "id": car_id,
-                    "name": car_name,
+                    "name": car_name or f"{brand} {model}".strip(),
+                    "brand": brand,
+                    "model": model,
+                    "year": year,
+                    "color": color
                 },
                 "dates": {
                     "start": start_date,
                     "end": end_date,
                     "days": days
                 },
-                "pricing": {
-                    "total_rental": total_rental,
-                    "total_delivery": total_delivery,
-                    "deposit": deposit,
-                    "grand_total": total_rental + total_delivery
+                "locations": {
+                    "pickupLocation": pickup_location,
+                    "returnLocation": return_location
                 },
-                "source": source,
+                "pricing": {
+                    "dailyRate": daily_rate,
+                    "totalRental": total_rental,
+                    "deposit": deposit,
+                    "deliveryPickup": 0,
+                    "deliveryReturn": 0,
+                    "totalDelivery": total_delivery,
+                    "grandTotal": total_rental + total_delivery
+                },
+                "contact": {
+                    "value": str(user_id),
+                    "type": "telegram"
+                },
                 "timestamp": datetime.utcnow().isoformat()
             },
+            "source": source,
             "created_at": datetime.utcnow().isoformat(),
             "updated_at": datetime.utcnow().isoformat()
         }
