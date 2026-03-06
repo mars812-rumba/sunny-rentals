@@ -423,8 +423,16 @@ export default function CarsPage({ userId }: CarsPageProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
-  // Use passed userId or get from URL
-  const targetUserId = userId || searchParams.get('user_id');
+  // User ID - update when URL changes
+  const [targetUserId, setTargetUserId] = useState(userId || '');
+  useEffect(() => {
+    const urlUserId = searchParams.get('user_id');
+    if (urlUserId) {
+      setTargetUserId(urlUserId);
+    } else if (userId) {
+      setTargetUserId(userId);
+    }
+  }, [searchParams, userId]);
   
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
