@@ -586,6 +586,18 @@ const loadUserDetails = async (user: any) => {
     loadUserDetails(user);
   };
 
+  // Navigate to offer flow - switch to Cars tab with user_id
+  const navigateToOffer = (userId: number | string) => {
+    // Dispatch custom event to switch to AdminPanel (CarsPage) with user_id
+    window.dispatchEvent(new CustomEvent('switchTab', { detail: 0 })); // 0 = Cars tab
+    // Update URL with user_id
+    setTimeout(() => {
+      const url = new URL(window.location.href);
+      url.searchParams.set('user_id', String(userId));
+      window.history.pushState({}, '', url.toString());
+    }, 100);
+  };
+
 // Функция для перехода сразу в чат
 const openUserChat = (user: any) => {
   setActiveTab('chat');
@@ -1550,9 +1562,22 @@ const handleUpdateNote = async () => {
 })()}
       {/* Блок 2: Активные заявки (Bookings) */}
       <div className="space-y-4">
-        <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
-          <Car size={14} className="text-blue-500" /> Активные заявки ({bookings?.length || 0})
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
+            <Car size={14} className="text-blue-500" /> Активные заявки ({bookings?.length || 0})
+          </h3>
+          {/* Кнопка "Создать оффер" */}
+          {selectedUser && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
+              onClick={() => navigateToOffer(selectedUser.user_id)}
+            >
+              📤 Создать оффер
+            </Button>
+          )}
+        </div>
         
         {bookings && bookings.length > 0 ? (
           <div className="grid grid-cols-1 gap-3">

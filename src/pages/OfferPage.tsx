@@ -180,17 +180,45 @@ export default function OfferPage() {
 
   const handleConfirm = async () => {
     setSubmitting(true);
-    const offerData = {
-      car_id: carId, car_name: car?.name, start_date: startDateStr, end_date: endDateStr,
-      days, price_per_day: pricePerDay, total_rental: parseInt(totalRental) || 0,
-      total_delivery: parseInt(totalDelivery) || 0, deposit: parseInt(deposit) || 0,
-      grand_total: grandTotal, created_at: new Date().toISOString(),
+    const userId = searchParams.get('user_id');
+    
+    const bookingData = {
+      user_id: userId,
+      car_id: carId,
+      car_name: car?.name,
+      start_date: startDateStr,
+      end_date: endDateStr,
+      days,
+      price_per_day: pricePerDay,
+      total_rental: parseInt(totalRental) || 0,
+      total_delivery: parseInt(totalDelivery) || 0,
+      deposit: parseInt(deposit) || 0,
+      grand_total: grandTotal,
+      source: 'offer_page',
+      created_at: new Date().toISOString(),
     };
-    console.log("Создаём бронь от клиента:", offerData);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success("Заявка отправлена! Мы свяжемся с вами.");
-    navigate(-1);
-    setSubmitting(false);
+
+    try {
+      const response = await fetch(`${API_URL}/api/bookings/offer-create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка создания брони');
+      }
+
+      const result = await response.json();
+      console.log("Создаём бронь от клиента:", bookingData);
+      toast.success("Заявка отправлена! Мы свяжемся с вами.");
+      navigate(-1);
+    } catch (error) {
+      console.error('Ошибка создания брони:', error);
+      toast.error("Ошибка при отправке заявки");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const formatPrice = (price: number) => price.toLocaleString() + " ฿";

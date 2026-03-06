@@ -161,12 +161,16 @@ export default function OfferAdminPage() {
 
   const copyClientLink = () => {
     const params = new URLSearchParams();
+    const userId = searchParams.get('user_id');
     params.set('car', carId || '');
     params.set('start', startDateStr || '');
     params.set('end', endDateStr || '');
     params.set('rental', totalRental || baseTotalRental.toString());
     params.set('delivery', totalDelivery || '0');
     params.set('deposit', deposit || baseDeposit.toString());
+    if (userId) {
+      params.set('user_id', userId);
+    }
     const url = `${window.location.origin}/offer?${params.toString()}`;
     navigator.clipboard.writeText(url);
     toast.success("Ссылка для клиента скопирована!");

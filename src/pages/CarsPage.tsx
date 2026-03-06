@@ -414,10 +414,17 @@ function PriceEditor({ car, onSave, onCancel }) {
   );
 }
 
-export default function CarsPage() {
+interface CarsPageProps {
+  userId?: string | null;
+}
+
+export default function CarsPage({ userId }: CarsPageProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  
+  // Use passed userId or get from URL
+  const targetUserId = userId || searchParams.get('user_id');
   
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -723,6 +730,23 @@ export default function CarsPage() {
       console.error("Error in bulk price update:", error);
       throw error;
     }
+  };
+
+  // Handle offer button click - navigate to offer admin page with user_id
+  const handleOfferClick = (car: any) => {
+    const startDateStr = startDate ? format(startDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+    const endDateStr = endDate ? format(endDate, 'yyyy-MM-dd') : format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd');
+    
+    const params = new URLSearchParams();
+    params.set('car', car.id);
+    params.set('start', startDateStr);
+    params.set('end', endDateStr);
+    
+    if (targetUserId) {
+      params.set('user_id', targetUserId);
+    }
+    
+    navigate(`/admin/offer?${params.toString()}`);
   };
 
   const filteredCars = useMemo(() => {
@@ -1049,6 +1073,18 @@ export default function CarsPage() {
                     >
                       <User className="h-3 w-3" />
                     </Button>
+
+                    {/* Кнопка "Предложение" (видна только если есть userId) */}
+                    {targetUserId && (
+                      <Button
+                        size="sm"
+                        variant="default"
+                        className="flex-1 h-8 text-xs px-1 bg-blue-600 hover:bg-blue-700"
+                        onClick={() => handleOfferClick(car)}
+                      >
+                        <Car className="h-3 w-3" />
+                      </Button>
+                    )}
                   </div>
 
                   {/* ✅ Депозит + Switch в одну строку */}

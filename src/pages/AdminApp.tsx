@@ -1,15 +1,23 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { Car, Calendar, Users } from "lucide-react";
 import AdminPanel from "./AdminPanel";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 
 const CRMPage = React.lazy(() => import("./CRMPage"));
 const AdminScheduler = React.lazy(() => import("./AdminScheduler"));
+const CarsPage = React.lazy(() => import("./CarsPage"));
 
 export default function AdminApp() {
   const [currentScreen, setCurrentScreen] = useState(2); // Начинаем с CRM
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const tg = window.Telegram?.WebApp;
   const user = tg?.initDataUnsafe?.user;
   const [carOwnersMap, setCarOwnersMap] = useState<Record<string, object>>({});
+  
+  // Store target user_id from URL for offer flow
+  const [targetUserId, setTargetUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (tg) tg.ready();
@@ -22,15 +30,50 @@ export default function AdminApp() {
         }
       }));
     }
-  }, [user]);
+    
+    // Listen for switchTab events to navigate between tabs
+    const handleSwitchTab = (event: CustomEvent) => {
+      const tabIndex = event.detail;
+      if (typeof tabIndex === 'number' && tabIndex >= 0 && tabIndex <= 2) {
+        setCurrentScreen(tabIndex);
+        
+        // Update URL with user_id when switching to Cars tab
+        if (tabIndex === 0 && targetUserId) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('user_id', targetUserId);
+          navigate(url.search, { replace: true });
+        }
+      }
+    };
+    window.addEventListener('switchTab', handleSwitchTab as EventListener);
+    return () => window.removeEventListener('switchTab', handleSwitchTab as EventListener);
+  }, [user, navigate, targetUserId]);
+
+  // Update targetUserId when searchParams change
+  useEffect(() => {
+    const userIdParam = searchParams.get('user_id');
+    if (userIdParam) {
+      setTargetUserId(userIdParam);
+    }
+  }, [searchParams]);
 
   const screens = [
-    { id: 0, name: "Авто", icon: Car, component: AdminPanel },
+    { id: 0, name: "Авто", icon: Car, component: CarsPage, userId: targetUserId },
     { id: 1, name: "Календарь", icon: Calendar, component: AdminScheduler },
     { id: 2, name: "CRM", icon: Users, component: CRMPage },
   ];
 
   const CurrentComponent = screens[currentScreen].component;
+  const CurrentComponentUserId = screens[currentScreen].userId || null;
+
+  // Create component props with userId if needed
+  const renderCurrentComponent = () => {
+    const Component = CurrentComponent;
+    if (currentScreen === 0 && CurrentComponentUserId) {
+      return <Component userId={CurrentComponentUserId} />;
+    }
+    return <Component />;
+  };
 
   const BottomNavBar = () => (
     <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200 sm:hidden">
@@ -89,7 +132,7 @@ export default function AdminApp() {
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
           </div>
         }>
-          <CurrentComponent />
+          {renderCurrentComponent()}
         </Suspense>
       </div>
       <BottomNavBar />

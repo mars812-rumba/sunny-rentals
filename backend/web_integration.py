@@ -1698,6 +1698,113 @@ def get_bookings(user_id: str | None = None):
         )
 
 
+@app.post(API_PREFIX + "/bookings/offer-create")
+def create_offer_booking(request: Request):
+    """
+    Создать бронь из оффера (offer page).
+    Принимает user_id, car_id, dates, pricing, source.
+    Создает бронь со статусом 'pre_booking' и обновляет статус пользователя.
+    """
+    try:
+        data = request.json()
+        print(f"📝 [offer-create] Creating booking from offer: {data}")
+
+        user_id = data.get('user_id')
+        car_id = data.get('car_id')
+        car_name = data.get('car_name')
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        days = data.get('days')
+        total_rental = data.get('total_rental', 0)
+        total_delivery = data.get('total_delivery', 0)
+        deposit = data.get('deposit', 0)
+        source = data.get('source', 'offer_page')
+
+        if not user_id or not car_id or not start_date or not end_date:
+            raise HTTPException(status_code=400, detail="Missing required fields: user_id, car_id, start_date, end_date")
+
+        # Генерируем booking_id
+        booking_id = gen_booking_id()
+
+        # Формируем booking запись
+        booking = {
+            "booking_id": booking_id,
+            "user_id": user_id,
+            "status": "pre_booking",
+            "form_data": {
+                "car": {
+                    "id": car_id,
+                    "name": car_name,
+                },
+                "dates": {
+                    "start": start_date,
+                    "end": end_date,
+                    "days": days
+                },
+                "pricing": {
+                    "total_rental": total_rental,
+                    "total_delivery": total_delivery,
+                    "deposit": deposit,
+                    "grand_total": total_rental + total_delivery
+                },
+                "source": source,
+                "timestamp": datetime.utcnow().isoformat()
+            },
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+
+        # Загружаем существующие брони и добавляем новую
+        bookings = load_bookings()
+        bookings.append(booking)
+
+        # Сохраняем
+        with _lock:
+            save_json(BOOKINGS_FILE, bookings)
+
+        # Обновляем статус пользователя на 'pre_booking'
+        if user_id:
+            users_data = load_json(USER_DATA_JSON)
+            user_found = False
+            for user in users_data:
+                if str(user.get("user_id")) == str(user_id):
+                    user["status"] = "pre_booking"
+                    user["updated_at"] = datetime.utcnow().isoformat()
+                    user["car_interested"] = car_name or car_id
+                    user_found = True
+                    break
+            
+            if user_found:
+                with _lock:
+                    save_json(USER_DATA_JSON, users_data)
+                print(f"✅ User {user_id} status updated to pre_booking")
+
+        # Логируем событие
+        log_dialog_event(
+            user_id=user_id,
+            action="booking_created_from_offer",
+            booking_id=booking_id,
+            car_id=car_id,
+            source=source
+        )
+
+        print(f"✅ Offer booking created: {booking_id} for user {user_id}")
+
+        return {
+            "status": "ok",
+            "booking_id": booking_id,
+            "message": "Бронь создана успешно"
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error creating offer booking: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 
 @app.get(API_PREFIX + "/bookings/logistics", response_model=List[LogisticsDate])
 async def get_bookings_logistics():
