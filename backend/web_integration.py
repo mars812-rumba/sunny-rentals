@@ -1685,7 +1685,7 @@ def get_available_cars(
 def get_bookings(user_id: str | None = None):
     try:
         bookings = load_bookings()
-        if user_id:
+        if user_id and user_id != "":
             bookings = [b for b in bookings if str(b.get("user_id")) == str(user_id)]
         bookings.sort(key=lambda x: x.get("form_data", {}).get("timestamp", ""), reverse=True)
         return {"status": "ok", "bookings": bookings, "count": len(bookings)}
@@ -1720,7 +1720,7 @@ def create_offer_booking(request: Request):
         deposit = data.get('deposit', 0)
         source = data.get('source', 'offer_page')
 
-        if not user_id or not car_id or not start_date or not end_date:
+        if (not user_id or user_id == "") or not car_id or not start_date or not end_date:
             raise HTTPException(status_code=400, detail="Missing required fields: user_id, car_id, start_date, end_date")
 
         # Генерируем booking_id
@@ -1763,7 +1763,7 @@ def create_offer_booking(request: Request):
             save_json(BOOKINGS_FILE, bookings)
 
         # Обновляем статус пользователя на 'pre_booking'
-        if user_id:
+        if user_id and user_id != "":
             users_data = load_json(USER_DATA_JSON)
             user_found = False
             for user in users_data:
@@ -4326,7 +4326,7 @@ async def reject_booking(booking_id: str, data: dict = None):
             raise HTTPException(status_code=404, detail=f"Бронь {booking_id} не найдена")
         
         # Архивируем лида (user status = archived)
-        if user_id:
+        if user_id and user_id != "":
             for user in users_data:
                 if str(user.get('user_id')) == str(user_id):
                     user['status'] = 'archive'
@@ -4562,7 +4562,7 @@ def get_active_dialogs():
                     try:
                         event = json.loads(line.strip())
                         user_id = event.get("user_id")
-                        if user_id:
+                        if user_id and user_id != "":
                             if user_id not in user_dialogs:
                                 user_dialogs[user_id] = {
                                     "status": None,
