@@ -49,11 +49,13 @@ export default function AdminApp() {
     return () => window.removeEventListener('switchTab', handleSwitchTab as EventListener);
   }, [user, navigate, targetUserId]);
 
-  // Update targetUserId when searchParams change
+  // Update targetUserId when searchParams change and switch to Cars tab
   useEffect(() => {
     const userIdParam = searchParams.get('user_id');
     if (userIdParam) {
       setTargetUserId(userIdParam);
+      // If we have user_id, switch to Cars tab (index 0)
+      setCurrentScreen(0);
     }
   }, [searchParams]);
 
