@@ -1779,14 +1779,17 @@ def create_offer_booking(request: Request):
                     save_json(USER_DATA_JSON, users_data)
                 print(f"✅ User {user_id} status updated to pre_booking")
 
-        # Логируем событие
-        log_dialog_event(
-            user_id=user_id,
-            action="booking_created_from_offer",
-            booking_id=booking_id,
-            car_id=car_id,
-            source=source
-        )
+        # Логируем событие (без try чтобы не падать если логирование сломано)
+        try:
+            log_dialog_event(
+                user_id=user_id,
+                action="booking_created_from_offer",
+                booking_id=booking_id,
+                car_id=car_id,
+                source=source
+            )
+        except Exception as e:
+            print(f"⚠️ Logging error (non-critical): {e}")
 
         print(f"✅ Offer booking created: {booking_id} for user {user_id}")
 
