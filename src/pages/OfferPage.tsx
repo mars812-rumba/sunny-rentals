@@ -197,8 +197,8 @@ export default function OfferPage() {
       total_rental: parseInt(totalRental) || 0,
       total_delivery: parseInt(totalDelivery) || 0,
       deposit: parseInt(deposit) || 0,
-      pickup_location: filters?.pickupLocation || 'airport',
-      return_location: filters?.returnLocation || 'airport',
+      pickup_location: searchParams.get('pickup') || 'airport',
+      return_location: searchParams.get('return') || 'airport',
       source: 'offer_page',
     };
 
