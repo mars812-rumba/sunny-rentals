@@ -1074,17 +1074,16 @@ export default function CarsPage({ userId }: CarsPageProps) {
                       <User className="h-3 w-3" />
                     </Button>
 
-                    {/* Кнопка "Предложение" (видна только если есть userId) */}
-                    {targetUserId && (
+                    {/* Кнопка "Предложение" - всегда видна */}
                       <Button
                         size="sm"
                         variant="default"
                         className="flex-1 h-8 text-xs px-1 bg-blue-600 hover:bg-blue-700"
                         onClick={() => handleOfferClick(car)}
+                        disabled={!startDate || !endDate}
                       >
                         <Car className="h-3 w-3" />
                       </Button>
-                    )}
                   </div>
 
                   {/* ✅ Депозит + Switch в одну строку */}
