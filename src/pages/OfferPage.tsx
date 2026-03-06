@@ -189,13 +189,10 @@ export default function OfferPage() {
       start_date: startDateStr,
       end_date: endDateStr,
       days,
-      price_per_day: pricePerDay,
       total_rental: parseInt(totalRental) || 0,
       total_delivery: parseInt(totalDelivery) || 0,
       deposit: parseInt(deposit) || 0,
-      grand_total: grandTotal,
       source: 'offer_page',
-      created_at: new Date().toISOString(),
     };
 
     try {
@@ -206,7 +203,8 @@ export default function OfferPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Ошибка создания брони');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Ошибка создания брони');
       }
 
       const result = await response.json();
