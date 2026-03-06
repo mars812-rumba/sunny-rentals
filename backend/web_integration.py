@@ -1699,14 +1699,14 @@ def get_bookings(user_id: str | None = None):
 
 
 @app.post(API_PREFIX + "/bookings/offer-create")
-def create_offer_booking(request: Request):
+async def create_offer_booking(request: Request):
     """
     Создать бронь из оффера (offer page).
     Принимает user_id, car_id, dates, pricing, source.
     Создает бронь со статусом 'pre_booking' и обновляет статус пользователя.
     """
     try:
-        data = request.json()
+        data = await request.json()
         print(f"📝 [offer-create] Creating booking from offer: {data}")
 
         user_id = data.get('user_id')
