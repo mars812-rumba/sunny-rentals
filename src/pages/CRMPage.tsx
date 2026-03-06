@@ -588,14 +588,8 @@ const loadUserDetails = async (user: any) => {
 
   // Navigate to offer flow - switch to Cars tab with user_id
   const navigateToOffer = (userId: number | string) => {
-    // Dispatch custom event to switch to AdminPanel (CarsPage) with user_id
-    window.dispatchEvent(new CustomEvent('switchTab', { detail: 0 })); // 0 = Cars tab
-    // Update URL with user_id
-    setTimeout(() => {
-      const url = new URL(window.location.href);
-      url.searchParams.set('user_id', String(userId));
-      window.history.pushState({}, '', url.toString());
-    }, 100);
+    // Dispatch custom event with tab index AND user_id
+    window.dispatchEvent(new CustomEvent('switchTab', { detail: { tab: 0, userId: String(userId) } }));
   };
 
 // Функция для перехода сразу в чат

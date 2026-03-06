@@ -33,8 +33,23 @@ export default function AdminApp() {
     
     // Listen for switchTab events to navigate between tabs
     const handleSwitchTab = (event: CustomEvent) => {
-      const tabIndex = event.detail;
+      const detail = event.detail;
+      let tabIndex = 0;
+      let userId = null;
+      
+      if (typeof detail === 'object' && detail !== null) {
+        tabIndex = detail.tab ?? 0;
+        userId = detail.userId;
+      } else if (typeof detail === 'number') {
+        tabIndex = detail;
+      }
+      
       if (typeof tabIndex === 'number' && tabIndex >= 0 && tabIndex <= 2) {
+        // Set user_id if provided
+        if (userId) {
+          setTargetUserId(String(userId));
+        }
+        
         setCurrentScreen(tabIndex);
         
         // Update URL with user_id when switching to Cars tab
@@ -52,12 +67,12 @@ export default function AdminApp() {
   // Update targetUserId when searchParams change and switch to Cars tab
   useEffect(() => {
     const userIdParam = searchParams.get('user_id');
-    if (userIdParam) {
+    if (userIdParam && !targetUserId) {
       setTargetUserId(userIdParam);
       // If we have user_id, switch to Cars tab (index 0)
       setCurrentScreen(0);
     }
-  }, [searchParams]);
+  }, [searchParams, targetUserId]);
 
   const screens = [
     { id: 0, name: "Авто", icon: Car, component: CarsPage, userId: targetUserId },
