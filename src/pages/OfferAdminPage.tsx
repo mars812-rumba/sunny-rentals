@@ -75,6 +75,12 @@ export default function OfferAdminPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  // User ID from URL - update when URL changes
+  const [urlUserId, setUrlUserId] = useState('');
+  useEffect(() => {
+    setUrlUserId(searchParams.get('user_id') || '');
+  }, [searchParams]);
+
   const carId = searchParams.get("car");
   const startDateStr = searchParams.get("start");
   const endDateStr = searchParams.get("end");
@@ -161,7 +167,7 @@ export default function OfferAdminPage() {
 
   const copyClientLink = () => {
     const params = new URLSearchParams();
-    const userId = searchParams.get('user_id') || '';
+    const userId = urlUserId;
     params.set('car', carId || '');
     params.set('start', startDateStr || '');
     params.set('end', endDateStr || '');
