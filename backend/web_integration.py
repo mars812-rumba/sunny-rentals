@@ -1732,6 +1732,32 @@ async def create_offer_booking(request: Request):
         if (not user_id or user_id == "") or not car_id or not start_date or not end_date:
             raise HTTPException(status_code=400, detail="Missing required fields: user_id, car_id, start_date, end_date")
 
+        # Проверка на дубликат - не создавать если уже есть активная бронь
+        bookings = load_bookings()
+        new_start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        new_end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        
+        for existing in bookings:
+            if (str(existing.get("user_id")) == str(user_id) and 
+                existing.get("status") in ["pre_booking", "confirmed"]):
+                
+                existing_form = existing.get("form_data", {})
+                existing_car = existing_form.get("car", {})
+                existing_dates = existing_form.get("dates", {})
+                
+                # Проверяем тот же автомобиль
+                if existing_car.get("id") == car_id:
+                    existing_start = datetime.fromisoformat(existing_dates.get("start", "").replace('Z', '+00:00'))
+                    existing_end = datetime.fromisoformat(existing_dates.get("end", "").replace('Z', '+00:00'))
+                    
+                    # Проверяем пересечение дат
+                    if not (new_end <= existing_start or new_start >= existing_end):
+                        return {
+                            "status": "exists",
+                            "message": "У вас уже есть активная бронь на этот автомобиль на эти даты",
+                            "existing_booking_id": existing.get("booking_id")
+                        }
+
         # Генерируем booking_id
         booking_id = gen_booking_id()
 

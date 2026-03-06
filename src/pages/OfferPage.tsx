@@ -218,6 +218,12 @@ export default function OfferPage() {
 
       const result = await response.json();
       console.log("Создаём бронь от клиента:", bookingData);
+      
+      if (result.status === 'exists') {
+        toast.info("У вас уже есть бронь на этот автомобиль!");
+        return;
+      }
+      
       setShowSuccessDialog(true);
     } catch (error) {
       console.error('Ошибка создания брони:', error);
