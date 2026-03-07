@@ -18,7 +18,7 @@ import {
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus,UserRoundMinus,UserRoundCheck,
   Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
   CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download,
-  Clock, FileQuestion, CircleArrowRight, Hourglass, Info, AlertCircle
+  Clock, FileQuestion
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { MarkerType } from '@/types/crm';
@@ -81,7 +81,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   'new': { label: 'NEW', color: '#64748b', bg: 'bg-slate-100' },
   'in_work': { label: 'WORK', color: '#7c3aed', bg: 'bg-green-50' },
   'pre_booking': { label: 'PBOOK', color: '#ea580c', bg: 'bg-orange-50' },
-  'confirmed': { label: 'CONF', color: '#16a34a', bg: 'bg-green-100' },
+  'confirmed': { label: 'BOOK', color: '#16a34a', bg: 'bg-green-100' },
   'archive': { label: 'ARCHIVE', color: '#94a3b8', bg: 'bg-slate-200' }
 };
 
@@ -1164,10 +1164,10 @@ const handleUpdateNote = async () => {
   <div className="flex gap-1.5 bg-slate-100/30 p-1 rounded-xl w-fit">
     {[
       { id: 'all', icon: Filter, color: 'text-slate-400' },
-      { id: 'offer_sent', icon: CircleArrowRight, color: 'text-amber-500' },
-      { id: 'waiting', icon: Hourglass, color: 'text-purple-500' },
-      { id: 'need_info', icon: Info, color: 'text-cyan-500' },
-      { id: 'follow_up', icon: AlertCircle, color: 'text-red-500' },
+      { id: 'offer_sent', icon: Send, color: 'text-amber-500' },
+      { id: 'waiting', icon: Clock, color: 'text-purple-500' },
+      { id: 'need_info', icon: FileQuestion, color: 'text-cyan-500' },
+      { id: 'follow_up', icon: RefreshCw, color: 'text-red-500' },
     ].map(m => (
       <Button
         key={m.id}
@@ -1410,7 +1410,7 @@ const handleUpdateNote = async () => {
         <div className="w-px h-4 bg-slate-200 mx-1"></div>
       </div>
 {/* ПЕРЕНЕСЕННЫЕ СЮДА БЕЙДЖИ СТАТУСОВ */}
-          <div className="flex gap-0.5">
+          <div className="flex gap-px">
             {['new', 'in_work', 'pre_booking', 'confirmed'].map(s => (
               <button
                 key={s}
@@ -1450,14 +1450,10 @@ const handleUpdateNote = async () => {
           </Button>
         </div>
 
-        {/* 4. Кнопка Telegram (внешняя) - зелёная если есть active бронь */}
+        {/* 4. Кнопка Telegram (внешняя) */}
         <Button
           size="icon"
-          className={`h-7 w-7 rounded-md shadow-sm transition-all ${
-            user.has_active_booking
-              ? 'bg-green-500 hover:bg-green-600 shadow-green-200 text-white'
-              : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200 text-white'
-          }`}
+          className="h-7 w-7 rounded-md shadow-sm shadow-blue-200 bg-blue-600 text-white hover:bg-blue-700 transition-all"
           onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/${user.username}`, '_blank'); }}
         >
           <Send className="w-3.5 h-3.5 rotate-[-20deg] translate-x-[-1px]" />
