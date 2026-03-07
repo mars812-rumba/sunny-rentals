@@ -1105,17 +1105,17 @@ const handleUpdateNote = async () => {
       </nav>
 
 <main className="p-4 max-w-[1600px] mx-auto w-full space-y-6">
-  {/* Stats Section */}
-  <div className="grid grid-cols-4 gap-4">
+  {/* Stats Section - компактный layout для мобильных */}
+  <div className="grid grid-cols-5 gap-2">
     {MAIN_STATUSES.map(key => {
       const count = stats?.[key] || 0;
-      
+
       return (
-        <Card key={key} onClick={() => setActiveStatus(key)} 
-          className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg scale-[1.02]' : 'hover:bg-white/50 opacity-80'}`}>
-          <CardContent className="p-3 flex flex-row items-center justify-center gap-2 relative">
-            <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
-            <span className="text-2xl font-black text-slate-800 leading-none">{count}</span>
+        <Card key={key} onClick={() => setActiveStatus(key)}
+          className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:bg-white/50 opacity-80'}`}>
+          <CardContent className="p-2 flex flex-col items-center justify-center gap-0.5 relative">
+            <span className="text-[8px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
+            <span className="text-base font-black text-slate-800 leading-none">{count}</span>
           </CardContent>
         </Card>
       );
@@ -1242,10 +1242,14 @@ const handleUpdateNote = async () => {
     <span className={`font-black text-[11px] truncate ${needsReply ? 'text-amber-700' : 'text-blue-600'}`}>
       @{user.username || 'user'}
     </span>
-    {/* Кнопка ИНФО рядом с юзернеймом */}
-    <Button 
-      size="icon" variant="ghost" 
-      className="h-5 w-5 rounded text-slate-300 hover:text-blue-500 hover:bg-blue-50"
+    {/* Кнопка ИНФО рядом с юзернеймом - зелёная если есть active бронь */}
+    <Button
+      size="icon" variant="ghost"
+      className={`h-5 w-5 rounded transition-all ${
+        user.has_active_booking
+          ? 'text-green-500 hover:text-green-600 hover:bg-green-50'
+          : 'text-slate-300 hover:text-blue-500 hover:bg-blue-50'
+      }`}
       onClick={(e) => { e.stopPropagation(); openUserDetails(user); }}
     >
       <SquareUser className="w-3.5 h-3.5" />
@@ -1645,8 +1649,8 @@ const handleUpdateNote = async () => {
                       <span className="text-lg font-black text-slate-900 tracking-tight">
                         {b.form_data?.pricing?.grandTotal ? `${b.form_data.pricing.grandTotal.toLocaleString()} ฿` : '0 ฿'}
                       </span>
-                      {/* Кнопки для pre_booking и confirmed */}
-                      {(b.status === 'pre_booking' || b.status === 'confirmed') && (
+                      {/* Кнопки для брони */}
+                      {b.status === 'pre_booking' && (
                         <div className="flex gap-2 mt-2">
                           <Button
                             size="sm"
@@ -1656,6 +1660,19 @@ const handleUpdateNote = async () => {
                           >
                             {loadingAction[`confirm_${b.booking_id}`] ? '...' : '✓'}
                           </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="bg-red-500 hover:bg-red-600 text-white text-xs"
+                            onClick={() => rejectBooking(b.booking_id, b.status)}
+                            disabled={loadingAction[`reject_${b.booking_id}`]}
+                          >
+                            {loadingAction[`reject_${b.booking_id}`] ? '...' : '✕'}
+                          </Button>
+                        </div>
+                      )}
+                      {b.status === 'confirmed' && (
+                        <div className="flex gap-2 mt-2">
                           <Button
                             size="sm"
                             variant="destructive"
