@@ -76,9 +76,9 @@ interface User {
 const MAIN_STATUSES = ['new', 'in_work', 'pre_booking', 'confirmed', 'archive'];
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   'new': { label: 'NEW', color: '#64748b', bg: 'bg-slate-100' },
-  'in_work': { label: 'IN WORK', color: '#7c3aed', bg: 'bg-green-50' },
-  'pre_booking': { label: 'PREBOOK', color: '#ea580c', bg: 'bg-orange-50' },
-  'confirmed': { label: 'CONFIRMED', color: '#16a34a', bg: 'bg-green-100' },
+  'in_work': { label: 'WORK', color: '#7c3aed', bg: 'bg-green-50' },
+  'pre_booking': { label: 'PBOOK', color: '#ea580c', bg: 'bg-orange-50' },
+  'confirmed': { label: 'CONF', color: '#16a34a', bg: 'bg-green-100' },
   'archive': { label: 'ARCHIVE', color: '#94a3b8', bg: 'bg-slate-200' }
 };
 
@@ -1400,7 +1400,7 @@ const handleUpdateNote = async () => {
       </div>
 {/* ПЕРЕНЕСЕННЫЕ СЮДА БЕЙДЖИ СТАТУСОВ */}
           <div className="flex gap-0.5">
-            {['new', 'in_work', 'pre_booking'].map(s => (
+            {['new', 'in_work', 'pre_booking', 'confirmed'].map(s => (
               <button
                 key={s}
                 onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, s); }}
