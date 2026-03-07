@@ -2405,28 +2405,37 @@ def get_crm_stats(period: str = Query("all")):
             user_date_str = user.get("updated_at") or user.get("created_at") or user.get("timestamp")
             if not user_date_str:
                 continue
-                
-            user_date = datetime.fromisoformat(user_date_str.replace('Z', ''))
-            
+
+            user_id = str(user.get("user_id"))
+            user_status = user.get("status")
+
             # Проверяем, попадает ли юзер в период
-            if user_date >= start_date:
-                # Если юзер в архиве, считаем его отдельно
-                if user.get("archived") is True:
-                    stats["archive"] += 1
-                else:
-                    user_status = user.get("status")
+            user_date = datetime.fromisoformat(user_date_str.replace('Z', ''))
+            if user_date < start_date:
+                continue
 
-                    # Маппинг на случай, если в базе остались старые статусы
-                    if user_status == "in_progress": user_status = "in_work"
-                    if user_status in ["hot", "booked", "pending"]: user_status = "pre_booking"
-                    if user_status == "interested": user_status = "new"
+            # Пропускаем web_session для счётчиков (кроме pre_booking)
+            if user_id.startswith("web_session") and user_status != "pre_booking":
+                continue
 
-                    if user_status in stats:
-                        stats[user_status] += 1
+            # Пропускаем нечисловые user_id (кроме pre_booking)
+            if not user_id.startswith("web_session"):
+                try:
+                    int(user_id)
+                except ValueError:
+                    continue
 
-                    # Дополнительно считаем пользователей с confirmed бронью
-                    if check_user_has_confirmed_booking(str(user.get("user_id"))):
-                        stats["confirmed"] += 1
+            # Если юзер в архиве, считаем его отдельно
+            if user.get("archived") is True:
+                stats["archive"] += 1
+            else:
+                # Маппинг на случай, если в базе остались старые статусы
+                if user_status == "in_progress": user_status = "in_work"
+                if user_status in ["hot", "booked", "pending"]: user_status = "pre_booking"
+                if user_status == "interested": user_status = "new"
+
+                if user_status in stats:
+                    stats[user_status] += 1
 
         return {
             "status": "ok",
