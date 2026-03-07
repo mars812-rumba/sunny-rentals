@@ -251,10 +251,9 @@ const CRMPage: React.FC = () => {
       }
       
       // Загружаем только текущую вкладку для отображения
-      // Для вкладки Confirmed используем фильтр по подтверждённым броням
-      const statusParam = activeStatus === 'confirmed' ? '' : `status=${activeStatus}`;
-      const confirmedParam = activeStatus === 'confirmed' ? 'has_confirmed_booking=true' : '';
-      const queryParams = [statusParam, confirmedParam, `period=${period}`].filter(Boolean).join('&');
+      // Для confirmed используем status=confirmed (не has_confirmed_booking)
+      const statusParam = activeStatus === 'confirmed' ? 'status=confirmed' : `status=${activeStatus}`;
+      const queryParams = [statusParam, `period=${period}`].filter(Boolean).join('&');
 
       const [uRes, sRes] = await Promise.all([
         fetch(`/api/crm/users?${queryParams}`),
