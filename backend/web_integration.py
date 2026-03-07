@@ -4348,6 +4348,15 @@ async def confirm_booking(booking_id: str):
         with _lock:
             save_json(BOOKINGS_FILE, bookings)
         print("✓ Bookings saved to JSON")
+
+        # Обновляем статус пользователя на confirmed
+        user_id = booking.get('user_id')
+        if user_id:
+            try:
+                update_all_user_records(user_id, {"status": "confirmed"})
+                print(f"✓ Статус пользователя {user_id} изменён на confirmed")
+            except Exception as e:
+                print(f"⚠️ Не удалось обновить статус пользователя: {e}")
         
         print("=== SUCCESS ===")
         return {
