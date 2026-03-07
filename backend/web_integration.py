@@ -184,6 +184,7 @@ class StatusUpdate(BaseModel):
     user_id: Union[int, str]
     status: str
     note: str = ""
+    archived: Optional[bool] = None
 
 class NoteAdd(BaseModel):
     user_id: Union[int, str]
@@ -2610,14 +2611,15 @@ async def update_user_status(update: StatusUpdate):
         user_id = update.user_id
         new_status = update.status
         note = update.note
-        
-        print(f"[update_status] user_id={user_id}, status={new_status}, note={note}")
-        
+        archived = update.archived
+
+        print(f"[update_status] user_id={user_id}, status={new_status}, note={note}, archived={archived}")
+
         # Получаем текущий статус
         current_user = get_user_latest_record(user_id)
         if not current_user:
             raise HTTPException(status_code=404, detail="User not found")
-        
+
         old_status = current_user.get('status', 'unknown')
 
         # Обновляем все записи пользователя
@@ -2625,9 +2627,12 @@ async def update_user_status(update: StatusUpdate):
             'status': new_status,
             'updated_at': datetime.utcnow().isoformat()
         }
-        
+
         if note:
             updates['last_note'] = note
+
+        if archived is not None:
+            updates['archived'] = archived
         
         success = update_all_user_records(user_id, updates)
         
@@ -2968,6 +2973,42 @@ async def delete_user_record(user_id: str): # Поменял int на str
     if success:
         return {"status": "ok"}
     raise HTTPException(status_code=404, detail="User not found")
+
+@app.delete(API_PREFIX + "/crm/permanent_delete/{user_id}")
+async def permanent_delete_user(user_id: str):
+    """Полное удаление: archived = true, удалить из user_data, записать в archive.json"""
+    try:
+        u_id_str = str(user_id)
+        if not USER_DATA_JSON.exists():
+            return {"status": "error", "message": "User data file not found"}
+
+        with open(USER_DATA_JSON, "r", encoding="utf-8") as f:
+            users_data = json.load(f)
+
+        user_records = [u for u in users_data if str(u.get('user_id')) == u_id_str]
+
+        if not user_records:
+            return {"status": "error", "message": "User not found"}
+
+        # Добавляем в archive.json с archived = true
+        archive_data = load_json(ARCHIVE_JSON)
+        for record in user_records:
+            record['archived_at'] = datetime.utcnow().isoformat()
+            record['archived'] = True  # Флаг полного удаления
+            archive_data.append(record)
+
+        # Удаляем из user_data.json
+        new_users_data = [u for u in users_data if str(u.get('user_id')) != u_id_str]
+
+        with _lock:
+            save_json(USER_DATA_JSON, new_users_data)
+            save_json(ARCHIVE_JSON, archive_data)
+
+        print(f"✅ Permanent delete: user {u_id_str} moved to archive.json")
+        return {"status": "ok"}
+    except Exception as e:
+        print(f"❌ Permanent delete error: {e}")
+        return {"status": "error", "message": str(e)}
 
 @app.post(API_PREFIX + "/crm/restore_user/{user_id}")
 async def restore_user_record(user_id: str): # Поменял int on str

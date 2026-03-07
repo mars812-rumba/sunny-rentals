@@ -757,24 +757,55 @@ const openUserChat = (user: any) => {
     }
   };
 
+  // Архивировать: меняет статус на 'archive' (для вкладок NEW, WORK, PBOOK, BOOK)
   const handleArchiveAction = async (userId: number) => {
-    if (!window.confirm("Архивировать этого лида? Он будет перемещен в архив.")) {
+    const isInArchiveTab = activeStatus === 'archive';
+    const confirmMsg = isInArchiveTab
+      ? "Удалить лида навсегда? Он будет полностью удалён из системы."
+      : "Архивировать этого лида? Он переместится во вкладку Архив.";
+
+    if (!window.confirm(confirmMsg)) {
       return;
     }
-    
+
     setLoadingAction(prev => ({ ...prev, [`archive_${userId}`]: true }));
     try {
-      const response = await fetch(`/api/crm/delete_user/${userId}`, {
-        method: 'DELETE'
-      });
-      const result = await response.json();
-      
-      if (result.status === 'ok') {
-        setUsers(prev => prev.filter(u => u.user_id !== userId));
-        console.log(`Пользователь ${userId} архивирован`);
+      if (isInArchiveTab) {
+        // Полное удаление: archived = true, перенос в archive.json
+        const response = await fetch(`/api/crm/permanent_delete/${userId}`, {
+          method: 'DELETE'
+        });
+        const result = await response.json();
+
+        if (result.status === 'ok') {
+          setUsers(prev => prev.filter(u => u.user_id !== userId));
+          console.log(`Пользователь ${userId} удалён навсегда`);
+        } else {
+          console.error('Ошибка удаления:', result);
+          alert('Ошибка при удалении лида');
+        }
       } else {
-        console.error('Ошибка архивирования:', result);
-        alert('Ошибка при архивировании лида');
+        // Архивирование: меняем статус на 'archive', archived = false
+        const response = await fetch('/api/crm/update_status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            status: 'archive',
+            archived: false
+          })
+        });
+
+        if (response.ok) {
+          // Обновляем пользователя в списке
+          setUsers(prev => prev.map(u =>
+            u.user_id === userId ? { ...u, status: 'archive', archived: false } : u
+          ));
+          console.log(`Пользователь ${userId} архивирован`);
+        } else {
+          console.error('Ошибка архивирования:', await response.json());
+          alert('Ошибка при архивировании лида');
+        }
       }
     } catch (e) {
       console.error('Ошибка архивирования:', e);
