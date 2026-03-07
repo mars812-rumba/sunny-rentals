@@ -552,6 +552,20 @@ def check_user_has_confirmed_booking(user_id: Union[int, str]) -> bool:
                 return True
     return False
 
+def check_user_has_active_booking(user_id: Union[int, str]) -> bool:
+    """
+    Проверяет есть ли у пользователя active бронь (pre_booking или confirmed).
+    """
+    bookings = load_bookings()
+    user_id_str = str(user_id)
+    for booking in bookings:
+        status = booking.get("status")
+        if status in ["pre_booking", "confirmed"]:
+            booking_user_id = booking.get("user_id")
+            if booking_user_id is not None and str(booking_user_id) == user_id_str:
+                return True
+    return False
+
 def get_user_latest_record(user_id: Union[int, str], from_archive: bool = False):
     json_file = ARCHIVE_JSON if from_archive else USER_DATA_JSON
     users_data = load_json(json_file)
@@ -2323,6 +2337,9 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
                 else:
                     user_copy["claude_status"] = "stopped"
                     user_copy["has_new_messages"] = False
+
+                # Добавляем флаг наличия active брони (pre_booking или confirmed)
+                user_copy["has_active_booking"] = check_user_has_active_booking(u_id)
 
                 filtered.append(user_copy)
 
@@ -4385,59 +4402,77 @@ async def confirm_booking(booking_id: str):
 
 @app.post(API_PREFIX + "/admin/bookings/{booking_id}/reject")
 async def reject_booking(booking_id: str, data: dict = None):
-    """Отклонить бронь и архивировать лида"""
+    """Отклонить бронь (pre_booking → archive, confirmed → in_work если нет других)"""
     try:
         print(f"=== START reject_booking for {booking_id} ===")
-        
+
         bookings = load_bookings()
         users_data = load_json(USER_DATA_JSON)
-        
+
         # Находим бронь
         booking_found = False
+        booking = None
         user_id = None
-        for booking in bookings:
-            if booking.get('booking_id') == booking_id:
-                if booking.get('status') not in ['pre_booking', 'new']:
+        for b in bookings:
+            if b.get('booking_id') == booking_id:
+                if b.get('status') not in ['pre_booking', 'confirmed', 'new']:
                     raise HTTPException(
                         status_code=400,
-                        detail=f"Бронь {booking_id} имеет статус {booking.get('status')}, нельзя отклонить"
+                        detail=f"Бронь {booking_id} имеет статус {b.get('status')}, нельзя отклонить"
                     )
-                
-                # Отклоняем бронь
-                booking['status'] = 'rejected'
-                booking['rejected_at'] = datetime.utcnow().isoformat()
-                booking['updated_at'] = datetime.utcnow().isoformat()
-                user_id = booking.get('user_id')
+                booking = b
+                user_id = b.get('user_id')
                 booking_found = True
-                
-                print(f"✓ Отклонена бронь {booking_id} для пользователя {user_id}")
                 break
-        
+
         if not booking_found:
             raise HTTPException(status_code=404, detail=f"Бронь {booking_id} не найдена")
-        
-        # Архивируем лида (user status = archived)
-        if user_id and user_id != "":
+
+        booking_status = booking.get('status')
+
+        # Отклоняем бронь
+        booking['status'] = 'rejected'
+        booking['rejected_at'] = datetime.utcnow().isoformat()
+        booking['updated_at'] = datetime.utcnow().isoformat()
+        print(f"✓ Бронь {booking_id} отклонена, статус={booking_status}")
+
+        # Логика в зависимости от типа брони
+        if user_id and user_id != "" and user_id != "admin":
             for user in users_data:
                 if str(user.get('user_id')) == str(user_id):
-                    user['status'] = 'archive'
-                    user['archived_at'] = datetime.utcnow().isoformat()
-                    user['updated_at'] = datetime.utcnow().isoformat()
-                    print(f"✓ Архивирован лид {user_id}")
+                    if booking_status in ['pre_booking', 'new']:
+                        # pre_booking → архивируем
+                        user['status'] = 'archive'
+                        user['archived_at'] = datetime.utcnow().isoformat()
+                        user['updated_at'] = datetime.utcnow().isoformat()
+                        print(f"✓ Лид {user_id} архивирован (была pre_booking)")
+                    elif booking_status == 'confirmed':
+                        # confirmed → проверить остальные confirmed брони
+                        other_confirmed = [b for b in bookings
+                            if str(b.get('user_id')) == str(user_id)
+                            and b.get('status') == 'confirmed'
+                            and b.get('booking_id') != booking_id]
+                        if other_confirmed:
+                            print(f"✓ У лида {user_id} есть другие confirmed брони, статус не меняем")
+                        else:
+                            # Нет других confirmed → in_work
+                            user['status'] = 'in_work'
+                            user['updated_at'] = datetime.utcnow().isoformat()
+                            print(f"✓ У лида {user_id} нет confirmed броней, статус → in_work")
                     break
-        
+
         # Сохраняем
         with _lock:
             save_json(BOOKINGS_FILE, bookings)
             save_json(USER_DATA_JSON, users_data)
-        print("✓ Bookings and users saved to JSON")
-        
+        print("✓ Saved to JSON")
+
         return {
             "status": "ok",
             "booking_id": booking_id,
-            "message": "Бронь отклонена, лид архивирован"
+            "message": f"Бронь отклонена ({booking_status})"
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:

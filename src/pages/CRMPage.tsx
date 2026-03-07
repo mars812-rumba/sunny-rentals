@@ -68,9 +68,12 @@ interface User {
     action?: string;
   }>;
   pickup_location?: string;
-  
+
   // Маркеры для ручного управления менеджером
   marker?: string | null;
+
+  // Наличие active брони (pre_booking или confirmed)
+  has_active_booking?: boolean;
 }
 
 const MAIN_STATUSES = ['new', 'in_work', 'pre_booking', 'confirmed', 'archive'];
@@ -1010,12 +1013,15 @@ const handleUpdateNote = async () => {
     }
   };
 
-  // Отклонить бронь и архивировать лида
-  const rejectBooking = async (bookingId: string) => {
-    if (!window.confirm('Отклонить заявку и архивировать лида?')) return;
-    
+  // Отклонить бронь (pre_booking → archive, confirmed → in_work)
+  const rejectBooking = async (bookingId: string, bookingStatus: string) => {
+    const message = bookingStatus === 'confirmed'
+      ? 'Отклонить подтверждённую бронь? Статус клиента изменится на IN_WORK.'
+      : 'Отклонить заявку и архивировать лида?';
+    if (!window.confirm(message)) return;
+
     setLoadingAction(prev => ({ ...prev, [`reject_${bookingId}`]: true }));
-    
+
     try {
       const response = await fetch(`/api/admin/bookings/${bookingId}/reject`, {
         method: 'POST',
@@ -1023,19 +1029,21 @@ const handleUpdateNote = async () => {
       });
 
       if (response.ok) {
-        // Удаляем бронь из списка (или помечаем rejected)
+        // Удаляем бронь из списка
         setBookings(prev => prev.filter(b => b.booking_id !== bookingId));
-        
-        // Обновляем статус пользователя на archived
+
+        // Обновляем статус пользователя
         if (selectedUser) {
+          // Если была confirmed → in_work, если pre_booking → archive
+          const newStatus = bookingStatus === 'confirmed' ? 'in_work' : 'archive';
           setUsers(prev => prev.map(u =>
             compareUserIds(u.user_id, selectedUser.user_id)
-              ? { ...u, status: 'archive', archived_at: new Date().toISOString() }
+              ? { ...u, status: newStatus, updated_at: new Date().toISOString() }
               : u
           ));
         }
-        
-        console.log('✅ Заявка отклонена, лид архивирован');
+
+        console.log(`✅ Бронь ${bookingId} отклонена, клиент → ${bookingStatus === 'confirmed' ? 'IN_WORK' : 'ARCHIVE'}`);
       } else {
         const error = await response.json();
         console.error('❌ Ошибка отклонения:', error.message);
@@ -1438,10 +1446,14 @@ const handleUpdateNote = async () => {
           </Button>
         </div>
 
-        {/* 4. Кнопка Telegram (внешняя) */}
+        {/* 4. Кнопка Telegram (внешняя) - зелёная если есть active бронь */}
         <Button
           size="icon"
-          className={`h-7 w-7 rounded-md shadow-sm shadow-blue-200 bg-blue-600 text-white hover:bg-blue-700 transition-all`}
+          className={`h-7 w-7 rounded-md shadow-sm transition-all ${
+            user.has_active_booking
+              ? 'bg-green-500 hover:bg-green-600 shadow-green-200 text-white'
+              : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200 text-white'
+          }`}
           onClick={(e) => { e.stopPropagation(); window.open(`https://t.me/${user.username}`, '_blank'); }}
         >
           <Send className="w-3.5 h-3.5 rotate-[-20deg] translate-x-[-1px]" />
@@ -1633,8 +1645,8 @@ const handleUpdateNote = async () => {
                       <span className="text-lg font-black text-slate-900 tracking-tight">
                         {b.form_data?.pricing?.grandTotal ? `${b.form_data.pricing.grandTotal.toLocaleString()} ฿` : '0 ฿'}
                       </span>
-                      {/* Кнопки для pre_booking */}
-                      {b.status === 'pre_booking' && (
+                      {/* Кнопки для pre_booking и confirmed */}
+                      {(b.status === 'pre_booking' || b.status === 'confirmed') && (
                         <div className="flex gap-2 mt-2">
                           <Button
                             size="sm"
@@ -1648,7 +1660,7 @@ const handleUpdateNote = async () => {
                             size="sm"
                             variant="destructive"
                             className="bg-red-500 hover:bg-red-600 text-white text-xs"
-                            onClick={() => rejectBooking(b.booking_id)}
+                            onClick={() => rejectBooking(b.booking_id, b.status)}
                             disabled={loadingAction[`reject_${b.booking_id}`]}
                           >
                             {loadingAction[`reject_${b.booking_id}`] ? '...' : '✕'}
