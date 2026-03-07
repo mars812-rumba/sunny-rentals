@@ -539,6 +539,19 @@ def load_bookings() -> List[Dict]:
     data = load_json(BOOKINGS_FILE)
     return data if isinstance(data, list) else []
 
+def has_confirmed_booking(user_id: Union[int, str]) -> bool:
+    """
+    Проверяет есть ли у пользователя хотя бы одна подтверждённая бронь.
+    """
+    bookings = load_bookings()
+    user_id_str = str(user_id)
+    for booking in bookings:
+        if booking.get("status") == "confirmed":
+            booking_user_id = booking.get("user_id")
+            if booking_user_id is not None and str(booking_user_id) == user_id_str:
+                return True
+    return False
+
 def get_user_latest_record(user_id: Union[int, str], from_archive: bool = False):
     json_file = ARCHIVE_JSON if from_archive else USER_DATA_JSON
     users_data = load_json(json_file)
@@ -2256,16 +2269,17 @@ def get_fast_dialog_map():
     return statuses
 
 @app.get(API_PREFIX + "/crm/users")
-def get_crm_users(status: str = None, period: str = "all"):
+def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking: bool = None):
     """
     Получить пользователей CRM.
     Если status не указан — возвращаем ВСЕХ пользователей (нужно для подсчёта непрочитанных во вкладках).
+    Параметр has_confirmed_booking: если true — возвращает только пользователей с подтверждённой бронью.
     """
     try:
         users_data = load_json(USER_DATA_JSON)
         # Получаем карту состояний ОДИН раз
         fast_map = get_fast_dialog_map()
-        
+
         now = datetime.utcnow()
         delta = {"today": 1, "week": 7, "month": 30}.get(period, 9999)
         start_date = now - timedelta(days=delta)
@@ -2277,26 +2291,30 @@ def get_crm_users(status: str = None, period: str = "all"):
             u_status = u.get("status")
             # ИСПОЛЬЗУЕМ updated_at для фильтра (чтобы показывать недавних пользователей)
             u_at = u.get("updated_at") or u.get("created_at")
-            
+
             # Фильтр: web_session показываем только если статус pre_booking
             if u_id.startswith("web_session") and u_status != "pre_booking":
                 continue
-            
+
             # Остальные - только если user_id числовой
             if not u_id.startswith("web_session"):
                 try:
                     int(u_id)
                 except ValueError:
                     continue
-            
+
             # Если status указан — фильтруем по нему
             if status and u_status != status:
                 continue
-            
+
+            # Фильтр: пользователи с подтверждённой бронью
+            if has_confirmed_booking and not has_confirmed_booking(u_id):
+                continue
+
             if not u_at: continue
-            
+
             u_date = datetime.fromisoformat(u_at.replace('Z', ''))
-            
+
             if u_date >= start_date and not u.get("archived"):
                 user_copy = u.copy()
                 # Подмешиваем данные из быстрой карты
@@ -2305,7 +2323,7 @@ def get_crm_users(status: str = None, period: str = "all"):
                 else:
                     user_copy["claude_status"] = "stopped"
                     user_copy["has_new_messages"] = False
-                
+
                 filtered.append(user_copy)
 
         filtered.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
@@ -2337,6 +2355,7 @@ def get_crm_stats(period: str = Query("all")):
             "new": 0,
             "in_work": 0,
             "pre_booking": 0,
+            "confirmed": 0,
             "archive": 0,
             "unread_by_status": {
                 "new": 0,
@@ -2396,14 +2415,18 @@ def get_crm_stats(period: str = Query("all")):
                     stats["archive"] += 1
                 else:
                     user_status = user.get("status")
-                    
+
                     # Маппинг на случай, если в базе остались старые статусы
                     if user_status == "in_progress": user_status = "in_work"
                     if user_status in ["hot", "booked", "pending"]: user_status = "pre_booking"
                     if user_status == "interested": user_status = "new"
-                    
+
                     if user_status in stats:
                         stats[user_status] += 1
+
+                    # Дополнительно считаем пользователей с confirmed бронью
+                    if has_confirmed_booking(str(user.get("user_id"))):
+                        stats["confirmed"] += 1
 
         return {
             "status": "ok",

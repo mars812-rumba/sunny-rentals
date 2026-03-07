@@ -73,11 +73,12 @@ interface User {
   marker?: string | null;
 }
 
-const MAIN_STATUSES = ['new', 'in_work', 'pre_booking', 'archive'];
+const MAIN_STATUSES = ['new', 'in_work', 'pre_booking', 'confirmed', 'archive'];
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   'new': { label: 'NEW', color: '#64748b', bg: 'bg-slate-100' },
   'in_work': { label: 'IN WORK', color: '#7c3aed', bg: 'bg-green-50' },
   'pre_booking': { label: 'PREBOOK', color: '#ea580c', bg: 'bg-orange-50' },
+  'confirmed': { label: 'CONFIRMED', color: '#16a34a', bg: 'bg-green-100' },
   'archive': { label: 'ARCHIVE', color: '#94a3b8', bg: 'bg-slate-200' }
 };
 
@@ -250,8 +251,13 @@ const CRMPage: React.FC = () => {
       }
       
       // Загружаем только текущую вкладку для отображения
+      // Для вкладки Confirmed используем фильтр по подтверждённым броням
+      const statusParam = activeStatus === 'confirmed' ? '' : `status=${activeStatus}`;
+      const confirmedParam = activeStatus === 'confirmed' ? 'has_confirmed_booking=true' : '';
+      const queryParams = [statusParam, confirmedParam, `period=${period}`].filter(Boolean).join('&');
+
       const [uRes, sRes] = await Promise.all([
-        fetch(`/api/crm/users?status=${activeStatus}&period=${period}`),
+        fetch(`/api/crm/users?${queryParams}`),
         fetch(`/api/crm/stats?period=${period}`)
       ]);
       const uData = await uRes.json();
@@ -1394,7 +1400,7 @@ const handleUpdateNote = async () => {
       </div>
 {/* ПЕРЕНЕСЕННЫЕ СЮДА БЕЙДЖИ СТАТУСОВ */}
           <div className="flex gap-0.5">
-            {['new', 'in_work', 'pre_booking'].map(s => (
+            {['new', 'in_work', 'pre_booking', 'confirmed', 'archive'].map(s => (
               <button
                 key={s}
                 onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, s); }}
