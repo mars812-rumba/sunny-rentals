@@ -539,7 +539,7 @@ def load_bookings() -> List[Dict]:
     data = load_json(BOOKINGS_FILE)
     return data if isinstance(data, list) else []
 
-def has_confirmed_booking(user_id: Union[int, str]) -> bool:
+def check_user_has_confirmed_booking(user_id: Union[int, str]) -> bool:
     """
     Проверяет есть ли у пользователя хотя бы одна подтверждённая бронь.
     """
@@ -2308,7 +2308,7 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
                 continue
 
             # Фильтр: пользователи с подтверждённой бронью
-            if has_confirmed_booking and not has_confirmed_booking(u_id):
+            if has_confirmed_booking and not check_user_has_confirmed_booking(u_id):
                 continue
 
             if not u_at: continue
@@ -2425,7 +2425,7 @@ def get_crm_stats(period: str = Query("all")):
                         stats[user_status] += 1
 
                     # Дополнительно считаем пользователей с confirmed бронью
-                    if has_confirmed_booking(str(user.get("user_id"))):
+                    if check_user_has_confirmed_booking(str(user.get("user_id"))):
                         stats["confirmed"] += 1
 
         return {
