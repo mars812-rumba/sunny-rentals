@@ -1400,7 +1400,7 @@ const handleUpdateNote = async () => {
       </div>
 {/* ПЕРЕНЕСЕННЫЕ СЮДА БЕЙДЖИ СТАТУСОВ */}
           <div className="flex gap-0.5">
-            {['new', 'in_work', 'pre_booking', 'confirmed', 'archive'].map(s => (
+            {['new', 'in_work', 'pre_booking'].map(s => (
               <button
                 key={s}
                 onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, s); }}
