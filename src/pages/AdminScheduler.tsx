@@ -69,21 +69,27 @@ export default function AdminScheduler() {
 
   const filteredCars = cars.filter(car => {
     const matchesClass = selectedClass === 'all' || car.class === selectedClass;
-    const matchesOwner = selectedOwner === 'all' || carOwnersMap[car.id] === ownersList.find(o => o.id === selectedOwner)?.name;
+    const ownerName = carOwnersMap[car.id];
+    const targetOwnerName = ownersList.find(o => o.id === selectedOwner)?.name;
+    const matchesOwner = selectedOwner === 'all' || ownerName === targetOwnerName;
     return matchesClass && matchesOwner;
   });
 
   const filteredBookings = bookings.filter(booking => {
     const car = cars.find(c => c.id === booking.form_data.car.id);
     const matchesClass = selectedClass === 'all' || car?.class === selectedClass;
-    const matchesOwner = selectedOwner === 'all' || carOwnersMap[car?.id] === ownersList.find(o => o.id === selectedOwner)?.name;
+    const ownerName = car ? carOwnersMap[car.id] : undefined;
+    const targetOwnerName = ownersList.find(o => o.id === selectedOwner)?.name;
+    const matchesOwner = selectedOwner === 'all' || ownerName === targetOwnerName;
     return matchesClass && matchesOwner;
   });
 
   const filteredLogisticsData = logisticsData.filter(item => {
     const car = cars.find(c => c.id === item.car_id);
     const matchesClass = selectedClass === 'all' || car?.class === selectedClass;
-    const matchesOwner = selectedOwner === 'all' || carOwnersMap[item.car_id] === ownersList.find(o => o.id === selectedOwner)?.name;
+    const ownerName = carOwnersMap[item.car_id];
+    const targetOwnerName = ownersList.find(o => o.id === selectedOwner)?.name;
+    const matchesOwner = selectedOwner === 'all' || ownerName === targetOwnerName;
     return matchesClass && matchesOwner;
   });
 
@@ -222,13 +228,13 @@ export default function AdminScheduler() {
 
       {/* Фильтры - внизу */}
       <div className="sticky top-[50px] z-30 bg-gray-100 border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-xs font-medium text-gray-600 flex items-center gap-1">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-medium text-gray-600 flex items-center gap-1 shrink-0">
             <Filter className="h-3 w-3" /> Фильтры:
           </span>
 
           <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="w-32 h-8 text-xs bg-white border-gray-300">
+            <SelectTrigger className="w-32 h-8 text-xs bg-white border-gray-300 shrink-0">
               <SelectValue placeholder="Класс" />
             </SelectTrigger>
             <SelectContent>
@@ -241,7 +247,7 @@ export default function AdminScheduler() {
           </Select>
 
           <Select value={selectedOwner} onValueChange={setSelectedOwner}>
-            <SelectTrigger className="w-48 h-8 text-xs bg-white border-gray-300">
+            <SelectTrigger className="w-48 h-8 text-xs bg-white border-gray-300 shrink-0">
               <Users className="h-3 w-3 mr-1" />
               <SelectValue placeholder="Все владельцы" />
             </SelectTrigger>
