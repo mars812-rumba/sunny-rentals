@@ -292,14 +292,14 @@ export async function fetchBookings(userId?: string): Promise<Booking[]> {
 }
 
 // Submit a new booking or update existing
-export async function submitBooking(formData: BookingFormData, bookingId?: string, bookingSource: 'web' | 'admin' | 'telegram' = 'web') {
+export async function submitBooking(formData: BookingFormData, bookingId?: string, bookingSource: 'web' | 'admin' | 'telegram' = 'web', userId?: number | string) {
   // ✅ ИСПРАВЛЕНИЕ: Используем разные эндпоинты в зависимости от источника
   let endpoint: string;
   
-  // Получаем user_id для Telegram
-  let userId = null;
+  // Для admin используем переданный userId, для Telegram - из WebApp
+  let bookingUserId = userId;
   if (bookingSource === 'telegram' && typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) {
-    userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    bookingUserId = window.Telegram.WebApp.initDataUnsafe.user.id;
   }
   
   switch (bookingSource) {
@@ -323,7 +323,7 @@ export async function submitBooking(formData: BookingFormData, bookingId?: strin
     },
     body: JSON.stringify({
       booking_id: bookingId,
-      user_id: userId,
+      user_id: bookingUserId,
       form_data: formData
     })
   });

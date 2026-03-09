@@ -227,7 +227,7 @@ __________________
        };
  
        const bId = booking?.booking_id || booking?.id || null;
-       await submitBooking(formDataForApi as any, bId, 'admin'); // Admin создает брони через admin эндпоинт
+       await submitBooking(formDataForApi as any, bId, 'admin', userId); // Admin создает брони через admin эндпоинт
  
        toast.success(isEditing ? "Обновлено" : "Создано");
        onSuccess();
