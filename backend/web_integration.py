@@ -4579,6 +4579,90 @@ async def admin_delete_booking(booking_id: str):
         raise HTTPException(status_code=500, detail=str(e))
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
+@app.post(API_PREFIX + "/admin/bookings/create")
+async def admin_create_booking_simple(request: Request):
+    """
+    Создание брони напрямую из CRM (упрощённый endpoint).
+    """
+    try:
+        data = await request.json()
+        print(f"=== START admin_create_booking_simple ===")
+        
+        user_id = data.get('user_id')
+        car_id = data.get('car_id')
+        car_name = data.get('car_name', '')
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        days = data.get('days', 1)
+        total_rental = data.get('total_rental', 0)
+        total_delivery = data.get('total_delivery', 0)
+        deposit = data.get('deposit', 5000)
+        
+        if not user_id or not car_id or not start_date or not end_date:
+            raise HTTPException(status_code=400, detail="user_id, car_id, start_date, end_date required")
+        
+        form_data = {
+            "car": {"id": car_id, "name": car_name, "brand": "", "model": "", "year": "", "color": ""},
+            "dates": {"start": start_date, "end": end_date, "days": days, "pickupTime": "13:00", "returnTime": "13:00"},
+            "locations": {"pickup": "airport", "dropoff": "airport", "pickupAddress": "", "dropoffAddress": ""},
+            "pricing": {"dailyRate": total_rental // days if days > 0 else total_rental, "totalRental": total_rental, "deposit": deposit, "delivery": total_delivery, "grandTotal": total_rental + total_delivery},
+            "contact": {"name": "", "value": "", "type": "telegram"},
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        bookings = load_bookings()
+        
+        # Проверка на дубликат
+        new_start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        new_end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        
+        for existing in bookings:
+            if str(existing.get("user_id")) == str(user_id) and existing.get("status") in ["pre_booking", "confirmed"]:
+                existing_form = existing.get("form_data", {})
+                if existing_form.get("car", {}).get("id") == car_id:
+                    existing_dates = existing_form.get("dates", {})
+                    existing_start = datetime.fromisoformat(existing_dates.get("start", "").replace('Z', '+00:00'))
+                    existing_end = datetime.fromisoformat(existing_dates.get("end", "").replace('Z', '+00:00'))
+                    if not (new_end <= existing_start or new_start >= existing_end):
+                        return {"status": "exists", "message": "Уже есть бронь на эти даты"}
+        
+        booking_id = gen_booking_id()
+        new_booking = {
+            "booking_id": booking_id,
+            "user_id": str(user_id),
+            "form_data": form_data,
+            "status": "pre_booking",
+            "created_at": datetime.utcnow().isoformat(),
+            "source": "admin_panel"
+        }
+        
+        bookings.append(new_booking)
+        
+        # Обновляем статус пользователя
+        users_data = load_json(USER_DATA_JSON)
+        for user in users_data:
+            if str(user.get('user_id')) == str(user_id):
+                user['status'] = 'pre_booking'
+                user['updated_at'] = datetime.utcnow().isoformat()
+                break
+        
+        with _lock:
+            save_json(BOOKINGS_FILE, bookings)
+            save_json(USER_DATA_JSON, users_data)
+        
+        print(f"✓ Created booking {booking_id} for user {user_id}")
+        return {"status": "ok", "booking_id": booking_id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"!!! ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ==============================
 # АДМИНКА CRUD (ФЛОТ-ПАНЕЛЬ)
 # ==============================

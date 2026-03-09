@@ -408,7 +408,7 @@ export async function createBookingFromCRM(data: {
   return response.json();
 }
 
-// Create booking from CRM with form data structure (for BookingFormDialog compatibility)
+// Create booking from CRM - uses dedicated /api/admin/bookings/create endpoint
 export async function createBookingFromCRMForm(userId: number | string, formData: any): Promise<{ booking_id: string; status: string }> {
   const car = formData.car || {};
   const dates = formData.dates || {};
@@ -424,23 +424,40 @@ export async function createBookingFromCRMForm(userId: number | string, formData
   const total_delivery = pricing.totalDelivery || 0;
   const deposit = pricing.deposit || 5000;
   
-  const pickup_location = locations.pickup || 'airport';
-  const return_location = locations.dropoff || 'airport';
-  
-  return createBookingFromCRM({
-    user_id: userId,
-    car_id: car.id || '',
-    car_name: car.name || `${car.brand || ''} ${car.model || ''}`.trim(),
-    start_date: startDate.toISOString(),
-    end_date: endDate.toISOString(),
-    days: days,
-    total_rental: total_rental,
-    total_delivery: total_delivery,
-    deposit: deposit,
-    pickup_location: pickup_location,
-    return_location: return_location,
-    source: 'crm_admin',
+  const response = await fetch(`${API_BASE_URL}/api/admin/bookings/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${AUTH_TOKEN}`,
+    },
+    body: JSON.stringify({
+      user_id: userId,
+      car_id: car.id || '',
+      car_name: car.name || `${car.brand || ''} ${car.model || ''}`.trim(),
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+      days: days,
+      total_rental: total_rental,
+      total_delivery: total_delivery,
+      deposit: deposit,
+      pickup_location: locations.pickup || 'airport',
+      return_location: locations.dropoff || 'airport',
+      pickup_address: locations.pickupAddress || '',
+      return_address: locations.dropoffAddress || '',
+      pickup_time: dates.pickupTime || '13:00',
+      return_time: dates.returnTime || '13:00',
+      contact_name: contact.name || '',
+      contact_value: contact.value || '',
+      contact_type: contact.type || 'telegram',
+    }),
   });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to create booking');
+  }
+
+  return response.json();
 }
 
 // Get available cars for date range
