@@ -4043,13 +4043,16 @@ def api_get_booking(booking_id: str):
 def list_bookings():
     return load_json(BOOKINGS_FILE)
 
-@app.post(API_PREFIX + "/admin/bookings")
-async def admin_create_booking(booking_data: AdminBookingRequest):
+@app.post(API_PREFIX + "/admin/bookings/{user_id}")
+async def admin_create_booking(user_id: str, booking_data: AdminBookingRequest):
     """Создание/обновление брони напрямую из админ-панели"""
     try:
         print("=== START admin_create_booking ===")
         print(f"Request data: {booking_data}")
-        print(f"user_id from request: {booking_data.user_id} (type: {type(booking_data.user_id)})")
+        print(f"user_id from path: {user_id}")
+        
+        # Используем user_id из URL
+        actual_user_id = user_id
         
         form_data = booking_data.form_data
         print(f"Form data parsed successfully: {form_data}")
@@ -4112,13 +4115,13 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
             booking_id = str(uuid.uuid4())[:8]
             print(f"Creating new booking: {booking_id}")
             
-            # Используем user_id из запроса
-            actual_user_id = booking_data.user_id
-            print(f"Using user_id from request: {actual_user_id} (type: {type(actual_user_id)})")
+            # Используем user_id из URL path
+            actual_user_id = user_id
+            print(f"Using user_id from path: {actual_user_id}")
             
             if not actual_user_id:
-                print("ERROR: user_id is None or empty, using 'admin'")
-                actual_user_id = "admin"
+                print("ERROR: user_id is None or empty")
+                raise HTTPException(status_code=400, detail="user_id is required")
             
             try:
                 new_booking = {
