@@ -4618,7 +4618,7 @@ async def admin_create_booking_simple(request: Request):
         form_data = {
             "car": {"id": car_id, "name": car_name, "brand": "", "model": "", "year": "", "color": ""},
             "dates": {"start": start_date, "end": end_date, "days": days, "pickupTime": pickup_time, "returnTime": return_time},
-            "locations": {"pickup": pickup_location, "dropoff": return_location, "pickupAddress": pickup_address, "dropoffAddress": return_address},
+            "locations": {"pickupLocation": pickup_location, "dropoffLocation": return_location, "pickupAddress": pickup_address, "dropoffAddress": return_address},
             "pricing": {"dailyRate": total_rental // days if days > 0 else total_rental, "totalRental": total_rental, "deposit": deposit, "delivery": total_delivery, "grandTotal": total_rental + total_delivery},
             "contact": {"name": contact_name, "value": contact_value, "type": contact_type},
             "timestamp": datetime.utcnow().isoformat()

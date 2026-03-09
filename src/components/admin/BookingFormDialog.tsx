@@ -135,9 +135,9 @@ export function BookingFormDialog({
         setCustomerContact(fd.contact.value || '');
         setContactType(fd.contact.type || 'telegram');
         setPickupLocation(fd.locations?.pickupLocation || 'airport');
-        setReturnLocation(fd.locations?.returnLocation || 'airport');
+        setReturnLocation(fd.locations?.dropoffLocation || 'airport');
         setPickupAddress(fd.locations?.pickupAddress || '');
-        setReturnAddress(fd.locations?.returnAddress || '');
+        setReturnAddress(fd.locations?.dropoffAddress || '');
         setPickupTime(fd.dates?.pickupTime || '13:00');
         setReturnTime(fd.dates?.returnTime || '13:00');
         
@@ -280,8 +280,8 @@ __________________
           pickupTime: pickupTime, returnTime: returnTime
         },
         locations: {
-          pickupLocation: String(pickupLocation), returnLocation: String(returnLocation),
-          pickupAddress: String(pickupAddress || ""), returnAddress: String(returnAddress || "")
+          pickupLocation: String(pickupLocation), dropoffLocation: String(returnLocation),
+          pickupAddress: String(pickupAddress || ""), dropoffAddress: String(returnAddress || "")
         },
         pricing: {
           dailyRate: Math.round(pricing.dailyRate), totalRental: Math.round(pricing.totalRental),

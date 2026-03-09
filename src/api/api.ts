@@ -416,13 +416,13 @@ export async function createBookingFromCRMForm(userId: number | string, formData
   const pricing = formData.pricing || {};
   const contact = formData.contact || {};
   
-  // Извлекаем из формы (которая использует snake_case)
+  // Извлекаем из формы (используем правильные ключи)
   const pickup_time = dates.pickupTime || '13:00';
   const return_time = dates.returnTime || '13:00';
   const pickup_address = locations.pickupAddress || '';
-  const return_address = locations.returnAddress || '';
+  const return_address = locations.dropoffAddress || '';
   const pickup_location = locations.pickupLocation || 'airport';
-  const return_location = locations.returnLocation || 'airport';
+  const return_location = locations.dropoffLocation || 'airport';
   
   const total_rental = pricing.totalRental || 0;
   const total_delivery = pricing.totalDelivery || 0;
