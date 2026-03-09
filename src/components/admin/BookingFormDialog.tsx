@@ -75,6 +75,10 @@ export function BookingFormDialog({
   const [manualDelivery, setManualDelivery] = useState<string>('');
   const [manualDeposit, setManualDeposit] = useState<string>('');
 
+  // Loaded prices from booking (don't recalculate)
+  const [loadedRental, setLoadedRental] = useState<number>(0);
+  const [loadedDelivery, setLoadedDelivery] = useState<number>(0);
+
   // Form State
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(new Date(), 3));
@@ -145,6 +149,8 @@ export function BookingFormDialog({
         setManualRental(fd.pricing?.totalRental?.toString() || '');
         setManualDelivery(fd.pricing?.totalDelivery?.toString() || '');
         setManualDeposit(fd.pricing?.deposit?.toString() || '');
+        setLoadedRental(fd.pricing?.totalRental || 0);
+        setLoadedDelivery(fd.pricing?.totalDelivery || 0);
         
         // Всегда заполняем manualData для корректного отображения и редактирования
         setManualData({
@@ -172,6 +178,8 @@ export function BookingFormDialog({
         setManualRental('');
         setManualDelivery('');
         setManualDeposit('');
+        setLoadedRental(0);
+        setLoadedDelivery(0);
       }
     }
   }, [isOpen, booking, carId]);
@@ -215,8 +223,9 @@ export function BookingFormDialog({
 
     const baseDelivery = (pickupLocation === 'airport' ? 0 : 500) + (returnLocation === 'airport' ? 0 : 500);
 
-    const finalRental = manualRental !== '' ? parseInt(manualRental) : calcRental;
-    const finalDelivery = manualDelivery !== '' ? parseInt(manualDelivery) : baseDelivery;
+    // Если manualRental пустой - используем loadedRental (при редактировании) или calcRental
+    const finalRental = manualRental !== '' ? parseInt(manualRental) : (loadedRental || calcRental);
+    const finalDelivery = manualDelivery !== '' ? parseInt(manualDelivery) : (loadedDelivery || baseDelivery);
     const finalDeposit = manualDeposit !== '' ? parseInt(manualDeposit) : calcDeposit;
 
     return {
@@ -227,7 +236,7 @@ export function BookingFormDialog({
       totalDelivery: finalDelivery,
       grandTotal: (finalRental || 0) + finalDelivery
     };
-  }, [startDate, endDate, selectedVehicleId, selectedTab, manualData, pickupLocation, returnLocation, vehicles, manualRental, manualDelivery, manualDeposit]);
+  }, [startDate, endDate, selectedVehicleId, selectedTab, manualData, pickupLocation, returnLocation, vehicles, manualRental, manualDelivery, manualDeposit, loadedRental, loadedDelivery]);
   
 const currentCarName = useMemo(() => {
   if (selectedTab === 'fleet') {
