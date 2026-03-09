@@ -69,27 +69,23 @@ export default function AdminScheduler() {
 
   const filteredCars = cars.filter(car => {
     const matchesClass = selectedClass === 'all' || car.class === selectedClass;
-    const ownerName = carOwnersMap[car.id];
-    const targetOwnerName = ownersList.find(o => o.id === selectedOwner)?.name;
-    const matchesOwner = selectedOwner === 'all' || ownerName === targetOwnerName;
+    const carOwnerId = carOwnersMap[car.id];
+    const matchesOwner = selectedOwner === 'all' || carOwnerId === selectedOwner;
     return matchesClass && matchesOwner;
   });
 
   const filteredBookings = bookings.filter(booking => {
     const car = cars.find(c => c.id === booking.form_data.car.id);
     const matchesClass = selectedClass === 'all' || car?.class === selectedClass;
-    const ownerName = car ? carOwnersMap[car.id] : undefined;
-    const targetOwnerName = ownersList.find(o => o.id === selectedOwner)?.name;
-    const matchesOwner = selectedOwner === 'all' || ownerName === targetOwnerName;
+    const carOwnerId = car ? carOwnersMap[car.id] : undefined;
+    const matchesOwner = selectedOwner === 'all' || carOwnerId === selectedOwner;
     return matchesClass && matchesOwner;
   });
 
   const filteredLogisticsData = logisticsData.filter(item => {
-    const car = cars.find(c => c.id === item.car_id);
-    const matchesClass = selectedClass === 'all' || car?.class === selectedClass;
-    const ownerName = carOwnersMap[item.car_id];
-    const targetOwnerName = ownersList.find(o => o.id === selectedOwner)?.name;
-    const matchesOwner = selectedOwner === 'all' || ownerName === targetOwnerName;
+    const matchesClass = selectedClass === 'all' || cars.find(c => c.id === item.car_id)?.class === selectedClass;
+    const carOwnerId = carOwnersMap[item.car_id];
+    const matchesOwner = selectedOwner === 'all' || carOwnerId === selectedOwner;
     return matchesClass && matchesOwner;
   });
 
