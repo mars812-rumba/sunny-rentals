@@ -78,6 +78,7 @@ export function BookingFormDialog({
   // Loaded prices from booking (don't recalculate)
   const [loadedRental, setLoadedRental] = useState<number>(0);
   const [loadedDelivery, setLoadedDelivery] = useState<number>(0);
+  const [loadedDeposit, setLoadedDeposit] = useState<number>(0);
 
   // Form State
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
@@ -151,6 +152,7 @@ export function BookingFormDialog({
         setManualDeposit(fd.pricing?.deposit?.toString() || '');
         setLoadedRental(fd.pricing?.totalRental || 0);
         setLoadedDelivery(fd.pricing?.totalDelivery || 0);
+        setLoadedDeposit(fd.pricing?.deposit || 0);
         
         // Всегда заполняем manualData для корректного отображения и редактирования
         setManualData({
@@ -180,9 +182,23 @@ export function BookingFormDialog({
         setManualDeposit('');
         setLoadedRental(0);
         setLoadedDelivery(0);
+        setLoadedDeposit(0);
       }
     }
   }, [isOpen, booking, carId]);
+
+  // Синхронизация: если booking загружен, используем его цены по умолчанию
+  useEffect(() => {
+    if (booking && loadedRental > 0 && manualRental === '') {
+      setManualRental(loadedRental.toString());
+    }
+    if (booking && loadedDelivery > 0 && manualDelivery === '') {
+      setManualDelivery(loadedDelivery.toString());
+    }
+    if (booking && loadedDeposit > 0 && manualDeposit === '') {
+      setManualDeposit(loadedDeposit.toString());
+    }
+  }, [booking, loadedRental, loadedDelivery, loadedDeposit, manualRental, manualDelivery, manualDeposit]);
 
   // 3. РАСЧЕТ СТОИМОСТИ (С защитой от пустых значений)
   const pricing = useMemo(() => {
