@@ -322,10 +322,11 @@ __________________
       };
 
       const bId = booking?.booking_id || booking?.id || null;
-      console.log("📤 [BookingFormDialog] Saving booking:", { bId, userId, isEditing, booking });
+      console.log("📤 [BookingFormDialog] Saving booking:", { bId, userId, isEditing });
       
-      if (!bId) {
-        console.error("❌ [BookingFormDialog] No booking_id found!", booking);
+      if (isEditing && !bId) {
+        // Редактирование без ID — это ошибка
+        console.error("❌ [BookingFormDialog] Editing but no booking_id found!", booking);
         toast.error("Ошибка: не найден ID брони");
         setIsSubmitting(false);
         return;
