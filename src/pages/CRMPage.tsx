@@ -617,12 +617,18 @@ const openBookingDialog = (booking?: any) => {
 };
 
 // При успешном сохранении заявки - обновить список
-const handleBookingSuccess = () => {
+const handleBookingSuccess = async () => {
   setIsBookingDialogOpen(false);
   setEditingBooking(null);
+  
   // Перезагрузить заявки для выбранного пользователя
   if (selectedUser) {
-    loadUserDetails(selectedUser);
+    // Принудительно загружаем bookings заново
+    const bRes = await fetch(`/api/crm/bookings/${selectedUser.user_id}`);
+    const bData = await bRes.json();
+    if (bData.status === 'ok') {
+      setBookings(bData.bookings);
+    }
   }
 };
 
