@@ -414,7 +414,9 @@ def check_booking_overlap(
     conflicting = []
     
     for booking in bookings:
-        if exclude_booking_id and booking.get('booking_id') == exclude_booking_id:
+        # Исключаем текущую бронь при редактировании
+        booking_id = booking.get('booking_id')
+        if exclude_booking_id and booking_id and booking_id == exclude_booking_id:
             continue
         
         # 🔧 КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Игнорируем pre_booking

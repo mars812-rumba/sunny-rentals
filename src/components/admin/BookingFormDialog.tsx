@@ -310,9 +310,11 @@ __________________
       
       if (isEditing && bId) {
         // Редактирование существующей брони
+        console.log("📤 [BookingFormDialog] Editing booking, booking_id:", bId);
         await submitBooking(formDataForApi as any, bId, 'admin', userId);
       } else {
         // Создание новой брони из CRM
+        console.log("📤 [BookingFormDialog] Creating new booking");
         await createBookingFromCRMForm(userId, formDataForApi);
       }
       console.log("✅ [BookingFormDialog] Booking saved successfully");
