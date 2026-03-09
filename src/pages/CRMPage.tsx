@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { MarkerType } from '@/types/crm';
+import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 
 // TypeScript интерфейсы для работы с диалогами
 interface DialogEvent {
@@ -111,6 +112,9 @@ const CRMPage: React.FC = () => {
   const [markerFilter, setMarkerFilter] = useState<string>('all');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  // Состояние для диалога создания/редактирования заявки
+  const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
+  const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
@@ -605,6 +609,23 @@ const openUserChat = (user: any) => {
   setActiveTab('chat');
   loadUserDetails(user);
 };
+
+// Открыть диалог создания/редактирования заявки
+const openBookingDialog = (booking?: any) => {
+  setEditingBooking(booking || null);
+  setIsBookingDialogOpen(true);
+};
+
+// При успешном сохранении заявки - обновить список
+const handleBookingSuccess = () => {
+  setIsBookingDialogOpen(false);
+  setEditingBooking(null);
+  // Перезагрузить заявки для выбранного пользователя
+  if (selectedUser) {
+    loadUserDetails(selectedUser);
+  }
+};
+
   const handleClaudeAction = async (userId: number, action: 'start' | 'pause' | 'resume' | 'stop') => {
     setLoadingAction(prev => ({ ...prev, [`claude_${userId}_${action}`]: true }));
     try {
@@ -1608,15 +1629,16 @@ const handleUpdateNote = async () => {
           <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
             <Car size={14} className="text-blue-500" /> Активные заявки ({bookings?.length || 0})
           </h3>
-          {/* Кнопка "Создать оффер" */}
+          {/* Кнопка "Добавить заявку" */}
           {selectedUser && (
             <Button
               size="sm"
               variant="outline"
               className="h-8 text-xs border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
-              onClick={() => navigateToOffer(selectedUser.user_id)}
+              onClick={() => openBookingDialog()}
             >
-              📤 Создать оффер
+              <CirclePlus size={14} className="mr-1" />
+              Добавить заявку
             </Button>
           )}
         </div>
@@ -1624,7 +1646,7 @@ const handleUpdateNote = async () => {
         {bookings && bookings.length > 0 ? (
           <div className="grid grid-cols-1 gap-3">
             {bookings.map((b, i) => (
-              <Card key={i} className="border-none bg-slate-50/50 shadow-none ring-1 ring-slate-100 overflow-hidden hover:ring-blue-200 transition-all">
+              <Card key={i} onClick={() => openBookingDialog(b)} className="cursor-pointer border-none bg-slate-50/50 shadow-none ring-1 ring-slate-100 overflow-hidden hover:ring-blue-200 hover:ring-2 transition-all">
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-4">
                     <div>
@@ -2107,6 +2129,26 @@ const handleUpdateNote = async () => {
   </DialogContent>
 </Dialog>
 
+      {/* Диалог создания/редактирования заявки */}
+      {isBookingDialogOpen && (
+        <BookingFormDialog
+          isOpen={isBookingDialogOpen}
+          onClose={() => {
+            setIsBookingDialogOpen(false);
+            setEditingBooking(null);
+          }}
+          userId={selectedUser?.user_id}
+          userName={selectedUser?.username}
+          userContact={selectedUser?.username}
+          initialDateRange={selectedUser?.dates_selected ? {
+            start: new Date(selectedUser.dates_selected.start),
+            end: new Date(selectedUser.dates_selected.end)
+          } : undefined}
+          carId={editingBooking?.form_data?.car?.id}
+          booking={editingBooking}
+          onSuccess={handleBookingSuccess}
+        />
+      )}
      
     </div>
   );
