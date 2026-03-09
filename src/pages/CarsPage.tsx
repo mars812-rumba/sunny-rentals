@@ -842,7 +842,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
                 onClick={() => setIsOwnersManagementOpen(true)}
                 className="h-8"
               >
-                <UserPlus className="h-4 w-4" />
+                <UserPlus className="h-3 w-3" />
               </Button>
               <Button
                 variant="outline"
@@ -850,7 +850,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
                 onClick={() => setIsBulkPriceDialogOpen(true)}
                 className="h-8"
               >
-                <TrendingUp className="h-4 w-4" />
+                <TrendingUp className="h-3 w-3" />
               </Button>
               {(selectedCategory !== "all" || selectedOwner !== "all" || startDate || endDate) && (
                 <Button
@@ -864,7 +864,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
                   }}
                   className="h-8"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3 w-3" />
                 </Button>
               )}
             </div>
@@ -874,8 +874,8 @@ export default function CarsPage({ userId }: CarsPageProps) {
           <div className="flex gap-2 mb-3">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="h-9 flex-1 justify-start text-sm">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                <Button variant="outline" className="h-8 flex-1 justify-start text-xs">
+                  <CalendarIcon className="mr-2 h-3 w-3" />
                   с {startDate ? format(startDate, "dd.MM.yy") : "?"}
                 </Button>
               </PopoverTrigger>
@@ -893,8 +893,8 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="h-9 flex-1 justify-start text-sm">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                <Button variant="outline" className="h-8 flex-1 justify-start text-xs">
+                  <CalendarIcon className="mr-2 h-3 w-3" />
                   по {endDate ? format(endDate, "dd.MM.yy") : "?"}
                 </Button>
               </PopoverTrigger>
@@ -914,7 +914,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
           {/* Строка 3: Категория и Владелец */}
           <div className="flex gap-2">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="h-9 flex-1">
+              <SelectTrigger className="h-8 text-xs bg-white border-gray-300 shrink-0 flex-1">
                 <SelectValue placeholder="Категория" />
               </SelectTrigger>
               <SelectContent>
@@ -928,7 +928,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
             </Select>
 
             <Select value={selectedOwner} onValueChange={setSelectedOwner}>
-              <SelectTrigger className="h-9 flex-1">
+              <SelectTrigger className="h-8 text-xs bg-white border-gray-300 shrink-0 flex-1">
                 <SelectValue placeholder="Владелец" />
               </SelectTrigger>
               <SelectContent>
