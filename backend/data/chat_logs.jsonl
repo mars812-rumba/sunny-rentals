@@ -1543,3 +1543,12 @@
 {"timestamp": "2026-03-04T12:55:42.936759", "user_id": 374897465, "role": "user", "content": "Вы на пхукетк"}
 {"timestamp": "2026-03-04T12:55:47.905864", "user_id": 374897465, "role": "user", "content": "Вы на пхукетк"}
 {"timestamp": "2026-03-04T12:55:47.906223", "user_id": 374897465, "role": "assistant", "content": "Да, мы работаем на Пхукете! 🏝️\n\nВот Toyota YARIS, который вас интересует:\n\nToyota YARIS 2022 Black (COMPACT)\nЦена: 840฿/день | Депозит: 5000฿\n\n![Toyota YARIS Black](image:compact/namo_yaris_sedan_black_2022/1.jpg)\n\nТакже у нас есть другие варианты YARIS:\n- YARIS 2022 White - 837฿/день\n- YARIS 2024 Gray - 840฿/день  \n- YARIS Hb 2023 Blue - 840฿/день\n- YARIS white Sedan - 840฿/день\n\nНа какие даты вам нужна аренда? Цены зависят от продолжительности аренды - есть скидки на длительные периоды! 📅"}
+{"timestamp": "2026-03-09T11:37:25.780207", "user_id": 8437503586, "role": "user", "text": "Здравствуйте", "username": "maksim_20261", "source": "telegram_bot"}
+{"timestamp": "2026-03-09T11:37:39.123464", "user_id": 8437503586, "role": "user", "text": "Пришлите каталог", "username": "maksim_20261", "source": "telegram_bot"}
+{"timestamp": "2026-03-09T11:39:42.726Z", "user_id": 8437503586, "role": "manager", "text": "Добрый день. Нажмите /start", "source": "crm_panel"}
+{"timestamp": "2026-03-09T11:54:45.223925", "user_id": 8437503586, "role": "user", "text": "Спасибо", "username": "maksim_20261", "source": "telegram_bot"}
+{"timestamp": "2026-03-09T11:54:52.384748", "user_id": 8437503586, "role": "user", "text": "Разобрался", "username": "maksim_20261", "source": "telegram_bot"}
+{"timestamp": "2026-03-09T12:00:35.408Z", "user_id": 8437503586, "role": "manager", "text": "Нужна помощь? Какого формата авто рассматриваете?", "source": "crm_panel"}
+{"timestamp": "2026-03-09T12:00:44.117Z", "user_id": 8437503586, "role": "manager", "text": "С 9-18 я так понял", "source": "crm_panel"}
+{"timestamp": "2026-03-09T14:04:55.021Z", "user_id": "1271204615", "role": "manager", "text": "🚗 *Бронирование авто:* Toyota YARIS 2022 White 📅 *Даты:* 15.03 - 27.03 (12 дн.) 💰 *Аренда:* 10080 ฿ 🚚 *Доставка:* 0 ฿ 💵 *Депозит:* 5000 ฿ __________________ ✅ *ИТОГО:* 10080 ฿ ", "source": "crm_panel"}
+{"timestamp": "2026-03-09T14:55:26.117Z", "user_id": "374897465", "role": "manager", "text": "https://sunny-rentals.online/offer?car=volvo_v60_2020_white&start=2026-03-10&end=2026-03-12&rental=3838&delivery=0&deposit=8000&user_id=7658402370", "source": "crm_panel"}
