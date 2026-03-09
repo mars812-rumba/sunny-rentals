@@ -439,7 +439,6 @@ const loadUserDetails = async (user: any) => {
         }
       });
       const results = await Promise.allSettled(promises);
-      const userIdStr = String(user.user_id);
       setUsers(prev => prev.map(user => {
         const result = results.find(r => r.status === 'fulfilled' && String(r.value.userId) === String(user.user_id));
         if (result && result.status === 'fulfilled' && result.value.dialogStatus) {
