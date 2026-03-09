@@ -4128,7 +4128,7 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
             
             # Обновляем статус пользователя на pre_booking
             if actual_user_id != "admin":
-                users_data = load_json(USERS_FILE)
+                users_data = load_json(USER_DATA_JSON)
                 for user in users_data:
                     if str(user.get('user_id')) == str(actual_user_id):
                         user['status'] = 'pre_booking'
@@ -4136,7 +4136,7 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
                         print(f"✓ Updated user {actual_user_id} status to pre_booking")
                         break
                 with _lock:
-                    save_json(USERS_FILE, users_data)
+                    save_json(USER_DATA_JSON, users_data)
         
         print("=== SUCCESS ===")
         return {
