@@ -4588,6 +4588,7 @@ async def admin_create_booking_simple(request: Request):
     try:
         data = await request.json()
         print(f"=== START admin_create_booking_simple ===")
+        print(f"Request data: {data}")
         
         user_id = data.get('user_id')
         car_id = data.get('car_id')
@@ -4599,15 +4600,27 @@ async def admin_create_booking_simple(request: Request):
         total_delivery = data.get('total_delivery', 0)
         deposit = data.get('deposit', 5000)
         
+        # Дополнительные поля
+        pickup_time = data.get('pickup_time', '13:00')
+        return_time = data.get('return_time', '13:00')
+        pickup_address = data.get('pickup_address', '')
+        return_address = data.get('return_address', '')
+        pickup_location = data.get('pickup_location', 'airport')
+        return_location = data.get('return_location', 'airport')
+        contact_name = data.get('contact_name', '')
+        contact_value = data.get('contact_value', '')
+        contact_type = data.get('contact_type', 'telegram')
+        
         if not user_id or not car_id or not start_date or not end_date:
             raise HTTPException(status_code=400, detail="user_id, car_id, start_date, end_date required")
         
+        # Используем реальные данные из запроса
         form_data = {
             "car": {"id": car_id, "name": car_name, "brand": "", "model": "", "year": "", "color": ""},
-            "dates": {"start": start_date, "end": end_date, "days": days, "pickupTime": "13:00", "returnTime": "13:00"},
-            "locations": {"pickup": "airport", "dropoff": "airport", "pickupAddress": "", "dropoffAddress": ""},
+            "dates": {"start": start_date, "end": end_date, "days": days, "pickupTime": pickup_time, "returnTime": return_time},
+            "locations": {"pickup": pickup_location, "dropoff": return_location, "pickupAddress": pickup_address, "dropoffAddress": return_address},
             "pricing": {"dailyRate": total_rental // days if days > 0 else total_rental, "totalRental": total_rental, "deposit": deposit, "delivery": total_delivery, "grandTotal": total_rental + total_delivery},
-            "contact": {"name": "", "value": "", "type": "telegram"},
+            "contact": {"name": contact_name, "value": contact_value, "type": contact_type},
             "timestamp": datetime.utcnow().isoformat()
         }
         

@@ -1719,12 +1719,13 @@ const handleUpdateNote = async () => {
                     </div>
                     <div className="text-center border-l border-slate-100">
                       <span className="block text-slate-400 uppercase">Доставка</span>
-                      <span className="font-black text-slate-800">{b.form_data?.pricing?.delivery?.toLocaleString() || 0} ฿</span>
+                      <span className="font-black text-slate-800">{b.form_data?.pricing?.totalDelivery?.toLocaleString() || 0} ฿</span>
                     </div>
                   </div>
                   <div className="mt-2 text-center">
-                    <span className="text-[8px] font-black text-slate-400 uppercase">ИТОГО</span>
-                    <span className="block text-lg font-black text-blue-600">{b.form_data?.pricing?.grandTotal?.toLocaleString() || 0} ฿</span>
+                    <span className="text-[8px] font-black text-slate-400 uppercase">Аренда</span>
+                    <span className="block text-lg font-black text-blue-600">{b.form_data?.pricing?.totalRental?.toLocaleString() || 0} ฿</span>
+                    <span className="text-[8px] text-slate-400">Депозит: {b.form_data?.pricing?.deposit?.toLocaleString() || 0} ฿</span>
                   </div>
 
                   {/* Кнопки для брони */}

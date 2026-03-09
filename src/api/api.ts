@@ -416,13 +416,18 @@ export async function createBookingFromCRMForm(userId: number | string, formData
   const pricing = formData.pricing || {};
   const contact = formData.contact || {};
   
-  const startDate = new Date(dates.start);
-  const endDate = new Date(dates.end);
-  const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) || 1;
+  // Извлекаем из формы (которая использует snake_case)
+  const pickup_time = dates.pickupTime || '13:00';
+  const return_time = dates.returnTime || '13:00';
+  const pickup_address = locations.pickupAddress || '';
+  const return_address = locations.returnAddress || '';
+  const pickup_location = locations.pickupLocation || 'airport';
+  const return_location = locations.returnLocation || 'airport';
   
-  const total_rental = pricing.totalRental || pricing.rentalPrice || 0;
+  const total_rental = pricing.totalRental || 0;
   const total_delivery = pricing.totalDelivery || 0;
   const deposit = pricing.deposit || 5000;
+  const days = dates.days || 1;
   
   const response = await fetch(`${API_BASE_URL}/api/admin/bookings/create`, {
     method: 'POST',
@@ -433,19 +438,19 @@ export async function createBookingFromCRMForm(userId: number | string, formData
     body: JSON.stringify({
       user_id: userId,
       car_id: car.id || '',
-      car_name: car.name || `${car.brand || ''} ${car.model || ''}`.trim(),
-      start_date: startDate.toISOString(),
-      end_date: endDate.toISOString(),
+      car_name: car.name || `${car.brand || ''} ${car.model || ''} ${car.year || ''}`.trim(),
+      start_date: dates.start,
+      end_date: dates.end,
       days: days,
       total_rental: total_rental,
       total_delivery: total_delivery,
       deposit: deposit,
-      pickup_location: locations.pickup || 'airport',
-      return_location: locations.dropoff || 'airport',
-      pickup_address: locations.pickupAddress || '',
-      return_address: locations.dropoffAddress || '',
-      pickup_time: dates.pickupTime || '13:00',
-      return_time: dates.returnTime || '13:00',
+      pickup_location: pickup_location,
+      return_location: return_location,
+      pickup_address: pickup_address,
+      return_address: return_address,
+      pickup_time: pickup_time,
+      return_time: return_time,
       contact_name: contact.name || '',
       contact_value: contact.value || '',
       contact_type: contact.type || 'telegram',
