@@ -322,7 +322,14 @@ __________________
       };
 
       const bId = booking?.booking_id || booking?.id || null;
-      console.log("📤 [BookingFormDialog] Saving booking:", { bId, userId, isEditing });
+      console.log("📤 [BookingFormDialog] Saving booking:", { bId, userId, isEditing, booking });
+      
+      if (!bId) {
+        console.error("❌ [BookingFormDialog] No booking_id found!", booking);
+        toast.error("Ошибка: не найден ID брони");
+        setIsSubmitting(false);
+        return;
+      }
       
       if (isEditing && bId) {
         // Редактирование существующей брони
