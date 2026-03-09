@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { startOfDay, startOfMonth } from 'date-fns';
-import { Calendar, Filter, LayoutGrid, List, ZoomIn, ZoomOut, Users } from 'lucide-react';
+import { Filter, LayoutGrid, List, ZoomIn, ZoomOut, Users } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { SchedulerCalendar } from '@/components/admin/SchedulerCalendar';
@@ -9,6 +9,7 @@ import { MonthCalendarView } from '@/components/admin/MonthCalendarView';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 import { DayDetailsModal } from '@/components/admin/DayDetailsModal';
 import { fetchCars, fetchBookings, fetchCarOwners, Car, Booking, fetchBookingsLogistics, fetchOwnersList } from '@/api/api.ts';
+import logo from '@/assets/logo.png';
 
 const CAR_CLASSES = [
   { id: 'all', name: 'Все классы' },
@@ -186,7 +187,7 @@ export default function AdminScheduler() {
       <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-4 py-2 shadow-md">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-blue-600" />
+            <img src={logo} alt="Sunny Rentals" className="h-7 w-auto" />
             <span className="text-sm font-semibold text-gray-900">Календарь</span>
           </div>
 

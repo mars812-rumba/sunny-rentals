@@ -17,6 +17,7 @@ import { format, addDays } from "date-fns";
 import { ru } from "date-fns/locale";
 import CarForm from "@/components/admin/CarForm";
 import { useCars } from "@/contexts/CarsContext";
+import logo from '@/assets/logo.png';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const ADMIN_KEY = "sunny2025";
@@ -832,7 +833,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
           {/* Строка 1: Заголовок + кнопки */}
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-2">
-              <Car className="h-4 w-4 text-blue-600" />
+              <img src={logo} alt="Sunny Rentals" className="h-7 w-auto" />
               <span className="text-sm font-semibold text-gray-900">Флот и офферы</span>
             </div>
             <div className="flex gap-2">
