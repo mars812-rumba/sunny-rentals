@@ -304,9 +304,7 @@ export async function submitBooking(formData: BookingFormData, bookingId?: strin
   
   switch (bookingSource) {
     case 'admin':
-      endpoint = bookingUserId 
-        ? `${API_BASE_URL}/api/admin/bookings/${bookingUserId}`
-        : `${API_BASE_URL}/api/admin/bookings`;
+      endpoint = `${API_BASE_URL}/api/admin/bookings`;
       break;
     case 'telegram':
       endpoint = `${API_BASE_URL}/api/bookings/telegram_webapp`;
@@ -325,6 +323,7 @@ export async function submitBooking(formData: BookingFormData, bookingId?: strin
     },
     body: JSON.stringify({
       booking_id: bookingId,
+      user_id: bookingUserId,
       form_data: formData
     })
   });

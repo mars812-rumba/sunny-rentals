@@ -4043,16 +4043,16 @@ def api_get_booking(booking_id: str):
 def list_bookings():
     return load_json(BOOKINGS_FILE)
 
-@app.post(API_PREFIX + "/admin/bookings/{user_id}")
-async def admin_create_booking(user_id: str, booking_data: AdminBookingRequest):
+@app.post(API_PREFIX + "/admin/bookings")
+async def admin_create_booking(booking_data: AdminBookingRequest):
     """Создание/обновление брони напрямую из админ-панели"""
     try:
         print("=== START admin_create_booking ===")
         print(f"Request data: {booking_data}")
-        print(f"user_id from path: {user_id}")
+        print(f"user_id from body: {booking_data.user_id}")
         
-        # Используем user_id из URL
-        actual_user_id = user_id
+        # Используем user_id из тела запроса
+        actual_user_id = booking_data.user_id
         
         form_data = booking_data.form_data
         print(f"Form data parsed successfully: {form_data}")
