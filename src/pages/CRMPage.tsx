@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { MarkerType } from '@/types/crm';
-import { BookingCreateForCRM } from '@/components/admin/BookingCreateForCRM';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 
 // TypeScript интерфейсы для работы с диалогами
