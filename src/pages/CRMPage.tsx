@@ -20,7 +20,6 @@ import {
   CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download,
   Clock, FileQuestion
 } from 'lucide-react';
-import logo from '@/assets/logo.png';
 import { MarkerType } from '@/types/crm';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 
@@ -1151,7 +1150,7 @@ const handleUpdateNote = async () => {
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-hidden">
       {/* Nav */}
       <nav className="bg-white border-b px-4 py-2 flex justify-between items-center sticky top-0 z-40 shadow-sm">
-        <img src={logo} alt="Sunny Rentals" className="h-7 w-auto" />
+        <img src="/android-chrome-192x192.png" alt="Sunny Rentals" className="h-7 w-auto" />
         <div className="flex bg-slate-100 p-1 rounded-lg">
           {['today', 'week', 'month', 'all'].map(p => (
             <button key={p} onClick={() => setPeriod(p)}

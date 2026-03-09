@@ -9,7 +9,6 @@ import { MonthCalendarView } from '@/components/admin/MonthCalendarView';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 import { DayDetailsModal } from '@/components/admin/DayDetailsModal';
 import { fetchCars, fetchBookings, fetchCarOwners, Car, Booking, fetchBookingsLogistics, fetchOwnersList } from '@/api/api.ts';
-import logo from '@/assets/logo.png';
 
 const CAR_CLASSES = [
   { id: 'all', name: 'Все классы' },
@@ -187,7 +186,7 @@ export default function AdminScheduler() {
       <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-4 py-2 shadow-md">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Sunny Rentals" className="h-7 w-auto" />
+            <img src="/android-chrome-192x192.png" alt="Sunny Rentals" className="h-7 w-auto" />
             <span className="text-sm font-semibold text-gray-900">Календарь</span>
           </div>
 
