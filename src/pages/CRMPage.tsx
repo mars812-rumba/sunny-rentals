@@ -621,10 +621,11 @@ const handleBookingSuccess = async () => {
   setIsBookingDialogOpen(false);
   setEditingBooking(null);
   
-  // Перезагрузить заявки для выбранного пользователя
-  if (selectedUser) {
+  // Перезагрузить заявки для выбранного пользователя (userId сохраняем из closure)
+  const currentUserId = selectedUser?.user_id;
+  if (currentUserId) {
     // Принудительно загружаем bookings заново
-    const bRes = await fetch(`/api/crm/bookings/${selectedUser.user_id}`);
+    const bRes = await fetch(`/api/crm/bookings/${currentUserId}`);
     const bData = await bRes.json();
     if (bData.status === 'ok') {
       setBookings(bData.bookings);

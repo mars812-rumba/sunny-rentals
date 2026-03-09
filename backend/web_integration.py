@@ -4111,15 +4111,18 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
             booking_id = str(uuid.uuid4())[:8]
             print(f"Creating new booking: {booking_id}")
             
+            # Используем user_id из запроса
+            actual_user_id = booking_data.user_id or "admin"
+            
             bookings.append({
                 "booking_id": booking_id,
-                "user_id": "admin",
+                "user_id": actual_user_id,
                 "form_data": form_data_dict,
                 "status": "pre_booking",  # ✅ ВСЕ брони начинаются как предварительные
                 "created_at": datetime.utcnow().isoformat(),
                 "source": "admin_panel"
             })
-            print(f"✓ Created pre_booking {booking_id}")
+            print(f"✓ Created pre_booking {booking_id} for user {actual_user_id}")
         
         # Сохраняем
         with _lock:
