@@ -4123,6 +4123,8 @@ async def admin_create_booking(user_id: str, booking_data: AdminBookingRequest):
                 print("ERROR: user_id is None or empty")
                 raise HTTPException(status_code=400, detail="user_id is required")
             
+            print(f"booking_id from request: '{booking_id}' (bool: {bool(booking_id)})")
+            
             try:
                 new_booking = {
                     "booking_id": booking_id,
