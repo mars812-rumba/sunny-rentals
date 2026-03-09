@@ -186,7 +186,7 @@ export default function AdminScheduler() {
       <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-4 py-2 shadow-md">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
-            <img src="/android-chrome-192x192.png" alt="Sunny Rentals" className="h-7 w-auto" />
+            <img src="/assets/logo.png" alt="Sunny Rentals" className="h-7 w-auto" />
             <span className="text-sm font-semibold text-gray-900">Календарь</span>
           </div>
 

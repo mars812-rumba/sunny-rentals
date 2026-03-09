@@ -832,7 +832,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
           {/* Строка 1: Заголовок + кнопки */}
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-2">
-              <img src="/android-chrome-192x192.png" alt="Sunny Rentals" className="h-7 w-auto" />
+              <img src="/assets/logo.png" alt="Sunny Rentals" className="h-7 w-auto" />
               <span className="text-sm font-semibold text-gray-900">Флот и офферы</span>
             </div>
             <div className="flex gap-2">
