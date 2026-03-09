@@ -138,6 +138,8 @@ export function BookingFormDialog({
         setReturnLocation(fd.locations?.returnLocation || 'airport');
         setPickupAddress(fd.locations?.pickupAddress || '');
         setReturnAddress(fd.locations?.returnAddress || '');
+        setPickupTime(fd.dates?.pickupTime || '13:00');
+        setReturnTime(fd.dates?.returnTime || '13:00');
         
         // Initialize manual pricing fields
         setManualRental(fd.pricing?.totalRental?.toString() || '');
@@ -793,13 +795,13 @@ return (
               </Button>
             )}
             
-            {isEditing && booking?.status === 'pre_booking' ? (
+            {isEditing ? (
               <Button
-                className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all"
+                className="flex-1 h-12 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition-all"
                 disabled={isSubmitting}
-                onClick={handleConfirm}
+                onClick={handleSubmit}
               >
-                {isSubmitting ? 'Обработка...' : 'Подтвердить'}
+                {isSubmitting ? 'Обработка...' : 'Сохранить изменения'}
               </Button>
             ) : (
               <Button
@@ -807,7 +809,7 @@ return (
                 disabled={isSubmitting}
                 onClick={handleSubmit}
               >
-                {isSubmitting ? 'Обработка...' : isEditing ? 'Сохранить изменения' : 'Создать бронирование'}
+                {isSubmitting ? 'Обработка...' : 'Создать бронирование'}
               </Button>
             )}
           </div>
