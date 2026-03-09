@@ -222,57 +222,55 @@ export default function AdminScheduler() {
         </div>
       </div>
 
-      {/* Фильтры - внизу */}
-      <div className="sticky top-[50px] z-30 bg-gray-100 border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-medium text-gray-600 flex items-center gap-1 shrink-0">
-            <Filter className="h-3 w-3" /> Фильтры:
-          </span>
+{/* Фильтры */}
+<div className="sticky top-[50px] z-30 bg-gray-100 border-b border-gray-200 px-3 py-2">
+  {/* Строка 1: фильтры */}
+  <div className="flex items-center gap-2 mb-2">
+    <Filter className="h-3 w-3 text-gray-500 shrink-0" />
+    <Select value={selectedClass} onValueChange={setSelectedClass}>
+      <SelectTrigger className="flex-1 h-8 text-xs bg-white border-gray-300">
+        <SelectValue placeholder="Все классы" />
+      </SelectTrigger>
+      <SelectContent>
+        {CAR_CLASSES.map(cls => (
+          <SelectItem key={cls.id} value={cls.id}>
+            {cls.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+    <Select value={selectedOwner} onValueChange={setSelectedOwner}>
+      <SelectTrigger className="flex-1 h-8 text-xs bg-white border-gray-300">
+        <SelectValue placeholder="Все владельцы" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">Все владельцы</SelectItem>
+        {ownersList.map(owner => (
+          <SelectItem key={owner.id} value={owner.id}>
+            {owner.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  </div>
 
-          <Select value={selectedClass} onValueChange={setSelectedClass}>
-            <SelectTrigger className="w-32 h-8 text-xs bg-white border-gray-300 shrink-0">
-              <SelectValue placeholder="Класс" />
-            </SelectTrigger>
-            <SelectContent>
-              {CAR_CLASSES.map(cls => (
-                <SelectItem key={cls.id} value={cls.id}>
-                  {cls.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={selectedOwner} onValueChange={setSelectedOwner}>
-            <SelectTrigger className="w-48 h-8 text-xs bg-white border-gray-300 shrink-0">
-              <Users className="h-3 w-3 mr-1" />
-              <SelectValue placeholder="Все владельцы" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Все владельцы</SelectItem>
-              {ownersList.map(owner => (
-                <SelectItem key={owner.id} value={owner.id}>
-                  {owner.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={resetFilters}
-              className="h-8 px-2 text-xs text-gray-500 hover:text-gray-900"
-            >
-              Сбросить
-            </Button>
-          )}
-
-          <span className="text-xs text-gray-500 ml-auto">
-            {filteredCars.length} авто / {filteredLogisticsData.length} доставок
-          </span>
-        </div>
-      </div>
+  {/* Строка 2: счётчик + сброс */}
+  <div className="flex items-center justify-between">
+    <span className="text-xs text-gray-500">
+      {filteredCars.length} авто / {filteredLogisticsData.length} доставок
+    </span>
+    {hasActiveFilters && (
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={resetFilters}
+        className="h-6 px-2 text-xs text-gray-500 hover:text-gray-900"
+      >
+        ✕ Сбросить
+      </Button>
+    )}
+  </div>
+</div>
 
       <main className="w-full p-0">
         {isLoading ? (

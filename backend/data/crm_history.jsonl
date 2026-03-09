@@ -4058,3 +4058,133 @@
 {"timestamp": "2026-03-04T12:55:04.018984", "user_id": 374897465, "action": "claude_response"}
 {"timestamp": "2026-03-04T12:55:42.936401", "user_id": 374897465, "action": "message_received", "content": "Вы на пхукетк"}
 {"timestamp": "2026-03-04T12:55:47.917115", "user_id": 374897465, "action": "claude_response"}
+{"timestamp": "2026-03-09T09:57:08.809954", "user_id": "web_session_ml7egnzi_olfru4g4l_4nv37f", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-03-09T09:57:22.921327", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:09:48.251372", "user_id": 1246223780, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:10:03.481649", "user_id": "1246223780", "action": "booking_created_from_offer", "booking_id": "bk_20260309_101003_477944", "car_id": "toyota_yaris_white_sedan", "source": "crm_admin"}
+{"timestamp": "2026-03-09T10:12:12.901688", "user_id": 1246223780, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:13:46.856414", "user_id": 1083802091, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:14:40.617606", "user_id": 1083802091, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:14:52.524999", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:21:05.107356", "user_id": 374897465, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:21:14.462216", "user_id": 374897465, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:21:15.947604", "user_id": 374897465, "action": "dialog_stopped"}
+{"timestamp": "2026-03-09T10:21:15.951309", "user_id": 374897465, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-03-09T10:29:02.388135", "user_id": 1208879071, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:38:04.687899", "user_id": 7658402370, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:44:02.326269", "user_id": 7658402370, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:46:51.924250", "user_id": 322666985, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:55:15.538657", "user_id": 322666985, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:55:18.687571", "user_id": 322666985, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:55:21.590989", "user_id": 322666985, "action": "status_changed", "old_status": "pre_booking", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T10:55:23.350212", "user_id": 7658402370, "action": "status_changed", "old_status": "pre_booking", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T10:55:24.266329", "user_id": "1208879071", "action": "status_changed", "old_status": "pre_booking", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T10:55:25.050631", "user_id": "725664451", "action": "status_changed", "old_status": "pre_booking", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T10:55:27.902777", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:56:30.069294", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:57:00.496654", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T10:59:11.651332", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:18:31.432574", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:18:39.382998", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:20:19.185246", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:25:47.039168", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:27:04.498110", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:36:25.407460", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:37:25.779746", "user_id": 8437503586, "action": "message_received", "content": "Здравствуйте"}
+{"timestamp": "2026-03-09T11:37:25.785140", "user_id": 8437503586, "action": "user_message_received", "message_length": 12, "message_type": "text", "username": "maksim_20261", "media_info": null}
+{"timestamp": "2026-03-09T11:37:39.123021", "user_id": 8437503586, "action": "message_received", "content": "Пришлите каталог"}
+{"timestamp": "2026-03-09T11:37:39.127292", "user_id": 8437503586, "action": "user_message_received", "message_length": 16, "message_type": "text", "username": "maksim_20261", "media_info": null}
+{"timestamp": "2026-03-09T11:39:28.546341", "user_id": 8437503586, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:39:42.726Z", "user_id": 8437503586, "action": "manager_message_sent", "message_length": 27}
+{"timestamp": "2026-03-09T11:39:55.656390", "user_id": "951200352", "action": "status_changed", "old_status": "archive", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T11:40:00.324073", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:43:42.121375", "user_id": 1083802091, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:43:57.069375", "user_id": "8437503586", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-09T12:00:00.000Z", "endDate": "2026-03-18T12:00:00.000Z", "days": 10, "category": "suv", "pickupLocation": "hotel", "returnLocation": "", "username": "maksim_20261"}, "username": "maksim_20261"}
+{"timestamp": "2026-03-09T11:43:57.214921", "user_id": "8437503586", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-09T12:00:00.000Z", "endDate": "2026-03-18T12:00:00.000Z", "days": 10, "category": "suv", "pickupLocation": "hotel", "returnLocation": "hotel", "username": "maksim_20261"}, "username": "maksim_20261"}
+{"timestamp": "2026-03-09T11:43:57.327734", "user_id": "8437503586", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-09T12:00:00.000Z", "endDate": "2026-03-18T12:00:00.000Z", "username": "maksim_20261"}, "username": "maksim_20261"}
+{"timestamp": "2026-03-09T11:43:57.442435", "user_id": "8437503586", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-09T12:00:00.000Z", "endDate": "2026-03-18T12:00:00.000Z", "username": "maksim_20261"}, "username": "maksim_20261"}
+{"timestamp": "2026-03-09T11:47:41.235262", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:49:53.799237", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:54:06.876611", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:54:45.223717", "user_id": 8437503586, "action": "message_received", "content": "Спасибо"}
+{"timestamp": "2026-03-09T11:54:45.229073", "user_id": 8437503586, "action": "user_message_received", "message_length": 7, "message_type": "text", "username": "maksim_20261", "media_info": null}
+{"timestamp": "2026-03-09T11:54:52.384320", "user_id": 8437503586, "action": "message_received", "content": "Разобрался"}
+{"timestamp": "2026-03-09T11:54:52.389831", "user_id": 8437503586, "action": "user_message_received", "message_length": 10, "message_type": "text", "username": "maksim_20261", "media_info": null}
+{"timestamp": "2026-03-09T11:55:45.569903", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:56:55.787665", "user_id": 1083802091, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:57:30.039651", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T11:59:51.529735", "user_id": "951200352", "action": "status_changed", "old_status": "archive", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T12:00:06.009190", "user_id": 83038051, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:00:13.210869", "user_id": 8437503586, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:00:35.408Z", "user_id": 8437503586, "action": "manager_message_sent", "message_length": 49}
+{"timestamp": "2026-03-09T12:00:44.117Z", "user_id": 8437503586, "action": "manager_message_sent", "message_length": 18}
+{"timestamp": "2026-03-09T12:02:56.666290", "user_id": 83038051, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:05:06.913201", "user_id": 83038051, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:10:47.083289", "user_id": 83038051, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:13:03.232777", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:14:27.339091", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:15:57.499175", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:16:09.723597", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:16:23.971890", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:19:26.902541", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:20:08.658641", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:23:11.711252", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:26:09.430022", "user_id": 8437503586, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:27:52.498572", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:27:58.468226", "user_id": 523777863, "action": "status_changed", "old_status": "pre_booking", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T12:28:05.835531", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:28:17.581557", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:28:57.668759", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:31:32.769155", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:33:25.672100", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:44:55.549827", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T12:49:29.156798", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T13:00:44.632473", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T13:17:42.065780", "user_id": 951200352, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T13:18:29.537886", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T13:19:54.944629", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T13:25:45.105887", "user_id": "1271204615", "action": "dialog_started", "initiated_by": "user", "username": "SakharovVKuzbass"}
+{"timestamp": "2026-03-09T13:26:41.146234", "user_id": "1271204615", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-14T17:00:00.000Z", "endDate": "2026-03-26T17:00:00.000Z", "username": "SakharovVKuzbass"}, "username": "SakharovVKuzbass"}
+{"timestamp": "2026-03-09T13:26:41.261358", "user_id": "1271204615", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-14T17:00:00.000Z", "endDate": "2026-03-26T17:00:00.000Z", "days": 13, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "SakharovVKuzbass"}, "username": "SakharovVKuzbass"}
+{"timestamp": "2026-03-09T13:55:33.604285", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T13:56:17.045140", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T13:56:28.716331", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T13:56:38.811419", "user_id": 523777863, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T14:02:13.978155", "user_id": 1208879071, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T14:04:10.503800", "user_id": 1271204615, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T14:04:24.067887", "user_id": 1271204615, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T14:04:55.021Z", "user_id": "1271204615", "action": "manager_message_sent", "message_length": 176}
+{"timestamp": "2026-03-09T14:05:23.872175", "user_id": 1271204615, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T14:05:53.074885", "user_id": 1271204615, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T14:10:01.254193", "user_id": 1271204615, "action": "claude_started"}
+{"timestamp": "2026-03-09T14:10:01.257612", "user_id": 1271204615, "action": "claude_started", "by": "manager"}
+{"timestamp": "2026-03-09T14:10:05.123384", "user_id": 1271204615, "action": "dialog_paused"}
+{"timestamp": "2026-03-09T14:10:05.125496", "user_id": 1271204615, "action": "claude_paused", "by": "manager"}
+{"timestamp": "2026-03-09T14:10:09.582736", "user_id": 1271204615, "action": "dialog_stopped"}
+{"timestamp": "2026-03-09T14:10:09.584129", "user_id": 1271204615, "action": "claude_stopped", "by": "manager"}
+{"timestamp": "2026-03-09T14:52:29.030697", "user_id": 7658402370, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T14:55:19.776311", "user_id": 374897465, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T14:55:26.117Z", "user_id": "374897465", "action": "manager_message_sent", "message_length": 146}
+{"timestamp": "2026-03-09T14:56:16.679758", "user_id": 8437503586, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T14:56:35.803453", "user_id": "7802120179", "action": "status_changed", "old_status": "new", "new_status": "archive", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T14:56:39.650351", "user_id": "318769672", "action": "status_changed", "old_status": "new", "new_status": "archive", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T14:56:41.713556", "user_id": "726657166", "action": "status_changed", "old_status": "new", "new_status": "archive", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T14:56:57.670742", "user_id": 7658402370, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T14:57:09.247266", "user_id": 7658402370, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T15:11:40.465586", "user_id": "1429592624", "action": "dialog_started", "initiated_by": "user", "username": "kzrk_ru"}
+{"timestamp": "2026-03-09T15:21:16.732311", "user_id": 1208879071, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T15:22:45.839997", "user_id": 374897465, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T15:24:53.988385", "user_id": 374897465, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T15:38:20.204963", "user_id": 1429592624, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T15:39:51.112228", "user_id": 374897465, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T15:40:14.949783", "user_id": 1429592624, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T15:42:04.631494", "user_id": 7658402370, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T16:07:04.848611", "user_id": 7658402370, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T16:08:55.935068", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T16:09:06.238933", "user_id": "725664451", "action": "status_changed", "old_status": "archive", "new_status": "confirmed", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T16:09:14.732004", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T16:09:35.646435", "user_id": 725664451, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T16:09:40.483416", "user_id": "725664451", "action": "status_changed", "old_status": "confirmed", "new_status": "in_work", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-09T16:09:49.035800", "user_id": 1208879071, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T16:22:08.329646", "user_id": 1429592624, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-09T16:27:11.647519", "user_id": 7658402370, "action": "messages_marked_read", "by": "manager"}

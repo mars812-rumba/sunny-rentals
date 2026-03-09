@@ -361,52 +361,6 @@
     "updated_at": "2026-02-26T12:08:37.819447"
   },
   {
-    "booking_id": "acf68963",
-    "user_id": "374897465",
-    "form_data": {
-      "car": {
-        "id": "toyota_yaris_2022_black",
-        "name": "Toyota YARIS 2022 Black",
-        "brand": "Toyota",
-        "model": "YARIS",
-        "year": "2022",
-        "color": "Black"
-      },
-      "dates": {
-        "start": "2026-02-28T17:00:00.000Z",
-        "end": "2026-03-06T17:00:00.000Z",
-        "days": 7
-      },
-      "locations": {
-        "pickupLocation": "airport",
-        "returnLocation": "airport",
-        "pickupAddress": null,
-        "returnAddress": null
-      },
-      "pricing": {
-        "dailyRate": 844,
-        "totalRental": 5908,
-        "deposit": 5000,
-        "deliveryPickup": 0,
-        "deliveryReturn": 0,
-        "totalDelivery": 0,
-        "grandTotal": 5908
-      },
-      "contact": {
-        "value": "@Marseloid",
-        "type": "telegram",
-        "name": null,
-        "phone": null
-      },
-      "timestamp": "2026-02-26T14:50:26.775Z"
-    },
-    "status": "rejected",
-    "created_at": "2026-02-26T14:50:31.022764",
-    "source": "telegram_webapp",
-    "rejected_at": "2026-02-26T14:51:36.201238",
-    "updated_at": "2026-02-26T14:51:36.201251"
-  },
-  {
     "booking_id": "7b4d11c8",
     "user_id": "277321286",
     "form_data": {
@@ -453,95 +407,223 @@
     "updated_at": "2026-02-27T04:03:26.217971"
   },
   {
-    "booking_id": "8c6caefb",
-    "user_id": "admin",
+    "booking_id": "bk_20260309_135604_974825",
+    "user_id": "523777863",
     "form_data": {
       "car": {
-        "id": "toyota_yaris_2024_gray",
-        "name": "Toyota YARIS 2024 Gray",
-        "brand": "Toyota",
-        "model": "YARIS",
-        "year": "2024",
-        "color": "Gray"
+        "id": "toyota_yaris_2023_blue",
+        "name": "Toyota YARIS Hb 2023 Blue",
+        "brand": "",
+        "model": "",
+        "year": "",
+        "color": ""
       },
       "dates": {
-        "start": "2026-03-04T02:00:00.000Z",
-        "end": "2026-03-12T02:00:00.000Z",
-        "days": 8
+        "start": "2026-03-09T02:30:00.000Z",
+        "end": "2026-03-20T03:00:00.000Z",
+        "days": 11,
+        "pickupTime": "09:30",
+        "returnTime": "10:00"
       },
       "locations": {
         "pickupLocation": "hotel",
-        "returnLocation": "hotel",
+        "dropoffLocation": "hotel",
         "pickupAddress": "",
-        "returnAddress": ""
+        "dropoffAddress": ""
       },
       "pricing": {
         "dailyRate": 840,
-        "totalRental": 6720,
+        "totalRental": 9240,
         "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 7720
+        "delivery": 1000,
+        "grandTotal": 10240
       },
       "contact": {
-        "value": "Зигмунд",
-        "type": "telegram",
-        "name": "Мудень",
-        "phone": ""
+        "name": "Marsel",
+        "value": "5373838",
+        "type": "telegram"
       },
-      "timestamp": "2026-03-02T13:10:48.423Z"
+      "timestamp": "2026-03-09T13:56:04.974320"
     },
     "status": "confirmed",
-    "created_at": "2026-03-02T13:10:49.726613",
+    "created_at": "2026-03-09T13:56:04.974866",
     "source": "admin_panel",
-    "confirmed_at": "2026-03-02T13:11:06.520938",
-    "updated_at": "2026-03-02T13:11:06.520950"
+    "confirmed_at": "2026-03-09T13:56:30.665128",
+    "updated_at": "2026-03-09T13:56:30.665140"
   },
   {
-    "booking_id": "fea56248",
-    "user_id": "725664451",
+    "booking_id": "bk_20260309_140253_265809",
+    "user_id": "1208879071",
     "form_data": {
       "car": {
-        "id": "Ar_city_rs_black_2025",
-        "name": "Honda City RS 2025 Black",
-        "brand": "Honda",
-        "model": "City RS",
-        "year": "2025",
-        "color": "Black"
+        "id": "mg_mg5_2024_green",
+        "name": "Toyota YARIS white Sedan",
+        "brand": "Toyota",
+        "model": "YARIS",
+        "year": "white",
+        "color": "Sedan"
       },
       "dates": {
-        "start": "2026-03-18T21:00:00.000Z",
-        "end": "2026-03-26T21:00:00.000Z",
-        "days": 9
+        "start": "2026-03-10T01:30:00.000Z",
+        "end": "2026-03-14T01:30:00.000Z",
+        "days": 4
+      },
+      "locations": {
+        "pickupLocation": "airport",
+        "dropoffLocation": "hotel",
+        "pickupAddress": "Hkt",
+        "dropoffAddress": "Hotel"
+      },
+      "pricing": {
+        "dailyRate": 840,
+        "totalRental": 4600,
+        "deposit": 5000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 500,
+        "totalDelivery": 500,
+        "grandTotal": 5100
+      },
+      "contact": {
+        "value": "Kiruxa",
+        "type": "telegram",
+        "name": "Kirill",
+        "phone": ""
+      },
+      "timestamp": "2026-03-09T14:03:23.044Z"
+    },
+    "status": "confirmed",
+    "created_at": "2026-03-09T14:02:53.265870",
+    "source": "admin_panel",
+    "updated_at": "2026-03-09T14:03:50.144518",
+    "confirmed_at": "2026-03-09T14:03:50.144506"
+  },
+  {
+    "booking_id": "bk_20260309_140444_852261",
+    "user_id": "1271204615",
+    "form_data": {
+      "car": {
+        "id": "toyota_yaris_2022_white",
+        "name": "Toyota YARIS 2022 White",
+        "brand": "",
+        "model": "",
+        "year": "",
+        "color": ""
+      },
+      "dates": {
+        "start": "2026-03-15T06:00:00.000Z",
+        "end": "2026-03-27T06:00:00.000Z",
+        "days": 12,
+        "pickupTime": "13:00",
+        "returnTime": "13:00"
+      },
+      "locations": {
+        "pickupLocation": "airport",
+        "dropoffLocation": "airport",
+        "pickupAddress": "",
+        "dropoffAddress": ""
+      },
+      "pricing": {
+        "dailyRate": 840,
+        "totalRental": 10080,
+        "deposit": 5000,
+        "delivery": 0,
+        "grandTotal": 10080
+      },
+      "contact": {
+        "name": "SakharovVKuzbass",
+        "value": "SakharovVKuzbass",
+        "type": "telegram"
+      },
+      "timestamp": "2026-03-09T14:04:44.851790"
+    },
+    "status": "pre_booking",
+    "created_at": "2026-03-09T14:04:44.852299",
+    "source": "admin_panel"
+  },
+  {
+    "booking_id": "bk_20260309_145346_283049",
+    "user_id": "7658402370",
+    "form_data": {
+      "car": {
+        "id": "toyota_veloz_2024_white",
+        "name": "Toyota VELOZ 2024 White",
+        "brand": "",
+        "model": "",
+        "year": "",
+        "color": ""
+      },
+      "dates": {
+        "start": "2026-03-09T01:30:00.000Z",
+        "end": "2026-03-19T01:30:00.000Z",
+        "days": 10,
+        "pickupTime": "08:30",
+        "returnTime": "08:30"
       },
       "locations": {
         "pickupLocation": "hotel",
-        "returnLocation": "hotel",
-        "pickupAddress": null,
-        "returnAddress": null
+        "dropoffLocation": "airport",
+        "pickupAddress": "Hotel California",
+        "dropoffAddress": ""
       },
       "pricing": {
-        "dailyRate": 900,
-        "totalRental": 8100,
-        "deposit": 5000,
-        "deliveryPickup": 500,
-        "deliveryReturn": 500,
-        "totalDelivery": 1000,
-        "grandTotal": 9100
+        "dailyRate": 1198,
+        "totalRental": 11980,
+        "deposit": 10000,
+        "delivery": 500,
+        "grandTotal": 12480
       },
       "contact": {
-        "value": "@Gleb_Baula",
-        "type": "telegram",
-        "name": null,
-        "phone": null
+        "name": "Жигули",
+        "value": "Monster",
+        "type": "telegram"
       },
-      "timestamp": "2026-03-04T09:21:32.856Z"
+      "timestamp": "2026-03-09T14:53:46.282489"
     },
-    "status": "rejected",
-    "created_at": "2026-03-04T09:21:33.201969",
-    "source": "telegram_webapp",
-    "rejected_at": "2026-03-04T09:38:32.468355",
-    "updated_at": "2026-03-04T09:38:32.468367"
+    "status": "pre_booking",
+    "created_at": "2026-03-09T14:53:46.283091",
+    "source": "admin_panel"
+  },
+  {
+    "booking_id": "bk_20260309_152315_706963",
+    "user_id": "374897465",
+    "form_data": {
+      "car": {
+        "id": "adv350_2025_new",
+        "name": "Adv350 2025 new",
+        "brand": "",
+        "model": "",
+        "year": "",
+        "color": ""
+      },
+      "dates": {
+        "start": "2026-03-10T06:00:00.000Z",
+        "end": "2026-03-19T06:00:00.000Z",
+        "days": 9,
+        "pickupTime": "13:00",
+        "returnTime": "13:00"
+      },
+      "locations": {
+        "pickupLocation": "hotel",
+        "dropoffLocation": "hotel",
+        "pickupAddress": "Жопа",
+        "dropoffAddress": "Жопа"
+      },
+      "pricing": {
+        "dailyRate": 616,
+        "totalRental": 5544,
+        "deposit": 10000,
+        "delivery": 1000,
+        "grandTotal": 6544
+      },
+      "contact": {
+        "name": "Marseloid",
+        "value": "Marseloid",
+        "type": "telegram"
+      },
+      "timestamp": "2026-03-09T15:23:15.704443"
+    },
+    "status": "pre_booking",
+    "created_at": "2026-03-09T15:23:15.707041",
+    "source": "admin_panel"
   }
 ]
