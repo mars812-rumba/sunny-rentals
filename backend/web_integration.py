@@ -4145,13 +4145,12 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
             booking_id = str(uuid.uuid4())[:8]
             print(f"Creating new booking: {booking_id}")
             
-            # Используем user_id из URL path
-            actual_user_id = user_id
-            print(f"Using user_id from path: {actual_user_id}")
+            # Используем user_id из тела запроса или "admin" если не передан
+            actual_user_id = booking_data.user_id if booking_data.user_id else "admin"
+            print(f"Using user_id: {actual_user_id}")
             
             if not actual_user_id:
-                print("ERROR: user_id is None or empty")
-                raise HTTPException(status_code=400, detail="user_id is required")
+                actual_user_id = "admin"
             
             print(f"booking_id from request: '{booking_id}' (bool: {bool(booking_id)})")
             
@@ -4620,7 +4619,7 @@ async def admin_create_booking_simple(request: Request):
         print(f"=== START admin_create_booking_simple ===")
         print(f"Request data: {data}")
         
-        user_id = data.get('user_id')
+        user_id = data.get('user_id') or "admin"
         car_id = data.get('car_id')
         car_name = data.get('car_name', '')
         start_date = data.get('start_date')
@@ -4641,8 +4640,8 @@ async def admin_create_booking_simple(request: Request):
         contact_value = data.get('contact_value', '')
         contact_type = data.get('contact_type', 'telegram')
         
-        if not user_id or not car_id or not start_date or not end_date:
-            raise HTTPException(status_code=400, detail="user_id, car_id, start_date, end_date required")
+        if not car_id or not start_date or not end_date:
+            raise HTTPException(status_code=400, detail="car_id, start_date, end_date required")
         
         # Используем реальные данные из запроса
         form_data = {
