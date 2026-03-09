@@ -10,10 +10,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Car, Users, AlertCircle, Plus, Edit, Trash2, LogOut, Check, X, Fuel, Settings, Zap, Bike, TrendingUp, TrendingDown, User, Calendar as CalendarIcon, DollarSign } from "lucide-react";
+import { Car, Users, AlertCircle, Plus, Edit, Trash2, LogOut, Check, X, Fuel, Settings, Zap, Bike, TrendingUp, TrendingDown, User, Calendar as CalendarIcon, DollarSign, UserPlus } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { ru } from "date-fns/locale";
 import CarForm from "@/components/admin/CarForm";
 import { useCars } from "@/contexts/CarsContext";
@@ -466,8 +466,9 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
   // ✅ Фильтры
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [selectedOwner, setSelectedOwner] = useState("all");
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>(addDays(new Date(), 7));
 
   const { refetchCars: refetchGlobalCars } = useCars();
 
@@ -765,6 +766,14 @@ export default function CarsPage({ userId }: CarsPageProps) {
       result = result.filter(car => car.class === selectedCategory);
     }
 
+    // Фильтр по владельцу
+    if (selectedOwner !== "all") {
+      result = result.filter(car => {
+        const ownerInfo = getOwnerForCar(car.id);
+        return ownerInfo?.owner?.id === selectedOwner;
+      });
+    }
+
     // Фильтр по датам
     if (startDate && endDate) {
       result = result.filter(car => {
@@ -780,7 +789,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
     // result = result.filter(car => car.available === true);
 
     return result;
-  }, [cars, selectedCategory, startDate, endDate, owners]);
+  }, [cars, selectedCategory, selectedOwner, startDate, endDate, owners]);
 
   if (loading) {
     return (
@@ -820,109 +829,118 @@ export default function CarsPage({ userId }: CarsPageProps) {
       {/* ✅ Компактный Sticky Header */}
       <div className="sticky top-0 z-50 bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto p-3">
-          {/* Первая строка: Даты (слева) + Категории (справа) */}
-          <div className="flex gap-3 mb-3">
-            {/* Левая половина - Даты */}
-            <div className="flex gap-2 flex-1">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-9 w-1/4 flex-1 justify-start text-sm">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "dd.MM.yy", { locale: ru }) : "Нач"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
-                    locale={ru}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-9 w-1/4 flex-1 justify-start text-sm">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? format(endDate, "dd.MM.yy", { locale: ru }) : "Кон"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={setEndDate}
-                    locale={ru}
-                    initialFocus
-                    disabled={(date) => startDate ? date < startDate : false}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {/* Правая половина - Категории */}
-            <div className="flex-1">
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Все категории" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Все категории</SelectItem>
-                  <SelectItem value="compact">Компакт</SelectItem>
-                  <SelectItem value="sedan">Седаны</SelectItem>
-                  <SelectItem value="suv">SUV</SelectItem>
-                  <SelectItem value="7s">7 мест</SelectItem>
-                  <SelectItem value="bikes">Байки</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* Строка 1: Заголовок + кнопки */}
+          <div className="flex justify-between items-center mb-3">
+            <h1 className="text-lg font-bold text-gray-800">Флот и офферы</h1>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsOwnersManagementOpen(true)}
+                className="h-8"
+              >
+                <UserPlus className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsBulkPriceDialogOpen(true)}
+                className="h-8"
+              >
+                <TrendingUp className="h-4 w-4" />
+              </Button>
+              {(selectedCategory !== "all" || selectedOwner !== "all" || startDate || endDate) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedCategory("all");
+                    setSelectedOwner("all");
+                    setStartDate(new Date());
+                    setEndDate(addDays(new Date(), 7));
+                  }}
+                  className="h-8"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
 
-          {/* Вторая строка: Владельцы + Изменить цены + Сброс */}
-          <div className="flex gap-2 items-center">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsOwnersManagementOpen(true)}
-              className="h-8 text-xs"
-            >
-              <Users className="h-3 w-3 mr-1" />
-              Владельцы
-            </Button>
+          {/* Строка 2: Даты */}
+          <div className="flex gap-2 mb-3">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-9 flex-1 justify-start text-sm">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  с {startDate ? format(startDate, "dd.MM.yy") : "?"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={startDate}
+                  onSelect={setStartDate}
+                  locale={ru}
+                  initialFocus
+                  disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                />
+              </PopoverContent>
+            </Popover>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsBulkPriceDialogOpen(true)}
-              className="h-8 text-xs"
-            >
-              <TrendingUp className="h-3 w-3 mr-1" />
-              Изменить цены
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-9 flex-1 justify-start text-sm">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  по {endDate ? format(endDate, "dd.MM.yy") : "?"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={endDate}
+                  onSelect={setEndDate}
+                  locale={ru}
+                  initialFocus
+                  disabled={(date) => date < new Date(new Date().setHours(0,0,0,0)) || (startDate ? date < startDate : false)}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
 
-            {(selectedCategory !== "all" || startDate || endDate) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setSelectedCategory("all");
-                  setStartDate(undefined);
-                  setEndDate(undefined);
-                }}
-                className="h-8 text-xs"
-              >
-                <X className="h-3 w-3 mr-1" />
+          {/* Строка 3: Категория и Владелец */}
+          <div className="flex gap-2">
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="h-9 flex-1">
+                <SelectValue placeholder="Категория" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все категории</SelectItem>
+                <SelectItem value="compact">Компакт</SelectItem>
+                <SelectItem value="sedan">Седаны</SelectItem>
+                <SelectItem value="suv">SUV</SelectItem>
+                <SelectItem value="7s">7 мест</SelectItem>
+                <SelectItem value="bikes">Байки</SelectItem>
+              </SelectContent>
+            </Select>
 
-              </Button>
-            )}
-
-
+            <Select value={selectedOwner} onValueChange={setSelectedOwner}>
+              <SelectTrigger className="h-9 flex-1">
+                <SelectValue placeholder="Владелец" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все владельцы</SelectItem>
+                {owners.map((owner) => (
+                  <SelectItem key={owner.id} value={owner.id}>
+                    {owner.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Счетчик */}
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 mt-3">
             Показано: {filteredCars.length} из {cars.length}
           </p>
         </div>
