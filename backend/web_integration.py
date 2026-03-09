@@ -4048,7 +4048,8 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
     """Создание/обновление брони напрямую из админ-панели"""
     try:
         print("=== START admin_create_booking ===")
-        print(f"Successfully parsed request data: {booking_data}")
+        print(f"Request data: {booking_data}")
+        print(f"user_id from request: {booking_data.user_id} (type: {type(booking_data.user_id)})")
         
         form_data = booking_data.form_data
         print(f"Form data parsed successfully: {form_data}")
@@ -4112,7 +4113,8 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
             print(f"Creating new booking: {booking_id}")
             
             # Используем user_id из запроса
-            actual_user_id = booking_data.user_id or "admin"
+            actual_user_id = booking_data.user_id if booking_data.user_id else "admin"
+            print(f"Using user_id: {actual_user_id}")
             
             bookings.append({
                 "booking_id": booking_id,
