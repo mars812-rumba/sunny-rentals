@@ -292,28 +292,28 @@ class DatesData(BaseModel):
     days: int
 
 class LocationsData(BaseModel):
-    pickupLocation: str
-    returnLocation: str
-    pickupAddress: Optional[str] = None
-    returnAddress: Optional[str] = None
+    pickupLocation: Optional[str] = 'airport'
+    dropoffLocation: Optional[str] = 'airport'
+    pickupAddress: Optional[str] = ''
+    dropoffAddress: Optional[str] = ''
     
     class Config:
         populate_by_name = True
 
 class PricingData(BaseModel):
-    dailyRate: int
-    totalRental: int
-    deposit: int
-    deliveryPickup: int
-    deliveryReturn: int
-    totalDelivery: int
-    grandTotal: int
+    dailyRate: Optional[int] = 0
+    totalRental: Optional[int] = 0
+    deposit: Optional[int] = 5000
+    deliveryPickup: Optional[int] = 0
+    deliveryReturn: Optional[int] = 0
+    totalDelivery: Optional[int] = 0
+    grandTotal: Optional[int] = 0
 
 class ContactData(BaseModel):
-    value: str
-    type: str
-    name: Optional[str] = None
-    phone: Optional[str] = None
+    value: Optional[str] = ''
+    type: Optional[str] = 'telegram'
+    name: Optional[str] = ''
+    phone: Optional[str] = ''
 
 class FormData(BaseModel):
     car: CarData
