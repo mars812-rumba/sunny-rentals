@@ -831,7 +831,10 @@ export default function CarsPage({ userId }: CarsPageProps) {
         <div className="max-w-7xl mx-auto p-3">
           {/* Строка 1: Заголовок + кнопки */}
           <div className="flex justify-between items-center mb-3">
-            <h1 className="text-lg font-bold text-gray-800">Флот и офферы</h1>
+            <div className="flex items-center gap-2">
+              <Car className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-semibold text-gray-900">Флот и офферы</span>
+            </div>
             <div className="flex gap-2">
               <Button
                 variant="outline"
