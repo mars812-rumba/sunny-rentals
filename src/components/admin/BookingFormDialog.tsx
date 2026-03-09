@@ -274,7 +274,8 @@ __________________
           color: String(selectedTab === 'fleet' ? (v?.color || "") : "")
         },
         dates: {
-          start: startDateTime.toISOString(), end: endDateTime.toISOString(), days: Math.round(pricing.days)
+          start: startDateTime.toISOString(), end: endDateTime.toISOString(), days: Math.round(pricing.days),
+          pickupTime: pickupTime, returnTime: returnTime
         },
         locations: {
           pickupLocation: String(pickupLocation), returnLocation: String(returnLocation),
