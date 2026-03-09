@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 // API и утилиты
-import { PICKUP_LOCATIONS, generateTimeOptions, submitBooking, createBookingFromCRMForm } from '@/api/api';
+import { PICKUP_LOCATIONS, generateTimeOptions, submitBooking, deleteBooking, confirmBooking, createBookingFromCRMForm } from '@/api/api';
 
 // --- УТИЛИТЫ СЕЗОННОСТИ ---
 const getSeason = (date: Date): 'high_season' | 'low_season' => {
@@ -308,7 +308,7 @@ __________________
       }
       console.log("✅ [BookingFormDialog] Booking saved successfully");
 
-      toast.success(isEditing ? "Обновлено" : "Создано");
+      toast.success("Сохранено");
       onSuccess();
       onClose();
     } catch (e: any) {
@@ -320,40 +320,35 @@ __________________
   };
 
   const handleDelete = async () => {
-    if (!booking?.booking_id || !confirm(`Удалить бронь?`)) return;
-    setIsDeleting(true);
+    if (!confirm("Удалить бронь?")) return;
+    setIsSubmitting(true);
     try {
-      const res = await fetch(`/api/admin/bookings/${booking.booking_id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error("Ошибка API");
-      toast.success("Удалено");
-      onSuccess();
-      onClose();
+      const bId = booking?.booking_id || booking?.id;
+      if (bId) {
+        await deleteBooking(bId);
+        toast.success("Удалено");
+        onSuccess();
+        onClose();
+      }
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message || "Ошибка удаления");
     } finally {
-      setIsDeleting(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleConfirm = async () => {
-    if (!booking?.booking_id) return;
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/admin/bookings/${booking.booking_id}/confirm`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      if (response.ok) {
-        toast.success('Бронирование подтверждено');
+      const bId = booking?.booking_id || booking?.id;
+      if (bId) {
+        await confirmBooking(bId);
+        toast.success("Подтверждено");
         onSuccess();
         onClose();
-      } else {
-        const error = await response.json();
-        toast.error(error.message || 'Ошибка подтверждения');
       }
     } catch (e: any) {
-      toast.error(e.message || 'Ошибка сети');
+      toast.error(e.message || "Ошибка");
     } finally {
       setIsSubmitting(false);
     }
@@ -781,17 +776,18 @@ return (
 
           </div>
 
-          {/* ACTION BUTTONS */}
+          {/* ACTION BUTTONS - Ряд 1: Удалить + Сохранить */}
           <div className="mt-8 flex gap-3 max-w-6xl mx-auto">
             {isEditing && (
               <Button 
-                variant="outline" 
+                variant="destructive"
                 size="lg" 
-                className="h-12 px-6 border-gray-200 text-gray-700 hover:bg-gray-100 rounded-xl" 
-                disabled={isDeleting} 
+                className="h-12 px-6 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl" 
+                disabled={isDeleting || isSubmitting} 
                 onClick={handleDelete}
               >
-                <Trash2 size={18} />
+                <Trash2 size={18} className="mr-2" />
+                Удалить
               </Button>
             )}
             
@@ -812,6 +808,30 @@ return (
                 {isSubmitting ? 'Обработка...' : 'Создать бронирование'}
               </Button>
             )}
+          </div>
+
+          {/* Ряд 2: Подтвердить + Отмена */}
+          <div className="mt-3 flex gap-3 max-w-6xl mx-auto">
+            {isEditing && (
+              <Button
+                variant="default"
+                size="lg"
+                className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all"
+                disabled={isSubmitting}
+                onClick={handleConfirm}
+              >
+                {isSubmitting ? '...' : '✓ Подтвердить бронь'}
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="lg"
+              className={`h-12 px-8 border-gray-200 text-gray-700 hover:bg-gray-100 rounded-xl ${isEditing ? 'flex-1' : 'w-full'}`}
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
+              Отмена
+            </Button>
           </div>
 
           <div className="h-6" />
