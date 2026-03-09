@@ -1719,7 +1719,7 @@ const handleUpdateNote = async () => {
                     </div>
                     <div className="text-center border-l border-slate-100">
                       <span className="block text-slate-400 uppercase">Доставка</span>
-                      <span className="font-black text-slate-800">{b.form_data?.pricing?.totalDelivery?.toLocaleString() || 0} ฿</span>
+                      <span className="font-black text-slate-800">{b.form_data?.pricing?.totalDelivery?.toLocaleString() || b.form_data?.pricing?.delivery?.toLocaleString() || 0} ฿</span>
                     </div>
                   </div>
                   <div className="mt-2 text-center">
