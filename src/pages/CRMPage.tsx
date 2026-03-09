@@ -1629,16 +1629,15 @@ const handleUpdateNote = async () => {
           <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
             <Car size={14} className="text-blue-500" /> Активные заявки ({bookings?.length || 0})
           </h3>
-          {/* Кнопка "Добавить заявку" */}
+          {/* Кнопка "Создать оффер" */}
           {selectedUser && (
             <Button
               size="sm"
               variant="outline"
-              className="h-8 text-xs border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
-              onClick={() => openBookingDialog()}
+              className="h-8 text-xs border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+              onClick={() => navigateToOffer(selectedUser.user_id)}
             >
-              <CirclePlus size={14} className="mr-1" />
-              Добавить заявку
+              📤 Создать оффер
             </Button>
           )}
         </div>
@@ -1648,14 +1647,15 @@ const handleUpdateNote = async () => {
             {bookings.map((b, i) => (
               <Card key={i} onClick={() => openBookingDialog(b)} className="cursor-pointer border-none bg-slate-50/50 shadow-none ring-1 ring-slate-100 overflow-hidden hover:ring-blue-200 hover:ring-2 transition-all">
                 <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-4">
+                  {/* Авто и даты */}
+                  <div className="flex justify-between items-start mb-3">
                     <div>
                       <p className="font-black text-[13px] text-slate-900 uppercase tracking-tight">
                         {b.form_data?.car?.name || 'Авто не указано'}
                       </p>
                       <div className="flex items-center gap-2 text-[10px] text-blue-600 font-bold mt-1">
                         <Calendar size={12} />
-                        {dayjs(b.form_data?.dates?.start).format('DD.MM.YY')} — {dayjs(b.form_data?.dates?.end).format('DD.MM.YY')} ({getDaysCount(selectedUser?.dates_selected?.start, selectedUser?.dates_selected?.end)} дн.)
+                        {dayjs(b.form_data?.dates?.start).format('DD.MM.YY')} — {dayjs(b.form_data?.dates?.end).format('DD.MM.YY')} ({getDaysCount(b.form_data?.dates?.start, b.form_data?.dates?.end)} дн.)
                       </div>
                     </div>
                     <Badge className={`text-[9px] font-black uppercase border-none px-2 py-0.5 rounded-md ${
@@ -1666,82 +1666,82 @@ const handleUpdateNote = async () => {
                     </Badge>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 text-[10px] border-t border-slate-200/50 pt-3">
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <MapPin size={12} className="text-red-400 shrink-0" />
-                        <span className="font-bold truncate">ВЫДАЧА: {b.form_data?.locations?.pickup || '—'}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-400 pl-5">
-                        <span className="truncate">ВОЗВРАТ: {b.form_data?.locations?.dropoff || '—'}</span>
-                      </div>
-                      
-                      {/* Contact Information - only show if exists */}
-                      {b.form_data?.contact && (
-                        <div className="flex items-center gap-2 text-slate-600 pt-1">
-                          <User size={12} className="text-blue-400 shrink-0" />
-                          <div className="flex flex-col">
-                            <span className="font-bold truncate">
-                              {b.form_data.contact.name || 'Имя не указано'}
-                            </span>
-                            {b.form_data.contact.value && (
-                              <span className="text-slate-400 text-[9px] truncate">
-                                {b.form_data.contact.value}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
+                  {/* Локации */}
+                  <div className="space-y-1 text-[10px] mb-3">
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <MapPin size={12} className="text-red-400 shrink-0" />
+                      <span className="font-bold">ВЫДАЧА: {b.form_data?.locations?.pickup || '—'}</span>
                     </div>
-                    <div className="flex flex-col items-end justify-center">
-                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter mb-0.5">Итоговая стоимость</span>
-                      <span className="text-lg font-black text-slate-900 tracking-tight">
-                        {b.form_data?.pricing?.grandTotal ? `${b.form_data.pricing.grandTotal.toLocaleString()} ฿` : '0 ฿'}
-                      </span>
-                      {/* Кнопки для брони */}
-                      {b.status === 'pre_booking' && (
-                        <div className="flex gap-2 mt-2">
-                          <Button
-                            size="sm"
-                            className="bg-green-500 hover:bg-green-600 text-white text-xs"
-                            onClick={() => confirmBooking(b.booking_id)}
-                            disabled={loadingAction[`confirm_${b.booking_id}`]}
-                          >
-                            {loadingAction[`confirm_${b.booking_id}`] ? '...' : '✓'}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="bg-red-500 hover:bg-red-600 text-white text-xs"
-                            onClick={() => rejectBooking(b.booking_id, b.status)}
-                            disabled={loadingAction[`reject_${b.booking_id}`]}
-                          >
-                            {loadingAction[`reject_${b.booking_id}`] ? '...' : '✕'}
-                          </Button>
-                        </div>
-                      )}
-                      {b.status === 'confirmed' && (
-                        <div className="flex gap-2 mt-2">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="bg-red-500 hover:bg-red-600 text-white text-xs"
-                            onClick={() => rejectBooking(b.booking_id, b.status)}
-                            disabled={loadingAction[`reject_${b.booking_id}`]}
-                          >
-                            {loadingAction[`reject_${b.booking_id}`] ? '...' : '✕'}
-                          </Button>
-                        </div>
-                      )}
+                    <div className="flex items-center gap-2 text-slate-400 pl-5">
+                      <span>ВОЗВРАТ: {b.form_data?.locations?.dropoff || '—'}</span>
                     </div>
                   </div>
+
+                  {/* Контакт */}
+                  {b.form_data?.contact && (
+                    <div className="flex items-center gap-2 text-[10px] text-slate-600 mb-3">
+                      <User size={12} className="text-blue-400 shrink-0" />
+                      <span className="font-bold">{b.form_data.contact.name || 'Имя не указано'}</span>
+                      {b.form_data.contact.value && <span className="text-slate-400">{b.form_data.contact.value}</span>}
+                    </div>
+                  )}
+
+                  {/* Цены */}
+                  <div className="grid grid-cols-3 gap-2 text-[9px] bg-white rounded-lg p-2 border border-slate-100">
+                    <div className="text-center">
+                      <span className="block text-slate-400 uppercase">Аренда</span>
+                      <span className="font-black text-slate-800">{b.form_data?.pricing?.rentalPrice?.toLocaleString() || 0} ฿</span>
+                    </div>
+                    <div className="text-center border-l border-slate-100">
+                      <span className="block text-slate-400 uppercase">Депозит</span>
+                      <span className="font-black text-slate-800">{b.form_data?.pricing?.deposit?.toLocaleString() || 0} ฿</span>
+                    </div>
+                    <div className="text-center border-l border-slate-100">
+                      <span className="block text-slate-400 uppercase">Доставка</span>
+                      <span className="font-black text-slate-800">{b.form_data?.pricing?.delivery?.toLocaleString() || 0} ฿</span>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-center">
+                    <span className="text-[8px] font-black text-slate-400 uppercase">ИТОГО</span>
+                    <span className="block text-lg font-black text-blue-600">{b.form_data?.pricing?.grandTotal?.toLocaleString() || 0} ฿</span>
+                  </div>
+
+                  {/* Кнопки для брони */}
+                  {b.status === 'pre_booking' && (
+                    <div className="flex gap-2 mt-3 pt-3 border-t border-slate-100">
+                      <Button 
+                        size="sm" 
+                        variant="default"
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs"
+                        onClick={(e) => { e.stopPropagation(); confirmBooking(b.booking_id, b.status); }}
+                        disabled={loadingAction[`confirm_${b.booking_id}`]}
+                      >
+                        {loadingAction[`confirm_${b.booking_id}`] ? '...' : '✓'}
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive"
+                        className="bg-red-500 hover:bg-red-600 text-white text-xs"
+                        onClick={(e) => { e.stopPropagation(); rejectBooking(b.booking_id, b.status); }}
+                        disabled={loadingAction[`reject_${b.booking_id}`]}
+                      >
+                        {loadingAction[`reject_${b.booking_id}`] ? '...' : '✕'}
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          <div className="p-10 text-center border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/30">
-            <p className="text-[10px] font-black text-slate-300 uppercase italic tracking-widest">Заявок пока нет</p>
+          /* Область "Нет заявок" - кликабельная */
+          <div 
+            onClick={() => openBookingDialog()}
+            className="cursor-pointer border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-all"
+          >
+            <CirclePlus size={32} className="mx-auto text-slate-300 mb-2" />
+            <p className="text-[11px] font-black text-slate-400 uppercase">Нет активных заявок</p>
+            <p className="text-[9px] text-slate-300 mt-1">Нажмите чтобы создать</p>
           </div>
         )}
 
