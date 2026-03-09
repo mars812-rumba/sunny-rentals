@@ -4113,30 +4113,39 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
             print(f"Creating new booking: {booking_id}")
             
             # Используем user_id из запроса
-            actual_user_id = booking_data.user_id if booking_data.user_id else "admin"
-            print(f"Using user_id: {actual_user_id}")
+            actual_user_id = booking_data.user_id
+            print(f"Using user_id from request: {actual_user_id} (type: {type(actual_user_id)})")
             
-            bookings.append({
-                "booking_id": booking_id,
-                "user_id": actual_user_id,
-                "form_data": form_data_dict,
-                "status": "pre_booking",  # ✅ ВСЕ брони начинаются как предварительные
-                "created_at": datetime.utcnow().isoformat(),
-                "source": "admin_panel"
-            })
-            print(f"✓ Created pre_booking {booking_id} for user {actual_user_id}")
+            if not actual_user_id:
+                print("ERROR: user_id is None or empty, using 'admin'")
+                actual_user_id = "admin"
             
-            # Обновляем статус пользователя на pre_booking
-            if actual_user_id != "admin":
-                users_data = load_json(USER_DATA_JSON)
-                for user in users_data:
-                    if str(user.get('user_id')) == str(actual_user_id):
-                        user['status'] = 'pre_booking'
-                        user['updated_at'] = datetime.utcnow().isoformat()
-                        print(f"✓ Updated user {actual_user_id} status to pre_booking")
-                        break
-                with _lock:
-                    save_json(USER_DATA_JSON, users_data)
+            try:
+                new_booking = {
+                    "booking_id": booking_id,
+                    "user_id": actual_user_id,
+                    "form_data": form_data_dict,
+                    "status": "pre_booking",
+                    "created_at": datetime.utcnow().isoformat(),
+                    "source": "admin_panel"
+                }
+                bookings.append(new_booking)
+                print(f"✓ Created pre_booking {booking_id} for user {actual_user_id}")
+                
+                # Обновляем статус пользователя на pre_booking
+                if actual_user_id != "admin":
+                    users_data = load_json(USER_DATA_JSON)
+                    for user in users_data:
+                        if str(user.get('user_id')) == str(actual_user_id):
+                            user['status'] = 'pre_booking'
+                            user['updated_at'] = datetime.utcnow().isoformat()
+                            print(f"✓ Updated user {actual_user_id} status to pre_booking")
+                            break
+                    with _lock:
+                        save_json(USER_DATA_JSON, users_data)
+            except Exception as create_err:
+                print(f"ERROR in booking creation: {create_err}")
+                raise
         
         print("=== SUCCESS ===")
         return {
