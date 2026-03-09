@@ -294,12 +294,15 @@ __________________
       };
 
       const bId = booking?.booking_id || booking?.id || null;
+      console.log("📤 [BookingFormDialog] Saving booking:", { bId, userId, isEditing });
       await submitBooking(formDataForApi as any, bId, 'admin', userId); // Admin создает брони через admin эндпоинт
+      console.log("✅ [BookingFormDialog] Booking saved successfully");
 
       toast.success(isEditing ? "Обновлено" : "Создано");
       onSuccess();
       onClose();
     } catch (e: any) {
+      console.error("❌ [BookingFormDialog] Error saving booking:", e);
       toast.error(e.message || "Ошибка");
     } finally {
       setIsSubmitting(false);
