@@ -188,6 +188,7 @@ export default function AdminScheduler() {
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <img src={logo} alt="" className="h-7 w-auto" />
+            <span className="text-sm font-semibold text-gray-900">Занятость</span>
           </div>
 
           {/* Переключатель вида */}

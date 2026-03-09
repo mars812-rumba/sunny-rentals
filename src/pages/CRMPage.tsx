@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { MarkerType } from '@/types/crm';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
+import logo from '@/assets/logo.png';
 
 // TypeScript интерфейсы для работы с диалогами
 interface DialogEvent {
@@ -1150,7 +1151,10 @@ const handleUpdateNote = async () => {
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-hidden">
       {/* Nav */}
       <nav className="bg-white border-b px-4 py-2 flex justify-between items-center sticky top-0 z-40 shadow-sm">
-        <img src="/assets/logo.png" alt="" className="h-7 w-auto" />
+        <div className="flex items-center gap-2">
+          <img src={logo} alt="" className="h-7 w-auto" />
+          <span className="text-sm font-semibold text-slate-900">CRM</span>
+        </div>
         <div className="flex bg-slate-100 p-1 rounded-lg">
           {['today', 'week', 'month', 'all'].map(p => (
             <button key={p} onClick={() => setPeriod(p)}
