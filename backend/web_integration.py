@@ -569,6 +569,26 @@ def check_user_has_active_booking(user_id: Union[int, str]) -> bool:
                 return True
     return False
 
+def get_user_last_booking(user_id: Union[int, str]) -> Optional[Dict]:
+    """
+    Возвращает последнюю бронь пользователя (если есть).
+    """
+    bookings = load_bookings()
+    user_id_str = str(user_id)
+    user_bookings = []
+    
+    for booking in bookings:
+        booking_user_id = booking.get("user_id")
+        if booking_user_id is not None and str(booking_user_id) == user_id_str:
+            user_bookings.append(booking)
+    
+    if not user_bookings:
+        return None
+    
+    # Сортируем по дате создания (новые первые)
+    user_bookings.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+    return user_bookings[0]
+
 def get_user_latest_record(user_id: Union[int, str], from_archive: bool = False):
     json_file = ARCHIVE_JSON if from_archive else USER_DATA_JSON
     users_data = load_json(json_file)
@@ -2343,6 +2363,9 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
 
                 # Добавляем флаг наличия active брони (pre_booking или confirmed)
                 user_copy["has_active_booking"] = check_user_has_active_booking(u_id)
+                
+                # Добавляем последнюю бронь пользователя
+                user_copy["last_booking"] = get_user_last_booking(u_id)
 
                 filtered.append(user_copy)
 

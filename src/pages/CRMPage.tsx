@@ -1249,7 +1249,9 @@ const handleUpdateNote = async () => {
   ) : (
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
   {getFilteredUsers(users).map(user => {
-    const days = getDaysCount(user.dates_selected?.start, user.dates_selected?.end);
+    // Используем last_booking если есть, иначе dates_selected
+    const bookingDates = user.last_booking?.form_data?.dates || user.dates_selected;
+    const days = getDaysCount(bookingDates?.start, bookingDates?.end);
     const dialog = user.dialog_status || user.dialog;
     
     // PRIORITY STATUS LOGIC: final_status overrides status
@@ -1285,9 +1287,9 @@ const handleUpdateNote = async () => {
 <div className="flex justify-between items-center">
   <div className="flex items-center gap-1.5 min-w-0 flex-1">
     <Car className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-    {/* ИСПРАВЛЕННАЯ СТРОКА НИЖЕ */}
+    {/* Используем last_booking если есть, иначе car_interested */}
     <span className="font-black text-[11px] text-slate-800 truncate uppercase tracking-tight">
-      {user.car_interested || "не выбрано"}
+      {user.last_booking?.form_data?.car?.name || user.car_interested || "не выбрано"}
     </span>
     {user.category_interested && (
       <span className="text-[7px] font-black text-slate-400 border border-slate-200 px-1 rounded uppercase">
@@ -1320,9 +1322,9 @@ const handleUpdateNote = async () => {
       <div className="flex items-center gap-2 min-w-0">
         <div className="flex items-center gap-1 text-[9px] font-bold">
           <Calendar className="w-2.5 h-2.5 text-orange-400" />
-          <span>{user.dates_selected?.start ? dayjs(user.dates_selected.start).format('DD.MM') : '??'}</span>
+          <span>{bookingDates?.start ? dayjs(bookingDates.start).format('DD.MM') : '??'}</span>
           <span>-</span>
-          <span>{user.dates_selected?.end ? dayjs(user.dates_selected.end).format('DD.MM') : '??'}</span>
+          <span>{bookingDates?.end ? dayjs(bookingDates.end).format('DD.MM') : '??'}</span>
           <span className="text-blue-500 ml-1">{days}D</span>
         </div>
         <div className="flex items-center gap-1 text-[9px] opacity-70">
