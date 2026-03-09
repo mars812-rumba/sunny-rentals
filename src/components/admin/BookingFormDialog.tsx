@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 // API и утилиты
-import { PICKUP_LOCATIONS, generateTimeOptions, submitBooking } from '@/api/api';
+import { PICKUP_LOCATIONS, generateTimeOptions, submitBooking, createBookingFromCRMForm } from '@/api/api';
 
 // --- УТИЛИТЫ СЕЗОННОСТИ ---
 const getSeason = (date: Date): 'high_season' | 'low_season' => {
@@ -295,7 +295,14 @@ __________________
 
       const bId = booking?.booking_id || booking?.id || null;
       console.log("📤 [BookingFormDialog] Saving booking:", { bId, userId, isEditing });
-      await submitBooking(formDataForApi as any, bId, 'admin', userId); // Admin создает брони через admin эндпоинт
+      
+      if (isEditing && bId) {
+        // Редактирование существующей брони
+        await submitBooking(formDataForApi as any, bId, 'admin', userId);
+      } else {
+        // Создание новой брони из CRM
+        await createBookingFromCRMForm(userId, formDataForApi);
+      }
       console.log("✅ [BookingFormDialog] Booking saved successfully");
 
       toast.success(isEditing ? "Обновлено" : "Создано");

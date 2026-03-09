@@ -376,6 +376,73 @@ export async function deleteBooking(bookingId: string): Promise<void> {
   }
 }
 
+// Create booking from CRM (using working offer-create endpoint)
+export async function createBookingFromCRM(data: {
+  user_id: number | string;
+  car_id: string;
+  car_name: string;
+  start_date: string;
+  end_date: string;
+  days: number;
+  total_rental: number;
+  total_delivery: number;
+  deposit: number;
+  pickup_location?: string;
+  return_location?: string;
+  source?: string;
+}): Promise<{ booking_id: string; status: string }> {
+  const response = await fetch(`${API_BASE_URL}/api/bookings/offer-create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${AUTH_TOKEN}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to create booking');
+  }
+
+  return response.json();
+}
+
+// Create booking from CRM with form data structure (for BookingFormDialog compatibility)
+export async function createBookingFromCRMForm(userId: number | string, formData: any): Promise<{ booking_id: string; status: string }> {
+  const car = formData.car || {};
+  const dates = formData.dates || {};
+  const locations = formData.locations || {};
+  const pricing = formData.pricing || {};
+  const contact = formData.contact || {};
+  
+  const startDate = new Date(dates.start);
+  const endDate = new Date(dates.end);
+  const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) || 1;
+  
+  const total_rental = pricing.totalRental || pricing.rentalPrice || 0;
+  const total_delivery = pricing.totalDelivery || 0;
+  const deposit = pricing.deposit || 5000;
+  
+  const pickup_location = locations.pickup || 'airport';
+  const return_location = locations.dropoff || 'airport';
+  
+  return createBookingFromCRM({
+    user_id: userId,
+    car_id: car.id || '',
+    car_name: car.name || `${car.brand || ''} ${car.model || ''}`.trim(),
+    start_date: startDate.toISOString(),
+    end_date: endDate.toISOString(),
+    days: days,
+    total_rental: total_rental,
+    total_delivery: total_delivery,
+    deposit: deposit,
+    pickup_location: pickup_location,
+    return_location: return_location,
+    source: 'crm_admin',
+  });
+}
+
 // Get available cars for date range
 export async function fetchAvailableCars(startDate: string, endDate: string, category?: string): Promise<Car[]> {
   let url = `${API_BASE_URL}/api/available-cars?start_date=${startDate}&end_date=${endDate}`;
