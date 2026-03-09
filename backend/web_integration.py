@@ -4112,6 +4112,11 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
             if not found:
                 print(f"ERROR: Booking {booking_id} not found")
                 raise HTTPException(status_code=404, detail="Booking not found")
+            
+            # ✅ Сохраняем изменения в файл
+            with _lock:
+                save_json(BOOKINGS_FILE, bookings)
+            print(f"✓ Saved bookings to file after update")
         else:
             # Создание
             booking_id = str(uuid.uuid4())[:8]
