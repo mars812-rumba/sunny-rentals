@@ -1673,15 +1673,30 @@ const handleUpdateNote = async () => {
                     </Badge>
                   </div>
 
-                  {/* Локации */}
+                  {/* Локации и время */}
                   <div className="space-y-1 text-[10px] mb-3">
                     <div className="flex items-center gap-2 text-slate-600">
                       <MapPin size={12} className="text-red-400 shrink-0" />
                       <span className="font-bold">ВЫДАЧА: {b.form_data?.locations?.pickup || '—'}</span>
+                      {b.form_data?.dates?.pickupTime && <span className="text-blue-600">⏰ {b.form_data.dates.pickupTime}</span>}
                     </div>
                     <div className="flex items-center gap-2 text-slate-400 pl-5">
                       <span>ВОЗВРАТ: {b.form_data?.locations?.dropoff || '—'}</span>
+                      {b.form_data?.dates?.returnTime && <span className="text-blue-600">⏰ {b.form_data.dates.returnTime}</span>}
                     </div>
+                    {/* Адрес доставки */}
+                    {b.form_data?.locations?.pickupAddress && (
+                      <div className="flex items-center gap-2 text-slate-500 pl-5">
+                        <span className="text-red-400">📍</span>
+                        <span>{b.form_data.locations.pickupAddress}</span>
+                      </div>
+                    )}
+                    {b.form_data?.locations?.dropoffAddress && (
+                      <div className="flex items-center gap-2 text-slate-500 pl-5">
+                        <span className="text-green-400">📍</span>
+                        <span>{b.form_data.locations.dropoffAddress}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Контакт */}

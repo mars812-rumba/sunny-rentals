@@ -4125,11 +4125,18 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
                 "source": "admin_panel"
             })
             print(f"✓ Created pre_booking {booking_id} for user {actual_user_id}")
-        
-        # Сохраняем
-        with _lock:
-            save_json(BOOKINGS_FILE, bookings)
-        print("✓ Bookings saved to JSON")
+            
+            # Обновляем статус пользователя на pre_booking
+            if actual_user_id != "admin":
+                users_data = load_json(USERS_FILE)
+                for user in users_data:
+                    if str(user.get('user_id')) == str(actual_user_id):
+                        user['status'] = 'pre_booking'
+                        user['updated_at'] = datetime.utcnow().isoformat()
+                        print(f"✓ Updated user {actual_user_id} status to pre_booking")
+                        break
+                with _lock:
+                    save_json(USERS_FILE, users_data)
         
         print("=== SUCCESS ===")
         return {
