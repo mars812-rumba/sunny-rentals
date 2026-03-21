@@ -855,7 +855,7 @@ return (
                 disabled={isSubmitting}
                 onClick={handleConfirm}
               >
-                {isSubmitting ? '...' : '✓ Подтвердить бронь'}
+                {isSubmitting ? '...' : '✓ Подтвердить'}
               </Button>
             )}
             <Button
