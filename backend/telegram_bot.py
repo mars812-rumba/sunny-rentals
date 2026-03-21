@@ -955,10 +955,13 @@ def handle_photo_message(message):
         
         # Только webhook на бэкенд — бот максимально минимальный
         try:
+            # Получаем username из message.from_user (доступно здесь)
+            sender_username = message.from_user.username
+            
             webhook_data = {
                 "user_id": user_id,
                 "media": media_info,
-                "username": username,
+                "username": sender_username,
                 "timestamp": datetime.now().isoformat()
             }
             response = requests.post("http://localhost:5000/api/internal/receive-media", json=webhook_data, timeout=5)
