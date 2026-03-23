@@ -22,16 +22,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 720,
-          "price_7_14": 720,
-          "price_15_29": 720,
-          "price_30": 450
+          "price_1_6": 718,
+          "price_7_14": 718,
+          "price_15_29": 718,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 843,
-          "price_7_14": 840,
-          "price_15_29": 840,
-          "price_30": 550
+          "price_1_6": 840,
+          "price_7_14": 837,
+          "price_15_29": 837,
+          "price_30": 548
         },
         "deposit": 5000
       },
@@ -45,7 +45,7 @@
       "quick_id": "toyota_yaris_2022_black",
       "rating": 4.5,
       "class_": "compact",
-      "updated_at": "2026-03-23T14:00:22.905229"
+      "updated_at": "2026-03-23T14:34:16.583587"
     },
     "toyota_yaris_2022_white": {
       "id": "toyota_yaris_2022_white",
@@ -67,16 +67,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 720,
-          "price_7_14": 720,
-          "price_15_29": 720,
-          "price_30": 450
+          "price_1_6": 718,
+          "price_7_14": 718,
+          "price_15_29": 718,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 837,
-          "price_7_14": 840,
-          "price_15_29": 800,
-          "price_30": 550
+          "price_1_6": 834,
+          "price_7_14": 837,
+          "price_15_29": 798,
+          "price_30": 548
         },
         "deposit": 5000
       },
@@ -90,7 +90,7 @@
       "quick_id": "yaris2022white",
       "rating": 4.5,
       "class_": "compact",
-      "updated_at": "2026-03-02T08:29:59.646143"
+      "updated_at": "2026-03-23T14:34:16.583625"
     },
     "toyota_yaris_2024_gray": {
       "id": "toyota_yaris_2024_gray",
@@ -113,16 +113,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 720,
-          "price_7_14": 720,
-          "price_15_29": 700,
-          "price_30": 450
+          "price_1_6": 718,
+          "price_7_14": 718,
+          "price_15_29": 698,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 840,
-          "price_7_14": 840,
-          "price_15_29": 800,
-          "price_30": 550
+          "price_1_6": 837,
+          "price_7_14": 837,
+          "price_15_29": 798,
+          "price_30": 548
         },
         "deposit": 5000
       },
@@ -136,7 +136,7 @@
       "quick_id": "yaris2024gray",
       "rating": 4.5,
       "class_": "compact",
-      "updated_at": "2026-03-02T08:30:47.025632"
+      "updated_at": "2026-03-23T14:34:16.583636"
     },
     "toyota_yaris_white_sedan": {
       "id": "toyota_yaris_white_sedan",
@@ -159,16 +159,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 720,
-          "price_7_14": 720,
-          "price_15_29": 700,
-          "price_30": 450
+          "price_1_6": 718,
+          "price_7_14": 718,
+          "price_15_29": 698,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 840,
-          "price_7_14": 840,
-          "price_15_29": 800,
-          "price_30": 550
+          "price_1_6": 837,
+          "price_7_14": 837,
+          "price_15_29": 798,
+          "price_30": 548
         },
         "deposit": 5000
       },
@@ -182,7 +182,7 @@
       "rating": 4.6,
       "available": true,
       "class_": "compact",
-      "updated_at": "2026-03-02T08:31:29.377536"
+      "updated_at": "2026-03-23T14:34:16.583646"
     },
     "toyota_yaris_2023_blue": {
       "id": "toyota_yaris_2023_blue",
@@ -206,16 +206,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 720,
-          "price_7_14": 720,
-          "price_15_29": 700,
-          "price_30": 450
+          "price_1_6": 718,
+          "price_7_14": 718,
+          "price_15_29": 698,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 840,
-          "price_7_14": 840,
-          "price_15_29": 800,
-          "price_30": 550
+          "price_1_6": 837,
+          "price_7_14": 837,
+          "price_15_29": 798,
+          "price_30": 548
         },
         "deposit": 5000
       },
@@ -229,7 +229,7 @@
       "quick_id": "yaris2023blue",
       "rating": 4.8,
       "class_": "compact",
-      "updated_at": "2026-03-02T08:32:14.052584"
+      "updated_at": "2026-03-23T14:34:16.583655"
     },
     "honda_civic_2024_black": {
       "id": "honda_civic_2024_black",
@@ -255,16 +255,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1163,
-          "price_7_14": 1081,
-          "price_15_29": 1081,
-          "price_30": 899
+          "price_1_6": 1159,
+          "price_7_14": 1077,
+          "price_15_29": 1077,
+          "price_30": 896
         },
         "high_season": {
-          "price_1_6": 1465,
-          "price_7_14": 1465,
-          "price_15_29": 1400,
-          "price_30": 1043
+          "price_1_6": 1460,
+          "price_7_14": 1460,
+          "price_15_29": 1396,
+          "price_30": 1039
         },
         "deposit": 5000
       },
@@ -278,7 +278,7 @@
       "rating": 4.5,
       "available": true,
       "class_": "sedan",
-      "updated_at": "2026-03-02T08:41:03.512570"
+      "updated_at": "2026-03-23T14:34:16.583664"
     },
     "honda_civic_2024_white": {
       "id": "honda_civic_2024_white",
@@ -303,16 +303,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1246,
-          "price_7_14": 1081,
-          "price_15_29": 1081,
-          "price_30": 899
+          "price_1_6": 1242,
+          "price_7_14": 1077,
+          "price_15_29": 1077,
+          "price_30": 896
         },
         "high_season": {
-          "price_1_6": 1303,
-          "price_7_14": 1216,
-          "price_15_29": 1122,
-          "price_30": 942
+          "price_1_6": 1298,
+          "price_7_14": 1212,
+          "price_15_29": 1118,
+          "price_30": 938
         },
         "deposit": 5000
       },
@@ -326,7 +326,7 @@
       "quick_id": "honda_civic_2024_white",
       "rating": 4.5,
       "class_": "sedan",
-      "updated_at": "2026-01-30T13:59:56.751560"
+      "updated_at": "2026-03-23T14:34:16.583687"
     },
     "mazda_mazda2_2024_white": {
       "id": "mazda_mazda2_2024_white",
@@ -354,16 +354,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 822,
-          "price_7_14": 737,
-          "price_15_29": 691,
-          "price_30": 489
+          "price_1_6": 819,
+          "price_7_14": 735,
+          "price_15_29": 688,
+          "price_30": 487
         },
         "high_season": {
-          "price_1_6": 858,
-          "price_7_14": 841,
-          "price_15_29": 871,
-          "price_30": 595
+          "price_1_6": 855,
+          "price_7_14": 837,
+          "price_15_29": 868,
+          "price_30": 593
         },
         "deposit": 5000
       },
@@ -377,7 +377,7 @@
       "rating": 4.8,
       "available": true,
       "class_": "sedan",
-      "updated_at": "2026-03-02T08:42:07.454877"
+      "updated_at": "2026-03-23T14:34:16.583697"
     },
     "toyota_ativ_2024_gray": {
       "id": "toyota_ativ_2024_gray",
@@ -401,16 +401,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 897,
-          "price_7_14": 813,
-          "price_15_29": 800,
-          "price_30": 479
+          "price_1_6": 894,
+          "price_7_14": 810,
+          "price_15_29": 798,
+          "price_30": 477
         },
         "high_season": {
-          "price_1_6": 936,
-          "price_7_14": 931,
-          "price_15_29": 843,
-          "price_30": 665
+          "price_1_6": 933,
+          "price_7_14": 928,
+          "price_15_29": 840,
+          "price_30": 662
         },
         "deposit": 5000
       },
@@ -423,7 +423,7 @@
       "quick_id": "ativ2024gray",
       "rating": 4.9,
       "available": true,
-      "updated_at": "2026-03-02T08:44:04.390037"
+      "updated_at": "2026-03-23T14:34:16.583707"
     },
     "mazda_mazda2_2023_gray": {
       "id": "mazda_mazda2_2023_gray",
@@ -447,16 +447,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 813,
-          "price_7_14": 738,
-          "price_15_29": 692,
-          "price_30": 459
+          "price_1_6": 810,
+          "price_7_14": 736,
+          "price_15_29": 689,
+          "price_30": 457
         },
         "high_season": {
-          "price_1_6": 931,
-          "price_7_14": 833,
-          "price_15_29": 703,
-          "price_30": 605
+          "price_1_6": 928,
+          "price_7_14": 830,
+          "price_15_29": 700,
+          "price_30": 602
         },
         "deposit": 5000
       },
@@ -469,7 +469,7 @@
       "quick_id": "mazda22023gray",
       "rating": 4.8,
       "available": true,
-      "updated_at": "2026-03-02T08:45:20.945710"
+      "updated_at": "2026-03-23T14:34:16.583716"
     },
     "toyota_camry_2020_black": {
       "id": "toyota_camry_2020_black",
@@ -492,16 +492,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1297,
-          "price_7_14": 1045,
-          "price_15_29": 1045,
-          "price_30": 899
+          "price_1_6": 1293,
+          "price_7_14": 1041,
+          "price_15_29": 1041,
+          "price_30": 896
         },
         "high_season": {
-          "price_1_6": 1467,
-          "price_7_14": 1203,
-          "price_15_29": 1203,
-          "price_30": 1050
+          "price_1_6": 1462,
+          "price_7_14": 1199,
+          "price_15_29": 1199,
+          "price_30": 1046
         },
         "deposit": 5000
       },
@@ -514,7 +514,7 @@
       "quick_id": "camry2020black",
       "rating": 4.9,
       "available": true,
-      "updated_at": "2026-03-23T13:00:34.197452"
+      "updated_at": "2026-03-23T14:34:16.583725"
     },
     "mg_mg5_2024_yellow": {
       "id": "mg_mg5_2024_yellow",
@@ -538,16 +538,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 980,
-          "price_7_14": 980,
-          "price_15_29": 823,
-          "price_30": 602
+          "price_1_6": 977,
+          "price_7_14": 977,
+          "price_15_29": 820,
+          "price_30": 599
         },
         "high_season": {
-          "price_1_6": 1080,
-          "price_7_14": 1080,
-          "price_15_29": 900,
-          "price_30": 650
+          "price_1_6": 1077,
+          "price_7_14": 1077,
+          "price_15_29": 897,
+          "price_30": 647
         },
         "deposit": 5000
       },
@@ -561,7 +561,7 @@
       "rating": 4.7,
       "available": true,
       "class_": "sedan",
-      "updated_at": "2026-03-02T08:46:27.396482"
+      "updated_at": "2026-03-23T14:34:16.583734"
     },
     "honda_city_2023_gray": {
       "id": "honda_city_2023_gray",
@@ -584,16 +584,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 824,
-          "price_7_14": 800,
-          "price_15_29": 700,
-          "price_30": 455
+          "price_1_6": 821,
+          "price_7_14": 798,
+          "price_15_29": 698,
+          "price_30": 453
         },
         "high_season": {
-          "price_1_6": 861,
-          "price_7_14": 763,
-          "price_15_29": 756,
-          "price_30": 605
+          "price_1_6": 857,
+          "price_7_14": 760,
+          "price_15_29": 753,
+          "price_30": 602
         },
         "deposit": 5000
       },
@@ -606,7 +606,7 @@
       "quick_id": "city2023gray",
       "rating": 4.5,
       "available": true,
-      "updated_at": "2026-03-02T08:47:03.340655"
+      "updated_at": "2026-03-23T14:34:16.583744"
     },
     "honda_civic_2023_white": {
       "id": "honda_civic_2023_white",
@@ -628,16 +628,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1163,
-          "price_7_14": 1081,
-          "price_15_29": 1081,
-          "price_30": 899
+          "price_1_6": 1159,
+          "price_7_14": 1077,
+          "price_15_29": 1077,
+          "price_30": 896
         },
         "high_season": {
-          "price_1_6": 1467,
-          "price_7_14": 1279,
-          "price_15_29": 1279,
-          "price_30": 1127
+          "price_1_6": 1462,
+          "price_7_14": 1275,
+          "price_15_29": 1275,
+          "price_30": 1123
         },
         "deposit": 5000
       },
@@ -650,7 +650,7 @@
       "quick_id": "civic2023white",
       "rating": 4.9,
       "available": true,
-      "updated_at": "2026-01-30T13:59:56.751693"
+      "updated_at": "2026-03-23T14:34:16.583753"
     },
     "toyota_altis_2023_gray": {
       "id": "toyota_altis_2023_gray",
@@ -673,16 +673,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1200,
-          "price_7_14": 1200,
-          "price_15_29": 1100,
-          "price_30": 800
+          "price_1_6": 1197,
+          "price_7_14": 1197,
+          "price_15_29": 1097,
+          "price_30": 798
         },
         "high_season": {
-          "price_1_6": 1389,
-          "price_7_14": 1127,
-          "price_15_29": 1084,
-          "price_30": 954
+          "price_1_6": 1384,
+          "price_7_14": 1123,
+          "price_15_29": 1080,
+          "price_30": 951
         },
         "deposit": 5000
       },
@@ -696,7 +696,7 @@
       "rating": 4.5,
       "available": true,
       "class_": "sedan",
-      "updated_at": "2026-03-02T08:47:40.803684"
+      "updated_at": "2026-03-23T14:34:16.583762"
     },
     "mg_mg5_2024_red": {
       "id": "mg_mg5_2024_red",
@@ -718,16 +718,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 980,
-          "price_7_14": 980,
-          "price_15_29": 800,
-          "price_30": 600
+          "price_1_6": 977,
+          "price_7_14": 977,
+          "price_15_29": 798,
+          "price_30": 598
         },
         "high_season": {
-          "price_1_6": 1080,
-          "price_7_14": 1080,
-          "price_15_29": 900,
-          "price_30": 700
+          "price_1_6": 1077,
+          "price_7_14": 1077,
+          "price_15_29": 897,
+          "price_30": 698
         },
         "deposit": 5000
       },
@@ -741,7 +741,7 @@
       "quick_id": "mg_mg5_2024_red",
       "rating": 4.5,
       "class_": "sedan",
-      "updated_at": "2026-03-02T08:48:50.072842"
+      "updated_at": "2026-03-23T14:34:16.583771"
     },
     "mazda_mazda2_2023_white": {
       "id": "mazda_mazda2_2023_white",
@@ -768,16 +768,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 800,
-          "price_7_14": 800,
-          "price_15_29": 700,
-          "price_30": 450
+          "price_1_6": 798,
+          "price_7_14": 798,
+          "price_15_29": 698,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 900,
-          "price_7_14": 900,
-          "price_15_29": 800,
-          "price_30": 600
+          "price_1_6": 897,
+          "price_7_14": 897,
+          "price_15_29": 798,
+          "price_30": 598
         },
         "deposit": 5000
       },
@@ -791,7 +791,7 @@
       "quick_id": "mazda22023white",
       "rating": 4.8,
       "class_": "sedan",
-      "updated_at": "2026-03-02T08:49:52.496324"
+      "updated_at": "2026-03-23T14:34:16.583780"
     },
     "mg_mg5_2024_green": {
       "id": "mg_mg5_2024_green",
@@ -814,16 +814,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1000,
-          "price_7_14": 1000,
-          "price_15_29": 1000,
-          "price_30": 750
+          "price_1_6": 997,
+          "price_7_14": 997,
+          "price_15_29": 997,
+          "price_30": 747
         },
         "high_season": {
-          "price_1_6": 1150,
-          "price_7_14": 1150,
-          "price_15_29": 1000,
-          "price_30": 800
+          "price_1_6": 1146,
+          "price_7_14": 1146,
+          "price_15_29": 997,
+          "price_30": 798
         },
         "deposit": 5000
       },
@@ -837,7 +837,7 @@
       "rating": 4.6,
       "available": true,
       "class_": "sedan",
-      "updated_at": "2026-03-02T08:50:53.351167"
+      "updated_at": "2026-03-23T14:34:16.583790"
     },
     "ford_raptor_2024_gray": {
       "id": "ford_raptor_2024_gray",
@@ -860,16 +860,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 2331,
-          "price_7_14": 2288,
-          "price_15_29": 2205,
-          "price_30": 1831
+          "price_1_6": 2324,
+          "price_7_14": 2281,
+          "price_15_29": 2198,
+          "price_30": 1825
         },
         "high_season": {
-          "price_1_6": 2274,
-          "price_7_14": 2165,
-          "price_15_29": 2143,
-          "price_30": 1772
+          "price_1_6": 2268,
+          "price_7_14": 2158,
+          "price_15_29": 2136,
+          "price_30": 1767
         },
         "deposit": 8000
       },
@@ -883,7 +883,7 @@
       "rating": 4.9,
       "available": true,
       "class_": "suv",
-      "updated_at": "2026-01-30T13:59:56.751742"
+      "updated_at": "2026-03-23T14:34:16.583799"
     },
     "mazda_cx3_2023_bege": {
       "id": "mazda_cx3_2023_bege",
@@ -907,16 +907,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1354,
-          "price_7_14": 1081,
-          "price_15_29": 1081,
-          "price_30": 1022
+          "price_1_6": 1350,
+          "price_7_14": 1077,
+          "price_15_29": 1077,
+          "price_30": 1018
         },
         "high_season": {
-          "price_1_6": 1417,
-          "price_7_14": 1127,
-          "price_15_29": 1127,
-          "price_30": 1067
+          "price_1_6": 1413,
+          "price_7_14": 1123,
+          "price_15_29": 1123,
+          "price_30": 1063
         },
         "deposit": 8000
       },
@@ -929,7 +929,7 @@
       "quick_id": "cx32023bege",
       "rating": 4.8,
       "available": true,
-      "updated_at": "2026-01-30T13:59:56.751751"
+      "updated_at": "2026-03-23T14:34:16.583808"
     },
     "honda_hrv_2025_blackv": {
       "id": "honda_hrv_2025_blackv",
@@ -951,16 +951,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1297,
-          "price_7_14": 1121,
-          "price_15_29": 1039,
-          "price_30": 899
+          "price_1_6": 1293,
+          "price_7_14": 1117,
+          "price_15_29": 1036,
+          "price_30": 896
         },
         "high_season": {
-          "price_1_6": 1353,
-          "price_7_14": 1173,
-          "price_15_29": 1165,
-          "price_30": 949
+          "price_1_6": 1349,
+          "price_7_14": 1169,
+          "price_15_29": 1161,
+          "price_30": 946
         },
         "deposit": 8000
       },
@@ -973,7 +973,7 @@
       "quick_id": "hrv2025blackv",
       "rating": 4.7,
       "available": true,
-      "updated_at": "2026-01-30T13:59:56.751760"
+      "updated_at": "2026-03-23T14:34:16.583817"
     },
     "toyota_fortuner_2019_white": {
       "id": "toyota_fortuner_2019_white",
@@ -997,16 +997,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1514,
-          "price_7_14": 1225,
-          "price_15_29": 1039,
-          "price_30": 914
+          "price_1_6": 1509,
+          "price_7_14": 1221,
+          "price_15_29": 1036,
+          "price_30": 911
         },
         "high_season": {
-          "price_1_6": 1695,
-          "price_7_14": 1610,
-          "price_15_29": 1577,
-          "price_30": 1203
+          "price_1_6": 1690,
+          "price_7_14": 1605,
+          "price_15_29": 1572,
+          "price_30": 1199
         },
         "deposit": 8000
       },
@@ -1020,7 +1020,7 @@
       "rating": 4.9,
       "available": false,
       "class_": "suv",
-      "updated_at": "2026-01-30T13:59:56.751769"
+      "updated_at": "2026-03-23T14:34:16.583826"
     },
     "mazda_cx30_2023_bege": {
       "id": "mazda_cx30_2023_bege",
@@ -1043,16 +1043,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1331,
-          "price_7_14": 1163,
-          "price_15_29": 955,
-          "price_30": 830
+          "price_1_6": 1327,
+          "price_7_14": 1159,
+          "price_15_29": 952,
+          "price_30": 827
         },
         "high_season": {
-          "price_1_6": 1389,
-          "price_7_14": 1216,
-          "price_15_29": 1159,
-          "price_30": 949
+          "price_1_6": 1384,
+          "price_7_14": 1212,
+          "price_15_29": 1156,
+          "price_30": 946
         },
         "deposit": 8000
       },
@@ -1065,7 +1065,7 @@
       "quick_id": "cx302023bege",
       "rating": 4.5,
       "available": true,
-      "updated_at": "2026-01-30T13:59:56.751779"
+      "updated_at": "2026-03-23T14:34:16.583835"
     },
     "toyota_fortuner_2023_gray": {
       "id": "toyota_fortuner_2023_gray",
@@ -1087,16 +1087,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1831,
-          "price_7_14": 1579,
-          "price_15_29": 1497,
-          "price_30": 1246
+          "price_1_6": 1825,
+          "price_7_14": 1575,
+          "price_15_29": 1493,
+          "price_30": 1242
         },
         "high_season": {
-          "price_1_6": 1912,
-          "price_7_14": 1651,
-          "price_15_29": 1564,
-          "price_30": 1303
+          "price_1_6": 1906,
+          "price_7_14": 1646,
+          "price_15_29": 1559,
+          "price_30": 1298
         },
         "deposit": 8000
       },
@@ -1110,7 +1110,7 @@
       "rating": 4.6,
       "available": true,
       "class_": "suv",
-      "updated_at": "2026-01-30T13:59:56.751788"
+      "updated_at": "2026-03-23T14:34:16.583844"
     },
     "toyota_corolla_2024_white": {
       "id": "toyota_corolla_2024_white",
@@ -1132,16 +1132,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1163,
-          "price_7_14": 998,
-          "price_15_29": 955,
-          "price_30": 703
+          "price_1_6": 1159,
+          "price_7_14": 995,
+          "price_15_29": 952,
+          "price_30": 700
         },
         "high_season": {
-          "price_1_6": 1360,
-          "price_7_14": 1264,
-          "price_15_29": 1124,
-          "price_30": 1023
+          "price_1_6": 1356,
+          "price_7_14": 1260,
+          "price_15_29": 1120,
+          "price_30": 1019
         },
         "deposit": 8000
       },
@@ -1155,7 +1155,7 @@
       "rating": 4.6,
       "available": true,
       "class_": "suv",
-      "updated_at": "2026-01-30T13:59:56.751797"
+      "updated_at": "2026-03-23T14:34:16.583854"
     },
     "mitsubishi_xforce_2025_white": {
       "id": "mitsubishi_xforce_2025_white",
@@ -1178,16 +1178,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1180,
-          "price_7_14": 1152,
-          "price_15_29": 914,
-          "price_30": 747
+          "price_1_6": 1177,
+          "price_7_14": 1148,
+          "price_15_29": 911,
+          "price_30": 744
         },
         "high_season": {
-          "price_1_6": 1353,
-          "price_7_14": 1353,
-          "price_15_29": 1084,
-          "price_30": 1028
+          "price_1_6": 1349,
+          "price_7_14": 1349,
+          "price_15_29": 1080,
+          "price_30": 1024
         },
         "deposit": 10000
       },
@@ -1200,7 +1200,7 @@
       "quick_id": "xforce2025white",
       "rating": 4.8,
       "available": true,
-      "updated_at": "2026-01-30T13:59:56.751806"
+      "updated_at": "2026-03-23T14:34:16.583863"
     },
     "volvo_v60_2020_white": {
       "id": "volvo_v60_2020_white",
@@ -1224,16 +1224,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1730,
-          "price_7_14": 1586,
-          "price_15_29": 1586,
-          "price_30": 1442
+          "price_1_6": 1725,
+          "price_7_14": 1581,
+          "price_15_29": 1581,
+          "price_30": 1437
         },
         "high_season": {
-          "price_1_6": 1919,
-          "price_7_14": 1806,
-          "price_15_29": 1806,
-          "price_30": 1695
+          "price_1_6": 1914,
+          "price_7_14": 1800,
+          "price_15_29": 1800,
+          "price_30": 1690
         },
         "deposit": 8000
       },
@@ -1247,7 +1247,7 @@
       "rating": 4.6,
       "available": false,
       "class_": "suv",
-      "updated_at": "2026-01-30T13:59:56.751816"
+      "updated_at": "2026-03-23T14:34:16.583872"
     },
     "isuzu_mux_2020_gray": {
       "id": "isuzu_mux_2020_gray",
@@ -1270,16 +1270,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1246,
-          "price_7_14": 1107,
-          "price_15_29": 1107,
-          "price_30": 969
+          "price_1_6": 1242,
+          "price_7_14": 1103,
+          "price_15_29": 1103,
+          "price_30": 966
         },
         "high_season": {
-          "price_1_6": 1476,
-          "price_7_14": 1331,
-          "price_15_29": 1331,
-          "price_30": 1157
+          "price_1_6": 1472,
+          "price_7_14": 1327,
+          "price_15_29": 1327,
+          "price_30": 1153
         },
         "deposit": 8000
       },
@@ -1292,7 +1292,7 @@
       "quick_id": "mux2020gray",
       "rating": 4.9,
       "available": true,
-      "updated_at": "2026-01-30T13:59:56.751825"
+      "updated_at": "2026-03-23T14:34:16.583881"
     },
     "mitsubishi_xpander_2023_white": {
       "id": "mitsubishi_xpander_2023_white",
@@ -1315,16 +1315,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1081,
-          "price_7_14": 998,
-          "price_15_29": 914,
-          "price_30": 703
+          "price_1_6": 1077,
+          "price_7_14": 995,
+          "price_15_29": 911,
+          "price_30": 700
         },
         "high_season": {
-          "price_1_6": 1291,
-          "price_7_14": 1203,
-          "price_15_29": 1125,
-          "price_30": 954
+          "price_1_6": 1287,
+          "price_7_14": 1199,
+          "price_15_29": 1121,
+          "price_30": 951
         },
         "deposit": 10000
       },
@@ -1338,7 +1338,7 @@
       "rating": 4.6,
       "available": true,
       "class_": "7s",
-      "updated_at": "2026-01-30T13:59:56.751835"
+      "updated_at": "2026-03-23T14:34:16.583890"
     },
     "toyota_veloz_2024_gray": {
       "id": "toyota_veloz_2024_gray",
@@ -1361,16 +1361,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1188,
-          "price_7_14": 1045,
-          "price_15_29": 1045,
-          "price_30": 899
+          "price_1_6": 1184,
+          "price_7_14": 1041,
+          "price_15_29": 1041,
+          "price_30": 896
         },
         "high_season": {
-          "price_1_6": 1203,
-          "price_7_14": 1195,
-          "price_15_29": 1126,
-          "price_30": 954
+          "price_1_6": 1199,
+          "price_7_14": 1191,
+          "price_15_29": 1122,
+          "price_30": 951
         },
         "deposit": 10000
       },
@@ -1384,7 +1384,7 @@
       "rating": 4.7,
       "available": true,
       "class_": "7s",
-      "updated_at": "2026-01-30T13:59:56.751844"
+      "updated_at": "2026-03-23T14:34:16.583900"
     },
     "toyota_veloz_2024_white": {
       "id": "toyota_veloz_2024_white",
@@ -1408,16 +1408,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1188,
-          "price_7_14": 1045,
-          "price_15_29": 914,
-          "price_30": 747
+          "price_1_6": 1184,
+          "price_7_14": 1041,
+          "price_15_29": 911,
+          "price_30": 744
         },
         "high_season": {
-          "price_1_6": 1251,
-          "price_7_14": 1198,
-          "price_15_29": 1126,
-          "price_30": 1033
+          "price_1_6": 1247,
+          "price_7_14": 1194,
+          "price_15_29": 1122,
+          "price_30": 1030
         },
         "deposit": 10000
       },
@@ -1431,7 +1431,7 @@
       "rating": 4.7,
       "available": true,
       "class_": "7s",
-      "updated_at": "2026-01-30T13:59:56.751853"
+      "updated_at": "2026-03-23T14:34:16.583909"
     },
     "namo_vios_white_2022": {
       "id": "namo_vios_white_2022",
@@ -1454,16 +1454,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 720,
-          "price_7_14": 720,
-          "price_15_29": 700,
-          "price_30": 450
+          "price_1_6": 718,
+          "price_7_14": 718,
+          "price_15_29": 698,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 840,
-          "price_7_14": 840,
-          "price_15_29": 800,
-          "price_30": 550
+          "price_1_6": 837,
+          "price_7_14": 837,
+          "price_15_29": 798,
+          "price_30": 548
         },
         "deposit": 5000
       },
@@ -1476,7 +1476,7 @@
       "supplier": "namo",
       "quick_id": "namo_vios_white_2022",
       "rating": 4.5,
-      "updated_at": "2026-03-02T08:32:58.672436"
+      "updated_at": "2026-03-23T14:34:16.583918"
     },
     "ar_hrvrs_black_2024": {
       "id": "ar_hrvrs_black_2024",
@@ -1495,16 +1495,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1497,
-          "price_7_14": 1497,
-          "price_15_29": 1246,
-          "price_30": 998
+          "price_1_6": 1493,
+          "price_7_14": 1493,
+          "price_15_29": 1242,
+          "price_30": 995
         },
         "high_season": {
-          "price_1_6": 1389,
-          "price_7_14": 1303,
-          "price_15_29": 1303,
-          "price_30": 1153
+          "price_1_6": 1384,
+          "price_7_14": 1298,
+          "price_15_29": 1298,
+          "price_30": 1149
         },
         "deposit": 10000
       },
@@ -1518,7 +1518,7 @@
       "quick_id": "ar_hrvrs_black_2024",
       "rating": 4.5,
       "class_": "suv",
-      "updated_at": "2026-01-30T13:59:56.751872"
+      "updated_at": "2026-03-23T14:34:16.583927"
     },
     "fern_ativ_gray_lt_2023": {
       "id": "fern_ativ_gray_lt_2023",
@@ -1541,16 +1541,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 900,
-          "price_7_14": 900,
-          "price_15_29": 800,
-          "price_30": 450
+          "price_1_6": 897,
+          "price_7_14": 897,
+          "price_15_29": 798,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 1000,
-          "price_7_14": 1000,
-          "price_15_29": 900,
-          "price_30": 600
+          "price_1_6": 997,
+          "price_7_14": 997,
+          "price_15_29": 897,
+          "price_30": 598
         },
         "deposit": 5000
       },
@@ -1564,7 +1564,7 @@
       "quick_id": "fern_ativ_gray_lt_2023",
       "rating": 4.5,
       "class_": "sedan",
-      "updated_at": "2026-03-02T08:51:52.466371"
+      "updated_at": "2026-03-23T14:34:16.583936"
     },
     "namo_veloz_white_2024": {
       "id": "namo_veloz_white_2024",
@@ -1586,16 +1586,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 665,
-          "price_7_14": 665,
-          "price_15_29": 580,
-          "price_30": 415
+          "price_1_6": 662,
+          "price_7_14": 662,
+          "price_15_29": 578,
+          "price_30": 413
         },
         "high_season": {
-          "price_1_6": 1291,
-          "price_7_14": 1213,
-          "price_15_29": 1119,
-          "price_30": 954
+          "price_1_6": 1287,
+          "price_7_14": 1209,
+          "price_15_29": 1116,
+          "price_30": 951
         },
         "deposit": 10000
       },
@@ -1609,7 +1609,7 @@
       "quick_id": "namo_veloz_white_2024",
       "rating": 4.5,
       "class_": "7s",
-      "updated_at": "2026-01-30T13:59:56.751891"
+      "updated_at": "2026-03-23T14:34:16.583946"
     },
     "ar_corolla_cross_blue_2024": {
       "id": "ar_corolla_cross_blue_2024",
@@ -1632,16 +1632,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1121,
-          "price_7_14": 955,
-          "price_15_29": 872,
-          "price_30": 914
+          "price_1_6": 1117,
+          "price_7_14": 952,
+          "price_15_29": 869,
+          "price_30": 911
         },
         "high_season": {
-          "price_1_6": 1348,
-          "price_7_14": 1216,
-          "price_15_29": 1213,
-          "price_30": 1055
+          "price_1_6": 1344,
+          "price_7_14": 1212,
+          "price_15_29": 1209,
+          "price_30": 1052
         },
         "deposit": 10000
       },
@@ -1655,7 +1655,7 @@
       "quick_id": "ar_corolla_cross_blue_2024",
       "rating": 4.5,
       "class_": "suv",
-      "updated_at": "2026-01-30T13:59:56.751900"
+      "updated_at": "2026-03-23T14:34:16.583955"
     },
     "namo_suzuki_swift_2020": {
       "id": "namo_suzuki_swift_2020",
@@ -1674,16 +1674,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 720,
-          "price_7_14": 720,
-          "price_15_29": 700,
-          "price_30": 450
+          "price_1_6": 718,
+          "price_7_14": 718,
+          "price_15_29": 698,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 840,
-          "price_7_14": 840,
-          "price_15_29": 800,
-          "price_30": 550
+          "price_1_6": 837,
+          "price_7_14": 837,
+          "price_15_29": 798,
+          "price_30": 548
         },
         "deposit": 5000
       },
@@ -1697,7 +1697,7 @@
       "quick_id": "Namoswift2020",
       "rating": 4.5,
       "class_": "compact",
-      "updated_at": "2026-03-02T08:33:52.121014"
+      "updated_at": "2026-03-23T14:34:16.583964"
     },
     "namo_city_sedan_white_2018": {
       "id": "namo_city_sedan_white_2018",
@@ -1720,16 +1720,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 720,
-          "price_7_14": 720,
-          "price_15_29": 700,
-          "price_30": 450
+          "price_1_6": 718,
+          "price_7_14": 718,
+          "price_15_29": 698,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 840,
-          "price_7_14": 840,
-          "price_15_29": 800,
-          "price_30": 550
+          "price_1_6": 837,
+          "price_7_14": 837,
+          "price_15_29": 798,
+          "price_30": 548
         },
         "deposit": 5000
       },
@@ -1742,7 +1742,7 @@
       "supplier": "namo",
       "quick_id": "city_sedan_white_2018",
       "rating": 4.5,
-      "updated_at": "2026-03-02T08:34:26.425312"
+      "updated_at": "2026-03-23T14:34:16.583973"
     },
     "namo_alphard_white_2024": {
       "id": "namo_alphard_white_2024",
@@ -1764,16 +1764,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 665,
-          "price_7_14": 665,
-          "price_15_29": 580,
-          "price_30": 415
+          "price_1_6": 662,
+          "price_7_14": 662,
+          "price_15_29": 578,
+          "price_30": 413
         },
         "high_season": {
-          "price_1_6": 8269,
-          "price_7_14": 7702,
-          "price_15_29": 6946,
-          "price_30": 5526
+          "price_1_6": 8247,
+          "price_7_14": 7681,
+          "price_15_29": 6927,
+          "price_30": 5511
         },
         "deposit": 10000
       },
@@ -1786,7 +1786,7 @@
       "supplier": "namo",
       "quick_id": "namoalphardwhite2024",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.751928"
+      "updated_at": "2026-03-23T14:34:16.583982"
     },
     "namo_bmw220_white_2024": {
       "id": "namo_bmw220_white_2024",
@@ -1812,16 +1812,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 665,
-          "price_7_14": 665,
-          "price_15_29": 580,
-          "price_30": 415
+          "price_1_6": 662,
+          "price_7_14": 662,
+          "price_15_29": 578,
+          "price_30": 413
         },
         "high_season": {
-          "price_1_6": 6093,
-          "price_7_14": 5222,
-          "price_15_29": 5222,
-          "price_30": 3087
+          "price_1_6": 6077,
+          "price_7_14": 5208,
+          "price_15_29": 5208,
+          "price_30": 3078
         },
         "deposit": 5000
       },
@@ -1834,7 +1834,7 @@
       "supplier": "namo",
       "quick_id": "namobmw220white2024",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.751937"
+      "updated_at": "2026-03-23T14:34:16.583991"
     },
     "jazz_namo_2018": {
       "id": "jazz_namo_2018",
@@ -1856,16 +1856,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 720,
-          "price_7_14": 720,
-          "price_15_29": 700,
-          "price_30": 450
+          "price_1_6": 718,
+          "price_7_14": 718,
+          "price_15_29": 698,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 840,
-          "price_7_14": 840,
-          "price_15_29": 800,
-          "price_30": 550
+          "price_1_6": 837,
+          "price_7_14": 837,
+          "price_15_29": 798,
+          "price_30": 548
         },
         "deposit": 5000
       },
@@ -1878,7 +1878,7 @@
       "supplier": "namo",
       "quick_id": "jazznamo2018",
       "rating": 4.5,
-      "updated_at": "2026-03-02T08:35:09.567948"
+      "updated_at": "2026-03-23T14:34:16.584000"
     },
     "namo_legender_2024": {
       "id": "namo_legender_2024",
@@ -1900,16 +1900,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 2043,
-          "price_7_14": 1924,
-          "price_15_29": 1685,
-          "price_30": 1684
+          "price_1_6": 2037,
+          "price_7_14": 1918,
+          "price_15_29": 1680,
+          "price_30": 1678
         },
         "high_season": {
-          "price_1_6": 2173,
-          "price_7_14": 1999,
-          "price_15_29": 1912,
-          "price_30": 1738
+          "price_1_6": 2167,
+          "price_7_14": 1993,
+          "price_15_29": 1906,
+          "price_30": 1733
         },
         "deposit": 10000
       },
@@ -1922,7 +1922,7 @@
       "supplier": "namo",
       "quick_id": "nmlegender2024",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.751955"
+      "updated_at": "2026-03-23T14:34:16.584009"
     },
     "namo_yaris_cross_2025": {
       "id": "namo_yaris_cross_2025",
@@ -1945,16 +1945,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1245,
-          "price_7_14": 1235,
-          "price_15_29": 1152,
-          "price_30": 914
+          "price_1_6": 1241,
+          "price_7_14": 1231,
+          "price_15_29": 1148,
+          "price_30": 911
         },
         "high_season": {
-          "price_1_6": 1299,
-          "price_7_14": 1201,
-          "price_15_29": 1203,
-          "price_30": 1033
+          "price_1_6": 1295,
+          "price_7_14": 1197,
+          "price_15_29": 1199,
+          "price_30": 1030
         },
         "deposit": 10000
       },
@@ -1967,7 +1967,7 @@
       "supplier": "namo",
       "quick_id": "nmcross2025",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.751965"
+      "updated_at": "2026-03-23T14:34:16.584018"
     },
     "Namo_h1_blackvagon_2023": {
       "id": "Namo_h1_blackvagon_2023",
@@ -1989,16 +1989,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 665,
-          "price_7_14": 665,
-          "price_15_29": 580,
-          "price_30": 415
+          "price_1_6": 662,
+          "price_7_14": 662,
+          "price_15_29": 578,
+          "price_30": 413
         },
         "high_season": {
-          "price_1_6": 2607,
-          "price_7_14": 2434,
-          "price_15_29": 2173,
-          "price_30": 1695
+          "price_1_6": 2599,
+          "price_7_14": 2427,
+          "price_15_29": 2167,
+          "price_30": 1690
         },
         "deposit": 10000
       },
@@ -2011,7 +2011,7 @@
       "supplier": "namo",
       "quick_id": "Blackvagon2023",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.751974"
+      "updated_at": "2026-03-23T14:34:16.584027"
     },
     "nm_toyota_ativ_gray_2024": {
       "id": "nm_toyota_ativ_gray_2024",
@@ -2034,16 +2034,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 665,
-          "price_7_14": 665,
-          "price_15_29": 580,
-          "price_30": 415
+          "price_1_6": 662,
+          "price_7_14": 662,
+          "price_15_29": 578,
+          "price_30": 413
         },
         "high_season": {
-          "price_1_6": 936,
-          "price_7_14": 931,
-          "price_15_29": 924,
-          "price_30": 760
+          "price_1_6": 933,
+          "price_7_14": 928,
+          "price_15_29": 920,
+          "price_30": 758
         },
         "deposit": 5000
       },
@@ -2056,7 +2056,7 @@
       "supplier": "namo",
       "quick_id": "nmtoyotaativgray2024",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.751983"
+      "updated_at": "2026-03-23T14:34:16.584037"
     },
     "nmax155_2019_black": {
       "id": "nmax155_2019_black",
@@ -2079,16 +2079,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 410,
-          "price_7_14": 368,
-          "price_15_29": 325,
-          "price_30": 271
+          "price_1_6": 408,
+          "price_7_14": 366,
+          "price_15_29": 323,
+          "price_30": 269
         },
         "high_season": {
-          "price_1_6": 298,
-          "price_7_14": 298,
-          "price_15_29": 237,
-          "price_30": 186
+          "price_1_6": 297,
+          "price_7_14": 297,
+          "price_15_29": 236,
+          "price_30": 184
         },
         "deposit": 5000
       },
@@ -2102,7 +2102,7 @@
       "quick_id": "2019black",
       "rating": 4.6,
       "class_": "bikes",
-      "updated_at": "2026-01-30T13:59:56.751993"
+      "updated_at": "2026-03-23T14:34:16.584047"
     },
     "pcx160_2023_keyless": {
       "id": "pcx160_2023_keyless",
@@ -2125,16 +2125,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 410,
-          "price_7_14": 368,
-          "price_15_29": 325,
-          "price_30": 271
+          "price_1_6": 408,
+          "price_7_14": 366,
+          "price_15_29": 323,
+          "price_30": 269
         },
         "high_season": {
-          "price_1_6": 367,
-          "price_7_14": 367,
-          "price_15_29": 315,
-          "price_30": 225
+          "price_1_6": 365,
+          "price_7_14": 365,
+          "price_15_29": 313,
+          "price_30": 223
         },
         "deposit": 5000
       },
@@ -2148,7 +2148,7 @@
       "quick_id": "2023keyless",
       "rating": 4.8,
       "class_": "bikes",
-      "updated_at": "2026-01-30T13:59:56.752003"
+      "updated_at": "2026-03-23T14:34:16.584056"
     },
     "nmax155_2024_keyless_topbox": {
       "id": "nmax155_2024_keyless_topbox",
@@ -2171,16 +2171,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 410,
-          "price_7_14": 368,
-          "price_15_29": 325,
-          "price_30": 271
+          "price_1_6": 408,
+          "price_7_14": 366,
+          "price_15_29": 323,
+          "price_30": 269
         },
         "high_season": {
-          "price_1_6": 367,
-          "price_7_14": 342,
-          "price_15_29": 288,
-          "price_30": 225
+          "price_1_6": 365,
+          "price_7_14": 340,
+          "price_15_29": 286,
+          "price_30": 223
         },
         "deposit": 5000
       },
@@ -2194,7 +2194,7 @@
       "quick_id": "2024keyless",
       "rating": 4.7,
       "class_": "bikes",
-      "updated_at": "2026-01-30T13:59:56.752013"
+      "updated_at": "2026-03-23T14:34:16.584066"
     },
     "adv350_2025_new": {
       "id": "adv350_2025_new",
@@ -2217,16 +2217,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 410,
-          "price_7_14": 368,
-          "price_15_29": 325,
-          "price_30": 271
+          "price_1_6": 408,
+          "price_7_14": 366,
+          "price_15_29": 323,
+          "price_30": 269
         },
         "high_season": {
-          "price_1_6": 702,
-          "price_7_14": 616,
-          "price_15_29": 547,
-          "price_30": 497
+          "price_1_6": 699,
+          "price_7_14": 614,
+          "price_15_29": 544,
+          "price_30": 495
         },
         "deposit": 10000
       },
@@ -2240,7 +2240,7 @@
       "quick_id": "2025new",
       "rating": 4.7,
       "class_": "bikes",
-      "updated_at": "2026-01-30T13:59:56.752022"
+      "updated_at": "2026-03-23T14:34:16.584075"
     },
     "nmax155_2019_white": {
       "id": "nmax155_2019_white",
@@ -2263,16 +2263,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 410,
-          "price_7_14": 368,
-          "price_15_29": 325,
-          "price_30": 271
+          "price_1_6": 408,
+          "price_7_14": 366,
+          "price_15_29": 323,
+          "price_30": 269
         },
         "high_season": {
-          "price_1_6": 298,
-          "price_7_14": 271,
-          "price_15_29": 237,
-          "price_30": 186
+          "price_1_6": 297,
+          "price_7_14": 269,
+          "price_15_29": 236,
+          "price_30": 184
         },
         "deposit": 3500
       },
@@ -2286,7 +2286,7 @@
       "quick_id": "2019white",
       "rating": 4.7,
       "class_": "bikes",
-      "updated_at": "2026-01-30T13:59:56.752031"
+      "updated_at": "2026-03-23T14:34:16.584085"
     },
     "nm_byd_seal_2024": {
       "id": "nm_byd_seal_2024",
@@ -2309,16 +2309,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 3080,
-          "price_7_14": 3080,
-          "price_15_29": 2914,
-          "price_30": 2246
+          "price_1_6": 3072,
+          "price_7_14": 3072,
+          "price_15_29": 2906,
+          "price_30": 2239
         },
         "high_season": {
-          "price_1_6": 3218,
-          "price_7_14": 3218,
-          "price_15_29": 3045,
-          "price_30": 2348
+          "price_1_6": 3209,
+          "price_7_14": 3209,
+          "price_15_29": 3036,
+          "price_30": 2341
         },
         "deposit": 5000
       },
@@ -2331,7 +2331,7 @@
       "supplier": "namo",
       "quick_id": "Bydseal2024",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752041"
+      "updated_at": "2026-03-23T14:34:16.584094"
     },
     "Forza_350_2024_topbox": {
       "id": "Forza_350_2024_topbox",
@@ -2352,16 +2352,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 614,
-          "price_7_14": 531,
-          "price_15_29": 508,
-          "price_30": 436
+          "price_1_6": 612,
+          "price_7_14": 529,
+          "price_15_29": 506,
+          "price_30": 434
         },
         "high_season": {
-          "price_1_6": 642,
-          "price_7_14": 555,
-          "price_15_29": 530,
-          "price_30": 452
+          "price_1_6": 639,
+          "price_7_14": 553,
+          "price_15_29": 528,
+          "price_30": 450
         },
         "deposit": 10000
       },
@@ -2374,7 +2374,7 @@
       "supplier": "namo",
       "quick_id": "Denforza2024",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752050"
+      "updated_at": "2026-03-23T14:34:16.584103"
     },
     "Nmax_2024_blue_topbox": {
       "id": "Nmax_2024_blue_topbox",
@@ -2396,16 +2396,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 351,
-          "price_7_14": 325,
-          "price_15_29": 301,
-          "price_30": 216
+          "price_1_6": 349,
+          "price_7_14": 323,
+          "price_15_29": 299,
+          "price_30": 215
         },
         "high_season": {
-          "price_1_6": 367,
-          "price_7_14": 342,
-          "price_15_29": 281,
-          "price_30": 225
+          "price_1_6": 365,
+          "price_7_14": 340,
+          "price_15_29": 279,
+          "price_30": 223
         },
         "deposit": 5000
       },
@@ -2418,7 +2418,7 @@
       "supplier": "namo",
       "quick_id": "Nmax2024bltop",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752060"
+      "updated_at": "2026-03-23T14:34:16.584112"
     },
     "Bb_adv_2023": {
       "id": "Bb_adv_2023",
@@ -2439,16 +2439,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 684,
-          "price_7_14": 601,
-          "price_15_29": 518,
-          "price_30": 436
+          "price_1_6": 681,
+          "price_7_14": 598,
+          "price_15_29": 516,
+          "price_30": 434
         },
         "high_season": {
-          "price_1_6": 714,
-          "price_7_14": 628,
-          "price_15_29": 540,
-          "price_30": 455
+          "price_1_6": 711,
+          "price_7_14": 625,
+          "price_15_29": 538,
+          "price_30": 453
         },
         "deposit": 5000
       },
@@ -2461,7 +2461,7 @@
       "supplier": "namo",
       "quick_id": "BumbleAdv2023",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752069"
+      "updated_at": "2026-03-23T14:34:16.584121"
     },
     "Bb_Cbr500r_2023": {
       "id": "Bb_Cbr500r_2023",
@@ -2482,16 +2482,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1205,
-          "price_7_14": 1149,
-          "price_15_29": 779,
-          "price_30": 722
+          "price_1_6": 1201,
+          "price_7_14": 1145,
+          "price_15_29": 777,
+          "price_30": 719
         },
         "high_season": {
-          "price_1_6": 1258,
-          "price_7_14": 1200,
-          "price_15_29": 810,
-          "price_30": 759
+          "price_1_6": 1254,
+          "price_7_14": 1197,
+          "price_15_29": 807,
+          "price_30": 757
         },
         "deposit": 5000
       },
@@ -2504,7 +2504,7 @@
       "supplier": "namo",
       "quick_id": "Cbrhonda500",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752078"
+      "updated_at": "2026-03-23T14:34:16.584130"
     },
     "Nm_city_white_2022": {
       "id": "Nm_city_white_2022",
@@ -2526,16 +2526,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 720,
-          "price_7_14": 720,
-          "price_15_29": 700,
-          "price_30": 450
+          "price_1_6": 718,
+          "price_7_14": 718,
+          "price_15_29": 698,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 840,
-          "price_7_14": 840,
-          "price_15_29": 800,
-          "price_30": 550
+          "price_1_6": 837,
+          "price_7_14": 837,
+          "price_15_29": 798,
+          "price_30": 548
         },
         "deposit": 5000
       },
@@ -2548,7 +2548,7 @@
       "supplier": "namo",
       "quick_id": "Nmyarissedangrey2024",
       "rating": 4.5,
-      "updated_at": "2026-03-02T08:35:47.827639"
+      "updated_at": "2026-03-23T14:34:16.584139"
     },
     "PW_mazda_cx30_gray_2023": {
       "id": "PW_mazda_cx30_gray_2023",
@@ -2571,16 +2571,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 998,
-          "price_7_14": 998,
-          "price_15_29": 998,
-          "price_30": 914
+          "price_1_6": 995,
+          "price_7_14": 995,
+          "price_15_29": 995,
+          "price_30": 911
         },
         "high_season": {
-          "price_1_6": 1258,
-          "price_7_14": 1258,
-          "price_15_29": 1216,
-          "price_30": 1122
+          "price_1_6": 1254,
+          "price_7_14": 1254,
+          "price_15_29": 1212,
+          "price_30": 1118
         },
         "deposit": 10000
       },
@@ -2593,7 +2593,7 @@
       "supplier": "namo",
       "quick_id": "Pwcx30",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752097"
+      "updated_at": "2026-03-23T14:34:16.584148"
     },
     "Ar_xpander_hev_white_2024": {
       "id": "Ar_xpander_hev_white_2024",
@@ -2620,16 +2620,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 1121,
-          "price_7_14": 1121,
-          "price_15_29": 1039,
-          "price_30": 914
+          "price_1_6": 1117,
+          "price_7_14": 1117,
+          "price_15_29": 1036,
+          "price_30": 911
         },
         "high_season": {
-          "price_1_6": 1348,
-          "price_7_14": 1280,
-          "price_15_29": 1276,
-          "price_30": 1126
+          "price_1_6": 1344,
+          "price_7_14": 1276,
+          "price_15_29": 1272,
+          "price_30": 1122
         },
         "deposit": 10000
       },
@@ -2642,7 +2642,7 @@
       "supplier": "namo",
       "quick_id": "Arxpander2024",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752107"
+      "updated_at": "2026-03-23T14:34:16.584158"
     },
     "Ar_veloz_gray_2024": {
       "id": "Ar_veloz_gray_2024",
@@ -2664,16 +2664,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 665,
-          "price_7_14": 665,
-          "price_15_29": 580,
-          "price_30": 415
+          "price_1_6": 662,
+          "price_7_14": 662,
+          "price_15_29": 578,
+          "price_30": 413
         },
         "high_season": {
-          "price_1_6": 1303,
-          "price_7_14": 1258,
-          "price_15_29": 1258,
-          "price_30": 1127
+          "price_1_6": 1298,
+          "price_7_14": 1254,
+          "price_15_29": 1254,
+          "price_30": 1123
         },
         "deposit": 10000
       },
@@ -2686,7 +2686,7 @@
       "supplier": "namo",
       "quick_id": "Arceliz2024",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752116"
+      "updated_at": "2026-03-23T14:34:16.584167"
     },
     "Ar_yaris_cross_white_2024": {
       "id": "Ar_yaris_cross_white_2024",
@@ -2709,16 +2709,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 665,
-          "price_7_14": 665,
-          "price_15_29": 580,
-          "price_30": 415
+          "price_1_6": 662,
+          "price_7_14": 662,
+          "price_15_29": 578,
+          "price_30": 413
         },
         "high_season": {
-          "price_1_6": 1294,
-          "price_7_14": 1294,
-          "price_15_29": 1126,
-          "price_30": 1046
+          "price_1_6": 1290,
+          "price_7_14": 1290,
+          "price_15_29": 1122,
+          "price_30": 1042
         },
         "deposit": 10000
       },
@@ -2731,7 +2731,7 @@
       "supplier": "namo",
       "quick_id": "Aryariscrosswhite24",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752125"
+      "updated_at": "2026-03-23T14:34:16.584176"
     },
     "Ar_city_rs_black_2025": {
       "id": "Ar_city_rs_black_2025",
@@ -2754,16 +2754,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 800,
-          "price_7_14": 800,
-          "price_15_29": 700,
-          "price_30": 450
+          "price_1_6": 798,
+          "price_7_14": 798,
+          "price_15_29": 698,
+          "price_30": 448
         },
         "high_season": {
-          "price_1_6": 900,
-          "price_7_14": 900,
-          "price_15_29": 800,
-          "price_30": 500
+          "price_1_6": 897,
+          "price_7_14": 897,
+          "price_15_29": 798,
+          "price_30": 498
         },
         "deposit": 5000
       },
@@ -2776,7 +2776,7 @@
       "supplier": "namo",
       "quick_id": "ArCityblack2025",
       "rating": 4.5,
-      "updated_at": "2026-03-02T08:52:43.656600"
+      "updated_at": "2026-03-23T14:34:16.584185"
     },
     "Fb_bike1_honda_adv350_black_2025": {
       "id": "Fb_bike1_honda_adv350_black_2025",
@@ -2795,16 +2795,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 669,
-          "price_7_14": 669,
-          "price_15_29": 586,
-          "price_30": 418
+          "price_1_6": 666,
+          "price_7_14": 666,
+          "price_15_29": 583,
+          "price_30": 416
         },
         "high_season": {
-          "price_1_6": 714,
-          "price_7_14": 634,
-          "price_15_29": 555,
-          "price_30": 475
+          "price_1_6": 711,
+          "price_7_14": 632,
+          "price_15_29": 553,
+          "price_30": 473
         },
         "deposit": 7000
       },
@@ -2817,7 +2817,7 @@
       "supplier": "namo",
       "quick_id": "Fbmpadv350black",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752143"
+      "updated_at": "2026-03-23T14:34:16.584194"
     },
     "Den_t-max2024": {
       "id": "Den_t-max2024",
@@ -2838,16 +2838,16 @@
       },
       "pricing": {
         "low_season": {
-          "price_1_6": 669,
-          "price_7_14": 669,
-          "price_15_29": 586,
-          "price_30": 418
+          "price_1_6": 666,
+          "price_7_14": 666,
+          "price_15_29": 583,
+          "price_30": 416
         },
         "high_season": {
-          "price_1_6": 1511,
-          "price_7_14": 1425,
-          "price_15_29": 1342,
-          "price_30": 972
+          "price_1_6": 1506,
+          "price_7_14": 1420,
+          "price_15_29": 1337,
+          "price_30": 969
         },
         "deposit": 15000
       },
@@ -2855,7 +2855,7 @@
       "supplier": "namo",
       "quick_id": "Detmak2024",
       "rating": 4.5,
-      "updated_at": "2026-01-30T13:59:56.752153"
+      "updated_at": "2026-03-23T14:34:16.584203"
     }
   }
 }

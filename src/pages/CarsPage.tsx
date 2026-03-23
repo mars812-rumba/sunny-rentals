@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo,useCallback } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import { ru } from "date-fns/locale";
 import CarForm from "@/components/admin/CarForm";
 import { useCars } from "@/contexts/CarsContext";
 import logo from '@/assets/logo.png';
+
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const ADMIN_KEY = "sunny2025";
@@ -375,11 +376,15 @@ function PriceEditor({ car, onSave, onCancel }) {
     setPrices(prev => ({ ...prev, [season]: { ...prev[season], [period]: numValue } }));
   };
 
+  
   const handleDepositChange = (value) => {
     setPrices(prev => ({ ...prev, deposit: parseInt(value) || 0 }));
   };
 
-  const handleSave = () => onSave({ ...car, pricing: { ...car.pricing, ...prices } });
+const handleSave = useCallback(() => {
+  onSave({ ...car, pricing: prices });
+}, [onSave, car, prices]);
+
 
   const periods = [
     { key: 'price_1_6', label: '1–6 дней' },
