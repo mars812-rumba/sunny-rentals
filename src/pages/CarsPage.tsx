@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -1153,13 +1153,13 @@ export default function CarsPage({ userId }: CarsPageProps) {
       </div>
 
       {/* Диалог редактирования/создания */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
+      <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <SheetContent side="bottom" className="h-[90dvh] sm:h-auto sm:max-h-[90dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-2xl">
+          <SheetHeader>
+            <SheetTitle>
               {editingCar ? "Редактировать авто" : "Новая машина"}
-            </DialogTitle>
-          </DialogHeader>
+            </SheetTitle>
+          </SheetHeader>
           <CarForm 
             car={editingCar} 
             onSave={handleSave} 
@@ -1172,15 +1172,15 @@ export default function CarsPage({ userId }: CarsPageProps) {
               refetchGlobalCars();
             }}
           />
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* Диалог редактирования цен */}
-      <Dialog open={isPriceDialogOpen} onOpenChange={setIsPriceDialogOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Редактировать цены</DialogTitle>
-          </DialogHeader>
+      <Sheet open={isPriceDialogOpen} onOpenChange={setIsPriceDialogOpen}>
+        <SheetContent side="bottom" className="h-[80dvh] sm:h-auto sm:max-h-[80dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Редактировать цены</SheetTitle>
+          </SheetHeader>
           {editingPriceId && (
             <PriceEditor
               car={cars.find(c => c.id === editingPriceId)}
@@ -1191,15 +1191,15 @@ export default function CarsPage({ userId }: CarsPageProps) {
               }}
             />
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* Диалог редактирования характеристик */}
-      <Dialog open={isSpecsDialogOpen} onOpenChange={setIsSpecsDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Редактировать характеристики</DialogTitle>
-          </DialogHeader>
+      <Sheet open={isSpecsDialogOpen} onOpenChange={setIsSpecsDialogOpen}>
+        <SheetContent side="bottom" className="h-[70dvh] sm:h-auto sm:max-h-[70dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Редактировать характеристики</SheetTitle>
+          </SheetHeader>
           {editingSpecsId && (
             <SpecsEditor
               car={cars.find(c => c.id === editingSpecsId)}
@@ -1210,28 +1210,28 @@ export default function CarsPage({ userId }: CarsPageProps) {
               }}
             />
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* Диалог массового изменения цен */}
-      <Dialog open={isBulkPriceDialogOpen} onOpenChange={setIsBulkPriceDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Массовое изменение цен</DialogTitle>
-          </DialogHeader>
+      <Sheet open={isBulkPriceDialogOpen} onOpenChange={setIsBulkPriceDialogOpen}>
+        <SheetContent side="bottom" className="h-[70dvh] sm:h-auto sm:max-h-[70dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Массовое изменение цен</SheetTitle>
+          </SheetHeader>
           <BulkPriceEditor
             onClose={() => setIsBulkPriceDialogOpen(false)}
             onSave={handleBulkPriceUpdate}
           />
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* Диалог владельца */}
-      <Dialog open={isQuickOwnerDialogOpen} onOpenChange={setIsQuickOwnerDialogOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Владелец: {quickOwnerCar?.name}</DialogTitle>
-          </DialogHeader>
+      <Sheet open={isQuickOwnerDialogOpen} onOpenChange={setIsQuickOwnerDialogOpen}>
+        <SheetContent side="bottom" className="h-[80dvh] sm:h-auto sm:max-h-[80dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Владелец: {quickOwnerCar?.name}</SheetTitle>
+          </SheetHeader>
           
           <div className="space-y-4 p-4">
             <div className="space-y-2">
@@ -1348,18 +1348,18 @@ export default function CarsPage({ userId }: CarsPageProps) {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* ✅ Диалог управления владельцами */}
-      <Dialog open={isOwnersManagementOpen} onOpenChange={setIsOwnersManagementOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+      <Sheet open={isOwnersManagementOpen} onOpenChange={setIsOwnersManagementOpen}>
+        <SheetContent side="bottom" className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
               Управление владельцами
-            </DialogTitle>
-          </DialogHeader>
+            </SheetTitle>
+          </SheetHeader>
 
           <div className="space-y-6 p-4">
             {/* Форма создания нового владельца */}
@@ -1524,8 +1524,8 @@ export default function CarsPage({ userId }: CarsPageProps) {
               </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
