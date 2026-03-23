@@ -598,6 +598,27 @@ export default function CarsPage({ userId }: CarsPageProps) {
     }
   };
 
+  const handleDeleteOwner = async (ownerId: string) => {
+    if (!confirm("Удалить владельца? Все его машины будут перемещены в 'Не назначен'.")) return;
+    
+    try {
+      const res = await fetch(`${API_URL}/api/admin/car-owners/${ownerId}?key=${ADMIN_KEY}`, {
+        method: "DELETE"
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Ошибка удаления");
+      }
+
+      alert("Владелец удален!");
+      await fetchOwners();
+      setSelectedOwnerForEdit(null);
+    } catch (err) {
+      alert(`Ошибка: ${err.message}`);
+    }
+  };
+
   const fetchCars = async () => {
     try {
       if (cars.length === 0) {
@@ -1509,13 +1530,22 @@ export default function CarsPage({ userId }: CarsPageProps) {
                             </p>
                           </div>
                           
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setSelectedOwnerForEdit({ ...owner })}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedOwnerForEdit({ ...owner })}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDeleteOwner(owner.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </CardContent>
