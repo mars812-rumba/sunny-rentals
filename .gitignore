@@ -41,6 +41,12 @@ logs/
 *.db
 *.sqlite
 
+# Data files (don't track in git - persistent data)
+backend/data/*.json
+backend/data/*.jsonl
+backend/data/media/
+backend/data/photos/
+
 # Временные файлы
 tmp/
 temp/
