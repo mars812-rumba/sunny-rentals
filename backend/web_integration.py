@@ -3850,6 +3850,72 @@ def update_car_owner(owner_id: str, owner_data: dict):
         print(f"❌ Error in update_car_owner: {e}")
         raise HTTPException(status_code=500, detail=str(e))   
 
+@app.delete(API_PREFIX + "/admin/car-owners/{owner_id}")
+def delete_car_owner(owner_id: str):
+    """Удалить владельца авто"""
+    try:
+        data = load_json(CAR_OWNERS_JSON)
+        owners = data.get("owners", {})
+
+        # Проверить, существует ли владелец
+        if owner_id not in owners:
+            raise HTTPException(status_code=404, detail=f"Owner with ID '{owner_id}' not found")
+
+        # Удалить владельца
+        deleted_owner = owners.pop(owner_id)
+
+        # Обновить car_ids в других владельцах (перенести машины в nobody)
+        nobody_id = "nobody"
+        if nobody_id not in owners:
+            owners[nobody_id] = {
+                "id": nobody_id,
+                "name": "Не назначен",
+                "contact": "",
+                "facebook_url": None,
+                "car_ids": {},
+                "created_at": datetime.utcnow().isoformat(),
+                "updated_at": datetime.utcnow().isoformat()
+            }
+
+        for other_owner_id, other_owner in owners.items():
+            if other_owner_id == owner_id:
+                continue
+            if other_owner.get("car_ids") and owner_id in other_owner["car_ids"]:
+                # Перенести машины в nobody
+                for car_id, car_info in list(other_owner["car_ids"][owner_id].items()):
+                    if nobody_id not in owners:
+                        owners[nobody_id]["car_ids"] = {}
+                    owners[nobody_id]["car_ids"][car_id] = car_info
+                del other_owner["car_ids"][owner_id]
+
+        # Также нужно обновить USER_DATA - убрать references на удаленного владельца
+        try:
+            user_data = load_json(USER_DATA_JSON)
+            users = user_data.get("users", {})
+            for user_id, user in users.items():
+                if user.get("car_owner_id") == owner_id:
+                    user["car_owner_id"] = None
+            save_json(USER_DATA_JSON, user_data)
+        except Exception as e:
+            print(f"⚠️ Error updating user_data: {e}")
+
+        data["owners"] = owners
+
+        # Сохранить в файл
+        with _lock:
+            save_json(CAR_OWNERS_JSON, data)
+
+        print(f"✅ Deleted car owner: {owner_id}")
+        return {
+            "status": "ok",
+            "message": f"Owner '{owner_id}' deleted successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error in delete_car_owner: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get(API_PREFIX + "/car-owners/{owner_id}")
 def get_car_owner(owner_id: str):
