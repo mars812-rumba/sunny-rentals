@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, memo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -93,12 +93,8 @@ function SheetActions({ onSave, onCancel, saveLabel = "Сохранить", disa
   );
 }
 
-// ─── STABLE VALUE INPUT (memo — не перерендеривается при смене category/season) ─
-const AdjustmentInput = memo(function AdjustmentInput({ value, onChange, step }: {
-  value: string;
-  onChange: (v: string) => void;
-  step: number;
-}) {
+// ─── STABLE VALUE INPUT (useCallback + useRef для стабильности) ─
+function AdjustmentInput({ value, onChange, step }: { value: string; onChange: (v: string) => void; step: number }) {
   return (
     <Input
       type="number"
@@ -109,7 +105,7 @@ const AdjustmentInput = memo(function AdjustmentInput({ value, onChange, step }:
       inputMode="decimal"
     />
   );
-});
+}
 
 // ─── BULK PRICE EDITOR ─────────────────────────────────────────────────────────
 function BulkPriceEditor({ onClose, onSave }) {
