@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -90,20 +90,6 @@ function SheetActions({ onSave, onCancel, saveLabel = "Сохранить", disa
         {isProcessing ? "Сохраняю..." : saveLabel}
       </Button>
     </div>
-  );
-}
-
-// ─── STABLE VALUE INPUT (useCallback + useRef для стабильности) ─
-function AdjustmentInput({ value, onChange, step }: { value: string; onChange: (v: string) => void; step: number }) {
-  return (
-    <Input
-      type="number"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="h-11 text-center text-xl font-bold rounded-xl border-gray-200"
-      step={step}
-      inputMode="decimal"
-    />
   );
 }
 
@@ -209,6 +195,7 @@ function BulkPriceEditor({ onClose, onSave }) {
         <FieldRow label={`Значение ${adjustmentType === 'percent' ? '(%)' : '(฿)'}`}>
           <div className="flex items-center gap-3">
             <Button
+              type="button"
               size="icon"
               variant="outline"
               className="h-11 w-11 rounded-xl shrink-0"
@@ -216,14 +203,16 @@ function BulkPriceEditor({ onClose, onSave }) {
             >
               <TrendingDown className="h-4 w-4" />
             </Button>
-            <div className="relative flex-1">
-              <AdjustmentInput
-                value={adjustmentValue}
-                onChange={handleValueChange}
-                step={adjustmentType === 'percent' ? 5 : 50}
-              />
-            </div>
+            <Input
+              type="number"
+              value={adjustmentValue}
+              onChange={(e) => setAdjustmentValue(e.target.value)}
+              className="h-11 text-center text-xl font-bold rounded-xl border-gray-200"
+              step={adjustmentType === 'percent' ? 5 : 50}
+              inputMode="decimal"
+            />
             <Button
+              type="button"
               size="icon"
               variant="outline"
               className="h-11 w-11 rounded-xl shrink-0"
