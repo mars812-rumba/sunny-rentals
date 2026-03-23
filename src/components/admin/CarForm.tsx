@@ -161,6 +161,12 @@ export default function CarForm({
 
   const compressImage = async (file: File): Promise<File> => {
     try {
+      // Проверяем поддержку imageCompression (может не работать на мобильных/PWA)
+      if (typeof imageCompression !== 'function') {
+        console.warn('⚠️ imageCompression не доступен, пропускаем сжатие');
+        return file;
+      }
+
       const originalSize = (file.size / 1024 / 1024).toFixed(2);
       console.log(`🔄 Сжимаю ${file.name}: ${originalSize}MB`);
       const compressedFile = await imageCompression(file, COMPRESSION_OPTIONS);
@@ -179,14 +185,11 @@ const uploadSinglePhoto = async (file: File, retries = 3): Promise<string | null
   formData.append("photos", file);
   formData.append("car_id", form.id);
   formData.append("car_class", form.class);
-  
+
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const res = await fetch(`${API_URL}/api/admin/upload-photos`, {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${getAuthToken()}`
-        },
         body: formData,
       });
       
