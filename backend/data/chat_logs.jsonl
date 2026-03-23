@@ -1564,3 +1564,4 @@
 {"timestamp": "2026-03-21T05:51:29.980Z", "user_id": "608450773", "role": "manager", "text": "Бронируем?)", "source": "crm_panel"}
 {"timestamp": "2026-03-21T05:58:52.458563", "user_id": "374897465", "role": "user", "text": "[Received_media]", "username": "Marseloid", "source": "telegram_bot", "media": {"type": "received_media", "filename": "photo_20260321_055852.jpg", "content_type": "image/jpeg", "file_size": 148916, "timestamp": "2026-03-21T05:58:52.449761", "download_url": "/api/crm/media/374897465/photo_20260321_055852.jpg"}}
 {"timestamp": "2026-03-21T11:44:34.565Z", "user_id": "374897465", "role": "manager", "text": "Приветствую!", "source": "crm_panel"}
+{"timestamp": "2026-03-23T13:20:32.314Z", "user_id": "6445540224", "role": "manager", "text": "Ок", "source": "crm_panel"}

@@ -1175,7 +1175,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
       {/* Диалог редактирования/создания */}
       <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
+        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-2 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
           <SheetHeader className="p-0 pt-3 pb-2 border-b">
             <SheetTitle>
               {editingCar ? "Редактировать авто" : "Новая машина"}

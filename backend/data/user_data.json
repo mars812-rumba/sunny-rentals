@@ -2477,8 +2477,8 @@
     "user_id": "6445540224",
     "username": null,
     "created_at": "2026-03-20T04:34:45.993049",
-    "updated_at": "2026-03-23T12:55:31.974910",
-    "status": "new",
+    "updated_at": "2026-03-23T13:20:38.912242",
+    "status": "archive",
     "form_started": false,
     "booking_submitted": false,
     "car_interested": null,
@@ -2491,10 +2491,11 @@
       "has_new_messages": false,
       "last_message_at": "2026-03-20T05:54:52.200113",
       "last_message_from": "user",
-      "message_count": 1,
+      "message_count": 2,
       "claude_status": "stopped"
     },
-    "last_message_at": "2026-03-20T05:54:52.220197"
+    "last_message_at": "2026-03-20T05:54:52.220197",
+    "archived": false
   },
   {
     "user_id": "web_session_mmvf195q_7x74n1upz_170ul3",
@@ -2608,34 +2609,6 @@
     "source": "telegram_webapp"
   },
   {
-    "user_id": "374897465",
-    "username": "Marseloid",
-    "created_at": "2026-02-26T13:22:02.652390",
-    "updated_at": "2026-03-21T11:58:10.241900",
-    "status": "confirmed",
-    "form_started": true,
-    "booking_submitted": true,
-    "car_interested": "Mazda MAZDA2 2023 Gray",
-    "category_interested": "sedan",
-    "dates_selected": {
-      "start": "2026-03-31T17:00:00.000Z",
-      "end": "2026-04-14T17:00:00.000Z",
-      "days": 15
-    },
-    "notes": [],
-    "source": "telegram_webapp",
-    "archived_at": "2026-02-26T14:51:36.201282",
-    "dialog": {
-      "active": false,
-      "has_new_messages": false,
-      "last_message_at": "2026-03-21T05:58:52.449839",
-      "last_message_from": "user",
-      "message_count": 23,
-      "claude_status": "stopped"
-    },
-    "last_message_at": "2026-03-21T05:58:52.462628"
-  },
-  {
     "user_id": "web_session_mn2pelhc_0mkof6yxd_1kgupk",
     "username": null,
     "created_at": "2026-03-23T11:28:38.731401",
@@ -2712,5 +2685,33 @@
     "dates_selected": null,
     "notes": [],
     "source": "telegram_webapp"
+  },
+  {
+    "user_id": "374897465",
+    "username": "Marseloid",
+    "created_at": "2026-02-26T13:22:02.652390",
+    "updated_at": "2026-03-23T13:31:09.599475",
+    "status": "confirmed",
+    "form_started": true,
+    "booking_submitted": true,
+    "car_interested": "Mazda MAZDA2 2023 Gray",
+    "category_interested": "sedan",
+    "dates_selected": {
+      "start": "2026-03-22T17:00:00.000Z",
+      "end": "2026-03-27T17:00:00.000Z",
+      "days": 1
+    },
+    "notes": [],
+    "source": "telegram_webapp",
+    "archived_at": "2026-02-26T14:51:36.201282",
+    "dialog": {
+      "active": false,
+      "has_new_messages": false,
+      "last_message_at": "2026-03-21T05:58:52.449839",
+      "last_message_from": "user",
+      "message_count": 23,
+      "claude_status": "stopped"
+    },
+    "last_message_at": "2026-03-21T05:58:52.462628"
   }
 ]

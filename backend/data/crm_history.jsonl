@@ -4267,3 +4267,11 @@
 {"timestamp": "2026-03-23T12:55:23.584523", "user_id": 212517491, "action": "messages_marked_read", "by": "manager"}
 {"timestamp": "2026-03-23T12:55:31.980301", "user_id": 6445540224, "action": "messages_marked_read", "by": "manager"}
 {"timestamp": "2026-03-23T13:00:03.614268", "user_id": "web_session_mn301cwl_9dzq1ln79_8g5h5v", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-03-23T13:20:20.957319", "user_id": 6445540224, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-23T13:20:24.797269", "user_id": 6445540224, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-23T13:20:32.314Z", "user_id": "6445540224", "action": "manager_message_sent", "message_length": 2}
+{"timestamp": "2026-03-23T13:20:38.918136", "user_id": "6445540224", "action": "status_changed", "old_status": "new", "new_status": "archive", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-23T13:31:09.704770", "user_id": "374897465", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-22T17:00:00.000Z", "endDate": "2026-03-27T17:00:00.000Z", "days": 6, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-03-23T13:31:09.860348", "user_id": "374897465", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-22T17:00:00.000Z", "endDate": "2026-03-27T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-03-23T13:31:09.986286", "user_id": "374897465", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-22T17:00:00.000Z", "endDate": "2026-03-27T17:00:00.000Z", "days": 6, "category": "sedan", "pickupLocation": "airport", "returnLocation": "airport", "username": "Marseloid"}, "username": "Marseloid"}
+{"timestamp": "2026-03-23T13:31:10.124965", "user_id": "374897465", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-03-22T17:00:00.000Z", "endDate": "2026-03-27T17:00:00.000Z", "username": "Marseloid"}, "username": "Marseloid"}

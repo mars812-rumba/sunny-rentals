@@ -258,23 +258,7 @@ const handleBookingSubmit = async (contact: { value: string, type: string }) => 
         }>
           {isMobile ? (
             <>
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="text-center opacity-0 animate-stat-item-appear" style={{ animationDelay: '0.1s' }}>
-                  <div className="text-2xl font-bold text-blue-600">50+</div>
-                  <div className="text-xs text-gray-600 leading-tight">{t('in_base')}</div>
-                </div>
-                <div className="text-center opacity-0 animate-stat-item-appear" style={{ animationDelay: '0.2s' }}>
-                  <div className="text-2xl font-bold text-green-600 animate-number-update-anim">{availableCars}</div>
-                  <div className="text-xs text-gray-600 leading-tight">{t('available')}</div>
-                </div>
-                <div className="text-center opacity-0 animate-stat-item-appear" style={{ animationDelay: '0.3s' }}>
-                  <div className="text-2xl font-bold text-orange-600 animate-number-update-anim">{bookedToday}</div>
-                  <div className="text-xs text-gray-600 leading-tight" dangerouslySetInnerHTML={{ __html: t('booked_today_html') }}></div>
-                </div>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600 font-medium">{t('choose_delivery_date_class')}</p>
-              </div>
+
             </>
           ) : (
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
