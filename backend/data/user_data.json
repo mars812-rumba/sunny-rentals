@@ -2477,7 +2477,7 @@
     "user_id": "6445540224",
     "username": null,
     "created_at": "2026-03-20T04:34:45.993049",
-    "updated_at": "2026-03-21T01:14:02.460834",
+    "updated_at": "2026-03-23T11:28:47.575487",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -2634,5 +2634,33 @@
       "claude_status": "stopped"
     },
     "last_message_at": "2026-03-21T05:58:52.462628"
+  },
+  {
+    "user_id": "web_session_mn2pelhc_0mkof6yxd_1kgupk",
+    "username": null,
+    "created_at": "2026-03-23T11:28:38.731401",
+    "updated_at": "2026-03-23T11:28:38.731432",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp"
+  },
+  {
+    "user_id": "web_session_mn33scaj_umpg45049_cluyps",
+    "username": null,
+    "created_at": "2026-03-23T11:29:24.565411",
+    "updated_at": "2026-03-23T11:29:24.565433",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp"
   }
 ]

@@ -156,22 +156,22 @@
           "facebook_url": null,
           "updated_at": "2026-01-05T11:35:24.867414"
         },
-        "toyota_yaris_2022_black": {
-          "notes": [],
-          "status": "rented",
-          "available_until": null,
-          "facebook_url": null,
-          "updated_at": "2026-03-02T08:25:38.092984"
-        },
         "toyota_yaris_2022_white": {
           "notes": [],
           "status": "rented",
           "available_until": null,
           "facebook_url": null,
           "updated_at": "2026-03-02T08:25:47.566449"
+        },
+        "toyota_yaris_2022_black": {
+          "notes": [],
+          "status": "rented",
+          "available_until": null,
+          "facebook_url": null,
+          "updated_at": "2026-03-23T12:11:22.730502"
         }
       },
-      "updated_at": "2026-03-02T08:25:47.566452"
+      "updated_at": "2026-03-23T12:11:22.730508"
     },
     "AR": {
       "id": "AR",
@@ -344,7 +344,7 @@
           "updated_at": "2026-03-03T03:07:37.217397"
         }
       },
-      "updated_at": "2026-03-03T03:07:37.217401"
+      "updated_at": "2026-03-23T12:11:22.730447"
     },
     "BB": {
       "id": "BB",

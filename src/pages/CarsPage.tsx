@@ -1154,8 +1154,8 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
       {/* Диалог редактирования/создания */}
       <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-2xl">
-          <SheetHeader>
+        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-4 sm:rounded-t-xl sm:max-w-2xl">
+          <SheetHeader className="p-0 pt-3 pb-2 border-b">
             <SheetTitle>
               {editingCar ? "Редактировать авто" : "Новая машина"}
             </SheetTitle>
@@ -1178,7 +1178,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
       {/* Диалог редактирования цен */}
       <Sheet open={isPriceDialogOpen} onOpenChange={setIsPriceDialogOpen}>
         <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
-          <SheetHeader>
+          <SheetHeader className="p-2 pt-3 pb-2 border-b">
             <SheetTitle>Редактировать цены</SheetTitle>
           </SheetHeader>
           {editingPriceId && (
@@ -1197,7 +1197,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
       {/* Диалог редактирования характеристик */}
       <Sheet open={isSpecsDialogOpen} onOpenChange={setIsSpecsDialogOpen}>
         <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
-          <SheetHeader>
+          <SheetHeader className="p-2 pt-3 pb-2 border-b">
             <SheetTitle>Редактировать характеристики</SheetTitle>
           </SheetHeader>
           {editingSpecsId && (
@@ -1216,7 +1216,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
       {/* Диалог массового изменения цен */}
       <Sheet open={isBulkPriceDialogOpen} onOpenChange={setIsBulkPriceDialogOpen}>
         <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
-          <SheetHeader>
+          <SheetHeader className="p-2 pt-3 pb-2 border-b">
             <SheetTitle>Массовое изменение цен</SheetTitle>
           </SheetHeader>
           <BulkPriceEditor
@@ -1229,7 +1229,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
       {/* Диалог владельца */}
       <Sheet open={isQuickOwnerDialogOpen} onOpenChange={setIsQuickOwnerDialogOpen}>
         <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
-          <SheetHeader>
+          <SheetHeader className="p-2 pt-3 pb-2 border-b">
             <SheetTitle>Владелец: {quickOwnerCar?.name}</SheetTitle>
           </SheetHeader>
           
@@ -1353,15 +1353,15 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
       {/* ✅ Диалог управления владельцами */}
       <Sheet open={isOwnersManagementOpen} onOpenChange={setIsOwnersManagementOpen}>
-        <SheetContent side="bottom" className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <SheetHeader>
+        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-2 sm:rounded-t-xl sm:max-w-md">
+          <SheetHeader className="p-2 pt-3 pb-2 border-b">
             <SheetTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
               Управление владельцами
             </SheetTitle>
           </SheetHeader>
 
-          <div className="space-y-6 p-4">
+          <div className="space-y-3 p-2">
             {/* Форма создания нового владельца */}
             <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
               <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
