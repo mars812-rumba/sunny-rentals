@@ -686,15 +686,9 @@ export default function CarsPage({ userId }: CarsPageProps) {
     let result = [...cars];
     if (selectedCategory !== "all") result = result.filter(car => car.class === selectedCategory);
     if (selectedOwner !== "all") result = result.filter(car => { const ownerInfo = getOwnerForCar(car.id); return ownerInfo?.owner?.id === selectedOwner; });
-    if (startDate && endDate) {
-      result = result.filter(car => {
-        const ownerInfo = getOwnerForCar(car.id);
-        if (!ownerInfo?.carInfo?.available_until) return true;
-        return new Date(ownerInfo.carInfo.available_until) <= startDate;
-      });
-    }
+    // ❌ УБРАН: фильтр по available_until - машины показываем все, просто помечаем недоступные
     return result;
-  }, [cars, selectedCategory, selectedOwner, startDate, endDate, owners]);
+  }, [cars, selectedCategory, selectedOwner, owners]);
 
   if (loading) {
     return (
