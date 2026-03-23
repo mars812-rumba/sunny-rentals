@@ -598,6 +598,27 @@ export default function CarsPage({ userId }: CarsPageProps) {
     }
   };
 
+  const handleDeleteOwner = async (ownerId: string) => {
+    if (!confirm("Удалить владельца? Все его машины будут перемещены в 'Не назначен'.")) return;
+    
+    try {
+      const res = await fetch(`${API_URL}/api/admin/car-owners/${ownerId}?key=${ADMIN_KEY}`, {
+        method: "DELETE"
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Ошибка удаления");
+      }
+
+      alert("Владелец удален!");
+      await fetchOwners();
+      setSelectedOwnerForEdit(null);
+    } catch (err) {
+      alert(`Ошибка: ${err.message}`);
+    }
+  };
+
   const fetchCars = async () => {
     try {
       if (cars.length === 0) {
@@ -1154,7 +1175,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
       {/* Диалог редактирования/создания */}
       <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-4 sm:rounded-t-xl sm:max-w-2xl">
+        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
           <SheetHeader className="p-0 pt-3 pb-2 border-b">
             <SheetTitle>
               {editingCar ? "Редактировать авто" : "Новая машина"}
@@ -1177,7 +1198,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
       {/* Диалог редактирования цен */}
       <Sheet open={isPriceDialogOpen} onOpenChange={setIsPriceDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+       <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
           <SheetHeader className="p-2 pt-3 pb-2 border-b">
             <SheetTitle>Редактировать цены</SheetTitle>
           </SheetHeader>
@@ -1196,7 +1217,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
       {/* Диалог редактирования характеристик */}
       <Sheet open={isSpecsDialogOpen} onOpenChange={setIsSpecsDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
           <SheetHeader className="p-2 pt-3 pb-2 border-b">
             <SheetTitle>Редактировать характеристики</SheetTitle>
           </SheetHeader>
@@ -1215,7 +1236,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
       {/* Диалог массового изменения цен */}
       <Sheet open={isBulkPriceDialogOpen} onOpenChange={setIsBulkPriceDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
           <SheetHeader className="p-2 pt-3 pb-2 border-b">
             <SheetTitle>Массовое изменение цен</SheetTitle>
           </SheetHeader>
@@ -1228,7 +1249,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
       {/* Диалог владельца */}
       <Sheet open={isQuickOwnerDialogOpen} onOpenChange={setIsQuickOwnerDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
           <SheetHeader className="p-2 pt-3 pb-2 border-b">
             <SheetTitle>Владелец: {quickOwnerCar?.name}</SheetTitle>
           </SheetHeader>
@@ -1353,7 +1374,8 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
       {/* ✅ Диалог управления владельцами */}
       <Sheet open={isOwnersManagementOpen} onOpenChange={setIsOwnersManagementOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-2 sm:rounded-t-xl sm:max-w-md">
+       <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
+
           <SheetHeader className="p-2 pt-3 pb-2 border-b">
             <SheetTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
@@ -1509,13 +1531,22 @@ export default function CarsPage({ userId }: CarsPageProps) {
                             </p>
                           </div>
                           
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setSelectedOwnerForEdit({ ...owner })}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedOwnerForEdit({ ...owner })}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDeleteOwner(owner.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </CardContent>

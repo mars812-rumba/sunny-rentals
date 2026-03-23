@@ -4262,3 +4262,8 @@
 {"timestamp": "2026-03-23T11:28:39.081059", "user_id": "web_session_mn2pelhc_0mkof6yxd_1kgupk", "action": "dialog_started", "initiated_by": "user", "username": null}
 {"timestamp": "2026-03-23T11:28:47.581539", "user_id": 6445540224, "action": "messages_marked_read", "by": "manager"}
 {"timestamp": "2026-03-23T11:29:24.696031", "user_id": "web_session_mn33scaj_umpg45049_cluyps", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-03-23T12:46:55.375429", "user_id": "49385685", "action": "dialog_started", "initiated_by": "user", "username": "dzabrail88"}
+{"timestamp": "2026-03-23T12:51:03.827715", "user_id": "212517491", "action": "dialog_started", "initiated_by": "user", "username": "pravda_rf"}
+{"timestamp": "2026-03-23T12:55:23.584523", "user_id": 212517491, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-23T12:55:31.980301", "user_id": 6445540224, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-23T13:00:03.614268", "user_id": "web_session_mn301cwl_9dzq1ln79_8g5h5v", "action": "dialog_started", "initiated_by": "user", "username": null}

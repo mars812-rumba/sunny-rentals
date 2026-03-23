@@ -164,14 +164,16 @@
           "updated_at": "2026-03-02T08:25:47.566449"
         },
         "toyota_yaris_2022_black": {
-          "notes": [],
+          "notes": [
+            "Машина"
+          ],
           "status": "rented",
           "available_until": null,
           "facebook_url": null,
-          "updated_at": "2026-03-23T12:11:22.730502"
+          "updated_at": "2026-03-23T12:55:54.028276"
         }
       },
-      "updated_at": "2026-03-23T12:11:22.730508"
+      "updated_at": "2026-03-23T12:55:54.028280"
     },
     "AR": {
       "id": "AR",

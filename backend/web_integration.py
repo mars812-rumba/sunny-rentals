@@ -3861,34 +3861,10 @@ def delete_car_owner(owner_id: str):
         if owner_id not in owners:
             raise HTTPException(status_code=404, detail=f"Owner with ID '{owner_id}' not found")
 
-        # Удалить владельца
-        deleted_owner = owners.pop(owner_id)
+        # Удалить владельца полностью
+        owners.pop(owner_id)
 
-        # Обновить car_ids в других владельцах (перенести машины в nobody)
-        nobody_id = "nobody"
-        if nobody_id not in owners:
-            owners[nobody_id] = {
-                "id": nobody_id,
-                "name": "Не назначен",
-                "contact": "",
-                "facebook_url": None,
-                "car_ids": {},
-                "created_at": datetime.utcnow().isoformat(),
-                "updated_at": datetime.utcnow().isoformat()
-            }
-
-        for other_owner_id, other_owner in owners.items():
-            if other_owner_id == owner_id:
-                continue
-            if other_owner.get("car_ids") and owner_id in other_owner["car_ids"]:
-                # Перенести машины в nobody
-                for car_id, car_info in list(other_owner["car_ids"][owner_id].items()):
-                    if nobody_id not in owners:
-                        owners[nobody_id]["car_ids"] = {}
-                    owners[nobody_id]["car_ids"][car_id] = car_info
-                del other_owner["car_ids"][owner_id]
-
-        # Также нужно обновить USER_DATA - убрать references на удаленного владельца
+        # Убрать car_owner_id из user_data
         try:
             user_data = load_json(USER_DATA_JSON)
             users = user_data.get("users", {})

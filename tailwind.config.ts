@@ -80,20 +80,12 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
         "float": {
           "0%, 100%": { transform: "translateY(0px)" },
@@ -118,28 +110,16 @@ export default {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(400%)" },
         },
-        // --- ДОБАВЛЕНО: Анимация блика для кнопки ---
         "shimmer": {
           "100%": { transform: "translateX(100%)" },
         },
-        // ---------------------------------------------
         "cardSlideIn": {
-            from: {
-                opacity: "0",
-                transform: "translateY(30px) scale(0.95)",
-            },
-            to: {
-                opacity: "1",
-                transform: "translateY(0) scale(1)",
-            },
+          from: { opacity: "0", transform: "translateY(30px) scale(0.95)" },
+to: { opacity: "1", transform: "translateY(0) scale(1)" },
         },
         "pulse": {
-          "0%, 100%": {
-            boxShadow: "0 0 0 0 rgba(16, 185, 129, 0.4)",
-          },
-          "50%": {
-            boxShadow: "0 0 0 10px rgba(16, 185, 129, 0)",
-          },
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(16, 185, 129, 0.4)" },
+          "50%": { boxShadow: "0 0 0 10px rgba(16, 185, 129, 0)" },
         },
         "lockShake": {
           "0%, 90%, 100%": { transform: "rotate(0deg)" },
@@ -154,6 +134,10 @@ export default {
           "0%, 100%": { transform: "scale(1)" },
           "50%": { transform: "scale(1.1)" },
         },
+        "slideInFromBottom": {
+          from: { transform: "translateY(100%)" },
+          to: { transform: "translateY(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -163,17 +147,16 @@ export default {
         "icon-rotate": "rotate 2s linear infinite",
         "fill-bar": "fillBar 2.4s ease-out forwards",
         "shine-effect": "shine 1.5s infinite",
-        // --- ДОБАВЛЕНО ---
         "shimmer": "shimmer 1.5s infinite",
-        // -----------------
         "card-slide-in": "cardSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
         "pulse-dot": "pulse 1.5s ease-in-out infinite",
         "lock-shake": "lockShake 3s infinite",
         "stat-item-appear": "countUp 0.6s ease forwards",
-        "soft-glow" : "soft-pulse 2s ease-in-out infinite, glow 2s ease-in-out infinite",
+        "soft-glow": "soft-pulse 2s ease-in-out infinite, glow 2s ease-in-out infinite",
         "number-update-anim": "numberChange 0.3s ease",
+        "slide-in-from-bottom": "slideInFromBottom 0.3s ease-out",
       },
     },
   },
-  plugins: [" tailwindcssAnimate"],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;
