@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -1198,87 +1198,95 @@ const handleBulkPriceUpdate = async (updateData: any) => {
       </div>
 
       {/* Диалог редактирования/создания */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-2xl sm:rounded-xl overflow-y-auto p-3 sm:p-6">
-          <DialogHeader className="pb-2">
-            <DialogTitle className="text-lg sm:text-xl">
+      <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <SheetContent side="bottom" className="h-[90dvh] sm:h-auto sm:max-h-[90dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-2xl">
+          <SheetHeader className="p-4 pb-2 border-b">
+            <SheetTitle className="text-lg sm:text-xl">
               {editingCar ? "Редактировать авто" : "Новая машина"}
-            </DialogTitle>
-          </DialogHeader>
-          <CarForm 
-            car={editingCar} 
-            onSave={handleSave} 
-            onCancel={() => {
-              setIsDialogOpen(false);
-              setEditingCar(null);
-            }}
-            onPhotoUpload={() => {
-              fetchCars();
-              refetchGlobalCars();
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+            </SheetTitle>
+          </SheetHeader>
+          <div className="p-4">
+            <CarForm 
+              car={editingCar} 
+              onSave={handleSave} 
+              onCancel={() => {
+                setIsDialogOpen(false);
+                setEditingCar(null);
+              }}
+              onPhotoUpload={() => {
+                fetchCars();
+                refetchGlobalCars();
+              }}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Диалог редактирования цен */}
-      <Dialog open={isPriceDialogOpen} onOpenChange={setIsPriceDialogOpen}>
-        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-md sm:rounded-xl overflow-y-auto p-3 sm:p-6">
-          <DialogHeader className="pb-2">
-            <DialogTitle className="text-lg sm:text-xl">Редактировать цены</DialogTitle>
-          </DialogHeader>
-          {editingPriceId && (
-            <PriceEditor
-              car={cars.find(c => c.id === editingPriceId)}
-              onSave={handlePriceSave}
-              onCancel={() => {
-                setIsPriceDialogOpen(false);
-                setEditingPriceId(null);
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <Sheet open={isPriceDialogOpen} onOpenChange={setIsPriceDialogOpen}>
+        <SheetContent side="bottom" className="h-[80dvh] sm:h-auto sm:max-h-[80dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+          <SheetHeader className="p-4 pb-2 border-b">
+            <SheetTitle className="text-lg sm:text-xl">Редактировать цены</SheetTitle>
+          </SheetHeader>
+          <div className="p-4">
+            {editingPriceId && (
+              <PriceEditor
+                car={cars.find(c => c.id === editingPriceId)}
+                onSave={handlePriceSave}
+                onCancel={() => {
+                  setIsPriceDialogOpen(false);
+                  setEditingPriceId(null);
+                }}
+              />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Диалог редактирования характеристик */}
-      <Dialog open={isSpecsDialogOpen} onOpenChange={setIsSpecsDialogOpen}>
-        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-md sm:rounded-xl overflow-y-auto p-3 sm:p-6">
-          <DialogHeader className="pb-2">
-            <DialogTitle className="text-lg sm:text-xl">Редактировать характеристики</DialogTitle>
-          </DialogHeader>
-          {editingSpecsId && (
-            <SpecsEditor
-              car={cars.find(c => c.id === editingSpecsId)}
-              onSave={handleSpecsSave}
-              onCancel={() => {
-                setIsSpecsDialogOpen(false);
-                setEditingSpecsId(null);
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <Sheet open={isSpecsDialogOpen} onOpenChange={setIsSpecsDialogOpen}>
+        <SheetContent side="bottom" className="h-[70dvh] sm:h-auto sm:max-h-[70dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+          <SheetHeader className="p-4 pb-2 border-b">
+            <SheetTitle className="text-lg sm:text-xl">Редактировать характеристики</SheetTitle>
+          </SheetHeader>
+          <div className="p-4">
+            {editingSpecsId && (
+              <SpecsEditor
+                car={cars.find(c => c.id === editingSpecsId)}
+                onSave={handleSpecsSave}
+                onCancel={() => {
+                  setIsSpecsDialogOpen(false);
+                  setEditingSpecsId(null);
+                }}
+              />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Диалог массового изменения цен */}
-      <Dialog open={isBulkPriceDialogOpen} onOpenChange={setIsBulkPriceDialogOpen}>
-        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-md sm:rounded-xl overflow-y-auto p-3 sm:p-6">
-          <DialogHeader className="pb-2">
-            <DialogTitle className="text-lg sm:text-xl">Массовое изменение цен</DialogTitle>
-          </DialogHeader>
-          <BulkPriceEditor
-            onClose={() => setIsBulkPriceDialogOpen(false)}
-            onSave={handleBulkPriceUpdate}
-          />
-        </DialogContent>
-      </Dialog>
+      <Sheet open={isBulkPriceDialogOpen} onOpenChange={setIsBulkPriceDialogOpen}>
+        <SheetContent side="bottom" className="h-[80dvh] sm:h-auto sm:max-h-[80dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+          <SheetHeader className="p-4 pb-2 border-b">
+            <SheetTitle className="text-lg sm:text-xl">Массовое изменение цен</SheetTitle>
+          </SheetHeader>
+          <div className="p-4">
+            <BulkPriceEditor
+              onClose={() => setIsBulkPriceDialogOpen(false)}
+              onSave={handleBulkPriceUpdate}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Диалог владельца */}
-      <Dialog open={isQuickOwnerDialogOpen} onOpenChange={setIsQuickOwnerDialogOpen}>
-        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-md sm:rounded-xl overflow-y-auto p-3 sm:p-6">
-          <DialogHeader className="pb-2">
-            <DialogTitle className="text-lg sm:text-xl">Владелец: {quickOwnerCar?.name}</DialogTitle>
-          </DialogHeader>
+      <Sheet open={isQuickOwnerDialogOpen} onOpenChange={setIsQuickOwnerDialogOpen}>
+        <SheetContent side="bottom" className="h-[85dvh] sm:h-auto sm:max-h-[85dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md">
+          <SheetHeader className="p-4 pb-2 border-b">
+            <SheetTitle className="text-lg sm:text-xl">Владелец: {quickOwnerCar?.name}</SheetTitle>
+          </SheetHeader>
           
-          <div className="space-y-3 sm:space-y-4 p-0">
+          <div className="space-y-3 sm:space-y-4 p-4">
             <div className="space-y-2">
               <Label>Владелец *</Label>
               <Select
@@ -1393,20 +1401,20 @@ const handleBulkPriceUpdate = async (updateData: any) => {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* ✅ Диалог управления владельцами */}
-      <Dialog open={isOwnersManagementOpen} onOpenChange={setIsOwnersManagementOpen}>
-        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-3xl sm:rounded-xl overflow-y-auto p-3 sm:p-6">
-          <DialogHeader className="pb-2">
-            <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+      <Sheet open={isOwnersManagementOpen} onOpenChange={setIsOwnersManagementOpen}>
+        <SheetContent side="bottom" className="h-[90dvh] sm:h-auto sm:max-h-[90dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-3xl">
+          <SheetHeader className="p-4 pb-2 border-b">
+            <SheetTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <Users className="h-5 w-5" />
               Управление владельцами
-            </DialogTitle>
-          </DialogHeader>
+            </SheetTitle>
+          </SheetHeader>
 
-          <div className="space-y-4 sm:space-y-6 p-0">
+          <div className="space-y-4 sm:space-y-6 p-4">
             {/* Форма создания нового владельца */}
             <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
               <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
@@ -1582,8 +1590,8 @@ const handleBulkPriceUpdate = async (updateData: any) => {
               </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
