@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Car, Users, AlertCircle, Plus, Edit, Trash2, LogOut, Check, X, Fuel, Settings, Zap, Bike, TrendingUp, TrendingDown, User, Calendar as CalendarIcon, DollarSign } from "lucide-react";
+import { Car, Users, AlertCircle, Plus, Edit, Trash2, LogOut, Check, X, Fuel, Settings, Zap, Bike, TrendingUp, TrendingDown, User, Calendar as CalendarIcon, DollarSign, Sun, Cloud } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
@@ -361,8 +361,11 @@ function PriceEditor({ car, onSave, onCancel }) {
 
   return (
     <div className="p-4 space-y-4">
-      <div className="space-y-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-        <div className="text-sm font-bold text-gray-800">🌤️ Низкий сезон</div>
+      <div className="space-y-3 p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+        <div className="flex items-center gap-2 text-sm font-bold text-gray-800">
+          <Cloud className="h-4 w-4 text-blue-500" />
+          Низкий сезон
+        </div>
         <div className="grid grid-cols-2 gap-3">
           {periods.map(({ key, label, placeholder }) => (
             <div key={key} className="space-y-1.5">
@@ -384,8 +387,11 @@ function PriceEditor({ car, onSave, onCancel }) {
         </div>
       </div>
 
-      <div className="space-y-3 p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border border-orange-200">
-        <div className="text-sm font-bold text-gray-800">☀️ Высокий сезон</div>
+      <div className="space-y-3 p-3 sm:p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border border-orange-200">
+        <div className="flex items-center gap-2 text-sm font-bold text-gray-800">
+          <Sun className="h-4 w-4 text-orange-500" />
+          Высокий сезон
+        </div>
         <div className="grid grid-cols-2 gap-3">
           {periods.map(({ key, label, placeholder }) => (
             <div key={key} className="space-y-1.5">
@@ -407,8 +413,11 @@ function PriceEditor({ car, onSave, onCancel }) {
         </div>
       </div>
 
-      <div className="space-y-2 p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-        <Label className="text-sm font-bold text-gray-800">💰 Депозит</Label>
+      <div className="space-y-2 p-3 sm:p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+        <Label className="flex items-center gap-2 text-sm font-bold text-gray-800">
+          <DollarSign className="h-4 w-4 text-purple-500" />
+          Депозит
+        </Label>
         <div className="relative">
           <Input
             type="number"
@@ -617,6 +626,27 @@ const handleUpdateOwner = async () => {
     alert("Владелец обновлен!");
     await fetchOwners();
     setSelectedOwnerForEdit(null);
+  } catch (err: any) {
+    alert(`Ошибка: ${err.message}`);
+  }
+};
+
+const handleDeleteOwner = async (ownerId: string) => {
+  try {
+    const res = await fetch(`${API_URL}/api/admin/car-owners/${ownerId}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || "Ошибка удаления");
+    }
+
+    alert("Владелец удален!");
+    await fetchOwners();
   } catch (err: any) {
     alert(`Ошибка: ${err.message}`);
   }
@@ -1169,9 +1199,9 @@ const handleBulkPriceUpdate = async (updateData: any) => {
 
       {/* Диалог редактирования/создания */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-2xl sm:rounded-xl overflow-y-auto p-3 sm:p-6">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-lg sm:text-xl">
               {editingCar ? "Редактировать авто" : "Новая машина"}
             </DialogTitle>
           </DialogHeader>
@@ -1192,9 +1222,9 @@ const handleBulkPriceUpdate = async (updateData: any) => {
 
       {/* Диалог редактирования цен */}
       <Dialog open={isPriceDialogOpen} onOpenChange={setIsPriceDialogOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Редактировать цены</DialogTitle>
+        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-md sm:rounded-xl overflow-y-auto p-3 sm:p-6">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-lg sm:text-xl">Редактировать цены</DialogTitle>
           </DialogHeader>
           {editingPriceId && (
             <PriceEditor
@@ -1211,9 +1241,9 @@ const handleBulkPriceUpdate = async (updateData: any) => {
 
       {/* Диалог редактирования характеристик */}
       <Dialog open={isSpecsDialogOpen} onOpenChange={setIsSpecsDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Редактировать характеристики</DialogTitle>
+        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-md sm:rounded-xl overflow-y-auto p-3 sm:p-6">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-lg sm:text-xl">Редактировать характеристики</DialogTitle>
           </DialogHeader>
           {editingSpecsId && (
             <SpecsEditor
@@ -1230,9 +1260,9 @@ const handleBulkPriceUpdate = async (updateData: any) => {
 
       {/* Диалог массового изменения цен */}
       <Dialog open={isBulkPriceDialogOpen} onOpenChange={setIsBulkPriceDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Массовое изменение цен</DialogTitle>
+        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-md sm:rounded-xl overflow-y-auto p-3 sm:p-6">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-lg sm:text-xl">Массовое изменение цен</DialogTitle>
           </DialogHeader>
           <BulkPriceEditor
             onClose={() => setIsBulkPriceDialogOpen(false)}
@@ -1243,12 +1273,12 @@ const handleBulkPriceUpdate = async (updateData: any) => {
 
       {/* Диалог владельца */}
       <Dialog open={isQuickOwnerDialogOpen} onOpenChange={setIsQuickOwnerDialogOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Владелец: {quickOwnerCar?.name}</DialogTitle>
+        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-md sm:rounded-xl overflow-y-auto p-3 sm:p-6">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-lg sm:text-xl">Владелец: {quickOwnerCar?.name}</DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4 p-4">
+          <div className="space-y-3 sm:space-y-4 p-0">
             <div className="space-y-2">
               <Label>Владелец *</Label>
               <Select
@@ -1368,17 +1398,17 @@ const handleBulkPriceUpdate = async (updateData: any) => {
 
       {/* ✅ Диалог управления владельцами */}
       <Dialog open={isOwnersManagementOpen} onOpenChange={setIsOwnersManagementOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+        <DialogContent className="w-full h-full max-h-[100dvh] sm:max-w-3xl sm:rounded-xl overflow-y-auto p-3 sm:p-6">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <Users className="h-5 w-5" />
               Управление владельцами
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6 p-4">
+          <div className="space-y-4 sm:space-y-6 p-0">
             {/* Форма создания нового владельца */}
-            <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+            <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
               <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
                 <Plus className="h-4 w-4" />
                 Добавить нового владельца
@@ -1524,13 +1554,26 @@ const handleBulkPriceUpdate = async (updateData: any) => {
                             </p>
                           </div>
                           
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setSelectedOwnerForEdit({ ...owner })}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedOwnerForEdit({ ...owner })}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => {
+                                if (confirm(`Удалить владельца ${owner.name}?`)) {
+                                  handleDeleteOwner(owner.id);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </CardContent>
