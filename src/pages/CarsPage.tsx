@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback, memo } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Car, Users, AlertCircle, Plus, Edit, Trash2, LogOut, Check, X, Fuel, Settings, Zap, Bike, TrendingUp, TrendingDown, User, Calendar as CalendarIcon, DollarSign, UserPlus } from "lucide-react";
+import { Car, Users, AlertCircle, Plus, Edit, Trash2, LogOut, Check, X, Fuel, Settings, Zap, Bike, TrendingUp, TrendingDown, User, Calendar as CalendarIcon, DollarSign, UserPlus, ChevronRight, Tag, Wrench, Sun, Cloud, Wallet, Phone, Facebook, Hash, FileText, ToggleLeft, ToggleRight } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format, addDays } from "date-fns";
@@ -22,45 +22,126 @@ import logo from '@/assets/logo.png';
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const ADMIN_KEY = "sunny2025";
 
-// Компонент массового изменения цен
+// ─── SHEET HEADER ──────────────────────────────────────────────────────────────
+function SheetSectionHeader({ icon: Icon, title, subtitle }: { icon: any; title: string; subtitle?: string }) {
+  return (
+    <div className="flex items-center gap-3 px-5 py-4 border-b bg-white">
+      <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+        <Icon className="h-4.5 w-4.5 text-blue-600" />
+      </div>
+      <div>
+        <p className="text-[15px] font-semibold text-gray-900 leading-tight">{title}</p>
+        {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
+      </div>
+    </div>
+  );
+}
+
+// ─── SECTION DIVIDER ───────────────────────────────────────────────────────────
+function SectionBlock({ title, icon: Icon, color = "blue", children }: { title: string; icon?: any; color?: "blue" | "orange" | "purple" | "green"; children: React.ReactNode }) {
+  const colors = {
+    blue:   "bg-blue-50 border-blue-200 text-blue-700",
+    orange: "bg-orange-50 border-orange-200 text-orange-700",
+    purple: "bg-purple-50 border-purple-200 text-purple-700",
+    green:  "bg-green-50 border-green-200 text-green-700",
+  };
+  return (
+    <div className={`rounded-xl border p-4 space-y-3 ${colors[color]}`}>
+      <div className="flex items-center gap-2 mb-1">
+        {Icon && <Icon className="h-4 w-4" />}
+        <span className="text-sm font-semibold">{title}</span>
+      </div>
+      <div className="text-gray-800">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─── FIELD ROW ─────────────────────────────────────────────────────────────────
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</Label>
+      {children}
+    </div>
+  );
+}
+
+// ─── SHEET ACTION BUTTONS ──────────────────────────────────────────────────────
+function SheetActions({ onSave, onCancel, saveLabel = "Сохранить", disabled = false, isProcessing = false }) {
+  return (
+    <div className="sticky bottom-0 bg-white border-t px-5 py-4 flex gap-3">
+      <Button
+        variant="outline"
+        onClick={onCancel}
+        disabled={isProcessing}
+        className="flex-1 h-11 rounded-xl border-gray-200 text-gray-600"
+      >
+        <X className="h-4 w-4 mr-2" />
+        Отмена
+      </Button>
+      <Button
+        onClick={onSave}
+        disabled={disabled || isProcessing}
+        className="flex-1 h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+      >
+        <Check className="h-4 w-4 mr-2" />
+        {isProcessing ? "Сохраняю..." : saveLabel}
+      </Button>
+    </div>
+  );
+}
+
+// ─── STABLE VALUE INPUT (memo — не перерендеривается при смене category/season) ─
+const AdjustmentInput = memo(function AdjustmentInput({ value, onChange, step }: {
+  value: string;
+  onChange: (v: string) => void;
+  step: number;
+}) {
+  return (
+    <Input
+      type="number"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="h-11 text-center text-xl font-bold rounded-xl border-gray-200"
+      step={step}
+      inputMode="decimal"
+    />
+  );
+});
+
+// ─── BULK PRICE EDITOR ─────────────────────────────────────────────────────────
 function BulkPriceEditor({ onClose, onSave }) {
   const [category, setCategory] = useState('all');
   const [adjustmentType, setAdjustmentType] = useState('percent');
-  const [adjustmentValue, setAdjustmentValue] = useState<number>(0);
+  const [adjustmentValue, setAdjustmentValue] = useState<string>("0");
   const [season, setSeason] = useState('both');
   const [isProcessing, setIsProcessing] = useState(false);
   const [carOwnersMap, setCarOwnersMap] = useState<Record<string, object>>({});
 
-
-const tg = window.Telegram?.WebApp;
-const user = tg?.initDataUnsafe?.user;
+  const tg = window.Telegram?.WebApp;
+  const user = tg?.initDataUnsafe?.user;
   useEffect(() => {
     if (tg) tg.ready();
     if (user) {
       setCarOwnersMap(prev => ({
         ...prev,
-        telegramUser: {
-          id: user.id,
-          name: user.username || user.first_name || ""
-        }
+        telegramUser: { id: user.id, name: user.username || user.first_name || "" }
       }));
     }
   }, [user]);
 
-  const handleApply = async () => {
-    if (adjustmentValue === 0) {
-      alert('Введите значение изменения');
-      return;
-    }
+  const adjustmentValueNum = parseFloat(adjustmentValue) || 0;
 
+  // useCallback — стабильная ссылка, memo-компонент не перерендеривается
+  const handleValueChange = useCallback((v: string) => setAdjustmentValue(v), []);
+
+  const handleApply = async () => {
+    if (adjustmentValueNum === 0) { alert('Введите значение изменения'); return; }
     setIsProcessing(true);
     try {
-      await onSave({
-        category,
-        adjustment_type: adjustmentType,
-        adjustment_value: adjustmentValue,
-        season
-      });
+      await onSave({ category, adjustment_type: adjustmentType, adjustment_value: adjustmentValueNum, season });
       onClose();
     } catch (error) {
       console.error('Error applying bulk price update:', error);
@@ -71,140 +152,135 @@ const user = tg?.initDataUnsafe?.user;
   };
 
   return (
-    <div className="space-y-6 p-4">
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <p className="text-sm text-yellow-800 font-semibold">
-          ⚠️ Это действие изменит цены для всех машин выбранной категории!
-        </p>
-      </div>
+    <div className="flex flex-col h-full">
+      <SheetSectionHeader icon={TrendingUp} title="Массовое изменение цен" subtitle="Изменяет цены для всех машин категории" />
 
-      <div className="space-y-2">
-        <Label className="text-sm font-bold">Категория</Label>
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Все категории</SelectItem>
-            <SelectItem value="compact">Компакт</SelectItem>
-            <SelectItem value="sedan">Седаны</SelectItem>
-            <SelectItem value="suv">SUV</SelectItem>
-            <SelectItem value="7s">7 мест</SelectItem>
-            <SelectItem value="bikes">Байки</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-sm font-bold">Сезон</Label>
-        <Select value={season} onValueChange={setSeason}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="both">Оба сезона</SelectItem>
-            <SelectItem value="low_season">Низкий сезон</SelectItem>
-            <SelectItem value="high_season">Высокий сезон</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-sm font-bold">Тип изменения</Label>
-        <Select value={adjustmentType} onValueChange={setAdjustmentType}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="percent">Процент (%)</SelectItem>
-            <SelectItem value="fixed">Фиксированная сумма (฿)</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-sm font-bold">
-          Значение {adjustmentType === 'percent' ? '(%)' : '(฿)'}
-        </Label>
-        <div className="flex gap-2 items-center">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setAdjustmentValue(adjustmentValue - (adjustmentType === 'percent' ? 5 : 50))}
-          >
-            <TrendingDown className="h-4 w-4" />
-          </Button>
-          <Input
-            type="number"
-            value={adjustmentValue}
-            onChange={(e) => setAdjustmentValue(parseFloat(e.target.value) || 0)}
-            className="text-center text-lg font-bold"
-            step={adjustmentType === 'percent' ? 5 : 50}
-          />
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setAdjustmentValue(adjustmentValue + (adjustmentType === 'percent' ? 5 : 50))}
-          >
-            <TrendingUp className="h-4 w-4" />
-          </Button>
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+        {/* Warning */}
+        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 font-medium leading-snug">
+            Это действие изменит цены для всех машин выбранной категории
+          </p>
         </div>
-        <p className="text-xs text-muted-foreground">
-          {adjustmentType === 'percent'
-            ? `${adjustmentValue > 0 ? 'Увеличение' : 'Уменьшение'} на ${Math.abs(adjustmentValue)}%`
-            : `${adjustmentValue > 0 ? 'Добавить' : 'Вычесть'} ${Math.abs(adjustmentValue)}฿`
-          }
-        </p>
+
+        <FieldRow label="Категория">
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className="h-11 rounded-xl border-gray-200"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Все категории</SelectItem>
+              <SelectItem value="compact">Компакт</SelectItem>
+              <SelectItem value="sedan">Седаны</SelectItem>
+              <SelectItem value="suv">SUV</SelectItem>
+              <SelectItem value="7s">7 мест</SelectItem>
+              <SelectItem value="bikes">Байки</SelectItem>
+            </SelectContent>
+          </Select>
+        </FieldRow>
+
+        <FieldRow label="Сезон">
+          <Select value={season} onValueChange={setSeason}>
+            <SelectTrigger className="h-11 rounded-xl border-gray-200"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="both">Оба сезона</SelectItem>
+              <SelectItem value="low_season">🌤 Низкий сезон</SelectItem>
+              <SelectItem value="high_season">☀️ Высокий сезон</SelectItem>
+            </SelectContent>
+          </Select>
+        </FieldRow>
+
+        <FieldRow label="Тип изменения">
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { value: 'percent', label: 'Процент', icon: '%' },
+              { value: 'fixed', label: 'Сумма ฿', icon: '฿' }
+            ].map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => setAdjustmentType(opt.value)}
+                className={`h-11 rounded-xl border-2 text-sm font-semibold transition-all ${
+                  adjustmentType === opt.value
+                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </FieldRow>
+
+        <FieldRow label={`Значение ${adjustmentType === 'percent' ? '(%)' : '(฿)'}`}>
+          <div className="flex items-center gap-3">
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-11 w-11 rounded-xl shrink-0"
+              onClick={() => setAdjustmentValue(String((parseFloat(adjustmentValue) || 0) - (adjustmentType === 'percent' ? 5 : 50)))}
+            >
+              <TrendingDown className="h-4 w-4" />
+            </Button>
+            <div className="relative flex-1">
+              <AdjustmentInput
+                value={adjustmentValue}
+                onChange={handleValueChange}
+                step={adjustmentType === 'percent' ? 5 : 50}
+              />
+            </div>
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-11 w-11 rounded-xl shrink-0"
+              onClick={() => setAdjustmentValue(String((parseFloat(adjustmentValue) || 0) + (adjustmentType === 'percent' ? 5 : 50)))}
+            >
+              <TrendingUp className="h-4 w-4" />
+            </Button>
+          </div>
+          <p className="text-xs text-gray-400 text-center mt-1">
+            {adjustmentValueNum > 0 ? '↑ Увеличение' : '↓ Уменьшение'} на {Math.abs(adjustmentValueNum)}{adjustmentType === 'percent' ? '%' : '฿'}
+          </p>
+        </FieldRow>
       </div>
 
-      <div className="flex gap-2 pt-4">
-        <Button
-          onClick={handleApply}
-          disabled={isProcessing || adjustmentValue === 0}
-          className="flex-1"
-        >
-          {isProcessing ? 'Применяю...' : 'Применить изменения'}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={onClose}
-          disabled={isProcessing}
-        >
-          Отмена
-        </Button>
-      </div>
+      <SheetActions
+        onSave={handleApply}
+        onCancel={onClose}
+        saveLabel="Применить"
+        disabled={adjustmentValueNum === 0}
+        isProcessing={isProcessing}
+      />
     </div>
   );
 }
 
-// Компонент отображения спецификаций
+// ─── SPECS BADGES ──────────────────────────────────────────────────────────────
 function SpecsBadges({ specs }) {
   if (!specs) return null;
-
   return (
     <div className="flex flex-wrap gap-1">
       {specs.fuel && (
         <Badge variant="outline" className="text-xs px-2 py-0.5">
-          <Fuel className="h-3 w-3 mr-1" />
-          {specs.fuel}
+          <Fuel className="h-3 w-3 mr-1" />{specs.fuel}
         </Badge>
       )}
       {specs.transmission && (
         <Badge variant="outline" className="text-xs px-2 py-0.5">
-          <Settings className="h-3 w-3 mr-1" />
-          {specs.transmission}
+          <Settings className="h-3 w-3 mr-1" />{specs.transmission}
         </Badge>
       )}
       {specs.power && (
         <Badge variant="outline" className="text-xs px-2 py-0.5">
-          <Zap className="h-3 w-3 mr-1" />
-          {specs.power}
+          <Zap className="h-3 w-3 mr-1" />{specs.power}
         </Badge>
       )}
       {specs.engine && (
-        <Badge variant="outline" className="text-xs px-2 py-0.5">
-          {specs.engine}
-        </Badge>
+        <Badge variant="outline" className="text-xs px-2 py-0.5">{specs.engine}</Badge>
       )}
     </div>
   );
 }
 
-// Компонент редактирования спецификаций
+// ─── SPECS EDITOR ──────────────────────────────────────────────────────────────
 function SpecsEditor({ car, onSave, onCancel }) {
   const [specs, setSpecs] = useState({
     fuel: car.specs?.fuel || "Бензин",
@@ -213,83 +289,85 @@ function SpecsEditor({ car, onSave, onCancel }) {
     engine: car.specs?.engine || ""
   });
 
-  const handleChange = (field, value) => {
-    setSpecs(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSave = () => {
-    onSave({ ...car, specs });
-  };
+  const handleChange = (field, value) => setSpecs(prev => ({ ...prev, [field]: value }));
+  const handleSave = () => onSave({ ...car, specs });
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="space-y-2">
-        <Label className="text-xs font-medium text-gray-700">Топливо</Label>
-        <Select value={specs.fuel} onValueChange={(value) => handleChange('fuel', value)}>
-          <SelectTrigger className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Бензин">Бензин</SelectItem>
-            <SelectItem value="Дизель">Дизель</SelectItem>
-            <SelectItem value="Электро">Электро</SelectItem>
-            <SelectItem value="Гибрид">Гибрид</SelectItem>
-          </SelectContent>
-        </Select>
+    <div className="flex flex-col h-full">
+      <SheetSectionHeader icon={Wrench} title="Характеристики" subtitle={`${car.brand} ${car.model}`} />
+
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+        <FieldRow label="Топливо">
+          <div className="grid grid-cols-2 gap-2">
+            {['Бензин', 'Дизель', 'Электро', 'Гибрид'].map(f => (
+              <button
+                key={f}
+                onClick={() => handleChange('fuel', f)}
+                className={`h-11 rounded-xl border-2 text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                  specs.fuel === f
+                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                }`}
+              >
+                <Fuel className="h-3.5 w-3.5" />
+                {f}
+              </button>
+            ))}
+          </div>
+        </FieldRow>
+
+        <FieldRow label="Коробка передач">
+          <div className="grid grid-cols-2 gap-2">
+            {['Автомат', 'Механика', 'CVT', 'Робот'].map(t => (
+              <button
+                key={t}
+                onClick={() => handleChange('transmission', t)}
+                className={`h-11 rounded-xl border-2 text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                  specs.transmission === t
+                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                }`}
+              >
+                <Settings className="h-3.5 w-3.5" />
+                {t}
+              </button>
+            ))}
+          </div>
+        </FieldRow>
+
+        <FieldRow label="Мощность (л.с.)">
+          <div className="relative">
+            <Zap className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              value={specs.power}
+              onChange={(e) => handleChange('power', e.target.value)}
+              placeholder="91 л.с."
+              className="h-11 pl-10 rounded-xl border-gray-200"
+            />
+          </div>
+        </FieldRow>
+
+        <FieldRow label="Объём двигателя">
+          <div className="relative">
+            <Settings className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              value={specs.engine}
+              onChange={(e) => handleChange('engine', e.target.value)}
+              placeholder="1.2L"
+              className="h-11 pl-10 rounded-xl border-gray-200"
+            />
+          </div>
+        </FieldRow>
       </div>
 
-      <div className="space-y-2">
-        <Label className="text-xs font-medium text-gray-700">Коробка передач</Label>
-        <Select value={specs.transmission} onValueChange={(value) => handleChange('transmission', value)}>
-          <SelectTrigger className="h-9">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Автомат">Автомат</SelectItem>
-            <SelectItem value="Механика">Механика</SelectItem>
-            <SelectItem value="CVT">Вариатор</SelectItem>
-            <SelectItem value="Робот">Робот</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-xs font-medium text-gray-700">Мощность (л.с.)</Label>
-        <Input
-          type="text"
-          value={specs.power}
-          onChange={(e) => handleChange('power', e.target.value)}
-          placeholder="91 л.с."
-          className="h-9"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label className="text-xs font-medium text-gray-700">Объем двигателя</Label>
-        <Input
-          type="text"
-          value={specs.engine}
-          onChange={(e) => handleChange('engine', e.target.value)}
-          placeholder="1.2L"
-          className="h-9"
-        />
-      </div>
-
-      <div className="flex gap-2 pt-2">
-        <Button size="sm" onClick={handleSave} className="flex-1 h-9">
-          <Check className="h-4 w-4 mr-2" />
-          Сохранить
-        </Button>
-        <Button size="sm" variant="outline" onClick={onCancel} className="flex-1 h-9">
-          <X className="h-4 w-4 mr-2" />
-          Отмена
-        </Button>
-      </div>
+      <SheetActions onSave={handleSave} onCancel={onCancel} />
     </div>
   );
 }
 
-// Компонент редактирования цен
+// ─── PRICE EDITOR ──────────────────────────────────────────────────────────────
 function PriceEditor({ car, onSave, onCancel }) {
   const [prices, setPrices] = useState({
     low_season: {
@@ -309,108 +387,81 @@ function PriceEditor({ car, onSave, onCancel }) {
 
   const handleChange = (season, period, value) => {
     const numValue = parseInt(value) || 0;
-    setPrices(prev => ({
-      ...prev,
-      [season]: {
-        ...prev[season],
-        [period]: numValue
-      }
-    }));
+    setPrices(prev => ({ ...prev, [season]: { ...prev[season], [period]: numValue } }));
   };
 
   const handleDepositChange = (value) => {
-    const numValue = parseInt(value) || 0;
-    setPrices(prev => ({
-      ...prev,
-      deposit: numValue
-    }));
+    setPrices(prev => ({ ...prev, deposit: parseInt(value) || 0 }));
   };
 
-  const handleSave = () => {
-    onSave({ ...car, pricing: { ...car.pricing, ...prices } });
-  };
+  const handleSave = () => onSave({ ...car, pricing: { ...car.pricing, ...prices } });
 
   const periods = [
-    { key: 'price_1_6', label: '1-6 дней', placeholder: '800' },
-    { key: 'price_7_14', label: '7-14 дней', placeholder: '700' },
-    { key: 'price_15_29', label: '15-29 дней', placeholder: '650' },
-    { key: 'price_30', label: '30+ дней', placeholder: '550' }
+    { key: 'price_1_6', label: '1–6 дней' },
+    { key: 'price_7_14', label: '7–14 дней' },
+    { key: 'price_15_29', label: '15–29 дней' },
+    { key: 'price_30', label: '30+ дней' }
   ];
 
+  const PriceGrid = ({ seasonKey, label, icon: Icon, color }) => (
+    <div className={`rounded-xl border p-4 space-y-3 ${
+      color === 'blue' ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-200'
+    }`}>
+      <div className={`flex items-center gap-2 text-sm font-semibold ${
+        color === 'blue' ? 'text-blue-700' : 'text-orange-700'
+      }`}>
+        <Icon className="h-4 w-4" />
+        {label}
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        {periods.map(({ key, label }) => (
+          <div key={key} className="space-y-1">
+            <p className="text-[11px] text-gray-500 font-medium">{label}</p>
+            <div className="relative">
+              <Input
+                type="number"
+                value={prices[seasonKey][key]}
+                onChange={(e) => handleChange(seasonKey, key, e.target.value)}
+                className="h-10 pr-7 text-sm rounded-lg border-white bg-white shadow-sm"
+                min="0"
+                step="50"
+              />
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">฿</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="p-4 space-y-4">
-      <div className="space-y-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-        <div className="text-sm font-bold text-gray-800">🌤️ Низкий сезон</div>
-        <div className="grid grid-cols-2 gap-3">
-          {periods.map(({ key, label, placeholder }) => (
-            <div key={key} className="space-y-1.5">
-              <Label className="text-xs font-medium text-gray-700">{label}</Label>
-              <div className="relative">
-                <Input
-                  type="number"
-                  value={prices.low_season[key]}
-                  onChange={(e) => handleChange('low_season', key, e.target.value)}
-                  placeholder={placeholder}
-                  className="h-10 pr-8 text-sm"
-                  min="0"
-                  step="50"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">฿</span>
-              </div>
-            </div>
-          ))}
+    <div className="flex flex-col h-full">
+      <SheetSectionHeader icon={DollarSign} title="Цены" subtitle={`${car.brand} ${car.model}`} />
+
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+        <PriceGrid seasonKey="low_season" label="Низкий сезон" icon={Cloud} color="blue" />
+        <PriceGrid seasonKey="high_season" label="Высокий сезон" icon={Sun} color="orange" />
+
+        <div className="rounded-xl border border-purple-200 bg-purple-50 p-4">
+          <div className="flex items-center gap-2 text-sm font-semibold text-purple-700 mb-3">
+            <Wallet className="h-4 w-4" />
+            Депозит
+          </div>
+          <div className="relative">
+            <Input
+              type="number"
+              value={prices.deposit}
+              onChange={(e) => handleDepositChange(e.target.value)}
+              className="h-10 pr-7 text-sm rounded-lg border-white bg-white shadow-sm"
+              min="0"
+              step="500"
+            />
+            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">฿</span>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-3 p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border border-orange-200">
-        <div className="text-sm font-bold text-gray-800">☀️ Высокий сезон</div>
-        <div className="grid grid-cols-2 gap-3">
-          {periods.map(({ key, label, placeholder }) => (
-            <div key={key} className="space-y-1.5">
-              <Label className="text-xs font-medium text-gray-700">{label}</Label>
-              <div className="relative">
-                <Input
-                  type="number"
-                  value={prices.high_season[key]}
-                  onChange={(e) => handleChange('high_season', key, e.target.value)}
-                  placeholder={placeholder}
-                  className="h-10 pr-8 text-sm"
-                  min="0"
-                  step="50"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">฿</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-2 p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-        <Label className="text-sm font-bold text-gray-800">💰 Депозит</Label>
-        <div className="relative">
-          <Input
-            type="number"
-            value={prices.deposit}
-            onChange={(e) => handleDepositChange(e.target.value)}
-            placeholder="5000"
-            className="h-10 pr-8 text-sm"
-            min="0"
-            step="500"
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">฿</span>
-        </div>
-      </div>
-
-      <div className="flex gap-2 pt-2">
-        <Button size="sm" onClick={handleSave} className="flex-1 h-10">
-          <Check className="h-4 w-4 mr-2" />
-          Сохранить
-        </Button>
-        <Button size="sm" variant="outline" onClick={onCancel} className="flex-1 h-10">
-          <X className="h-4 w-4 mr-2" />
-          Отмена
-        </Button>
-      </div>
+      <SheetActions onSave={handleSave} onCancel={onCancel} />
     </div>
   );
 }
@@ -423,18 +474,14 @@ export default function CarsPage({ userId }: CarsPageProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
-  // User ID - update when URL changes
+
   const [targetUserId, setTargetUserId] = useState(userId || '');
   useEffect(() => {
     const urlUserId = searchParams.get('user_id');
-    if (urlUserId) {
-      setTargetUserId(urlUserId);
-    } else if (userId) {
-      setTargetUserId(userId);
-    }
+    if (urlUserId) setTargetUserId(urlUserId);
+    else if (userId) setTargetUserId(userId);
   }, [searchParams, userId]);
-  
+
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -457,22 +504,15 @@ export default function CarsPage({ userId }: CarsPageProps) {
   });
   const [isOwnersManagementOpen, setIsOwnersManagementOpen] = useState(false);
   const [selectedOwnerForEdit, setSelectedOwnerForEdit] = useState(null);
-  const [newOwnerData, setNewOwnerData] = useState({
-    id: "",
-    name: "",
-    contact: "",
-    facebook_url: ""
-  });
+  const [newOwnerData, setNewOwnerData] = useState({ id: "", name: "", contact: "", facebook_url: "" });
   const [creatingOwner, setCreatingOwner] = useState(false);
 
-  // ✅ Фильтры
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedOwner, setSelectedOwner] = useState("all");
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(new Date(), 7));
 
   const { refetchCars: refetchGlobalCars } = useCars();
-
   const isAdmin = searchParams.get("key") === ADMIN_KEY;
 
   useEffect(() => {
@@ -483,13 +523,8 @@ export default function CarsPage({ userId }: CarsPageProps) {
   const fetchOwners = async () => {
     try {
       const res = await fetch(`${API_URL}/api/car-owners`);
-      if (res.ok) {
-        const data = await res.json();
-        setOwners(data.owners || []);
-      }
-    } catch (error) {
-      console.error("Error fetching owners:", error);
-    }
+      if (res.ok) { const data = await res.json(); setOwners(data.owners || []); }
+    } catch (error) { console.error("Error fetching owners:", error); }
   };
 
   const getOwnerForCar = (carId: string) => {
@@ -502,314 +537,162 @@ export default function CarsPage({ userId }: CarsPageProps) {
   };
 
   const handleQuickOwnerSave = async () => {
-    if (!quickOwnerFormData.owner_id || !quickOwnerCar) {
-      alert('Выберите владельца');
-      return;
-    }
-
+    if (!quickOwnerFormData.owner_id || !quickOwnerCar) { alert('Выберите владельца'); return; }
     try {
-      const res = await fetch(
-        `${API_URL}/api/admin/cars/${quickOwnerCar.id}/owner-info?key=${ADMIN_KEY}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            owner_id: quickOwnerFormData.owner_id,
-            facebook_url: quickOwnerFormData.facebook_url || null,
-            available_until: quickOwnerFormData.available_until || null,
-            notes: quickOwnerFormData.notes || [],
-            status: quickOwnerFormData.status
-          })
-        }
-      );
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || "Ошибка сохранения");
-      }
-
+      const res = await fetch(`${API_URL}/api/admin/cars/${quickOwnerCar.id}/owner-info?key=${ADMIN_KEY}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          owner_id: quickOwnerFormData.owner_id,
+          facebook_url: quickOwnerFormData.facebook_url || null,
+          available_until: quickOwnerFormData.available_until || null,
+          notes: quickOwnerFormData.notes || [],
+          status: quickOwnerFormData.status
+        })
+      });
+      if (!res.ok) { const err = await res.json(); throw new Error(err.detail || "Ошибка сохранения"); }
       alert('Данные владельца сохранены!');
-      await fetchOwners();
-      await fetchCars();
-      setIsQuickOwnerDialogOpen(false);
-    } catch (err) {
-      alert(`Ошибка: ${err.message}`);
-    }
+      await fetchOwners(); await fetchCars(); setIsQuickOwnerDialogOpen(false);
+    } catch (err) { alert(`Ошибка: ${err.message}`); }
   };
 
   const handleCreateOwner = async () => {
-    if (!newOwnerData.id || !newOwnerData.name || !newOwnerData.contact) {
-      alert("ID, имя и контакт обязательны");
-      return;
-    }
-
+    if (!newOwnerData.id || !newOwnerData.name || !newOwnerData.contact) { alert("ID, имя и контакт обязательны"); return; }
     setCreatingOwner(true);
     try {
       const res = await fetch(`${API_URL}/api/admin/car-owners?key=${ADMIN_KEY}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: newOwnerData.id,
-          name: newOwnerData.name,
-          contact: newOwnerData.contact,
-          facebook_url: newOwnerData.facebook_url || null
-        })
+        body: JSON.stringify({ id: newOwnerData.id, name: newOwnerData.name, contact: newOwnerData.contact, facebook_url: newOwnerData.facebook_url || null })
       });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || "Ошибка создания владельца");
-      }
-
+      if (!res.ok) { const err = await res.json(); throw new Error(err.detail || "Ошибка создания владельца"); }
       alert("Владелец создан!");
-      await fetchOwners();
-      setNewOwnerData({ id: "", name: "", contact: "", facebook_url: "" });
-    } catch (err) {
-      alert(`Ошибка: ${err.message}`);
-    } finally {
-      setCreatingOwner(false);
-    }
+      await fetchOwners(); setNewOwnerData({ id: "", name: "", contact: "", facebook_url: "" });
+    } catch (err) { alert(`Ошибка: ${err.message}`); } finally { setCreatingOwner(false); }
   };
 
   const handleUpdateOwner = async () => {
     if (!selectedOwnerForEdit) return;
-
     try {
       const res = await fetch(`${API_URL}/api/admin/car-owners/${selectedOwnerForEdit.id}?key=${ADMIN_KEY}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: selectedOwnerForEdit.name,
-          contact: selectedOwnerForEdit.contact,
-          facebook_url: selectedOwnerForEdit.facebook_url || null
-        })
+        body: JSON.stringify({ name: selectedOwnerForEdit.name, contact: selectedOwnerForEdit.contact, facebook_url: selectedOwnerForEdit.facebook_url || null })
       });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || "Ошибка обновления");
-      }
-
-      alert("Владелец обновлен!");
-      await fetchOwners();
-      setSelectedOwnerForEdit(null);
-    } catch (err) {
-      alert(`Ошибка: ${err.message}`);
-    }
+      if (!res.ok) { const err = await res.json(); throw new Error(err.detail || "Ошибка обновления"); }
+      alert("Владелец обновлен!"); await fetchOwners(); setSelectedOwnerForEdit(null);
+    } catch (err) { alert(`Ошибка: ${err.message}`); }
   };
 
   const handleDeleteOwner = async (ownerId: string) => {
     if (!confirm("Удалить владельца? Все его машины будут перемещены в 'Не назначен'.")) return;
-    
     try {
-      const res = await fetch(`${API_URL}/api/admin/car-owners/${ownerId}?key=${ADMIN_KEY}`, {
-        method: "DELETE"
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || "Ошибка удаления");
-      }
-
-      alert("Владелец удален!");
-      await fetchOwners();
-      setSelectedOwnerForEdit(null);
-    } catch (err) {
-      alert(`Ошибка: ${err.message}`);
-    }
+      const res = await fetch(`${API_URL}/api/admin/car-owners/${ownerId}?key=${ADMIN_KEY}`, { method: "DELETE" });
+      if (!res.ok) { const err = await res.json(); throw new Error(err.detail || "Ошибка удаления"); }
+      alert("Владелец удален!"); await fetchOwners(); setSelectedOwnerForEdit(null);
+    } catch (err) { alert(`Ошибка: ${err.message}`); }
   };
 
   const fetchCars = async () => {
     try {
-      if (cars.length === 0) {
-        setLoading(true);
-      }
+      if (cars.length === 0) setLoading(true);
       const endpoint = isAdmin ? `/api/admin/cars?key=${ADMIN_KEY}` : `/api/cars`;
       const res = await fetch(`${API_URL}${endpoint}`);
       if (!res.ok) throw new Error("Не удалось загрузить машины");
       const data = await res.json();
-      
       const carsList = isAdmin ? Object.values(data.cars || {}) : (data.cars || []);
       setCars(carsList);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { setError(err.message); } finally { setLoading(false); }
   };
 
   const getImageUrl = (path, lastUpdated) => {
     if (!path) return "/placeholder.svg";
     if (path.startsWith("http")) return path;
-
-    const cacheBuster = lastUpdated 
-      ? new Date(lastUpdated).getTime() 
-      : Date.now();
-
-    if (path.startsWith("images_web/")) {
-      return `${API_URL}/${path}?v=${cacheBuster}`;
-    }
-
+    const cacheBuster = lastUpdated ? new Date(lastUpdated).getTime() : Date.now();
+    if (path.startsWith("images_web/")) return `${API_URL}/${path}?v=${cacheBuster}`;
     return `${API_URL}/images_web/${path}?v=${cacheBuster}`;
   };
 
   const handleSave = async (car) => {
     const method = editingCar ? "PUT" : "POST";
-    const url = editingCar 
-      ? `${API_URL}/api/admin/cars/${car.id}?key=${ADMIN_KEY}`
-      : `${API_URL}/api/admin/cars?key=${ADMIN_KEY}`;
-    
+    const url = editingCar ? `${API_URL}/api/admin/cars/${car.id}?key=${ADMIN_KEY}` : `${API_URL}/api/admin/cars?key=${ADMIN_KEY}`;
     try {
-      await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(car),
-      });
-      
-      await fetchCars();
-      refetchGlobalCars();
-      setIsDialogOpen(false);
-      setEditingCar(null);
-    } catch (error) {
-      console.error("Error saving car:", error);
-    }
+      await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(car) });
+      await fetchCars(); refetchGlobalCars(); setIsDialogOpen(false); setEditingCar(null);
+    } catch (error) { console.error("Error saving car:", error); }
   };
 
   const handlePriceSave = async (updatedCar) => {
     try {
       await fetch(`${API_URL}/api/admin/cars/${updatedCar.id}?key=${ADMIN_KEY}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedCar),
+        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedCar)
       });
-      
       setCars(prev => prev.map(c => c.id === updatedCar.id ? updatedCar : c));
-      refetchGlobalCars();
-      setEditingPriceId(null);
-      setIsPriceDialogOpen(false);
-    } catch (error) {
-      console.error("Error updating prices:", error);
-    }
+      refetchGlobalCars(); setEditingPriceId(null); setIsPriceDialogOpen(false);
+    } catch (error) { console.error("Error updating prices:", error); }
   };
 
   const handleSpecsSave = async (updatedCar) => {
     try {
       await fetch(`${API_URL}/api/admin/cars/${updatedCar.id}?key=${ADMIN_KEY}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedCar),
+        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedCar)
       });
-      
       setCars(prev => prev.map(c => c.id === updatedCar.id ? updatedCar : c));
-      refetchGlobalCars();
-      setEditingSpecsId(null);
-      setIsSpecsDialogOpen(false);
-    } catch (error) {
-      console.error("Error updating specs:", error);
-    }
+      refetchGlobalCars(); setEditingSpecsId(null); setIsSpecsDialogOpen(false);
+    } catch (error) { console.error("Error updating specs:", error); }
   };
 
   const handleDelete = async (id) => {
     if (!confirm("Удалить машину?")) return;
-    
     try {
-      await fetch(`${API_URL}/api/admin/cars/${id}?key=${ADMIN_KEY}`, { 
-        method: "DELETE" 
-      });
-      await fetchCars();
-      refetchGlobalCars();
-    } catch (error) {
-      console.error("Error deleting car:", error);
-    }
+      await fetch(`${API_URL}/api/admin/cars/${id}?key=${ADMIN_KEY}`, { method: "DELETE" });
+      await fetchCars(); refetchGlobalCars();
+    } catch (error) { console.error("Error deleting car:", error); }
   };
 
   const handleToggleAvailability = async (car) => {
     try {
       const updatedCar = { ...car, available: !car.available };
       await fetch(`${API_URL}/api/admin/cars/${car.id}?key=${ADMIN_KEY}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedCar),
+        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedCar)
       });
-
       setCars(prev => prev.map(c => c.id === car.id ? updatedCar : c));
       refetchGlobalCars();
-    } catch (error) {
-      console.error("Error toggling availability:", error);
-    }
+    } catch (error) { console.error("Error toggling availability:", error); }
   };
 
   const handleBulkPriceUpdate = async (updateData) => {
     try {
       const response = await fetch(`${API_URL}/api/admin/bulk-price-update?key=${ADMIN_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updateData),
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updateData)
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to update prices");
-      }
-
+      if (!response.ok) throw new Error("Failed to update prices");
       const result = await response.json();
       alert(`✅ ${result.message}`);
-
-      await fetchCars();
-      refetchGlobalCars();
-      setIsBulkPriceDialogOpen(false);
-    } catch (error) {
-      console.error("Error in bulk price update:", error);
-      throw error;
-    }
+      await fetchCars(); refetchGlobalCars(); setIsBulkPriceDialogOpen(false);
+    } catch (error) { console.error("Error in bulk price update:", error); throw error; }
   };
 
-  // Handle offer button click - navigate to offer admin page with user_id
   const handleOfferClick = (car: any) => {
     const startDateStr = startDate ? format(startDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
     const endDateStr = endDate ? format(endDate, 'yyyy-MM-dd') : format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd');
-    
     const params = new URLSearchParams();
-    params.set('car', car.id);
-    params.set('start', startDateStr);
-    params.set('end', endDateStr);
-    
-    if (targetUserId) {
-      params.set('user_id', targetUserId);
-    }
-    
+    params.set('car', car.id); params.set('start', startDateStr); params.set('end', endDateStr);
+    if (targetUserId) params.set('user_id', targetUserId);
     navigate(`/admin/offer?${params.toString()}`);
   };
 
   const filteredCars = useMemo(() => {
     let result = [...cars];
-
-    // Фильтр по категории (используем поле class)
-    if (selectedCategory !== "all") {
-      result = result.filter(car => car.class === selectedCategory);
-    }
-
-    // Фильтр по владельцу
-    if (selectedOwner !== "all") {
-      result = result.filter(car => {
-        const ownerInfo = getOwnerForCar(car.id);
-        return ownerInfo?.owner?.id === selectedOwner;
-      });
-    }
-
-    // Фильтр по датам
+    if (selectedCategory !== "all") result = result.filter(car => car.class === selectedCategory);
+    if (selectedOwner !== "all") result = result.filter(car => { const ownerInfo = getOwnerForCar(car.id); return ownerInfo?.owner?.id === selectedOwner; });
     if (startDate && endDate) {
       result = result.filter(car => {
         const ownerInfo = getOwnerForCar(car.id);
         if (!ownerInfo?.carInfo?.available_until) return true;
-        
-        const availableUntil = new Date(ownerInfo.carInfo.available_until);
-        return availableUntil <= startDate;
+        return new Date(ownerInfo.carInfo.available_until) <= startDate;
       });
     }
-
-    // ❌ УБРАЛИ ФИЛЬТР ПО ДОСТУПНОСТИ - он ломал брони!
-    // result = result.filter(car => car.available === true);
-
     return result;
   }, [cars, selectedCategory, selectedOwner, startDate, endDate, owners]);
 
@@ -846,53 +729,33 @@ export default function CarsPage({ userId }: CarsPageProps) {
     );
   }
 
+  // ─── shared sheet content wrapper classname ───────────────────────────────
+  const sheetCls = "h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom";
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* ✅ Компактный Sticky Header */}
+      {/* Sticky Header — не трогаем */}
       <div className="sticky top-0 z-50 bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto p-3">
-          {/* Строка 1: Заголовок + кнопки */}
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-2">
               <img src={logo} alt="" className="h-7 w-auto" />
               <span className="text-sm font-semibold text-gray-900">Парк</span>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsOwnersManagementOpen(true)}
-                className="h-8"
-              >
+              <Button variant="outline" size="sm" onClick={() => setIsOwnersManagementOpen(true)} className="h-8">
                 <UserPlus className="h-3 w-3" />
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsBulkPriceDialogOpen(true)}
-                className="h-8"
-              >
+              <Button variant="outline" size="sm" onClick={() => setIsBulkPriceDialogOpen(true)} className="h-8">
                 <TrendingUp className="h-3 w-3" />
               </Button>
               {(selectedCategory !== "all" || selectedOwner !== "all" || startDate || endDate) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedCategory("all");
-                    setSelectedOwner("all");
-                    setStartDate(new Date());
-                    setEndDate(addDays(new Date(), 7));
-                  }}
-                  className="h-8"
-                >
+                <Button variant="ghost" size="sm" onClick={() => { setSelectedCategory("all"); setSelectedOwner("all"); setStartDate(new Date()); setEndDate(addDays(new Date(), 7)); }} className="h-8">
                   <X className="h-3 w-3" />
                 </Button>
               )}
             </div>
           </div>
-
-          {/* Строка 2: Даты */}
           <div className="flex gap-2 mb-3">
             <Popover>
               <PopoverTrigger asChild>
@@ -902,17 +765,9 @@ export default function CarsPage({ userId }: CarsPageProps) {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={startDate}
-                  onSelect={setStartDate}
-                  locale={ru}
-                  initialFocus
-                  disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
-                />
+                <Calendar mode="single" selected={startDate} onSelect={setStartDate} locale={ru} initialFocus disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))} />
               </PopoverContent>
             </Popover>
-
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="h-8 flex-1 justify-start text-xs">
@@ -921,24 +776,13 @@ export default function CarsPage({ userId }: CarsPageProps) {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={endDate}
-                  onSelect={setEndDate}
-                  locale={ru}
-                  initialFocus
-                  disabled={(date) => date < new Date(new Date().setHours(0,0,0,0)) || (startDate ? date < startDate : false)}
-                />
+                <Calendar mode="single" selected={endDate} onSelect={setEndDate} locale={ru} initialFocus disabled={(date) => date < new Date(new Date().setHours(0,0,0,0)) || (startDate ? date < startDate : false)} />
               </PopoverContent>
             </Popover>
           </div>
-
-          {/* Строка 3: Категория и Владелец */}
           <div className="flex gap-2">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="h-8 text-xs bg-white border-gray-300 shrink-0 flex-1">
-                <SelectValue placeholder="Категория" />
-              </SelectTrigger>
+              <SelectTrigger className="h-8 text-xs bg-white border-gray-300 shrink-0 flex-1"><SelectValue placeholder="Категория" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Все категории</SelectItem>
                 <SelectItem value="compact">Компакт</SelectItem>
@@ -948,298 +792,152 @@ export default function CarsPage({ userId }: CarsPageProps) {
                 <SelectItem value="bikes">Байки</SelectItem>
               </SelectContent>
             </Select>
-
             <Select value={selectedOwner} onValueChange={setSelectedOwner}>
-              <SelectTrigger className="h-8 text-xs bg-white border-gray-300 shrink-0 flex-1">
-                <SelectValue placeholder="Владелец" />
-              </SelectTrigger>
+              <SelectTrigger className="h-8 text-xs bg-white border-gray-300 shrink-0 flex-1"><SelectValue placeholder="Владелец" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Все владельцы</SelectItem>
                 {owners.map((owner) => (
-                  <SelectItem key={owner.id} value={owner.id}>
-                    {owner.name}
-                  </SelectItem>
+                  <SelectItem key={owner.id} value={owner.id}>{owner.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-
-          {/* Счетчик */}
-          <p className="text-xs text-gray-500 mt-3">
-            Показано: {filteredCars.length} из {cars.length}
-          </p>
+          <p className="text-xs text-gray-500 mt-3">Показано: {filteredCars.length} из {cars.length}</p>
         </div>
       </div>
 
-      {/* ✅ Список машин (компактные вертикальные карточки) */}
+      {/* Car grid — не трогаем */}
       <div className="max-w-7xl mx-auto p-4">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {filteredCars.map((car) => {
             const ownerInfo = getOwnerForCar(car.id);
             const deposit = car.pricing?.deposit || 0;
-            
-            // ✅ Получаем текущий сезон (low: Апрель-Октябрь, high: остальное)
-            const getCurrentSeason = () => {
-              const month = new Date().getMonth() + 1; // 1-12
-              return (month >= 4 && month <= 10) ? 'low_season' : 'high_season';
-            };
+            const getCurrentSeason = () => { const month = new Date().getMonth() + 1; return (month >= 4 && month <= 10) ? 'low_season' : 'high_season'; };
             const currentSeason = getCurrentSeason();
             const seasonPrices = car.pricing?.[currentSeason] || {};
-            
-            // ✅ Две важные цены: 1-6 дней и 15-29 дней
             const price1_6 = seasonPrices.price_1_6 || 0;
             const price15_29 = seasonPrices.price_15_29 || 0;
 
             return (
               <Card key={car.id} className="overflow-hidden hover:shadow-md transition-shadow group relative">
-                {/* ✅ Фото */}
                 <div className="relative h-32 bg-muted">
-                  <img
-                    src={getImageUrl(car.photos?.main, car.updated_at)}
-                    alt={car.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = "/placeholder.svg";
-                    }}
-                  />
-                  
-                  {/* Бейдж владельца */}
+                  <img src={getImageUrl(car.photos?.main, car.updated_at)} alt={car.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
                   {ownerInfo && (
                     <div className="absolute top-2 left-2 bg-purple-500/95 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1 shadow-sm">
                       <User className="h-3 w-3 text-white" />
                       <span className="text-xs font-bold text-white">{ownerInfo.owner.id}</span>
                     </div>
                   )}
-
-                  {/* Дата доступности */}
                   {ownerInfo?.carInfo?.available_until && (
                     <div className="absolute top-2 right-2 bg-blue-500/95 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1 shadow-sm">
                       <CalendarIcon className="h-3 w-3 text-white" />
-                      <span className="text-[10px] font-medium text-white">
-                        {new Date(ownerInfo.carInfo.available_until).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })}
-                      </span>
+                      <span className="text-[10px] font-medium text-white">{new Date(ownerInfo.carInfo.available_until).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' })}</span>
                     </div>
                   )}
-
-                  {/* Админ кнопки */}
                   <div className="absolute bottom-2 right-2 flex gap-1">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => {
-                        setEditingCar(car);
-                        setIsDialogOpen(true);
-                      }}
-                    >
+                    <Button size="sm" variant="secondary" className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => { setEditingCar(car); setIsDialogOpen(true); }}>
                       <Edit className="h-3 w-3" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => handleDelete(car.id)}
-                    >
+                    <Button size="sm" variant="destructive" className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDelete(car.id)}>
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
-
-                {/* ✅ Контент */}
                 <CardContent className="p-3 space-y-2">
-                  {/* Название */}
                   <div>
-                    <h3 className="font-semibold text-sm leading-tight line-clamp-1">
-                      {car.brand} {car.model}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {car.year} • {car.color}
-                    </p>
+                    <h3 className="font-semibold text-sm leading-tight line-clamp-1">{car.brand} {car.model}</h3>
+                    <p className="text-xs text-muted-foreground">{car.year} • {car.color}</p>
                   </div>
-
-                  {/* ✅ Цены (1-6д и 15-29д) */}
                   <div className="flex items-center gap-1 text-xs font-semibold text-blue-600">
                     <DollarSign className="h-3 w-3" />
                     <span>{price1_6}฿ • {price15_29}฿</span>
                   </div>
-
-                  {/* ✅ 3 кнопки */}
                   <div className="flex items-center gap-1">
-                    {/* Кнопка Цены */}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 h-8 text-xs px-1"
-                      onClick={() => {
-                        setEditingPriceId(car.id);
-                        setIsPriceDialogOpen(true);
-                      }}
-                    >
+                    <Button size="sm" variant="outline" className="flex-1 h-8 text-xs px-1" onClick={() => { setEditingPriceId(car.id); setIsPriceDialogOpen(true); }}>
                       <DollarSign className="h-3 w-3" />
                     </Button>
-
-                    {/* Кнопка Характеристики */}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 h-8 text-xs px-1"
-                      onClick={() => {
-                        setEditingSpecsId(car.id);
-                        setIsSpecsDialogOpen(true);
-                      }}
-                    >
+                    <Button size="sm" variant="outline" className="flex-1 h-8 text-xs px-1" onClick={() => { setEditingSpecsId(car.id); setIsSpecsDialogOpen(true); }}>
                       <Settings className="h-3 w-3" />
                     </Button>
-
-                    {/* Кнопка Владелец */}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 h-8 text-xs px-1"
-                      onClick={() => {
-                        const ownerData = getOwnerForCar(car.id);
-                        setQuickOwnerCar(car);
-                        
-                        if (ownerData) {
-                          setQuickOwnerFormData({
-                            owner_id: ownerData.owner.id,
-                            facebook_url: ownerData.carInfo.facebook_url || "",
-                            available_until: ownerData.carInfo.available_until || "",
-                            notes: ownerData.carInfo.notes || [],
-                            status: ownerData.carInfo.status || "available"
-                          });
-                        } else {
-                          setQuickOwnerFormData({
-                            owner_id: "",
-                            facebook_url: "",
-                            available_until: "",
-                            notes: [],
-                            status: "available"
-                          });
-                        }
-                        
-                        setIsQuickOwnerDialogOpen(true);
-                      }}
-                    >
+                    <Button size="sm" variant="outline" className="flex-1 h-8 text-xs px-1" onClick={() => {
+                      const ownerData = getOwnerForCar(car.id);
+                      setQuickOwnerCar(car);
+                      if (ownerData) {
+                        setQuickOwnerFormData({ owner_id: ownerData.owner.id, facebook_url: ownerData.carInfo.facebook_url || "", available_until: ownerData.carInfo.available_until || "", notes: ownerData.carInfo.notes || [], status: ownerData.carInfo.status || "available" });
+                      } else {
+                        setQuickOwnerFormData({ owner_id: "", facebook_url: "", available_until: "", notes: [], status: "available" });
+                      }
+                      setIsQuickOwnerDialogOpen(true);
+                    }}>
                       <User className="h-3 w-3" />
                     </Button>
-
-                    {/* Кнопка "Предложение" - всегда видна */}
-                      <Button
-                        size="sm"
-                        variant="default"
-                        className="flex-1 h-8 text-xs px-1 bg-blue-600 hover:bg-blue-700"
-                        onClick={() => handleOfferClick(car)}
-                        disabled={!startDate || !endDate}
-                      >
-                        <Car className="h-3 w-3" />
-                      </Button>
+                    <Button size="sm" variant="default" className="flex-1 h-8 text-xs px-1 bg-blue-600 hover:bg-blue-700" onClick={() => handleOfferClick(car)} disabled={!startDate || !endDate}>
+                      <Car className="h-3 w-3" />
+                    </Button>
                   </div>
-
-                  {/* ✅ Депозит + Switch в одну строку */}
                   <div className="pt-2 border-t flex items-center justify-between">
-                    <div className="text-xs text-muted-foreground">
-                      Депозит: {deposit}฿
-                    </div>
-                    <Switch
-                      checked={car.available}
-                      onCheckedChange={() => handleToggleAvailability(car)}
-                      className="data-[state=checked]:bg-green-500 scale-[0.65]"
-                    />
+                    <div className="text-xs text-muted-foreground">Депозит: {deposit}฿</div>
+                    <Switch checked={car.available} onCheckedChange={() => handleToggleAvailability(car)} className="data-[state=checked]:bg-green-500 scale-[0.65]" />
                   </div>
                 </CardContent>
               </Card>
             );
           })}
-
-          {/* Карточка "Добавить" */}
-          <Card 
-            className="overflow-hidden border-2 border-dashed border-gray-300 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group"
-            onClick={() => {
-              setEditingCar(null);
-              setIsDialogOpen(true);
-            }}
-          >
+          <Card className="overflow-hidden border-2 border-dashed border-gray-300 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group" onClick={() => { setEditingCar(null); setIsDialogOpen(true); }}>
             <div className="h-full flex flex-col items-center justify-center p-6 min-h-[280px]">
               <div className="w-16 h-16 rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors flex items-center justify-center mb-3">
                 <Plus className="h-8 w-8 text-blue-600" />
               </div>
-              <p className="text-sm font-semibold text-gray-700 group-hover:text-blue-600 transition-colors">
-                Добавить авто
-              </p>
+              <p className="text-sm font-semibold text-gray-700 group-hover:text-blue-600 transition-colors">Добавить авто</p>
             </div>
           </Card>
         </div>
       </div>
 
-      {/* Диалог редактирования/создания */}
+      {/* ═══ SHEET: Редактирование машины ═══ */}
       <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-2 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
+        <SheetContent side="bottom" className={sheetCls}>
           <SheetHeader className="p-0 pt-3 pb-2 border-b">
-            <SheetTitle>
-              {editingCar ? "Редактировать авто" : "Новая машина"}
-            </SheetTitle>
+            <SheetTitle>{editingCar ? "Редактировать авто" : "Новая машина"}</SheetTitle>
           </SheetHeader>
-          <CarForm 
-            car={editingCar} 
-            onSave={handleSave} 
-            onCancel={() => {
-              setIsDialogOpen(false);
-              setEditingCar(null);
-            }}
-            onPhotoUpload={() => {
-              fetchCars();
-              refetchGlobalCars();
-            }}
+          <CarForm
+            car={editingCar}
+            onSave={handleSave}
+            onCancel={() => { setIsDialogOpen(false); setEditingCar(null); }}
+            onPhotoUpload={() => { fetchCars(); refetchGlobalCars(); }}
           />
         </SheetContent>
       </Sheet>
 
-      {/* Диалог редактирования цен */}
+      {/* ═══ SHEET: Цены ═══ */}
       <Sheet open={isPriceDialogOpen} onOpenChange={setIsPriceDialogOpen}>
-       <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
-          <SheetHeader className="p-2 pt-3 pb-2 border-b">
-            <SheetTitle>Редактировать цены</SheetTitle>
-          </SheetHeader>
+        <SheetContent side="bottom" className={sheetCls}>
           {editingPriceId && (
             <PriceEditor
               car={cars.find(c => c.id === editingPriceId)}
               onSave={handlePriceSave}
-              onCancel={() => {
-                setIsPriceDialogOpen(false);
-                setEditingPriceId(null);
-              }}
+              onCancel={() => { setIsPriceDialogOpen(false); setEditingPriceId(null); }}
             />
           )}
         </SheetContent>
       </Sheet>
 
-      {/* Диалог редактирования характеристик */}
+      {/* ═══ SHEET: Характеристики ═══ */}
       <Sheet open={isSpecsDialogOpen} onOpenChange={setIsSpecsDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
-          <SheetHeader className="p-2 pt-3 pb-2 border-b">
-            <SheetTitle>Редактировать характеристики</SheetTitle>
-          </SheetHeader>
+        <SheetContent side="bottom" className={sheetCls}>
           {editingSpecsId && (
             <SpecsEditor
               car={cars.find(c => c.id === editingSpecsId)}
               onSave={handleSpecsSave}
-              onCancel={() => {
-                setIsSpecsDialogOpen(false);
-                setEditingSpecsId(null);
-              }}
+              onCancel={() => { setIsSpecsDialogOpen(false); setEditingSpecsId(null); }}
             />
           )}
         </SheetContent>
       </Sheet>
 
-      {/* Диалог массового изменения цен */}
+      {/* ═══ SHEET: Массовое изменение цен ═══ */}
       <Sheet open={isBulkPriceDialogOpen} onOpenChange={setIsBulkPriceDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
-          <SheetHeader className="p-2 pt-3 pb-2 border-b">
-            <SheetTitle>Массовое изменение цен</SheetTitle>
-          </SheetHeader>
+        <SheetContent side="bottom" className={sheetCls}>
           <BulkPriceEditor
             onClose={() => setIsBulkPriceDialogOpen(false)}
             onSave={handleBulkPriceUpdate}
@@ -1247,316 +945,249 @@ export default function CarsPage({ userId }: CarsPageProps) {
         </SheetContent>
       </Sheet>
 
-      {/* Диалог владельца */}
+      {/* ═══ SHEET: Владелец машины ═══ */}
       <Sheet open={isQuickOwnerDialogOpen} onOpenChange={setIsQuickOwnerDialogOpen}>
-        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
-          <SheetHeader className="p-2 pt-3 pb-2 border-b">
-            <SheetTitle>Владелец: {quickOwnerCar?.name}</SheetTitle>
-          </SheetHeader>
-          
-          <div className="space-y-4 p-4">
-            <div className="space-y-2">
-              <Label>Владелец *</Label>
-              <Select
-                value={quickOwnerFormData.owner_id}
-                onValueChange={(val) => {
-                  setQuickOwnerFormData(prev => ({ ...prev, owner_id: val }));
-                }}
-              >
-                <SelectTrigger><SelectValue placeholder="Выберите владельца" /></SelectTrigger>
-                <SelectContent>
-                  {owners.map((owner) => (
-                    <SelectItem key={owner.id} value={owner.id}>
-                      {owner.name} ({owner.id})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        <SheetContent side="bottom" className={sheetCls}>
+          <div className="flex flex-col h-full">
+            <SheetSectionHeader
+              icon={User}
+              title={`Владелец: ${quickOwnerCar?.brand} ${quickOwnerCar?.model}`}
+              subtitle={quickOwnerCar?.id}
+            />
 
-            {quickOwnerFormData.owner_id && (() => {
-              const selectedOwner = owners.find(o => o.id === quickOwnerFormData.owner_id);
-              return selectedOwner ? (
-                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <h4 className="font-semibold text-blue-900 mb-2 text-sm">Информация</h4>
-                  <div className="space-y-1 text-xs">
-                    <p><span className="text-gray-600">Контакт:</span> {selectedOwner.contact}</p>
-                    {selectedOwner.facebook_url && (
-                      <p>
-                        <span className="text-gray-600">Facebook:</span>{' '}
-                        <a href={selectedOwner.facebook_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                          Профиль
-                        </a>
-                      </p>
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+              <FieldRow label="Владелец *">
+                <Select value={quickOwnerFormData.owner_id} onValueChange={(val) => setQuickOwnerFormData(prev => ({ ...prev, owner_id: val }))}>
+                  <SelectTrigger className="h-11 rounded-xl border-gray-200">
+                    <SelectValue placeholder="Выберите владельца" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {owners.map((owner) => (
+                      <SelectItem key={owner.id} value={owner.id}>{owner.name} ({owner.id})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FieldRow>
+
+              {quickOwnerFormData.owner_id && (() => {
+                const sel = owners.find(o => o.id === quickOwnerFormData.owner_id);
+                return sel ? (
+                  <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 space-y-2">
+                    <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Контакты владельца</p>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Phone className="h-4 w-4 text-blue-400 shrink-0" />
+                      {sel.contact}
+                    </div>
+                    {sel.facebook_url && (
+                      <a href={sel.facebook_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-blue-600 hover:underline">
+                        <Facebook className="h-4 w-4 shrink-0" />
+                        Facebook профиль
+                      </a>
                     )}
                   </div>
+                ) : null;
+              })()}
+
+              <FieldRow label="Ссылка на объявление Facebook">
+                <div className="relative">
+                  <Facebook className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    type="url"
+                    value={quickOwnerFormData.facebook_url}
+                    onChange={(e) => setQuickOwnerFormData(prev => ({ ...prev, facebook_url: e.target.value }))}
+                    placeholder="https://facebook.com/..."
+                    className="h-11 pl-10 rounded-xl border-gray-200"
+                  />
                 </div>
-              ) : null;
-            })()}
+              </FieldRow>
 
-            <div className="space-y-2">
-              <Label>Ссылка на объявление Facebook</Label>
-              <Input
-                type="url"
-                value={quickOwnerFormData.facebook_url}
-                onChange={(e) => setQuickOwnerFormData(prev => ({ ...prev, facebook_url: e.target.value }))}
-                placeholder="https://facebook.com/..."
-              />
-            </div>
-
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
-              <div>
-                <Label className="text-sm font-medium">Статус</Label>
-                <p className="text-xs text-gray-500">Доступна для аренды</p>
+              {/* Статус */}
+              <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-800">Статус машины</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Доступна для аренды</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`text-xs font-semibold ${quickOwnerFormData.status !== 'available' ? 'text-red-500' : 'text-gray-300'}`}>Занята</span>
+                  <Switch
+                    checked={quickOwnerFormData.status === 'available'}
+                    onCheckedChange={(checked) => setQuickOwnerFormData(prev => ({ ...prev, status: checked ? 'available' : 'rented' }))}
+                    className="data-[state=checked]:bg-green-500"
+                  />
+                  <span className={`text-xs font-semibold ${quickOwnerFormData.status === 'available' ? 'text-green-600' : 'text-gray-300'}`}>Свободна</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className={`text-sm font-medium ${quickOwnerFormData.status === 'available' ? 'text-gray-400' : 'text-red-600'}`}>
-                  Занята
-                </span>
-                <Switch
-                  checked={quickOwnerFormData.status === 'available'}
-                  onCheckedChange={(checked) => 
-                    setQuickOwnerFormData(prev => ({ 
-                      ...prev, 
-                      status: checked ? 'available' : 'rented' 
-                    }))
-                  }
-                  className="data-[state=checked]:bg-green-500"
-                />
-                <span className={`text-sm font-medium ${quickOwnerFormData.status === 'available' ? 'text-green-600' : 'text-gray-400'}`}>
-                  Свободна
-                </span>
-              </div>
+
+              <FieldRow label="Свободна до (дата)">
+                <div className="relative">
+                  <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    type="date"
+                    value={quickOwnerFormData.available_until}
+                    onChange={(e) => setQuickOwnerFormData(prev => ({ ...prev, available_until: e.target.value }))}
+                    className="h-11 pl-10 rounded-xl border-gray-200"
+                  />
+                </div>
+              </FieldRow>
+
+              <FieldRow label="Примечания">
+                <div className="relative">
+                  <FileText className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <textarea
+                    value={quickOwnerFormData.notes?.length ? quickOwnerFormData.notes.join('\n') : ''}
+                    onChange={(e) => setQuickOwnerFormData(prev => ({ ...prev, notes: e.target.value ? e.target.value.split('\n').filter(n => n.trim()) : [] }))}
+                    placeholder="Каждая строка — отдельная пометка"
+                    className="w-full pl-10 pr-3 pt-2.5 pb-2.5 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                    rows={4}
+                  />
+                </div>
+              </FieldRow>
             </div>
 
-            <div className="space-y-2">
-              <Label>Свободна до (дата)</Label>
-              <Input
-                type="date"
-                value={quickOwnerFormData.available_until}
-                onChange={(e) => setQuickOwnerFormData(prev => ({ ...prev, available_until: e.target.value }))}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Примечание (пометка)</Label>
-              <textarea
-                value={quickOwnerFormData.notes && quickOwnerFormData.notes.length > 0 ? quickOwnerFormData.notes.join('\n') : ''}
-                onChange={(e) => setQuickOwnerFormData(prev => ({
-                  ...prev,
-                  notes: e.target.value ? e.target.value.split('\n').filter(n => n.trim()) : []
-                }))}
-                placeholder="Каждая строка - отдельная пометка"
-                className="w-full p-3 border border-gray-300 rounded-lg text-sm"
-                rows={4}
-              />
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsQuickOwnerDialogOpen(false)}
-                className="flex-1"
-              >
-                Отмена
-              </Button>
-              <Button
-                onClick={handleQuickOwnerSave}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
-                disabled={!quickOwnerFormData.owner_id}
-              >
-                Сохранить
-              </Button>
-            </div>
+            <SheetActions
+              onSave={handleQuickOwnerSave}
+              onCancel={() => setIsQuickOwnerDialogOpen(false)}
+              disabled={!quickOwnerFormData.owner_id}
+            />
           </div>
         </SheetContent>
       </Sheet>
 
-      {/* ✅ Диалог управления владельцами */}
+      {/* ═══ SHEET: Управление владельцами ═══ */}
       <Sheet open={isOwnersManagementOpen} onOpenChange={setIsOwnersManagementOpen}>
-       <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
+        <SheetContent side="bottom" className={sheetCls}>
+          <div className="flex flex-col h-full">
+            <SheetSectionHeader icon={Users} title="Владельцы" subtitle={`${owners.length} владельцев в базе`} />
 
-          <SheetHeader className="p-2 pt-3 pb-2 border-b">
-            <SheetTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Управление владельцами
-            </SheetTitle>
-          </SheetHeader>
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+              {/* ── Добавить нового ── */}
+              <div className="rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 space-y-3">
+                <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                  <Plus className="h-4 w-4 text-blue-500" />
+                  Добавить владельца
+                </p>
 
-          <div className="space-y-3 p-2">
-            {/* Форма создания нового владельца */}
-            <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-              <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Добавить нового владельца
-              </h3>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label className="text-sm">ID владельца *</Label>
-                  <Input
-                    value={newOwnerData.id}
-                    onChange={(e) => setNewOwnerData(prev => ({ ...prev, id: e.target.value }))}
-                    placeholder="namo, ar, den..."
-                    disabled={creatingOwner}
-                  />
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-gray-500 font-medium">ID *</Label>
+                    <div className="relative">
+                      <Hash className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                      <Input value={newOwnerData.id} onChange={(e) => setNewOwnerData(p => ({ ...p, id: e.target.value }))} placeholder="namo, ar..." disabled={creatingOwner} className="h-10 pl-8 rounded-xl border-white bg-white text-sm shadow-sm" />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-gray-500 font-medium">Имя *</Label>
+                    <div className="relative">
+                      <User className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                      <Input value={newOwnerData.name} onChange={(e) => setNewOwnerData(p => ({ ...p, name: e.target.value }))} placeholder="Namo Rentals" disabled={creatingOwner} className="h-10 pl-8 rounded-xl border-white bg-white text-sm shadow-sm" />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-gray-500 font-medium">Контакт *</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                      <Input value={newOwnerData.contact} onChange={(e) => setNewOwnerData(p => ({ ...p, contact: e.target.value }))} placeholder="+66-98-..." disabled={creatingOwner} className="h-10 pl-8 rounded-xl border-white bg-white text-sm shadow-sm" />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-gray-500 font-medium">Facebook</Label>
+                    <div className="relative">
+                      <Facebook className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                      <Input type="url" value={newOwnerData.facebook_url} onChange={(e) => setNewOwnerData(p => ({ ...p, facebook_url: e.target.value }))} placeholder="https://..." disabled={creatingOwner} className="h-10 pl-8 rounded-xl border-white bg-white text-sm shadow-sm" />
+                    </div>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm">Имя *</Label>
-                  <Input
-                    value={newOwnerData.name}
-                    onChange={(e) => setNewOwnerData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Namo Rentals"
-                    disabled={creatingOwner}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm">Контакт *</Label>
-                  <Input
-                    value={newOwnerData.contact}
-                    onChange={(e) => setNewOwnerData(prev => ({ ...prev, contact: e.target.value }))}
-                    placeholder="+66-98-234-5678"
-                    disabled={creatingOwner}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm">Facebook URL</Label>
-                  <Input
-                    type="url"
-                    value={newOwnerData.facebook_url}
-                    onChange={(e) => setNewOwnerData(prev => ({ ...prev, facebook_url: e.target.value }))}
-                    placeholder="https://facebook.com/..."
-                    disabled={creatingOwner}
-                  />
-                </div>
+                <Button
+                  onClick={handleCreateOwner}
+                  disabled={creatingOwner || !newOwnerData.id || !newOwnerData.name || !newOwnerData.contact}
+                  className="w-full h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-sm font-semibold"
+                >
+                  {creatingOwner ? "Создание..." : "Создать владельца"}
+                </Button>
               </div>
 
-              <Button
-                onClick={handleCreateOwner}
-                disabled={creatingOwner || !newOwnerData.id || !newOwnerData.name || !newOwnerData.contact}
-                className="w-full mt-3 bg-blue-600 hover:bg-blue-700"
-              >
-                {creatingOwner ? "Создание..." : "Создать владельца"}
-              </Button>
-            </div>
-
-            {/* Список существующих владельцев */}
-            <div>
-              <h3 className="font-bold text-gray-800 mb-3">Существующие владельцы ({owners.length})</h3>
-              
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {owners.map((owner) => (
-                  <Card key={owner.id} className="overflow-hidden">
-                    <CardContent className="p-4">
+              {/* ── Список владельцев ── */}
+              <div>
+                <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide px-1 mb-3">
+                  Все владельцы
+                </p>
+                <div className="space-y-2">
+                  {owners.map((owner) => (
+                    <div key={owner.id} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
                       {selectedOwnerForEdit?.id === owner.id ? (
-                        // Режим редактирования
-                        <div className="space-y-3">
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-2">
-                              <Label className="text-sm">ID</Label>
-                              <Input value={owner.id} disabled className="bg-gray-50" />
+                        // ── Режим редактирования ──
+                        <div className="p-4 space-y-3">
+                          <div className="grid grid-cols-2 gap-2.5">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500">ID</Label>
+                              <Input value={owner.id} disabled className="h-10 rounded-xl bg-gray-50 border-gray-200 text-sm" />
                             </div>
-                            <div className="space-y-2">
-                              <Label className="text-sm">Имя *</Label>
-                              <Input
-                                value={selectedOwnerForEdit.name}
-                                onChange={(e) => setSelectedOwnerForEdit(prev => ({ ...prev, name: e.target.value }))}
-                              />
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500">Имя *</Label>
+                              <Input value={selectedOwnerForEdit.name} onChange={(e) => setSelectedOwnerForEdit(p => ({ ...p, name: e.target.value }))} className="h-10 rounded-xl border-gray-200 text-sm" />
                             </div>
-                            <div className="space-y-2">
-                              <Label className="text-sm">Контакт *</Label>
-                              <Input
-                                value={selectedOwnerForEdit.contact}
-                                onChange={(e) => setSelectedOwnerForEdit(prev => ({ ...prev, contact: e.target.value }))}
-                              />
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500">Контакт *</Label>
+                              <Input value={selectedOwnerForEdit.contact} onChange={(e) => setSelectedOwnerForEdit(p => ({ ...p, contact: e.target.value }))} className="h-10 rounded-xl border-gray-200 text-sm" />
                             </div>
-                            <div className="space-y-2">
-                              <Label className="text-sm">Facebook</Label>
-                              <Input
-                                type="url"
-                                value={selectedOwnerForEdit.facebook_url || ""}
-                                onChange={(e) => setSelectedOwnerForEdit(prev => ({ ...prev, facebook_url: e.target.value }))}
-                              />
+                            <div className="space-y-1">
+                              <Label className="text-xs text-gray-500">Facebook</Label>
+                              <Input type="url" value={selectedOwnerForEdit.facebook_url || ""} onChange={(e) => setSelectedOwnerForEdit(p => ({ ...p, facebook_url: e.target.value }))} className="h-10 rounded-xl border-gray-200 text-sm" />
                             </div>
                           </div>
-                          
                           <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              onClick={handleUpdateOwner}
-                              className="flex-1"
-                            >
-                              <Check className="h-4 w-4 mr-2" />
-                              Сохранить
+                            <Button size="sm" onClick={handleUpdateOwner} className="flex-1 h-9 rounded-xl text-xs font-semibold">
+                              <Check className="h-3.5 w-3.5 mr-1.5" />Сохранить
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setSelectedOwnerForEdit(null)}
-                              className="flex-1"
-                            >
-                              <X className="h-4 w-4 mr-2" />
-                              Отмена
+                            <Button size="sm" variant="outline" onClick={() => setSelectedOwnerForEdit(null)} className="flex-1 h-9 rounded-xl text-xs">
+                              <X className="h-3.5 w-3.5 mr-1.5" />Отмена
                             </Button>
                           </div>
                         </div>
                       ) : (
-                        // Режим просмотра
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-bold text-gray-800">{owner.name}</h4>
-                              <Badge variant="outline" className="text-xs">
-                                {owner.id}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-gray-600">
-                              📞 {owner.contact}
-                            </p>
-                            {owner.facebook_url && (
-                              <a 
-                                href={owner.facebook_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-xs text-blue-600 hover:underline"
-                              >
-                                📘 Facebook
-                              </a>
-                            )}
-                            <p className="text-xs text-gray-500 mt-2">
-                              Машин: {Object.keys(owner.car_ids || {}).length}
-                            </p>
+                        // ── Режим просмотра ──
+                        <div className="flex items-center px-4 py-3 gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">
+                            <User className="h-4 w-4 text-purple-500" />
                           </div>
-                          
-                          <div className="flex gap-1">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setSelectedOwnerForEdit({ ...owner })}
-                            >
-                              <Edit className="h-4 w-4" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-semibold text-gray-900 truncate">{owner.name}</span>
+                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">{owner.id}</Badge>
+                            </div>
+                            <div className="flex items-center gap-3 mt-0.5">
+                              <span className="text-xs text-gray-500 flex items-center gap-1">
+                                <Phone className="h-3 w-3" />{owner.contact}
+                              </span>
+                              <span className="text-xs text-gray-400">{Object.keys(owner.car_ids || {}).length} авто</span>
+                            </div>
+                          </div>
+                          <div className="flex gap-1 shrink-0">
+                            <Button size="sm" variant="ghost" onClick={() => setSelectedOwnerForEdit({ ...owner })} className="h-8 w-8 p-0 rounded-lg hover:bg-blue-50 hover:text-blue-600">
+                              <Edit className="h-3.5 w-3.5" />
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleDeleteOwner(owner.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
+                            <Button size="sm" variant="ghost" onClick={() => handleDeleteOwner(owner.id)} className="h-8 w-8 p-0 rounded-lg hover:bg-red-50 hover:text-red-600">
+                              <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </div>
                         </div>
                       )}
-                    </CardContent>
-                  </Card>
-                ))}
+                    </div>
+                  ))}
+                </div>
               </div>
+            </div>
+
+            {/* Закрыть */}
+            <div className="sticky bottom-0 bg-white border-t px-5 py-4">
+              <Button variant="outline" onClick={() => setIsOwnersManagementOpen(false)} className="w-full h-11 rounded-xl border-gray-200 text-gray-600">
+                Закрыть
+              </Button>
             </div>
           </div>
         </SheetContent>
       </Sheet>
     </div>
   );
-};
+}

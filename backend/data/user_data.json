@@ -2166,7 +2166,7 @@
     "user_id": "295234136",
     "username": "RomanPavlovskiy",
     "created_at": "2026-03-17T23:32:48.975352",
-    "updated_at": "2026-03-18T05:37:43.268243",
+    "updated_at": "2026-03-23T13:46:08.444151",
     "status": "new",
     "form_started": true,
     "booking_submitted": false,
@@ -2330,8 +2330,8 @@
     "user_id": "458387121",
     "username": "Ilnur878",
     "created_at": "2026-03-18T18:53:46.633772",
-    "updated_at": "2026-03-19T13:05:15.276250",
-    "status": "new",
+    "updated_at": "2026-03-23T13:45:52.566915",
+    "status": "archive",
     "form_started": false,
     "booking_submitted": false,
     "car_interested": null,
@@ -2346,7 +2346,8 @@
       "last_message_from": "user",
       "message_count": 1,
       "claude_status": "stopped"
-    }
+    },
+    "archived": false
   },
   {
     "user_id": "web_session_mmwh003p_9libwt5mx_lqdyur",
@@ -2673,10 +2674,10 @@
     "source": "telegram_webapp"
   },
   {
-    "user_id": "web_session_mn301cwl_9dzq1ln79_8g5h5v",
-    "username": null,
-    "created_at": "2026-03-23T13:00:03.152782",
-    "updated_at": "2026-03-23T13:00:03.152818",
+    "user_id": "459017094",
+    "username": "alexmania22",
+    "created_at": "2026-03-23T13:32:55.909585",
+    "updated_at": "2026-03-23T13:32:55.909615",
     "status": "new",
     "form_started": false,
     "booking_submitted": false,
@@ -2713,5 +2714,19 @@
       "claude_status": "stopped"
     },
     "last_message_at": "2026-03-21T05:58:52.462628"
+  },
+  {
+    "user_id": "web_session_mn301cwl_9dzq1ln79_8g5h5v",
+    "username": null,
+    "created_at": "2026-03-23T13:00:03.152782",
+    "updated_at": "2026-03-23T13:00:03.152818",
+    "status": "new",
+    "form_started": false,
+    "booking_submitted": false,
+    "car_interested": null,
+    "category_interested": null,
+    "dates_selected": null,
+    "notes": [],
+    "source": "telegram_webapp"
   }
 ]
