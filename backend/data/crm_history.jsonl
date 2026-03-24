@@ -4298,3 +4298,22 @@
 {"timestamp": "2026-03-23T15:34:28.330587", "user_id": "477643828", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-04-01T14:00:00.000Z", "endDate": "2026-04-14T14:00:00.000Z", "days": 14, "category": "suv", "pickupLocation": "villa", "returnLocation": "villa", "username": "sandrz7044"}, "username": "sandrz7044"}
 {"timestamp": "2026-03-23T15:35:12.134084", "user_id": "477643828", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-04-01T14:00:00.000Z", "endDate": "2026-04-14T14:00:00.000Z", "username": "sandrz7044"}, "username": "sandrz7044"}
 {"timestamp": "2026-03-23T15:35:12.251452", "user_id": "477643828", "action": "dialog_continued", "initiated_by": "user", "event_type": "filters_used", "filters": {"startDate": "2026-04-01T14:00:00.000Z", "endDate": "2026-04-14T14:00:00.000Z", "days": 14, "category": "compact", "pickupLocation": "villa", "returnLocation": "villa", "username": "sandrz7044"}, "username": "sandrz7044"}
+{"timestamp": "2026-03-24T02:25:26.095566", "user_id": "web_session_mn3zsnfu_6n53lc5di_fqat0p", "action": "dialog_started", "initiated_by": "user", "username": null}
+{"timestamp": "2026-03-24T02:32:56.170102", "user_id": "5639680268", "action": "status_changed", "old_status": "new", "new_status": "archive", "note": "", "changed_by": "6451825371"}
+{"timestamp": "2026-03-24T02:33:21.672049", "user_id": 477643828, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-24T02:33:39.009Z", "user_id": "477643828", "action": "manager_message_sent", "message_length": 37}
+{"timestamp": "2026-03-24T02:33:51.000499", "user_id": 112308372, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-24T02:33:51.663Z", "user_id": "112308372", "action": "manager_message_sent", "message_length": 37}
+{"timestamp": "2026-03-24T02:33:56.984800", "user_id": 459017094, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-24T02:34:00.248Z", "user_id": "459017094", "action": "manager_message_sent", "message_length": 37}
+{"timestamp": "2026-03-24T02:34:06.190012", "user_id": 212517491, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-24T02:34:08.314Z", "user_id": "212517491", "action": "manager_message_sent", "message_length": 37}
+{"timestamp": "2026-03-24T02:34:14.951219", "user_id": 49385685, "action": "messages_marked_read", "by": "manager"}
+{"timestamp": "2026-03-24T02:34:17.943Z", "user_id": "49385685", "action": "manager_message_sent", "message_length": 37}
+{"timestamp": "2026-03-24T02:45:08.952317", "user_id": 477643828, "action": "message_received", "content": "Здравствуйте, пока что требуется байк с 2 по 15 апреля"}
+{"timestamp": "2026-03-24T02:45:08.963251", "user_id": 477643828, "action": "user_message_received", "message_length": 54, "message_type": "text", "username": "sandrz7044", "media_info": null}
+{"timestamp": "2026-03-24T02:45:09.038921", "user_id": 477643828, "action": "message_received", "content": "Машина под вопросом"}
+{"timestamp": "2026-03-24T02:45:09.041773", "user_id": 477643828, "action": "user_message_received", "message_length": 19, "message_type": "text", "username": "sandrz7044", "media_info": null}
+{"timestamp": "2026-03-24T02:45:09.295013", "user_id": 477643828, "action": "message_received", "content": "Пока что"}
+{"timestamp": "2026-03-24T02:45:09.297842", "user_id": 477643828, "action": "user_message_received", "message_length": 8, "message_type": "text", "username": "sandrz7044", "media_info": null}
+{"timestamp": "2026-03-24T02:47:22.805408", "user_id": 477643828, "action": "messages_marked_read", "by": "manager"}

@@ -393,44 +393,62 @@ const handleSave = useCallback(() => {
     { key: 'price_30', label: '30+ дней' }
   ];
 
-  const PriceGrid = ({ seasonKey, label, icon: Icon, color }) => (
-    <div className={`rounded-xl border p-4 space-y-3 ${
-      color === 'blue' ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-200'
-    }`}>
-      <div className={`flex items-center gap-2 text-sm font-semibold ${
-        color === 'blue' ? 'text-blue-700' : 'text-orange-700'
-      }`}>
-        <Icon className="h-4 w-4" />
-        {label}
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        {periods.map(({ key, label }) => (
-          <div key={key} className="space-y-1">
-            <p className="text-[11px] text-gray-500 font-medium">{label}</p>
-            <div className="relative">
-              <Input
-                type="number"
-                value={prices[seasonKey][key]}
-                onChange={(e) => handleChange(seasonKey, key, e.target.value)}
-                className="h-10 pr-7 text-sm rounded-lg border-white bg-white shadow-sm"
-                min="0"
-                step="50"
-              />
-              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">฿</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <div className="flex flex-col h-full">
       <SheetSectionHeader icon={DollarSign} title="Цены" subtitle={`${car.brand} ${car.model}`} />
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-        <PriceGrid seasonKey="low_season" label="Низкий сезон" icon={Cloud} color="blue" />
-        <PriceGrid seasonKey="high_season" label="Высокий сезон" icon={Sun} color="orange" />
+        {/* Низкий сезон */}
+        <div className="rounded-xl border p-4 space-y-3 bg-blue-50 border-blue-200">
+          <div className="flex items-center gap-2 text-sm font-semibold text-blue-700">
+            <Cloud className="h-4 w-4" />
+            Низкий сезон
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {periods.map(({ key, label }) => (
+              <div key={key} className="space-y-1">
+                <p className="text-[11px] text-gray-500 font-medium">{label}</p>
+                <div className="relative">
+                  <Input
+                    type="number"
+                    value={prices.low_season[key]}
+                    onChange={(e) => handleChange('low_season', key, e.target.value)}
+                    className="h-10 pr-7 text-sm rounded-lg border-white bg-white shadow-sm"
+                    min="0"
+                    step="50"
+                  />
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">฿</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Высокий сезон */}
+        <div className="rounded-xl border p-4 space-y-3 bg-orange-50 border-orange-200">
+          <div className="flex items-center gap-2 text-sm font-semibold text-orange-700">
+            <Sun className="h-4 w-4" />
+            Высокий сезон
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {periods.map(({ key, label }) => (
+              <div key={key} className="space-y-1">
+                <p className="text-[11px] text-gray-500 font-medium">{label}</p>
+                <div className="relative">
+                  <Input
+                    type="number"
+                    value={prices.high_season[key]}
+                    onChange={(e) => handleChange('high_season', key, e.target.value)}
+                    className="h-10 pr-7 text-sm rounded-lg border-white bg-white shadow-sm"
+                    min="0"
+                    step="50"
+                  />
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">฿</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="rounded-xl border border-purple-200 bg-purple-50 p-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-purple-700 mb-3">
@@ -880,7 +898,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
       {/* ═══ SHEET: Редактирование машины ═══ */}
       <Sheet open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <SheetContent side="bottom" className={sheetCls}>
+        <SheetContent side="bottom" className="h-[100dvh] sm:h-auto sm:max-h-[100dvh] overflow-y-auto p-0 px-[12px] sm:rounded-t-xl sm:max-w-md animate-slide-in-from-bottom">
           <SheetHeader className="p-0 pt-3 pb-2 border-b">
             <SheetTitle>{editingCar ? "Редактировать авто" : "Новая машина"}</SheetTitle>
           </SheetHeader>

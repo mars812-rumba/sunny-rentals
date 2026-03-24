@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Trash, Check, Sparkles, User } from "lucide-react";
+import { Upload, Trash, Check, Sparkles, User, Info, Image, DollarSign, X, Plus, Camera, FolderOpen, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import imageCompression from 'browser-image-compression';
 
@@ -66,6 +66,7 @@ export default function CarForm({
 
   const [form, setForm] = useState({
     id: car?.id || "",
+    name: car?.name || "",
     brand: car?.brand || "",
     model: car?.model || "",
     year: car?.year || "",
@@ -412,9 +413,9 @@ const handleSubmit = async (e: React.FormEvent) => {
         {/* Табы */}
         <div className="flex gap-2 p-1 bg-gray-100 rounded-xl">
           {[
-            { id: "info", label: "Инфо", icon: "ℹ️" },
-            { id: "photos", label: "Фото", icon: "📸" },
-            { id: "pricing", label: "Цены", icon: "💰" }
+            { id: "info", label: "Инфо", icon: Info },
+            { id: "photos", label: "Фото", icon: Image },
+            { id: "pricing", label: "Цены", icon: DollarSign }
           ].map(tab => (
             <button
               key={tab.id}
@@ -423,13 +424,13 @@ const handleSubmit = async (e: React.FormEvent) => {
                 setActiveTab(tab.id as any);
                 setShowOwnerPanel(false);
               }}
-              className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${
+              className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center gap-1.5 ${
                 activeTab === tab.id && !showOwnerPanel
                   ? "bg-white text-blue-600 shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              <span className="mr-1.5">{tab.icon}</span>
+              <tab.icon className="h-4 w-4" />
               {tab.label}
             </button>
           ))}
@@ -601,7 +602,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                       onClick={() => setActiveTab("photos")}
                       className="w-full"
                     >
-                      📸 Управление фото
+                      <Camera className="h-4 w-4 mr-2" />
+                      Управление фото
                     </Button>
                   </div>
                 ) : (
@@ -613,7 +615,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                       size="sm"
                       onClick={() => setActiveTab("photos")}
                     >
-                      📸 Загрузить фото
+                      <Camera className="h-4 w-4 mr-2" />
+                      Загрузить фото
                     </Button>
                   </div>
                 )}
@@ -652,7 +655,17 @@ const handleSubmit = async (e: React.FormEvent) => {
                 disabled={uploading || !form.id}
                 onClick={() => document.getElementById("photo-upload")?.click()}
               >
-                {uploading ? "⏳ Обработка..." : "📁 Выбрать файлы"}
+                {uploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Обработка...
+                  </>
+                ) : (
+                  <>
+                    <FolderOpen className="h-4 w-4 mr-2" />
+                    Выбрать файлы
+                  </>
+                )}
               </Button>
             </div>
           </div>
@@ -839,7 +852,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                   onClick={() => setShowNewOwnerForm(true)}
                   className="w-full text-blue-600 border-blue-300"
                 >
-                  + Добавить нового владельца
+                  <Plus className="h-4 w-4 mr-2" />
+                  Добавить нового владельца
                 </Button>
               </>
             ) : (
@@ -851,7 +865,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     onClick={() => setShowNewOwnerForm(false)}
                     className="text-gray-500 hover:text-gray-700"
                   >
-                    ✕
+                    <X className="h-4 w-4" />
                   </button>
                 </div>
 
@@ -912,7 +926,17 @@ const handleSubmit = async (e: React.FormEvent) => {
                     disabled={creatingOwner || !newOwnerData.id || !newOwnerData.name || !newOwnerData.contact}
                     className="flex-1 bg-blue-600 hover:bg-blue-700"
                   >
-                    {creatingOwner ? "⏳ Создание..." : "✓ Создать"}
+                    {creatingOwner ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Создание...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-4 w-4 mr-2" />
+                        Создать
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>

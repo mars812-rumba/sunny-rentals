@@ -1565,3 +1565,11 @@
 {"timestamp": "2026-03-21T05:58:52.458563", "user_id": "374897465", "role": "user", "text": "[Received_media]", "username": "Marseloid", "source": "telegram_bot", "media": {"type": "received_media", "filename": "photo_20260321_055852.jpg", "content_type": "image/jpeg", "file_size": 148916, "timestamp": "2026-03-21T05:58:52.449761", "download_url": "/api/crm/media/374897465/photo_20260321_055852.jpg"}}
 {"timestamp": "2026-03-21T11:44:34.565Z", "user_id": "374897465", "role": "manager", "text": "Приветствую!", "source": "crm_panel"}
 {"timestamp": "2026-03-23T13:20:32.314Z", "user_id": "6445540224", "role": "manager", "text": "Ок", "source": "crm_panel"}
+{"timestamp": "2026-03-24T02:33:39.009Z", "user_id": "477643828", "role": "manager", "text": "Здравствуйте! Подскажите, нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T02:33:51.663Z", "user_id": "112308372", "role": "manager", "text": "Здравствуйте! Подскажите, нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T02:34:00.248Z", "user_id": "459017094", "role": "manager", "text": "Здравствуйте! Подскажите, нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T02:34:08.314Z", "user_id": "212517491", "role": "manager", "text": "Здравствуйте! Подскажите, нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T02:34:17.943Z", "user_id": "49385685", "role": "manager", "text": "Здравствуйте! Подскажите, нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T02:45:08.952820", "user_id": 477643828, "role": "user", "text": "Здравствуйте, пока что требуется байк с 2 по 15 апреля", "username": "sandrz7044", "source": "telegram_bot"}
+{"timestamp": "2026-03-24T02:45:09.039199", "user_id": 477643828, "role": "user", "text": "Машина под вопросом", "username": "sandrz7044", "source": "telegram_bot"}
+{"timestamp": "2026-03-24T02:45:09.295303", "user_id": 477643828, "role": "user", "text": "Пока что", "username": "sandrz7044", "source": "telegram_bot"}
