@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Trash, Check, Sparkles, User, Info, Image, DollarSign, X, Plus, Camera, FolderOpen, Loader2 } from "lucide-react";
+import { Upload, Trash, Check, Sparkles, User, Info, Image, DollarSign, X, Plus, Camera, FolderOpen, Loader2, Tag, Hash, Car, Palette, Calendar, Layers, ToggleLeft } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import imageCompression from 'browser-image-compression';
 
@@ -467,75 +467,93 @@ const handleSubmit = async (e: React.FormEvent) => {
           {/* ✅ Сетка: форма слева, фото справа */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Левая колонка - Форма */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>ID машины *</Label>
-                  <Input
-                    value={form.id}
-                    onChange={e => setForm(prev => ({ ...prev, id: e.target.value }))}
-                    disabled={!!car?.id}
-                    placeholder="toyota-camry-2024"
-                  />
-                  {!car?.id && <p className="text-xs text-amber-600">После создания нельзя изменить</p>}
+            <div className="space-y-3">
+              {/* ID машины и Quick ID */}
+              <div className="p-4 bg-gray-50 rounded-xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <Tag className="h-4 w-4 text-blue-600" />
+                  <Label className="text-sm font-medium text-gray-700">ID машины</Label>
                 </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>Quick ID</Label>
-                  <Input
-                    value={form.quick_id}
-                    onChange={e => setForm(prev => ({ ...prev, quick_id: e.target.value }))}
-                    placeholder="camry24"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Бренд *</Label>
-                  <Select value={form.brand} onValueChange={val => setForm(prev => ({ ...prev, brand: val }))}>
-                    <SelectTrigger><SelectValue placeholder="Выберите бренд" /></SelectTrigger>
-                    <SelectContent>{BRANDS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Модель *</Label>
-                  <Input
-                    value={form.model}
-                    onChange={e => setForm(prev => ({ ...prev, model: e.target.value }))}
-                    placeholder="Camry"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Input
+                      value={form.id}
+                      onChange={e => setForm(prev => ({ ...prev, id: e.target.value }))}
+                      disabled={!!car?.id}
+                      placeholder="ID"
+                      className="h-9"
+                    />
+                    {!car?.id && <p className="text-[10px] text-amber-600">После создания нельзя изменить</p>}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Input
+                      value={form.quick_id}
+                      onChange={e => setForm(prev => ({ ...prev, quick_id: e.target.value }))}
+                      placeholder="Quick ID"
+                      className="h-9"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Год *</Label>
-                  <Select value={form.year} onValueChange={val => setForm(prev => ({ ...prev, year: val }))}>
-                    <SelectTrigger><SelectValue placeholder="Год" /></SelectTrigger>
-                    <SelectContent>{YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}</SelectContent>
-                  </Select>
+              {/* Бренд и Модель */}
+              <div className="p-4 bg-white rounded-xl space-y-3 border border-gray-100">
+                <div className="flex items-center gap-2">
+                  <Car className="h-4 w-4 text-blue-600" />
+                  <Label className="text-sm font-medium text-gray-700">Бренд и модель</Label>
                 </div>
-                <div className="space-y-2">
-                  <Label>Цвет</Label>
-                  <Input
-                    value={form.color}
-                    onChange={e => setForm(prev => ({ ...prev, color: e.target.value }))}
-                    placeholder="белый"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Select value={form.brand} onValueChange={val => setForm(prev => ({ ...prev, brand: val }))}>
+                      <SelectTrigger className="h-9"><SelectValue placeholder="Бренд" /></SelectTrigger>
+                      <SelectContent>{BRANDS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Input
+                      value={form.model}
+                      onChange={e => setForm(prev => ({ ...prev, model: e.target.value }))}
+                      placeholder="Модель"
+                      className="h-9"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Класс *</Label>
-                <Select value={form.class} onValueChange={val => setForm(prev => ({ ...prev, class: val }))}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {CLASSES.map(c => <SelectItem key={c} value={c}>{getClassLabel(c)}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+              {/* Год, Цвет и Класс */}
+              <div className="p-4 bg-gray-50 rounded-xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-blue-600" />
+                  <Label className="text-sm font-medium text-gray-700">Параметры</Label>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1.5">
+                    <Select value={form.year} onValueChange={val => setForm(prev => ({ ...prev, year: val }))}>
+                      <SelectTrigger className="h-9"><SelectValue placeholder="Год" /></SelectTrigger>
+                      <SelectContent>{YEARS.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Input
+                      value={form.color}
+                      onChange={e => setForm(prev => ({ ...prev, color: e.target.value }))}
+                      placeholder="Цвет"
+                      className="h-9"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Select value={form.class} onValueChange={val => setForm(prev => ({ ...prev, class: val }))}>
+                      <SelectTrigger className="h-9"><SelectValue placeholder="Класс" /></SelectTrigger>
+                      <SelectContent>
+                        {CLASSES.map(c => <SelectItem key={c} value={c}>{getClassLabel(c)}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+              {/* Доступность */}
+              <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100">
                 <div>
                   <Label>Доступность</Label>
                   <p className="text-xs text-gray-500">Показывать клиентам</p>
@@ -1015,7 +1033,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         </div>
       )}
 
-      <div className="flex gap-3 pt-4 border-t">
+      <div className="flex gap-3 pt-4 pb-[6px] border-t">
         <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
           Отмена
         </Button>
