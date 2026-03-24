@@ -1573,3 +1573,20 @@
 {"timestamp": "2026-03-24T02:45:08.952820", "user_id": 477643828, "role": "user", "text": "Здравствуйте, пока что требуется байк с 2 по 15 апреля", "username": "sandrz7044", "source": "telegram_bot"}
 {"timestamp": "2026-03-24T02:45:09.039199", "user_id": 477643828, "role": "user", "text": "Машина под вопросом", "username": "sandrz7044", "source": "telegram_bot"}
 {"timestamp": "2026-03-24T02:45:09.295303", "user_id": 477643828, "role": "user", "text": "Пока что", "username": "sandrz7044", "source": "telegram_bot"}
+{"timestamp": "2026-03-24T04:38:42.243180", "user_id": 212517491, "role": "user", "text": "Добрый день. С 6 апреля нужна машина. На месяц. Что сможете предложить?", "username": "pravda_rf", "source": "telegram_bot"}
+{"timestamp": "2026-03-24T04:53:29.816Z", "user_id": "212517491", "role": "manager", "text": "Сейчас с основного аккаунта скину что есть", "source": "crm_panel"}
+{"timestamp": "2026-03-24T04:55:14.382Z", "user_id": "212517491", "role": "manager", "text": "Сбросил 3 варианта", "source": "crm_panel"}
+{"timestamp": "2026-03-24T11:50:12.652Z", "user_id": "6981057562", "role": "manager", "text": "Здравствуйте! Подскажите, нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T11:50:25.469Z", "user_id": "2126609852", "role": "manager", "text": "Здравствуйте! Подскажите, нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T11:50:39.032Z", "user_id": "353686731", "role": "manager", "text": "Здравствуйте! Подскажите, нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T11:50:49.352Z", "user_id": "230344913", "role": "manager", "text": "Здравствуйте! Подскажите, нашли авто?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T11:51:13.456Z", "user_id": "230344913", "role": "manager", "text": "Нужна на месяц с 8 апреля?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T11:52:27.911347", "user_id": 230344913, "role": "user", "text": "Привет! Нужен байк - Nmax или PCX, 2025 г.", "username": "MishaAnrof", "source": "telegram_bot"}
+{"timestamp": "2026-03-24T11:53:22.490Z", "user_id": "230344913", "role": "manager", "text": "Байки с самовывозом только с пхукет тауна. Устроит?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T11:53:40.720773", "user_id": 230344913, "role": "user", "text": "Я как раз там первую неделю буду", "username": "MishaAnrof", "source": "telegram_bot"}
+{"timestamp": "2026-03-24T11:54:15.901Z", "user_id": "230344913", "role": "manager", "text": "Принял, скоро пришлю", "source": "crm_panel"}
+{"timestamp": "2026-03-24T14:24:09.290Z", "user_id": "374897465", "role": "manager", "text": "Привет ОпенКлау! Че каво засранец?", "source": "crm_panel"}
+{"timestamp": "2026-03-24T14:24:23.724378", "user_id": 374897465, "role": "user", "text": "Заебись бразер!", "username": "Marseloid", "source": "telegram_bot"}
+{"timestamp": "2026-03-24T15:05:25.542Z", "user_id": "374897465", "role": "manager", "text": "Привет! Потдвердите", "source": "crm_panel"}
+{"timestamp": "2026-03-24T15:05:47.278547", "user_id": 374897465, "role": "user", "text": "Ок подтверждаю", "username": "Marseloid", "source": "telegram_bot"}
+{"timestamp": "2026-03-24T15:07:09.401797", "user_id": 374897465, "role": "user", "text": "https://sunny-rentals.online/offer?car=toyota_yaris_white_sedan&start=2026-03-24&end=2026-03-31&rental=7000&delivery=1000&deposit=5000&user_id=374897465", "username": "Marseloid", "source": "telegram_bot"}

@@ -22,14 +22,6 @@ const COMPRESSION_OPTIONS = {
   fileType: 'image/jpeg',
   initialQuality: 0.85
 };
-// Утилита для получения токена
-const getAuthToken = (): string => {
-  const token = localStorage.getItem('authToken');
-  if (!token) {
-    throw new Error('Auth token not found. Please login.');
-  }
-  return token;
-};
 const getImageUrl = (path: string | undefined, timestamp?: number): string => {
   if (!path) return "/placeholder.svg";
   if (path.startsWith("http")) return path;
@@ -298,9 +290,8 @@ const handleCreateOwner = async () => {
   try {
     const res = await fetch(`${API_URL}/api/admin/car-owners`, {
       method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${getAuthToken()}`
+      headers: {
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         id: newOwnerData.id,
@@ -366,9 +357,8 @@ const handleSubmit = async (e: React.FormEvent) => {
   try {
     const res = await fetch(url, {
       method,
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${getAuthToken()}`
+      headers: {
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)
     });
@@ -382,8 +372,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       const ownerRes = await fetch(`${API_URL}/api/admin/cars/${form.id}/owner-info`, {
         method: "PUT",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${getAuthToken()}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           owner_id: ownerFormData.owner_id,

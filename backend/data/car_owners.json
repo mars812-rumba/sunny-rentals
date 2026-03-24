@@ -157,23 +157,16 @@
           "updated_at": "2026-01-05T11:35:24.867414"
         },
         "toyota_yaris_2022_white": {
-          "notes": [],
+          "notes": [
+            "Пуля"
+          ],
           "status": "rented",
           "available_until": null,
           "facebook_url": null,
-          "updated_at": "2026-03-23T14:20:20.976454"
-        },
-        "toyota_yaris_2022_black": {
-          "notes": [
-            "Машина занята"
-          ],
-          "status": "available",
-          "available_until": null,
-          "facebook_url": null,
-          "updated_at": "2026-03-23T14:22:59.774166"
+          "updated_at": "2026-03-24T09:11:40.208809"
         }
       },
-      "updated_at": "2026-03-23T14:22:59.774170"
+      "updated_at": "2026-03-24T15:10:30.874043"
     },
     "AR": {
       "id": "AR",
@@ -344,9 +337,18 @@
           "available_until": null,
           "facebook_url": null,
           "updated_at": "2026-03-03T03:07:37.217397"
+        },
+        "toyota_yaris_2022_black": {
+          "notes": [
+            "Машина занята битая"
+          ],
+          "status": "available",
+          "available_until": "2026-03-27",
+          "facebook_url": null,
+          "updated_at": "2026-03-24T15:10:30.874073"
         }
       },
-      "updated_at": "2026-03-23T14:19:58.922350"
+      "updated_at": "2026-03-24T15:10:30.874076"
     },
     "BB": {
       "id": "BB",

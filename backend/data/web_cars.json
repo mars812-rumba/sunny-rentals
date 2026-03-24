@@ -973,7 +973,7 @@
       "quick_id": "hrv2025blackv",
       "rating": 4.7,
       "available": true,
-      "updated_at": "2026-03-23T14:34:16.583817"
+      "updated_at": "2026-03-24T06:22:40.451205"
     },
     "toyota_fortuner_2019_white": {
       "id": "toyota_fortuner_2019_white",
@@ -1836,50 +1836,6 @@
       "rating": 4.5,
       "updated_at": "2026-03-23T14:34:16.583991"
     },
-    "jazz_namo_2018": {
-      "id": "jazz_namo_2018",
-      "name": "Honda jazz 2018 Белый",
-      "class": "compact",
-      "brand": "Honda",
-      "model": "jazz",
-      "year": "2018",
-      "color": "Белый",
-      "available": true,
-      "photos": {
-        "main": "compact/jazz_namo_2018/1.jpg",
-        "gallery": [
-          "compact/jazz_namo_2018/1.jpg",
-          "compact/jazz_namo_2018/2.jpg",
-          "compact/jazz_namo_2018/3.jpg",
-          "compact/jazz_namo_2018/4.jpg"
-        ]
-      },
-      "pricing": {
-        "low_season": {
-          "price_1_6": 718,
-          "price_7_14": 718,
-          "price_15_29": 698,
-          "price_30": 448
-        },
-        "high_season": {
-          "price_1_6": 837,
-          "price_7_14": 837,
-          "price_15_29": 798,
-          "price_30": 548
-        },
-        "deposit": 5000
-      },
-      "specs": {
-        "fuel": "Бензин",
-        "transmission": "CVT",
-        "power": "120",
-        "engine": "1.5L"
-      },
-      "supplier": "namo",
-      "quick_id": "jazznamo2018",
-      "rating": 4.5,
-      "updated_at": "2026-03-23T14:34:16.584000"
-    },
     "namo_legender_2024": {
       "id": "namo_legender_2024",
       "name": "Toyota Legender 2024 white",
@@ -2724,14 +2680,14 @@
       },
       "specs": {
         "fuel": "Гибрид",
-        "transmission": "CVT",
+        "transmission": "Автомат",
         "power": "122",
         "engine": "1,5 L"
       },
       "supplier": "namo",
       "quick_id": "Aryariscrosswhite24",
       "rating": 4.5,
-      "updated_at": "2026-03-23T14:34:16.584176"
+      "updated_at": "2026-03-24T06:26:13.379226"
     },
     "Ar_city_rs_black_2025": {
       "id": "Ar_city_rs_black_2025",
@@ -2856,6 +2812,52 @@
       "quick_id": "Detmak2024",
       "rating": 4.5,
       "updated_at": "2026-03-23T14:34:16.584203"
+    },
+    "Nm_jazz_white_2019": {
+      "id": "Nm_jazz_white_2019",
+      "name": "Honda Jazz 2019 Белый",
+      "class": "compact",
+      "brand": "Honda",
+      "model": "Jazz",
+      "year": "2019",
+      "color": "Белый",
+      "available": true,
+      "photos": {
+        "main": "compact/Nm_jazz_white_2019/7.jpg",
+        "gallery": [
+          "compact/Nm_jazz_white_2019/7.jpg",
+          "compact/Nm_jazz_white_2019/8.jpg",
+          "compact/Nm_jazz_white_2019/9.jpg",
+          "compact/Nm_jazz_white_2019/10.jpg",
+          "compact/Nm_jazz_white_2019/11.jpg",
+          "compact/Nm_jazz_white_2019/12.jpg"
+        ]
+      },
+      "pricing": {
+        "low_season": {
+          "price_1_6": 800,
+          "price_7_14": 800,
+          "price_15_29": 700,
+          "price_30": 500
+        },
+        "high_season": {
+          "price_1_6": 900,
+          "price_7_14": 800,
+          "price_15_29": 700,
+          "price_30": 600
+        },
+        "deposit": 5000
+      },
+      "specs": {
+        "fuel": "Бензин",
+        "transmission": "CVT",
+        "power": "120 hp",
+        "engine": "1.5L"
+      },
+      "supplier": "namo",
+      "quick_id": "Nm_jazz",
+      "rating": 4.5,
+      "updated_at": "2026-03-24T15:24:52.425993"
     }
   }
 }

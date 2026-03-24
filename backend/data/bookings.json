@@ -807,5 +807,135 @@
     "source": "telegram_webapp",
     "updated_at": "2026-03-21T11:46:24.205728",
     "confirmed_at": "2026-03-21T11:46:24.205716"
+  },
+  {
+    "booking_id": "41f7875a",
+    "user_id": "374897465",
+    "form_data": {
+      "car": {
+        "id": "nmax155_2019_black",
+        "name": "Nmax155 2019 black",
+        "brand": "Nmax155",
+        "model": "2019",
+        "year": "black",
+        "color": ""
+      },
+      "dates": {
+        "start": "2026-04-11T17:00:00.000Z",
+        "end": "2026-04-23T17:00:00.000Z",
+        "days": 13
+      },
+      "locations": {
+        "pickupLocation": "airport",
+        "dropoffLocation": "airport",
+        "pickupAddress": "",
+        "dropoffAddress": ""
+      },
+      "pricing": {
+        "dailyRate": 297,
+        "totalRental": 3861,
+        "deposit": 5000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 0,
+        "grandTotal": 3861
+      },
+      "contact": {
+        "value": "@Marseloid",
+        "type": "telegram",
+        "name": "",
+        "phone": ""
+      },
+      "timestamp": "2026-03-24T14:59:13.054Z"
+    },
+    "status": "confirmed",
+    "created_at": "2026-03-24T14:59:14.510647",
+    "source": "telegram_webapp",
+    "confirmed_at": "2026-03-24T15:01:20.400187",
+    "updated_at": "2026-03-24T15:01:20.400204"
+  },
+  {
+    "booking_id": "bk_20260324_150320_728031",
+    "user_id": "admin",
+    "form_data": {
+      "car": {
+        "id": "toyota_yaris_2023_blue",
+        "name": "Toyota YARIS Hb 2023 Blue",
+        "brand": "",
+        "model": "",
+        "year": "",
+        "color": ""
+      },
+      "dates": {
+        "start": "2026-03-31T02:00:00.000Z",
+        "end": "2026-04-08T02:00:00.000Z",
+        "days": 8,
+        "pickupTime": "09:00",
+        "returnTime": "09:00"
+      },
+      "locations": {
+        "pickupLocation": "hotel",
+        "dropoffLocation": "airport",
+        "pickupAddress": "Отель",
+        "dropoffAddress": ""
+      },
+      "pricing": {
+        "dailyRate": 837,
+        "totalRental": 6696,
+        "deposit": 5000,
+        "delivery": 500,
+        "grandTotal": 7196
+      },
+      "contact": {
+        "name": "Марсель",
+        "value": "Mars",
+        "type": "telegram"
+      },
+      "timestamp": "2026-03-24T15:03:20.727314"
+    },
+    "status": "pre_booking",
+    "created_at": "2026-03-24T15:03:20.728128",
+    "source": "admin_panel"
+  },
+  {
+    "booking_id": "bk_20260324_150733_882226",
+    "user_id": "374897465",
+    "status": "pre_booking",
+    "form_data": {
+      "car": {
+        "id": "toyota_yaris_white_sedan",
+        "name": "Toyota YARIS white Sedan",
+        "brand": "Toyota",
+        "model": "YARIS",
+        "year": "white",
+        "color": "Sedan"
+      },
+      "dates": {
+        "start": "2026-03-24",
+        "end": "2026-03-31",
+        "days": 7
+      },
+      "locations": {
+        "pickupLocation": "airport",
+        "returnLocation": "airport"
+      },
+      "pricing": {
+        "dailyRate": 1000,
+        "totalRental": 7000,
+        "deposit": 5000,
+        "deliveryPickup": 0,
+        "deliveryReturn": 0,
+        "totalDelivery": 1000,
+        "grandTotal": 8000
+      },
+      "contact": {
+        "value": "374897465",
+        "type": "telegram"
+      },
+      "timestamp": "2026-03-24T15:07:33.882303"
+    },
+    "source": "offer_page",
+    "created_at": "2026-03-24T15:07:33.882322",
+    "updated_at": "2026-03-24T15:07:33.882326"
   }
 ]
