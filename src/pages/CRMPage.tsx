@@ -1151,8 +1151,8 @@ const handleUpdateNote = async () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-hidden">
-      {/* Combined Sticky Header: Nav + Stats + Filters */}
-      <div className="sticky top-0 z-50 bg-white shadow-sm">
+      {/* Combined Fixed Header: Nav + Stats + Filters */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
         
         {/* Nav */}
         <nav className="bg-white border-b px-4 py-2 flex justify-between items-center">
@@ -1251,8 +1251,8 @@ const handleUpdateNote = async () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="p-4 max-w-[1600px] mx-auto w-full">
+      {/* Main Content - with top padding to account for fixed header */}
+      <main className="p-4 max-w-[1600px] mx-auto w-full pt-[120px]">
   {loading ? (
     <div className="h-96 flex flex-col items-center justify-center text-slate-300">
        <RefreshCcw className="w-10 h-10 animate-spin mb-4 text-blue-100" />
