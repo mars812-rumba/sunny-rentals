@@ -1264,18 +1264,9 @@ const handleUpdateNote = async () => {
     // ЛОГИКА ПОДСВЕТКИ: если есть непрочитанное сообщение от юзера - нужно внимание
     const needsReply = dialog?.has_new_messages && dialog?.last_message_from === 'user';
     const aiActive = dialog?.claude_status === 'active';
-    // 1. ОПРЕДЕЛЯЕМ ФОН В ЗАВИСИМОСТИ ОТ МАРКЕРА
-    const markerStyles: Record<string, string> = {
-      'offer_sent': 'bg-amber-50/60 border-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.3)]',   // Оффер - янтарный
-      'waiting': 'bg-purple-50/60 border-purple-200 shadow-[0_0_12px_rgba(168,85,247,0.3)]',     // Клиент думает - фиолетовый
-      'need_info': 'bg-cyan-50/60 border-cyan-200 shadow-[0_0_12px_rgba(6,182,212,0.3)]',       // Нужна инфо - циан
-      'follow_up': 'bg-red-50/60 border-red-200 shadow-[0_0_12px_rgba(239,68,68,0.3)]',         // Follow-up - красный
-    };
 
-    // Приоритет: если есть маркер — красим в его цвет. Если нет и нужен ответ — красим в янтарный. Иначе — белый.
-    const cardBgClass = user.marker && markerStyles[user.marker] 
-      ? markerStyles[user.marker] 
-      : (needsReply ? 'bg-amber-50/60 border-amber-200' : 'bg-white');
+    // Примечание: фон карточки - всегда белый, маркер показывается только на поле заметки
+    const cardBgClass = needsReply ? 'bg-amber-50/60 border-amber-200' : 'bg-white';
 
     return (
 
