@@ -1253,7 +1253,7 @@ const handleUpdateNote = async () => {
       </div>
 
       {/* Main Content - with top padding to account for fixed header */}
-      <main className="p-4 max-w-[1600px] mx-auto w-full pt-[120px]">
+      <main className="p-4 max-w-[1600px] mx-auto w-full pt-[140px]">
   {loading ? (
     <div className="h-96 flex flex-col items-center justify-center text-slate-300">
        <RefreshCcw className="w-10 h-10 animate-spin mb-4 text-blue-100" />
