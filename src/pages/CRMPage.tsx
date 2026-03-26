@@ -1340,8 +1340,11 @@ const handleUpdateNote = async () => {
 {/* СТРОКА 3: Интерактивная заметка */}
 <div
   className={`flex items-center gap-1.5 rounded px-2 py-1 border transition-colors cursor-text min-h-[24px] ${
-    user.last_note ? 'bg-[#f8b515]/10 border-[#f8b515]/30 hover:bg-[#f8b515]/20' : 
-                    'bg-slate-50 border-slate-100 hover:bg-white hover:border-blue-200'
+    user.marker === 'offer_sent' ? 'bg-amber-100/50 border-amber-200/50' :
+    user.marker === 'waiting' ? 'bg-purple-100/50 border-purple-200/50' :
+    user.marker === 'need_info' ? 'bg-cyan-100/50 border-cyan-200/50' :
+    user.marker === 'follow_up' ? 'bg-red-100/50 border-red-200/50' :
+                                  'bg-slate-50 border-slate-100 hover:bg-white hover:border-blue-200'
   }`}
   onClick={(e) => {
     e.stopPropagation();
@@ -1350,13 +1353,23 @@ const handleUpdateNote = async () => {
   }}
 >
   <StickyNote className={`w-2.5 h-2.5 shrink-0 ${
-    user.last_note ? 'text-[#f8b515]' : 'text-slate-400'
+    user.marker === 'offer_sent' ? 'text-amber-600' :
+    user.marker === 'waiting' ? 'text-purple-600' :
+    user.marker === 'need_info' ? 'text-cyan-600' :
+    user.marker === 'follow_up' ? 'text-red-600' :
+                                   'text-slate-400'
   }`} />
   
   {compareUserIds(editingNoteId, user.user_id) ? (
     <input
       autoFocus
-      className="text-[8px] bg-transparent outline-none w-full font-bold text-blue-600"
+      className={`text-[8px] bg-transparent outline-none w-full font-bold ${
+        user.marker === 'offer_sent' ? 'text-amber-800' :
+        user.marker === 'waiting' ? 'text-purple-800' :
+        user.marker === 'need_info' ? 'text-cyan-800' :
+        user.marker === 'follow_up' ? 'text-red-800' :
+                                       'text-blue-600'
+      }`}
       value={tempNote}
       onChange={(e) => setTempNote(e.target.value)}
       onBlur={() => handleQuickSaveNote(user.user_id)}
@@ -1365,7 +1378,11 @@ const handleUpdateNote = async () => {
     />
   ) : (
     <p className={`text-[8px] truncate w-full italic tracking-tight ${
-      user.last_note ? 'text-[#8a650d]' : 'text-slate-400'
+      user.marker === 'offer_sent' ? 'text-amber-700' :
+      user.marker === 'waiting' ? 'text-purple-700' :
+      user.marker === 'need_info' ? 'text-cyan-700' :
+      user.marker === 'follow_up' ? 'text-red-700' :
+                                     'text-slate-400'
     }`}>
       {user.last_note || "Добавить заметку..."}
     </p>
