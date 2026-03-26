@@ -1386,7 +1386,6 @@ const handleUpdateNote = async () => {
     }`}>
       {user.last_note || "Добавить заметку..."}
     </p>
-    </p>
   )}
 </div>
 
