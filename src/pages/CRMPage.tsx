@@ -18,10 +18,11 @@ import {
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus, MessageCircleReply,UserRoundCheck,
   Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
   CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download,
-  Clock, FileQuestion
+  Clock, FileQuestion, Info
 } from 'lucide-react';
 import { MarkerType } from '@/types/crm';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
+import { CRMTutorialSheet } from '@/components/admin/CRMTutorialSheet';
 import logo from '@/assets/logo.png';
 
 // TypeScript интерфейсы для работы с диалогами
@@ -100,6 +101,7 @@ const CRMPage: React.FC = () => {
   const [note, setNote] = useState('');
   const [managerMessage, setManagerMessage] = useState('');
   const [loadingAction, setLoadingAction] = useState<Record<string, boolean>>({});
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
@@ -1233,14 +1235,14 @@ const handleUpdateNote = async () => {
       </div>
     </div>
 
-    {/* Refresh button */}
+    {/* Help button */}
     <Button 
       size="icon" 
       variant="ghost" 
-      onClick={refreshAllDialogStatuses} 
+      onClick={() => setTutorialOpen(true)} 
       className="h-7 w-7 shrink-0 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
     >
-      <RefreshCw className="w-3 h-3" />
+      <Info className="w-3 h-3" />
     </Button>
   </div>
 
@@ -2172,7 +2174,11 @@ const handleUpdateNote = async () => {
           onSuccess={handleBookingSuccess}
         />
       )}
-     
+      
+      <CRMTutorialSheet 
+        open={tutorialOpen} 
+        onOpenChange={setTutorialOpen} 
+      />
     </div>
   );
 };
