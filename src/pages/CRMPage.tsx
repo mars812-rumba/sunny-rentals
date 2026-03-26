@@ -1189,7 +1189,8 @@ const handleUpdateNote = async () => {
         </div>
 
         {/* Filters Row */}
-        <div className="px-4 pb-2 bg-slate-50">
+        <div className="px-4 pb-3 bg-slate-50">
+          <div className="h-px bg-slate-200 mb-2"></div>
           <div className="flex items-center justify-between gap-1 p-1 bg-white/90 rounded-lg shadow-sm border border-slate-100">
             <div className="flex items-center gap-0.5 overflow-x-auto">
               
