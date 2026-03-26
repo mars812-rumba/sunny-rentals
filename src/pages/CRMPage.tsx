@@ -1171,8 +1171,8 @@ const handleUpdateNote = async () => {
         </nav>
 
         {/* Stats Row */}
-        <div className="px-4 pt-2 bg-slate-50">
-          <div className="grid grid-cols-5 gap-1">
+        <div className="px-4 pt-3 pb-2 bg-slate-50">
+          <div className="grid grid-cols-5 gap-1.5">
             {MAIN_STATUSES.map(key => {
               const count = stats?.[key] || 0;
               return (
