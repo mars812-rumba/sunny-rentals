@@ -1377,7 +1377,7 @@ const handleUpdateNote = async () => {
       onClick={(e) => e.stopPropagation()}
     />
   ) : (
-    <p className={`text-[8px] truncate w-full italic tracking-tight ${
+    <p className={`text-[8px] truncate w-full font-bold tracking-tight ${
       user.marker === 'offer_sent' ? 'text-amber-700' :
       user.marker === 'waiting' ? 'text-purple-700' :
       user.marker === 'need_info' ? 'text-cyan-700' :
