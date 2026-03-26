@@ -1167,83 +1167,85 @@ const handleUpdateNote = async () => {
         </div>
       </nav>
 
-<main className="p-4 max-w-[1600px] mx-auto w-full space-y-6">
-  {/* Stats Section - компактный layout для мобильных */}
-  <div className="grid grid-cols-5 gap-2">
-    {MAIN_STATUSES.map(key => {
-      const count = stats?.[key] || 0;
-
-      return (
-        <Card key={key} onClick={() => setActiveStatus(key)}
-          className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:bg-white/50 opacity-80'}`}>
-          <CardContent className="p-2 flex flex-col items-center justify-center gap-0.5 relative">
-            <span className="text-[8px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
-            <span className="text-base font-black text-slate-800 leading-none">{count}</span>
-          </CardContent>
-        </Card>
-      );
-    })}
-  </div>
-
-  {/* Compact filter bar - single row, sticky bottom on mobile */}
-  <div className="flex items-center justify-between gap-1 p-1.5 bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-slate-100 sticky bottom-0 z-40 mb-4">
-    {/* All filters in one compact row */}
-    <div className="flex items-center gap-0.5 overflow-x-auto max-w-[calc(100vw-80px)]">
-      
-      {/* Dialog filters */}
-      <div className="flex gap-0.5">
-        {[
-          { id: 'all', icon: Users, color: 'text-slate-500', count: users.length },
-          { id: 'new', icon: UserRoundCheck, color: 'text-red-500', count: users.filter(u => u.dialog_status?.has_new_messages).length },
-          { id: 'ai-on', icon: UserRoundPlus, color: 'text-green-600', count: users.filter(u => u.dialog_status?.claude_status === 'active').length },
-        ].map(f => (
-          <Button
-            key={f.id}
-            variant={dialogFilter === f.id ? 'default' : 'ghost'}
-            onClick={() => setDialogFilter(f.id as 'all' | 'new' | 'ai-on')}
-            className="h-7 px-1.5 rounded-md flex gap-1 shrink-0 transition-all"
-          >
-            <f.icon className={`w-3 h-3 ${dialogFilter === f.id ? 'text-white' : f.color}`} />
-            <span className={`text-[9px] font-bold ${dialogFilter === f.id ? 'text-white' : 'text-slate-400'}`}>
-              {f.count}
-            </span>
-          </Button>
-        ))}
-      </div>
-
-      {/* Divider */}
-      <div className="w-px h-5 bg-slate-300 shrink-0 mx-0.5"></div>
-
-      {/* Marker filters */}
-      <div className="flex gap-0.5">
-        {[
-          { id: 'all', icon: Filter, color: 'text-slate-400' },
-          { id: 'offer_sent', icon: Send, color: 'text-amber-500' },
-          { id: 'waiting', icon: Clock, color: 'text-purple-500' },
-          { id: 'need_info', icon: FileQuestion, color: 'text-cyan-500' },
-          { id: 'follow_up', icon: MessageCircleReply, color: 'text-red-500' },
-        ].map(m => (
-          <Button
-            key={m.id}
-            variant={markerFilter === m.id ? 'default' : 'ghost'}
-            onClick={() => setMarkerFilter(m.id)}
-            className="h-7 px-1 rounded-md shrink-0 transition-all"
-          >
-            <m.icon className={`w-3 h-3 ${markerFilter === m.id ? 'text-white' : m.color}`} />
-          </Button>
-        ))}
-      </div>
+<main className="p-4 max-w-[1600px] mx-auto w-full space-y-4">
+  {/* Sticky header: Stats + Filters combined */}
+  <div className="sticky top-[52px] z-40 bg-slate-50/95 backdrop-blur-sm -mx-4 px-4 pt-2 pb-1">
+    
+    {/* Row 1: Status chips (Воронка) */}
+    <div className="grid grid-cols-5 gap-1 mb-1.5">
+      {MAIN_STATUSES.map(key => {
+        const count = stats?.[key] || 0;
+        return (
+          <Card key={key} onClick={() => setActiveStatus(key)}
+            className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-md' : 'hover:bg-white/50 opacity-80'}`}>
+            <CardContent className="p-1.5 flex flex-col items-center justify-center gap-0.5">
+              <span className="text-[7px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
+              <span className="text-sm font-black text-slate-800 leading-none">{count}</span>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
 
-    {/* Help button */}
-    <Button 
-      size="icon" 
-      variant="ghost" 
-      onClick={() => setTutorialOpen(true)} 
-      className="h-7 w-7 shrink-0 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
-    >
-      <Info className="w-3 h-3" />
-    </Button>
+    {/* Row 2: Filters */}
+    <div className="flex items-center justify-between gap-1 p-1 bg-white/90 rounded-lg shadow-sm border border-slate-100">
+      <div className="flex items-center gap-0.5 overflow-x-auto">
+        
+        {/* Dialog filters */}
+        <div className="flex gap-0.5">
+          {[
+            { id: 'all', icon: Users, color: 'text-slate-500', count: users.length },
+            { id: 'new', icon: UserRoundCheck, color: 'text-red-500', count: users.filter(u => u.dialog_status?.has_new_messages).length },
+            { id: 'ai-on', icon: UserRoundPlus, color: 'text-green-600', count: users.filter(u => u.dialog_status?.claude_status === 'active').length },
+          ].map(f => (
+            <Button
+              key={f.id}
+              variant={dialogFilter === f.id ? 'default' : 'ghost'}
+              onClick={() => setDialogFilter(f.id as 'all' | 'new' | 'ai-on')}
+              className="h-6 px-1.5 rounded-md flex gap-1 shrink-0 transition-all"
+            >
+              <f.icon className={`w-3 h-3 ${dialogFilter === f.id ? 'text-white' : f.color}`} />
+              <span className={`text-[9px] font-bold ${dialogFilter === f.id ? 'text-white' : 'text-slate-400'}`}>
+                {f.count}
+              </span>
+            </Button>
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div className="w-px h-4 bg-slate-300 shrink-0 mx-0.5"></div>
+
+        {/* Marker filters */}
+        <div className="flex gap-0.5">
+          {[
+            { id: 'all', icon: Filter, color: 'text-slate-400' },
+            { id: 'offer_sent', icon: Send, color: 'text-amber-500' },
+            { id: 'waiting', icon: Clock, color: 'text-purple-500' },
+            { id: 'need_info', icon: FileQuestion, color: 'text-cyan-500' },
+            { id: 'follow_up', icon: MessageCircleReply, color: 'text-red-500' },
+          ].map(m => (
+            <Button
+              key={m.id}
+              variant={markerFilter === m.id ? 'default' : 'ghost'}
+              onClick={() => setMarkerFilter(m.id)}
+              className="h-6 px-1 rounded-md shrink-0 transition-all"
+            >
+              <m.icon className={`w-3 h-3 ${markerFilter === m.id ? 'text-white' : m.color}`} />
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Help button */}
+      <Button 
+        size="icon" 
+        variant="ghost" 
+        onClick={() => setTutorialOpen(true)} 
+        className="h-6 w-6 shrink-0 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
+      >
+        <Info className="w-3 h-3" />
+      </Button>
+    </div>
   </div>
 
   {/* User Cards Grid */}
