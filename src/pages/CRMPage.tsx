@@ -1151,104 +1151,108 @@ const handleUpdateNote = async () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-hidden">
-      {/* Nav */}
-      <nav className="bg-white border-b px-4 py-2 flex justify-between items-center sticky top-0 z-40 shadow-sm">
-        <div className="flex items-center gap-2">
-          <img src={logo} alt="" className="h-7 w-auto" />
-          <span className="text-sm font-semibold text-slate-900">CRM</span>
-        </div>
-        <div className="flex bg-slate-100 p-1 rounded-lg">
-          {['today', 'week', 'month', 'all'].map(p => (
-            <button key={p} onClick={() => setPeriod(p)}
-              className={`px-3 py-1 text-[9px] font-bold uppercase rounded-md transition-all ${period === p ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}>
-              {p}
-            </button>
-          ))}
-        </div>
-      </nav>
-
-<main className="p-4 max-w-[1600px] mx-auto w-full space-y-4">
-  {/* Sticky header: Stats + Filters combined */}
-  <div className="sticky top-[52px] z-40 bg-slate-50/95 backdrop-blur-sm -mx-4 px-4 pt-2 pb-1">
-    
-    {/* Row 1: Status chips (Воронка) */}
-    <div className="grid grid-cols-5 gap-1 mb-1.5">
-      {MAIN_STATUSES.map(key => {
-        const count = stats?.[key] || 0;
-        return (
-          <Card key={key} onClick={() => setActiveStatus(key)}
-            className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-md' : 'hover:bg-white/50 opacity-80'}`}>
-            <CardContent className="p-1.5 flex flex-col items-center justify-center gap-0.5">
-              <span className="text-[7px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
-              <span className="text-sm font-black text-slate-800 leading-none">{count}</span>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
-
-    {/* Row 2: Filters */}
-    <div className="flex items-center justify-between gap-1 p-1 bg-white/90 rounded-lg shadow-sm border border-slate-100">
-      <div className="flex items-center gap-0.5 overflow-x-auto">
+      {/* Combined Sticky Header: Nav + Stats + Filters */}
+      <div className="sticky top-0 z-50 bg-white shadow-sm">
         
-        {/* Dialog filters */}
-        <div className="flex gap-0.5">
-          {[
-            { id: 'all', icon: Users, color: 'text-slate-500', count: users.length },
-            { id: 'new', icon: UserRoundCheck, color: 'text-red-500', count: users.filter(u => u.dialog_status?.has_new_messages).length },
-            { id: 'ai-on', icon: UserRoundPlus, color: 'text-green-600', count: users.filter(u => u.dialog_status?.claude_status === 'active').length },
-          ].map(f => (
-            <Button
-              key={f.id}
-              variant={dialogFilter === f.id ? 'default' : 'ghost'}
-              onClick={() => setDialogFilter(f.id as 'all' | 'new' | 'ai-on')}
-              className="h-6 px-1.5 rounded-md flex gap-1 shrink-0 transition-all"
-            >
-              <f.icon className={`w-3 h-3 ${dialogFilter === f.id ? 'text-white' : f.color}`} />
-              <span className={`text-[9px] font-bold ${dialogFilter === f.id ? 'text-white' : 'text-slate-400'}`}>
-                {f.count}
-              </span>
-            </Button>
-          ))}
+        {/* Nav */}
+        <nav className="bg-white border-b px-4 py-2 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="" className="h-7 w-auto" />
+            <span className="text-sm font-semibold text-slate-900">CRM</span>
+          </div>
+          <div className="flex bg-slate-100 p-1 rounded-lg">
+            {['today', 'week', 'month', 'all'].map(p => (
+              <button key={p} onClick={() => setPeriod(p)}
+                className={`px-3 py-1 text-[9px] font-bold uppercase rounded-md transition-all ${period === p ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}>
+                {p}
+              </button>
+            ))}
+          </div>
+        </nav>
+
+        {/* Stats Row */}
+        <div className="px-4 pt-2 bg-slate-50">
+          <div className="grid grid-cols-5 gap-1">
+            {MAIN_STATUSES.map(key => {
+              const count = stats?.[key] || 0;
+              return (
+                <Card key={key} onClick={() => setActiveStatus(key)}
+                  className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-md' : 'hover:bg-white/50 opacity-80'}`}>
+                  <CardContent className="p-1.5 flex flex-col items-center justify-center gap-0.5">
+                    <span className="text-[7px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
+                    <span className="text-sm font-black text-slate-800 leading-none">{count}</span>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Divider */}
-        <div className="w-px h-4 bg-slate-300 shrink-0 mx-0.5"></div>
+        {/* Filters Row */}
+        <div className="px-4 pb-2 bg-slate-50">
+          <div className="flex items-center justify-between gap-1 p-1 bg-white/90 rounded-lg shadow-sm border border-slate-100">
+            <div className="flex items-center gap-0.5 overflow-x-auto">
+              
+              {/* Dialog filters */}
+              <div className="flex gap-0.5">
+                {[
+                  { id: 'all', icon: Users, color: 'text-slate-500', count: users.length },
+                  { id: 'new', icon: UserRoundCheck, color: 'text-red-500', count: users.filter(u => u.dialog_status?.has_new_messages).length },
+                  { id: 'ai-on', icon: UserRoundPlus, color: 'text-green-600', count: users.filter(u => u.dialog_status?.claude_status === 'active').length },
+                ].map(f => (
+                  <Button
+                    key={f.id}
+                    variant={dialogFilter === f.id ? 'default' : 'ghost'}
+                    onClick={() => setDialogFilter(f.id as 'all' | 'new' | 'ai-on')}
+                    className="h-6 px-1.5 rounded-md flex gap-1 shrink-0 transition-all"
+                  >
+                    <f.icon className={`w-3 h-3 ${dialogFilter === f.id ? 'text-white' : f.color}`} />
+                    <span className={`text-[9px] font-bold ${dialogFilter === f.id ? 'text-white' : 'text-slate-400'}`}>
+                      {f.count}
+                    </span>
+                  </Button>
+                ))}
+              </div>
 
-        {/* Marker filters */}
-        <div className="flex gap-0.5">
-          {[
-            { id: 'all', icon: Filter, color: 'text-slate-400' },
-            { id: 'offer_sent', icon: Send, color: 'text-amber-500' },
-            { id: 'waiting', icon: Clock, color: 'text-purple-500' },
-            { id: 'need_info', icon: FileQuestion, color: 'text-cyan-500' },
-            { id: 'follow_up', icon: MessageCircleReply, color: 'text-red-500' },
-          ].map(m => (
-            <Button
-              key={m.id}
-              variant={markerFilter === m.id ? 'default' : 'ghost'}
-              onClick={() => setMarkerFilter(m.id)}
-              className="h-6 px-1 rounded-md shrink-0 transition-all"
+              {/* Divider */}
+              <div className="w-px h-4 bg-slate-300 shrink-0 mx-0.5"></div>
+
+              {/* Marker filters */}
+              <div className="flex gap-0.5">
+                {[
+                  { id: 'all', icon: Filter, color: 'text-slate-400' },
+                  { id: 'offer_sent', icon: Send, color: 'text-amber-500' },
+                  { id: 'waiting', icon: Clock, color: 'text-purple-500' },
+                  { id: 'need_info', icon: FileQuestion, color: 'text-cyan-500' },
+                  { id: 'follow_up', icon: MessageCircleReply, color: 'text-red-500' },
+                ].map(m => (
+                  <Button
+                    key={m.id}
+                    variant={markerFilter === m.id ? 'default' : 'ghost'}
+                    onClick={() => setMarkerFilter(m.id)}
+                    className="h-6 px-1 rounded-md shrink-0 transition-all"
+                  >
+                    <m.icon className={`w-3 h-3 ${markerFilter === m.id ? 'text-white' : m.color}`} />
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Help button */}
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              onClick={() => setTutorialOpen(true)} 
+              className="h-6 w-6 shrink-0 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
             >
-              <m.icon className={`w-3 h-3 ${markerFilter === m.id ? 'text-white' : m.color}`} />
+              <Info className="w-3 h-3" />
             </Button>
-          ))}
+          </div>
         </div>
       </div>
 
-      {/* Help button */}
-      <Button 
-        size="icon" 
-        variant="ghost" 
-        onClick={() => setTutorialOpen(true)} 
-        className="h-6 w-6 shrink-0 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
-      >
-        <Info className="w-3 h-3" />
-      </Button>
-    </div>
-  </div>
-
-  {/* User Cards Grid */}
+      {/* Main Content */}
+      <main className="p-4 max-w-[1600px] mx-auto w-full">
   {loading ? (
     <div className="h-96 flex flex-col items-center justify-center text-slate-300">
        <RefreshCcw className="w-10 h-10 animate-spin mb-4 text-blue-100" />
