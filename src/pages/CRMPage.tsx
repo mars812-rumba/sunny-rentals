@@ -1183,65 +1183,66 @@ const handleUpdateNote = async () => {
     })}
   </div>
 
-  <div className="flex flex-col gap-2 p-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 sticky top-[60px] z-40 mb-4">
-  
-  {/* РЯД 1: Системные фильтры (Сообщения и ИИ) */}
-  <div className="flex items-center justify-between w-full">
-    <div className="flex gap-1.5 bg-slate-100/50 p-1 rounded-xl">
-      {[
-        { id: 'all', icon: Users, color: 'text-slate-500', count: users.length },
-        { id: 'new', icon: UserRoundCheck, color: 'text-red-500', count: users.filter(u => u.dialog_status?.has_new_messages).length },
-        { id: 'ai-on', icon: UserRoundPlus, color: 'text-green-600', count: users.filter(u => u.dialog_status?.claude_status === 'active').length },
-      ].map(f => (
-        <Button
-          key={f.id}
-          variant={dialogFilter === f.id ? 'default' : 'ghost'}
-          onClick={() => setDialogFilter(f.id as 'all' | 'new' | 'ai-on')}
-          className="h-8 px-2.5 rounded-lg flex gap-1.5 transition-all"
-        >
-          <f.icon className={`w-4 h-4 ${dialogFilter === f.id ? 'text-white' : f.color}`} />
-          <span className={`text-[10px] font-black ${dialogFilter === f.id ? 'text-white' : 'text-slate-500'}`}>
-            {f.count}
-          </span>
-        </Button>
-      ))}
+  {/* Compact filter bar - single row, sticky bottom on mobile */}
+  <div className="flex items-center justify-between gap-1 p-1.5 bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-slate-100 sticky bottom-0 z-40 mb-4">
+    {/* All filters in one compact row */}
+    <div className="flex items-center gap-0.5 overflow-x-auto max-w-[calc(100vw-80px)]">
+      
+      {/* Dialog filters */}
+      <div className="flex gap-0.5">
+        {[
+          { id: 'all', icon: Users, color: 'text-slate-500', count: users.length },
+          { id: 'new', icon: UserRoundCheck, color: 'text-red-500', count: users.filter(u => u.dialog_status?.has_new_messages).length },
+          { id: 'ai-on', icon: UserRoundPlus, color: 'text-green-600', count: users.filter(u => u.dialog_status?.claude_status === 'active').length },
+        ].map(f => (
+          <Button
+            key={f.id}
+            variant={dialogFilter === f.id ? 'default' : 'ghost'}
+            onClick={() => setDialogFilter(f.id as 'all' | 'new' | 'ai-on')}
+            className="h-7 px-1.5 rounded-md flex gap-1 shrink-0 transition-all"
+          >
+            <f.icon className={`w-3 h-3 ${dialogFilter === f.id ? 'text-white' : f.color}`} />
+            <span className={`text-[9px] font-bold ${dialogFilter === f.id ? 'text-white' : 'text-slate-400'}`}>
+              {f.count}
+            </span>
+          </Button>
+        ))}
+      </div>
+
+      {/* Divider */}
+      <div className="w-px h-5 bg-slate-300 shrink-0 mx-0.5"></div>
+
+      {/* Marker filters */}
+      <div className="flex gap-0.5">
+        {[
+          { id: 'all', icon: Filter, color: 'text-slate-400' },
+          { id: 'offer_sent', icon: Send, color: 'text-amber-500' },
+          { id: 'waiting', icon: Clock, color: 'text-purple-500' },
+          { id: 'need_info', icon: FileQuestion, color: 'text-cyan-500' },
+          { id: 'follow_up', icon: RefreshCw, color: 'text-red-500' },
+        ].map(m => (
+          <Button
+            key={m.id}
+            variant={markerFilter === m.id ? 'default' : 'ghost'}
+            onClick={() => setMarkerFilter(m.id)}
+            className="h-7 px-1 rounded-md shrink-0 transition-all"
+          >
+            <m.icon className={`w-3 h-3 ${markerFilter === m.id ? 'text-white' : m.color}`} />
+          </Button>
+        ))}
+      </div>
     </div>
 
-    {/* Кнопка обновления теперь в верхнем ряду сбоку */}
+    {/* Refresh button */}
     <Button 
       size="icon" 
       variant="ghost" 
       onClick={refreshAllDialogStatuses} 
-      className="h-8 w-8 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
+      className="h-7 w-7 shrink-0 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
     >
-      <RefreshCw className="w-3.5 h-3.5" />
+      <RefreshCw className="w-3 h-3" />
     </Button>
   </div>
-
-  {/* РАЗДЕЛИТЕЛЬ (тонкая линия) */}
-  <div className="h-px bg-slate-100 w-full mx-auto"></div>
-
-  {/* РЯД 2: Маркеры (Бизнес-логика) */}
-  <div className="flex gap-1.5 bg-slate-100/30 p-1 rounded-xl w-fit">
-    {[
-      { id: 'all', icon: Filter, color: 'text-slate-400' },
-      { id: 'offer_sent', icon: Send, color: 'text-amber-500' },
-      { id: 'waiting', icon: Clock, color: 'text-purple-500' },
-      { id: 'need_info', icon: FileQuestion, color: 'text-cyan-500' },
-      { id: 'follow_up', icon: RefreshCw, color: 'text-red-500' },
-    ].map(m => (
-      <Button
-        key={m.id}
-        variant={markerFilter === m.id ? 'default' : 'ghost'}
-        onClick={() => setMarkerFilter(m.id)}
-        className="h-8 w-10 px-0 rounded-lg transition-all"
-      >
-        <m.icon className={`w-4 h-4 ${markerFilter === m.id ? 'text-white' : m.color}`} />
-      </Button>
-    ))}
-  </div>
-
-</div>
 
   {/* User Cards Grid */}
   {loading ? (
