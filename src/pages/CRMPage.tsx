@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import dayjs from 'dayjs';
 import {
   Calendar, Car, StickyNote , MessageSquare, Plus, Pencil, Trash2, Phone,
-  SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus,UserRoundMinus,UserRoundCheck,
+  SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus, MessageCircleReply,UserRoundCheck,
   Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
   CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download,
   Clock, FileQuestion
@@ -1219,7 +1219,7 @@ const handleUpdateNote = async () => {
           { id: 'offer_sent', icon: Send, color: 'text-amber-500' },
           { id: 'waiting', icon: Clock, color: 'text-purple-500' },
           { id: 'need_info', icon: FileQuestion, color: 'text-cyan-500' },
-          { id: 'follow_up', icon: RefreshCw, color: 'text-red-500' },
+          { id: 'follow_up', icon: MessageCircleReply, color: 'text-red-500' },
         ].map(m => (
           <Button
             key={m.id}
@@ -1466,7 +1466,7 @@ const handleUpdateNote = async () => {
             }`}
             title="Follow-up"
           >
-            <RefreshCw className="w-3 h-3" />
+            <MessageCircleReply className="w-3 h-3" />
           </button>
         </div>
 
