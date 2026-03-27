@@ -90,10 +90,10 @@ const MonthGrid = memo(({
                 <div
                   key={dayKey}
                   className={cn(
-                    "min-h-[100px] p-1.5 transition-colors cursor-pointer group bg-transparent",
+                    "min-h-[100px] p-0.5 transition-colors cursor-pointer group bg-transparent",
                     !isCurrentMonth ? "opacity-60" : "hover:bg-blue-60/50"
                   )}
-                  onClick={() => onDayClick(day, events)}
+                  onClick={() => onDayClick(day, events, false)}
                 >
                   <div className="flex justify-between items-start mb-1">
                     <span className={cn(
@@ -105,42 +105,44 @@ const MonthGrid = memo(({
                   </div>
                   
                   <div className="space-y-0.5 overflow-hidden font-sans">
-                    {events.slice(0, 5).map((ev, idx) => {
+                    {events.slice(0, 4).map((ev, idx) => {
                       // Цвет в зависимости от статуса брони
-                      const isPreBooking = ev.bookingStatus === 'pre_booking';
+                      const isPreBooking = ev.booking?.status === 'pre_booking';
                       const bgClass = isPreBooking
-                        ? "bg-gray-400 text-gray-700 border-gray-300"
+                        ? "bg-slate-200 text-slate-600"
                         : ev.type === 'pickup' 
-                          ? "bg-green-400 text-gray-800 border-green-50"
-                          : "bg-yellow-400 text-gray-800 border-yellow-50";
+                          ? "bg-green-400 text-green-900"
+                          : "bg-yellow-400 text-yellow-900";
                       
                       return (
                         <div 
                           key={idx}
                           className={cn(
-                            "w-full h-[13px] px-1 text-[7px] font-bold border shadow-sm cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all",
+                            "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
                             bgClass
                           )}
-                          style={{
-                            clipPath: "polygon(3px 0%, 100% 0%, calc(100% - 3px) 100%, 0% 100%)"
-                          }}
                           onClick={(e) => {
                             e.stopPropagation();
                             onBadgeClick(ev, e);
                           }}
                         >
-                          <div className="flex items-center w-full gap-0.5">
-                            <span className="truncate flex-1 tracking-tighter">
-                              {ev.carName}
-                            </span>
-                          </div>
+                          <span className="truncate tracking-tight">
+                            {ev.carName}
+                          </span>
                         </div>
                       );
                     })}
                     
-                    {events.length > 5 && (
-                      <div className="text-[5px] text-slate-400 font-bold pl-1 tracking-tighter">
-                        + ещё {events.length - 5}
+                    {events.length > 4 && (
+                      <div 
+                        className="text-[7px] text-blue-500 font-bold pl-1 cursor-pointer hover:text-blue-700" 
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          // Открыть popup только с теми бейджами которые не влезли
+                          onDayClick && onDayClick(new Date(dayKey), events.slice(4), true);
+                        }}
+                      >
+                        + ещё {events.length - 4}
                       </div>
                     )}
                   </div>
@@ -196,26 +198,30 @@ export function MonthCalendarView({
         bookingStatus: fullBooking.status  // для определения цвета
       };
 
-      const pDate = new Date(item.pickup_date);
-      const rDate = new Date(item.return_date);
-      if (isNaN(pDate.getTime())) return;
+      const pDate = item.pickup_date ? new Date(item.pickup_date) : null;
+      const rDate = item.return_date ? new Date(item.return_date) : null;
 
-      const pKey = format(pDate, 'yyyy-MM-dd');
-      const rKey = format(rDate, 'yyyy-MM-dd');
+      if (!pDate || isNaN(pDate.getTime())) {
+        // Пропускаем если нет pickup даты
+      } else {
+        const pKey = format(pDate, 'yyyy-MM-dd');
+        if (!map.has(pKey)) map.set(pKey, []);
+        map.get(pKey)!.push({ ...baseEvent, type: 'pickup', time: format(pDate, 'HH:mm') });
+      }
 
-      if (!map.has(pKey)) map.set(pKey, []);
-      map.get(pKey)!.push({ ...baseEvent, type: 'pickup', time: format(pDate, 'HH:mm') });
-
-      if (!map.has(rKey)) map.set(rKey, []);
-      map.get(rKey)!.push({ ...baseEvent, type: 'return', time: format(rDate, 'HH:mm') });
+      if (rDate && !isNaN(rDate.getTime())) {
+        const rKey = format(rDate, 'yyyy-MM-dd');
+        if (!map.has(rKey)) map.set(rKey, []);
+        map.get(rKey)!.push({ ...baseEvent, type: 'return', time: format(rDate, 'HH:mm') });
+      }
     });
 
     return map;
   }, [logisticsData, bookings]);
 
-  const handleInnerDayClick = useCallback((date: Date, events: DayEvent[]) => {
-    // Click on empty space - create booking immediately
-    if (onCreateBooking) {
+  const handleInnerDayClick = useCallback((date: Date, events: DayEvent[], isOverflowClick = false) => {
+    // Click on empty space - create booking immediately (только если не overflow click)
+    if (onCreateBooking && !isOverflowClick) {
       onCreateBooking({ start: date, end: date });
     }
     if (onDayClick) onDayClick(date, events);
@@ -256,8 +262,19 @@ export function MonthCalendarView({
   return (
     <div className="bg-white min-h-[600px] w-full flex flex-col select-none overflow-hidden relative">
       <div className="grid grid-cols-7 bg-white relative z-20 pt-2 border-b border-gray-50 font-sans">
-        {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day, i) => (
-          <div key={i} className="py-2 text-center text-[10px] font-bold text-gray-300 uppercase">{day}</div>
+        {[
+          { name: 'Пн', isWeekend: false },
+          { name: 'Вт', isWeekend: false },
+          { name: 'Ср', isWeekend: false },
+          { name: 'Чт', isWeekend: false },
+          { name: 'Пт', isWeekend: false },
+          { name: 'Сб', isWeekend: true },
+          { name: 'Вс', isWeekend: true }
+        ].map((day, i) => (
+          <div key={i} className={cn(
+            "py-2 text-center text-[10px] font-bold uppercase",
+            day.isWeekend ? "text-red-400" : "text-slate-500"
+          )}>{day.name}</div>
         ))}
       </div>
 

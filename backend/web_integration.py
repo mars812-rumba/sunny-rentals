@@ -69,8 +69,35 @@ model_specs = {
 # ==============================
 
 ROOT = Path(__file__).parent.parent
-DATA = Path(__file__).parent / "data"
-DATA.mkdir(exist_ok=True)
+
+# Demo mode: DEMO_MODE=true makes all data go to /tmp/demo_work/
+# Data resets on VPS reboot - perfect for demo purposes
+DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
+DEMO_WORK_DIR = Path("/tmp/demo_work")
+DEMO_CLEAN_DATA = Path(__file__).parent / "data" / "demo"
+
+# Support for multi-park: DATA_PATH env var overrides default ./data
+_data_path = os.getenv("DATA_PATH")
+if _data_path:
+    BASE_DATA = Path(__file__).parent / _data_path
+else:
+    BASE_DATA = Path(__file__).parent / "data"
+
+# In DEMO_MODE, use DEMO_WORK_DIR instead of BASE_DATA
+if DEMO_MODE:
+    DATA = DEMO_WORK_DIR
+    # Copy demo data to work dir if not exists
+    if not DEMO_WORK_DIR.exists():
+        import shutil
+        shutil.copytree(DEMO_CLEAN_DATA, DEMO_WORK_DIR, dirs_exist_ok=True)
+        # Clean up chat logs for demo
+        (DEMO_WORK_DIR / "chat_logs.jsonl").write_text("", encoding="utf-8")
+        (DEMO_WORK_DIR / "crm_history.jsonl").write_text("", encoding="utf-8")
+else:
+    DATA = BASE_DATA
+
+DATA.mkdir(exist_ok=True, parents=True)
+
 IMAGES = ROOT / "public" / "images_web"
 IMAGES.mkdir(exist_ok=True)
 MEDIA_ROOT = Path(__file__).parent / "media"
@@ -78,6 +105,7 @@ MEDIA_ROOT.mkdir(exist_ok=True)
 
 VALID_CLASSES = ["compact", "sedan", "suv", "7s", "bikes"]
 
+# File paths
 CARS_JSON = DATA / "web_cars.json"
 BOOKINGS_FILE = DATA / "bookings.json"
 USER_DATA_JSON = DATA / "user_data.json"
@@ -96,6 +124,9 @@ if not CAR_OWNERS_JSON.exists():
 ADMIN_KEY = "sunny2025"
 ADMIN_ID = "6451825371"
 API_PREFIX = "/api"
+
+print(f"📁 DATA path: {DATA}")
+print(f"🔧 DEMO_MODE: {DEMO_MODE}")
 
 ADMIN_USERNAME = "sunny_admin"
 ADMIN_PASSWORD = "Marseloid812$$"
@@ -1922,6 +1953,10 @@ async def get_bookings_logistics():
         logistics_data = []
         
         for booking in bookings:
+            # Пропускаем отменённые
+            if booking.get('status') == 'cancelled':
+                continue
+                
             # Извлекаем даты из разных возможных мест
             start_date = (
                 booking.get('form_data', {}).get('dates', {}).get('start') or 
@@ -1932,7 +1967,7 @@ async def get_bookings_logistics():
                 booking.get('end_date')
             )
             
-            if not start_date or not end_date:
+            if not start_date:
                 continue
                 
             # Извлекаем информацию об авто
@@ -1944,15 +1979,28 @@ async def get_bookings_logistics():
             client_name = booking.get('form_data', {}).get('contact', {}).get('name') or 'Клиент'
             location = booking.get('form_data', {}).get('locations', {}).get('pickupLocation') or ''
             
+            # pickup создаётся для ВСЕХ броней
             logistics_data.append({
                 'booking_id': booking.get('booking_id', '') or '',
                 'car_id': car_id or '',
                 'car_name': car_name or 'Авто',
-                'pickup_date': start_date or '',
-                'return_date': end_date or '',
+                'pickup_date': start_date,
+                'return_date': '',  # пока пусто
                 'client_name': client_name or 'Клиент',
                 'location': location or ''
             })
+            
+            # return создаётся ТОЛЬКО для confirmed
+            if booking.get('status') == 'confirmed' and end_date:
+                logistics_data.append({
+                    'booking_id': booking.get('booking_id', '') or '',
+                    'car_id': car_id or '',
+                    'car_name': car_name or 'Авто',
+                    'pickup_date': '',  # пусто для return события
+                    'return_date': end_date,  # реальная дата возврата
+                    'client_name': client_name or 'Клиент',
+                    'location': location or ''
+                })
         
         return logistics_data
         
@@ -5350,6 +5398,7 @@ async def send_media_to_user(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("web_integration:app", host="0.0.0.0", port=5000, reload=True)
+    PORT = int(os.getenv("PORT", 5000))
+    uvicorn.run("web_integration:app", host="0.0.0.0", port=PORT, reload=True)
 
 

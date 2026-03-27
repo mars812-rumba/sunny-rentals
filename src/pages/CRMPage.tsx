@@ -50,7 +50,7 @@ interface User {
   dialog_status?: DialogStatus; // Получаем из API
   // ... остальные поля из существующего интерфейса
   status?: string;
-  final_status?: string; // PRIORITY: Manager's manual choice overrides status
+  
   car_interested?: string;
   category_interested?: string;
   dates_selected?: {
@@ -93,7 +93,7 @@ const CRMPage: React.FC = () => {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeStatus, setActiveStatus] = useState('new');
-  const [period, setPeriod] = useState('week');
+  const [period, setPeriod] = useState('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [chats, setChats] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
@@ -883,7 +883,7 @@ const handleBookingSuccess = async () => {
   const handleMoveForward = async (userId: number) => {
     const user = users.find(u => compareUserIds(u.user_id, userId));
     if (!user) return;
-    const currentStatus = user.status || user.final_status;
+    const currentStatus = user.status;
     const nextStatus = STATUS_FLOW[currentStatus];
     if (nextStatus) {
       await handleStatusChange(userId, nextStatus);
@@ -895,7 +895,7 @@ const handleBookingSuccess = async () => {
   const handleMoveBack = async (userId: number) => {
     const user = users.find(u => compareUserIds(u.user_id, userId));
     if (!user) return;
-    const currentStatus = user.status || user.final_status;
+    const currentStatus = user.status;
     const prevStatus = STATUS_REVERSE[currentStatus];
     if (prevStatus) {
       await handleStatusChange(userId, prevStatus);
@@ -1266,8 +1266,7 @@ const handleUpdateNote = async () => {
     const days = getDaysCount(bookingDates?.start, bookingDates?.end);
     const dialog = user.dialog_status || user.dialog;
     
-    // PRIORITY STATUS LOGIC: final_status overrides status
-    const currentStatus = user.final_status || user.status;
+    const currentStatus = user.status;
     
     // ЛОГИКА ПОДСВЕТКИ: если есть непрочитанное сообщение от юзера - нужно внимание
     const needsReply = dialog?.has_new_messages && dialog?.last_message_from === 'user';

@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Car, Users, AlertCircle, Plus, Edit, Trash2, LogOut, Check, X, Fuel, Settings, Zap, Bike, TrendingUp, TrendingDown, User, Calendar as CalendarIcon, DollarSign, UserPlus, ChevronRight, Tag, Wrench, Sun, Cloud, Wallet, Phone, Facebook, Hash, FileText, ToggleLeft, ToggleRight } from "lucide-react";
+import { Car, Users, AlertCircle, Plus, Edit, Trash2, LogOut, Check, X, Fuel, Settings, Zap, Bike, TrendingUp, TrendingDown, User, Calendar as CalendarIcon, Wallet, UserPlus, ChevronRight, Tag, Wrench, Sun, Cloud, Wallet, Phone, Facebook, Hash, FileText, ToggleLeft, ToggleRight } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format, addDays } from "date-fns";
@@ -20,7 +20,7 @@ import { useCars } from "@/contexts/CarsContext";
 import logo from '@/assets/logo.png';
 
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "";
 const ADMIN_KEY = "sunny2025";
 
 // ─── SHEET HEADER ──────────────────────────────────────────────────────────────
@@ -395,7 +395,7 @@ const handleSave = useCallback(() => {
 
   return (
     <div className="flex flex-col h-full">
-      <SheetSectionHeader icon={DollarSign} title="Цены" subtitle={`${car.brand} ${car.model}`} />
+      <SheetSectionHeader icon={Wallet} title="Цены" subtitle={`${car.brand} ${car.model}`} />
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
         {/* Низкий сезон */}
@@ -818,7 +818,9 @@ export default function CarsPage({ userId }: CarsPageProps) {
             const currentSeason = getCurrentSeason();
             const seasonPrices = car.pricing?.[currentSeason] || {};
             const price1_6 = seasonPrices.price_1_6 || 0;
+            const price7_14 = seasonPrices.price_7_14 || 0;
             const price15_29 = seasonPrices.price_15_29 || 0;
+            const price30 = seasonPrices.price_30 || 0;
 
             return (
               <Card key={car.id} className="overflow-hidden hover:shadow-md transition-shadow group relative">
@@ -850,13 +852,13 @@ export default function CarsPage({ userId }: CarsPageProps) {
                     <h3 className="font-semibold text-sm leading-tight line-clamp-1">{car.brand} {car.model}</h3>
                     <p className="text-xs text-muted-foreground">{car.year} • {car.color}</p>
                   </div>
-                  <div className="flex items-center gap-1 text-xs font-semibold text-blue-600">
-                    <DollarSign className="h-3 w-3" />
-                    <span>{price1_6}฿ • {price15_29}฿</span>
+                  <div className="flex items-center gap-1 text-[10px] font-semibold text-blue-600">
+                    <Wallet className="h-3 w-3 shrink-0" />
+                    <span>{price1_6} · {price7_14} · {price15_29} · {price30}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Button size="sm" variant="outline" className="flex-1 h-8 text-xs px-1" onClick={() => { setEditingPriceId(car.id); setIsPriceDialogOpen(true); }}>
-                      <DollarSign className="h-3 w-3" />
+                      <Wallet className="h-3 w-3" />
                     </Button>
                     <Button size="sm" variant="outline" className="flex-1 h-8 text-xs px-1" onClick={() => { setEditingSpecsId(car.id); setIsSpecsDialogOpen(true); }}>
                       <Settings className="h-3 w-3" />

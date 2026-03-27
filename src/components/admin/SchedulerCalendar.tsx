@@ -10,7 +10,7 @@ const getPhotoUrl = (filename: string | null | undefined): string | null => {
   if (!filename) return null;
   if (filename.startsWith('http')) return filename;
   
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_BASE = import.meta.env.VITE_API_URL || '';
   return `${API_BASE}/images_web/${filename}`;
 };
 
@@ -311,6 +311,7 @@ export function SchedulerCalendar({
     width: position.width - 4,
     backgroundColor: bgColor,
     clipPath: "polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%)",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
   }}
 
 
