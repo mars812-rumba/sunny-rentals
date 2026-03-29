@@ -765,9 +765,9 @@ return (
                     </div>
 
                     {/* Аренда */}
-                    <div className="flex items-end gap-2">
-                      <span className="text-sm text-gray-600 w-20">Аренда</span>
-                      <div className="flex-1 border-b border-dashed border-gray-400 mb-1" />
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600 w-20 shrink-0">Аренда</span>
+                      <div className="flex-1 h-px" style={{ background: 'repeating-linear-gradient(to right, #9ca3af 0, #9ca3af 3px, transparent 3px, transparent 7px)' }} />
                       <div className="flex items-center text-gray-900">
                         <input 
                           className="bg-transparent text-right font-medium text-sm w-20 outline-none focus:text-gray-700" 
@@ -779,9 +779,9 @@ return (
                     </div>
 
                     {/* Доставка */}
-                    <div className="flex items-end gap-2">
-                      <span className="text-sm text-gray-600 w-20">Доставка</span>
-                      <div className="flex-1 border-b border-dashed border-gray-400 mb-1" />
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600 w-20 shrink-0">Доставка</span>
+                      <div className="flex-1 h-px" style={{ background: 'repeating-linear-gradient(to right, #9ca3af 0, #9ca3af 3px, transparent 3px, transparent 7px)' }} />
                       <div className="flex items-center text-gray-900">
                         <input 
                           className="bg-transparent text-right font-medium text-sm w-20 outline-none focus:text-gray-700" 
@@ -793,9 +793,9 @@ return (
                     </div>
 
                     {/* Депозит */}
-                    <div className="flex items-end gap-2">
-                      <span className="text-sm text-gray-600 w-20">Депозит</span>
-                      <div className="flex-1 border-b border-dashed border-gray-400 mb-1" />
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600 w-20 shrink-0">Депозит</span>
+                      <div className="flex-1 h-px" style={{ background: 'repeating-linear-gradient(to right, #9ca3af 0, #9ca3af 3px, transparent 3px, transparent 7px)' }} />
                       <div className="flex items-center text-gray-700">
                         <input 
                           className="bg-transparent text-right font-medium text-sm w-20 outline-none focus:text-gray-800" 
