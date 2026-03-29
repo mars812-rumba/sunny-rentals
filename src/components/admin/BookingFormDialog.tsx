@@ -740,7 +740,7 @@ return (
                   <div className="space-y-3">
                     {/* Авто с миниатюрой */}
                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      {selectedTab === 'fleet' && vehicles.find(v => v.id === selectedVehicleId)?.photos?.main ? (
+                      {selectedTab === 'fleet' && vehicles.length > 0 && vehicles.find(v => v.id === selectedVehicleId)?.photos?.main ? (
                         <div 
                           className="w-12 h-12 bg-cover bg-center rounded-md shrink-0"
                           style={{ backgroundImage: `url(${getPhotoUrl(vehicles.find(v => v.id === selectedVehicleId)?.photos?.main || '')})` }}
