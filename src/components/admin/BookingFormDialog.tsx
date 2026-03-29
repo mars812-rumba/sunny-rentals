@@ -32,7 +32,7 @@ const getPriceTierKey = (days: number): string => {
 const getPhotoUrl = (filename: string | null | undefined): string => {
   if (!filename) return '';
   if (filename.startsWith('http')) return filename;
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_BASE = import.meta.env.VITE_API_URL || '';
   return `${API_BASE}/images_web/${filename}`;
 };
 
@@ -581,7 +581,7 @@ return (
                       <PopoverTrigger asChild>
                         <Button 
                           variant="outline" 
-                          className="w-full text-left-sm h-10 rounded-lg bg-gray-50 border-gray-200"
+                          className="w-full justify-start text-left h-10 rounded-lg bg-gray-50 border-gray-200"
                         >
                           {startDate ? format(startDate, 'dd.MM.yyyy') : 'Выберите дату'}
                         </Button>
@@ -609,7 +609,7 @@ return (
                       <PopoverTrigger asChild>
                         <Button 
                           variant="outline" 
-                          className="w-full text-left-sm h-10 rounded-lg bg-gray-50 border-gray-200"
+                          className="w-full justify-start text-left h-10 rounded-lg bg-gray-50 border-gray-200"
                         >
                           {endDate ? format(endDate, 'dd.MM.yyyy') : 'Выберите дату'}
                         </Button>
@@ -738,21 +738,36 @@ return (
                   </div>
 
                   <div className="space-y-3">
-                    {/* Авто */}
-                    <div className="flex items-end gap-2">
-                      <span className="text-sm text-gray-600">Авто</span>
-                      <div className="flex-1 border-b border-dotted border-gray-300 mb-1" />
-                      <span className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
-                        {selectedTab === 'fleet' 
-                          ? vehicles.find(v => v.id === selectedVehicleId)?.name 
-                          : manualData.name || '---'}
-                      </span>
+                    {/* Авто с миниатюрой */}
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      {selectedTab === 'fleet' && vehicles.find(v => v.id === selectedVehicleId)?.photos?.main ? (
+                        <div 
+                          className="w-12 h-12 bg-cover bg-center rounded-md shrink-0"
+                          style={{ backgroundImage: `url(${getPhotoUrl(vehicles.find(v => v.id === selectedVehicleId)?.photos?.main || '')})` }}
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center text-gray-400 text-xs shrink-0">
+                          🚗
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-900 truncate">
+                          {selectedTab === 'fleet' 
+                            ? vehicles.find(v => v.id === selectedVehicleId)?.name 
+                            : manualData.name || '---'}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {selectedTab === 'fleet' 
+                            ? `${vehicles.find(v => v.id === selectedVehicleId)?.brand || ''} • ${vehicles.find(v => v.id === selectedVehicleId)?.class || ''}`
+                            : ''}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Аренда */}
                     <div className="flex items-end gap-2">
-                      <span className="text-sm text-gray-600">Аренда</span>
-                      <div className="flex-1 border-b border-dotted border-gray-300 mb-1" />
+                      <span className="text-sm text-gray-600 w-20">Аренда</span>
+                      <div className="flex-1 border-b border-dashed border-gray-400 mb-1" />
                       <div className="flex items-center text-gray-900">
                         <input 
                           className="bg-transparent text-right font-medium text-sm w-20 outline-none focus:text-gray-700" 
@@ -765,8 +780,8 @@ return (
 
                     {/* Доставка */}
                     <div className="flex items-end gap-2">
-                      <span className="text-sm text-gray-600">Доставка</span>
-                      <div className="flex-1 border-b border-dotted border-gray-300 mb-1" />
+                      <span className="text-sm text-gray-600 w-20">Доставка</span>
+                      <div className="flex-1 border-b border-dashed border-gray-400 mb-1" />
                       <div className="flex items-center text-gray-900">
                         <input 
                           className="bg-transparent text-right font-medium text-sm w-20 outline-none focus:text-gray-700" 
@@ -779,8 +794,8 @@ return (
 
                     {/* Депозит */}
                     <div className="flex items-end gap-2">
-                      <span className="text-sm text-gray-600">Депозит</span>
-                      <div className="flex-1 border-b border-dotted border-gray-300 mb-1" />
+                      <span className="text-sm text-gray-600 w-20">Депозит</span>
+                      <div className="flex-1 border-b border-dashed border-gray-400 mb-1" />
                       <div className="flex items-center text-gray-700">
                         <input 
                           className="bg-transparent text-right font-medium text-sm w-20 outline-none focus:text-gray-800" 
