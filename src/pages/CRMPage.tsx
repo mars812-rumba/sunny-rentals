@@ -18,7 +18,7 @@ import {
   SquareUser, RefreshCcw, RefreshCw, Users,UserRoundPlus, MessageCircleReply,UserRoundCheck,
   Play, Square, Send, MapPin, X, User, Pause, ToggleLeft, ToggleRight,MessageCircle,Filter,
   CirclePlus, CircleDollarSign, CircleMinus, CircleCheckBig, Paperclip, Image, FileText, Download,
-  Clock, FileQuestion, Info
+  Clock, FileQuestion, Info, Check, AlertCircle
 } from 'lucide-react';
 import { MarkerType } from '@/types/crm';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
@@ -457,30 +457,44 @@ const loadUserDetails = async (user: any) => {
   const handleSendMessage = async () => {
     if (!managerMessage.trim() || !selectedUser) return;
 
-    const msgData = {
+    const tempId = `temp_${Date.now()}`;
+    const optimisticMessage = {
+      id: tempId,
       user_id: selectedUser.user_id,
-      text: managerMessage,
       role: 'manager',
-      timestamp: new Date().toISOString()
+      content: { text: managerMessage },
+      timestamp: new Date().toISOString(),
+      send_status: 'pending' // pending | sent | failed
     };
+    
     const messageText = managerMessage;
     setManagerMessage('');
+
+    // Optimistic: add message immediately
+    setChats(prev => [...prev, optimisticMessage]);
 
     try {
       const response = await fetch('/api/crm/send_message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(msgData)
+        body: JSON.stringify({
+          user_id: selectedUser.user_id,
+          text: messageText,
+          role: 'manager',
+          timestamp: optimisticMessage.timestamp
+        })
       });
 
       if (response.ok) {
-        // Refresh chat history to show the sent message
-        await fetchChatHistory(selectedUser.user_id, false);
+        // Update message status to sent
+        setChats(prev => prev.map(m => 
+          m.id === tempId ? { ...m, send_status: 'sent' } : m
+        ));
 
-        // Refresh dialog statuses to update active dialog indicators
+        // Refresh dialog statuses
         await refreshAllDialogStatuses();
 
-        // Также локально обновляем message_count для индикации
+        // Update message count locally
         const targetUserId = String(selectedUser.user_id);
         setUsers(prev => prev.map(user =>
           String(user.user_id) === targetUserId && (user.dialog_status || user.dialog)
@@ -516,8 +530,11 @@ const loadUserDetails = async (user: any) => {
       }
     } catch (e) {
       console.error("Ошибка отправки:", e);
-      // Restore message on error
-      setManagerMessage(messageText);
+      // Mark message as failed
+      setChats(prev => prev.map(m =>
+        m.id === tempId ? { ...m, send_status: 'failed' } : m
+      ));
+      alert('Не удалось отправить сообщение');
     }
   };
 
@@ -845,7 +862,20 @@ const handleBookingSuccess = async () => {
     }
   };
 
-  const handleStatusChange = async (userId: number, newStatus: string) => {
+  const handleStatusChange = async (userId: number, newStatus: string, stayOnTab = false) => {
+    // Optimistic update — сначала UI, потом API
+    const previousUsers = users;
+    const previousTab = activeStatus;
+    
+    // Если уходим из текущей вкладки — убираем карточку
+    if (!stayOnTab && activeStatus !== newStatus) {
+      setUsers(prev => prev.filter(u => !compareUserIds(u.user_id, userId)));
+    } else {
+      setUsers(prev => prev.map(u =>
+        compareUserIds(u.user_id, userId) ? { ...u, status: newStatus } : u
+      ));
+    }
+    
     try {
       const response = await fetch('/api/crm/update_status', {
         method: 'POST',
@@ -857,13 +887,23 @@ const handleBookingSuccess = async () => {
       });
 
       if (response.ok) {
-        setUsers(prev => prev.map(user =>
-          compareUserIds(user.user_id, userId) ? { ...user, status: newStatus } : user
-        ));
         console.log(`Статус ${userId} → ${newStatus}`);
+        // Если нужно — переключить вкладку (для workflow кнопок)
+        if (!stayOnTab) {
+          setActiveStatus(newStatus);
+        }
+      } else {
+        // Error — откат
+        setUsers(previousUsers);
+        if (!stayOnTab) setActiveStatus(previousTab);
+        alert('Ошибка сохранения статуса');
       }
     } catch (e) {
       console.error('Ошибка статуса:', e);
+      // Откат при ошибке сети
+      setUsers(previousUsers);
+      if (!stayOnTab) setActiveStatus(previousTab);
+      alert('Ошибка сохранения статуса');
     }
   };
 
@@ -886,9 +926,7 @@ const handleBookingSuccess = async () => {
     const currentStatus = user.status;
     const nextStatus = STATUS_FLOW[currentStatus];
     if (nextStatus) {
-      await handleStatusChange(userId, nextStatus);
-      // Переключить на новую вкладку
-      setActiveStatus(nextStatus);
+      await handleStatusChange(userId, nextStatus, false); // stayOnTab=false — переключить вкладку
     }
   };
 
@@ -898,8 +936,7 @@ const handleBookingSuccess = async () => {
     const currentStatus = user.status;
     const prevStatus = STATUS_REVERSE[currentStatus];
     if (prevStatus) {
-      await handleStatusChange(userId, prevStatus);
-      setActiveStatus(prevStatus);
+      await handleStatusChange(userId, prevStatus, false); // stayOnTab=false — переключить вкладку
     }
   };
 
@@ -1477,7 +1514,7 @@ const handleUpdateNote = async () => {
             {['new', 'in_work', 'pre_booking', 'confirmed'].map(s => (
               <button
                 key={s}
-                onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, s); }}
+                onClick={(e) => { e.stopPropagation(); handleStatusChange(user.user_id, s, false); }}
                 className={`px-1.5 py-0.5 rounded text-[7px] font-bold uppercase transition-all ${
                   currentStatus === s ? 'text-white shadow-sm' : 'text-slate-400 hover:text-slate-600'
                 }`}
@@ -1979,6 +2016,21 @@ const handleUpdateNote = async () => {
             ) : (
               /* ===== TEXT ONLY MESSAGE ===== */
               <p className="break-words overflow-wrap-anywhere">{messageText}</p>
+            )}
+            
+            {/* Checkmarks for manager messages */}
+            {msg.role !== 'user' && (
+              <div className="flex items-center justify-end gap-0.5 mt-1">
+                {msg.send_status === 'pending' && (
+                  <Clock className="w-2.5 h-2.5 text-slate-400" />
+                )}
+                {msg.send_status === 'sent' && (
+                  <Check className="w-2.5 h-2.5 text-blue-400" />
+                )}
+                {msg.send_status === 'failed' && (
+                  <AlertCircle className="w-2.5 h-2.5 text-red-500" />
+                )}
+              </div>
             )}
           </div>
 
