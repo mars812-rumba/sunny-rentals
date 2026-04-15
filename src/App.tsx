@@ -13,6 +13,7 @@ import Site from "./pages/Site";
 import CRMPage from "@/pages/CRMPage";
 import OfferPage from "./pages/OfferPage";
 import OfferAdminPage from "./pages/OfferAdminPage";
+import DashboardPage from "./pages/DashboardPage";
 import React, { Suspense, useEffect } from 'react';
 import { trackLeadEvent } from '@/api/api';
 
@@ -66,6 +67,7 @@ const App = () => {
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/offer" element={<OfferPage />} />
             <Route path="/admin/offer" element={<OfferAdminPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             
             {/* Старые роуты - можно оставить или удалить */}
             <Route 
