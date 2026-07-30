@@ -10,10 +10,10 @@ import { ReviewsSection } from "@/components/site/ReviewsSection";
 import { FAQSection } from "@/components/site/FAQSection";
 import { TelegramPromoSection } from "@/components/site/TelegramPromoSection";
 import { ContactsSection } from "@/components/site/ContactsSection";
-import { FinalCTASection } from "@/components/site/FinalCTASection";
 import { Footer } from "@/components/site/Footer";
 import { CarsClientsList } from "@/components/site/CarsClientsList";
 import FilterResults, { DesktopFilterForm } from "@/components/site/FilterResults";
+import { StickyContactMenu } from "@/components/site/StickyContactMenu";
 //import { ScrollToFleetButton } from "@/components/site/ScrollToFleetButton";
 
 const Site = () => {
@@ -142,9 +142,9 @@ const Site = () => {
           <FAQSection />
           {/*<TelegramPromoSection />*/}
           {/*<ContactsSection />*/}
-          <FinalCTASection />
         </main>
         <Footer />
+        <StickyContactMenu />
        {/*<ScrollToFleetButton />*/}
       </div>
     </>
