@@ -182,9 +182,9 @@ useEffect(() => {
           return;
         }
         setSelectedCar(car);
-        setIsBookingModalOpen(true);
         setIsBookingSubmitted(false);
         setBookingId(null);
+        window.open('https://t.me/webapp_rent_bot', '_blank', 'noopener,noreferrer');
       };
     
     
@@ -215,9 +215,6 @@ useEffect(() => {
         </section>
       )}
 
-      {/* Desktop anchor */}
-      {!isMobile && <div id="fleet" className="scroll-mt-20" />}
-
       {/* Results Section */}
       <section className="py-12 lg:py-16 bg-blue/30">
         <div className="container mx-auto px-4">
@@ -247,7 +244,7 @@ useEffect(() => {
                     {t('found_cars', { count: carsToDisplay.length, category: categories.find(c => c.id === selectedCategory)?.name })}
                   </h2>
                   <p className="text-muted-foreground">
-                    {language === 'ru' ? 'Выберите транспорт и забронируйте онлайн' : 'Select vehicle and book online'}
+                    {language === 'ru' ? 'Выберите транспорт и забронируйте через Telegram' : 'Select a vehicle and book via Telegram'}
                   </p>
                 </div>
                 <CarList 

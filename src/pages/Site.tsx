@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/site/Header";
 import { HeroSectionWithFilters } from "@/components/site/HeroSectionWithFilters";
@@ -14,9 +14,6 @@ import { FinalCTASection } from "@/components/site/FinalCTASection";
 import { Footer } from "@/components/site/Footer";
 import { CarsClientsList } from "@/components/site/CarsClientsList";
 import FilterResults, { DesktopFilterForm } from "@/components/site/FilterResults";
-import { OffersSection } from "@/components/content/OffersSection";
-import { getAllOffers, clearContentCache } from "@/utils/contentLoader";
-import { OfferData } from "@/types/seo";
 //import { ScrollToFleetButton } from "@/components/site/ScrollToFleetButton";
 
 const Site = () => {
@@ -36,26 +33,6 @@ const Site = () => {
   const [isBookingSubmitted, setIsBookingSubmitted] = useState(false);
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [deepLinkCarId, setDeepLinkCarId] = useState<string | null>(null);
-
-  // Офферы
-  const [offers, setOffers] = useState<OfferData[]>([]);
-  const [offersLoading, setOffersLoading] = useState(true);
-
-  // Загрузка офферов
-  useEffect(() => {
-    const loadOffers = async () => {
-      try {
-        clearContentCache();
-        const data = await getAllOffers();
-        setOffers(data);
-      } catch (err) {
-        console.error('Error loading offers:', err);
-      } finally {
-        setOffersLoading(false);
-      }
-    };
-    loadOffers();
-  }, []);
 
   const handleFiltersChange = useCallback((newFilters: any) => {
     setFilters(newFilters);
@@ -117,24 +94,27 @@ const Site = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <main>
-          <HeroSection
-            desktopForm={
+          <HeroSection />
+          <section id="fleet" className="hidden bg-slate-50 py-12 lg:block">
+            <div className="container mx-auto px-4">
+              <div className="mx-auto max-w-3xl">
+                <div className="mb-7 text-center">
+                  <h2 className="text-3xl font-black text-foreground">
+                    Подберите транспорт на ваши даты
+                  </h2>
+                  <p className="mt-2 text-muted-foreground">
+                    Укажите даты и место выдачи — покажем доступные авто и байки
+                  </p>
+                </div>
               <DesktopFilterForm
                 selectedCategory={selectedCategory}
                 onCategoryChange={handleCategoryChange}
                 filters={filters}
                 onFiltersChange={handleFiltersChange}
               />
-            }
-          />
-          {/*<HeroSectionWithFilters />*/}
-          {/*<CarsClientsList />*/}
-          <OffersSection offers={offers} loading={offersLoading} maxDisplay={3} />
-          <ReviewsSection />
-          <WhyUsSection />
-          {/*<HowItWorksSection />*/}
-          {/*<DepositProtectionSection />*/}
-          <FAQSection />
+              </div>
+            </div>
+          </section>
           <FilterResults
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
@@ -155,6 +135,11 @@ const Site = () => {
             deepLinkCarId={deepLinkCarId}
             setDeepLinkCarId={setDeepLinkCarId}
           />
+          <ReviewsSection />
+          <WhyUsSection />
+          {/*<HowItWorksSection />*/}
+          {/*<DepositProtectionSection />*/}
+          <FAQSection />
           {/*<TelegramPromoSection />*/}
           {/*<ContactsSection />*/}
           <FinalCTASection />

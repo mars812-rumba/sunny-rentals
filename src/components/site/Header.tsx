@@ -3,17 +3,17 @@ import { Menu, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button-variants";
 import logo from "@/assets/logo.png";
+import whatsappIcon from "@/assets/icons/wa_ico.webp";
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
+    { href: "/blog", label: "Блог" },
     { href: "#why-us", label: "Преимущества" },
-    { href: "#how-it-works", label: "Как работает" },
     { href: "#fleet", label: "Автопарк" },
     { href: "#reviews", label: "Отзывы" },
     { href: "#faq", label: "FAQ" },
-    { href: "#contacts", label: "Контакты" },
   ];
 
   return (
@@ -41,7 +41,7 @@ export const Header = () => {
           </a>
 
           {/* Десктопная навигация */}
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -53,7 +53,7 @@ export const Header = () => {
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             {/* Язык */}
             <button className="hidden md:flex items-center gap-1.5 text-sm font-medium text-white/90 hover:text-white transition-colors">
               RU
@@ -68,7 +68,17 @@ export const Header = () => {
                 "hidden md:inline-flex bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold shadow-lg shadow-cyan-500/30 border border-cyan-400/50"
               )}
             >
-              Забронировать
+              Забронировать через Telegram
+            </a>
+
+            <a
+              href="https://wa.me/66842039140"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden xl:inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[#25D366] px-4 text-sm font-bold text-white shadow-lg shadow-emerald-950/20 transition hover:bg-[#1fbd5b] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/50"
+            >
+              <img src={whatsappIcon} alt="" className="h-5 w-5" />
+              WhatsApp
             </a>
 
             {/* Мобильное меню */}
@@ -109,10 +119,22 @@ export const Header = () => {
 
             <a
               href="https://t.me/webapp_rent_bot"
-              className="mt-4 inline-flex justify-center items-center gap-3 px-10 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xl font-bold rounded-full shadow-2xl"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex justify-center items-center gap-3 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-lg font-bold rounded-full shadow-2xl"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Забронировать
+              Забронировать через Telegram
+            </a>
+            <a
+              href="https://wa.me/66842039140"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex justify-center items-center gap-3 px-8 py-4 bg-[#25D366] text-white text-lg font-bold rounded-full shadow-2xl"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <img src={whatsappIcon} alt="" className="h-6 w-6" />
+              Написать в WhatsApp
             </a>
           </nav>
         </div>

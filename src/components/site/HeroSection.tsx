@@ -27,6 +27,8 @@ import sedanImg600 from '@/assets/classes/sedan_desk.png';
 import seatImg600 from '@/assets/classes/7seat_desk.png';
 import suvImg600 from '@/assets/classes/suv_desk.png';
 import bikeImg600 from '@/assets/classes/bike_desk.png';
+import telegramIcon from '@/assets/icons/telegram_ico.webp';
+import whatsappIcon from '@/assets/icons/wa_ico.webp';
 
 // Gallery data for vehicle classes
 interface HeroSectionProps {
@@ -62,14 +64,14 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
           <div className="relative z-10 container mx-auto px-4 pt-1.5 pb-12 lg:pt-8 lg:pb-16">
           <div className={cn(
             "grid gap-8 lg:gap-16 items-start",
-            isMobile ? "grid-cols-1" : "lg:grid-cols-2"
+            isMobile ? "grid-cols-1" : desktopForm ? "lg:grid-cols-2" : "lg:grid-cols-1"
           )}>
             {/* Left: Marketing Content */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
-              className="text-white"
+              className={cn("text-white", !desktopForm && "mx-auto w-full max-w-5xl text-center")}
             >
               {/* Rating Badge */}
               <motion.div
@@ -97,9 +99,31 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
                 Расчет стоимости аренды в онлайн калькуляторе
               </p>
 
+              <div className="mb-5 flex flex-col justify-center gap-3 sm:flex-row">
+                <a
+                  href="https://t.me/webapp_rent_bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#229ED9] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-sky-950/25 transition hover:-translate-y-0.5 hover:bg-[#168dcc] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/50"
+                >
+                  <img src={telegramIcon} alt="" className="h-5 w-5" />
+                  Забронировать через Telegram
+                </a>
+                <a
+                  href="https://wa.me/66842039140"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-950/25 transition hover:-translate-y-0.5 hover:bg-[#1fbd5b] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/50"
+                >
+                  <img src={whatsappIcon} alt="" className="h-5 w-5" />
+                  Написать в WhatsApp
+                </a>
+              </div>
+
               <div className={cn(
                 "relative mx-auto lg:mx-0",
-                isMobile ? "max-w-[380px]" : "max-w-[620px]"
+                isMobile ? "max-w-[380px]" : "max-w-[620px]",
+                !desktopForm && "lg:mx-auto"
               )}></div>
 
               {/* Vehicle Gallery Carousel */}
@@ -195,8 +219,6 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
         </div>
       </section>
 
-      {/* Desktop anchor */}
-      {!isMobile && <div id="fleet" className="scroll-mt-20" />}
    </>
   );
 };
