@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowDown, Star } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
@@ -35,6 +35,14 @@ interface HeroSectionProps {
 
 export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
     const isMobile = useIsMobile();
+    const reduceMotion = useReducedMotion();
+    const [isHeroReady, setIsHeroReady] = useState(false);
+    const [useMobileAssets] = useState(() => (
+      typeof window !== 'undefined'
+        ? window.matchMedia('(max-width: 767px)').matches
+        : false
+    ));
+
     const vehicleGallery = [
     { imageMobile: compactImg, imageDesktop: compactImg600, title:  'Компакт' , description: 'Экономия и парковка', price: 'от 600฿' },
     { imageMobile: sedanImg, imageDesktop: sedanImg600, title: 'Седан' , description: 'Комфорт и вместительность' , price: 'от 700฿' },
@@ -42,15 +50,108 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
     { imageMobile: suvImg, imageDesktop: suvImg600, title: 'SUV', description:   'Уверенность на дороге', price: 'от 1,400฿' },
     { imageMobile: bikeImg, imageDesktop: bikeImg600, title: 'Байк', description: 'Быстрое передвижение', price: 'от 250฿' },
   ];
+
+  useEffect(() => {
+    let isActive = true;
+
+    const preloadImage = (src: string) => new Promise<void>((resolve) => {
+      const image = new Image();
+      image.onload = () => {
+        if (typeof image.decode === 'function') {
+          image.decode().catch(() => undefined).finally(resolve);
+          return;
+        }
+
+        resolve();
+      };
+      image.onerror = () => resolve();
+      image.fetchPriority = 'high';
+      image.src = src;
+    });
+
+    const criticalImages = useMobileAssets
+      ? [heroImageMob, compactImg]
+      : [heroImage, compactImg600];
+
+    const minimumDisplay = new Promise<void>((resolve) => {
+      window.setTimeout(resolve, reduceMotion ? 100 : 450);
+    });
+    const safetyTimeout = window.setTimeout(() => {
+      if (isActive) setIsHeroReady(true);
+    }, 5000);
+
+    Promise.all([
+      ...criticalImages.map(preloadImage),
+      minimumDisplay,
+    ]).then(() => {
+      if (isActive) {
+        window.clearTimeout(safetyTimeout);
+        setIsHeroReady(true);
+      }
+    });
+
+    return () => {
+      isActive = false;
+      window.clearTimeout(safetyTimeout);
+    };
+  }, [reduceMotion, useMobileAssets]);
+
    return (
     <>
+      <AnimatePresence>
+        {!isHeroReady && (
+          <motion.div
+            key="hero-preloader"
+            role="status"
+            aria-label="Загружаем Sunny Rentals"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.45, ease: 'easeOut' }}
+            className="fixed inset-0 z-[100] grid place-items-center overflow-hidden bg-gradient-to-br from-blue-950 via-sky-900 to-cyan-700 text-white"
+          >
+            <div className="absolute inset-0 opacity-40 [background:radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.22),transparent_34%)]" />
+            <div className="relative flex flex-col items-center px-6 text-center">
+              <div className="relative grid h-20 w-20 place-items-center">
+                <motion.div
+                  animate={reduceMotion ? undefined : { rotate: 360 }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
+                  className="absolute inset-0 rounded-full border border-white/20 border-t-amber-300"
+                />
+                <motion.div
+                  animate={reduceMotion ? undefined : { scale: [0.9, 1.08, 0.9], opacity: [0.75, 1, 0.75] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="h-10 w-10 rounded-full bg-amber-300 shadow-[0_0_36px_rgba(252,211,77,0.6)]"
+                />
+              </div>
+
+              <div className="mt-6 text-xl font-black tracking-tight">Sunny Rentals</div>
+              <div className="mt-1 text-xs font-semibold uppercase tracking-[0.28em] text-white/55">
+                Phuket
+              </div>
+
+              <div className="mt-7 h-0.5 w-36 overflow-hidden rounded-full bg-white/15">
+                <motion.div
+                  initial={{ x: '-100%' }}
+                  animate={reduceMotion ? { x: 0 } : { x: ['-100%', '120%'] }}
+                  transition={reduceMotion
+                    ? { duration: 0 }
+                    : { duration: 1.15, repeat: Infinity, ease: 'easeInOut' }}
+                  className="h-full w-2/3 rounded-full bg-gradient-to-r from-cyan-300 to-amber-300"
+                />
+              </div>
+              <span className="sr-only">Загружаем страницу</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Hero Section */}
       <section className="relative min-h-[85vh] lg:min-h-screen overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0">
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-100"
-            style={{ backgroundImage: `url(${isMobile ? heroImageMob : heroImage})` }}
+            style={{ backgroundImage: `url(${useMobileAssets ? heroImageMob : heroImage})` }}
           />
           <div className="absolute inset-0 bg-gradient-to-br from-black/35 via-black/25 to-primary-dark/15" />
           {/* Decorative gradient orbs */}
