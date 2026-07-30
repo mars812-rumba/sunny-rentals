@@ -16,7 +16,7 @@ export function SiteHeader() {
 
         <nav className="site-nav" aria-label="Основная навигация">
           <Link href="/cars">Автопарк</Link>
-          <a href="/#booking">Подобрать</a>
+          <Link href="/#booking">Подобрать</Link>
           <a href={siteConfig.telegramBotUrl}>Telegram</a>
         </nav>
       </div>

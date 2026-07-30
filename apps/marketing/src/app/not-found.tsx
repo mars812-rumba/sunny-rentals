@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { siteConfig } from "@/lib/site";
 
 export default function NotFound() {
@@ -10,9 +12,9 @@ export default function NotFound() {
           Вернитесь на главную или откройте подбор транспорта в Telegram.
         </p>
         <div className="hero__actions">
-          <a className="button button--primary" href="/">
+          <Link className="button button--primary" href="/">
             На главную
-          </a>
+          </Link>
           <a className="button button--secondary" href={siteConfig.telegramBotUrl}>
             Открыть Telegram
           </a>

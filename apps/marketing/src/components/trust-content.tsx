@@ -110,7 +110,7 @@ export function TrustContent() {
           </Link>
           <nav aria-label="Навигация в подвале">
             <Link href="/cars">Автопарк</Link>
-            <a href="/#booking">Подобрать транспорт</a>
+            <Link href="/#booking">Подобрать транспорт</Link>
             <a href={siteConfig.telegramBotUrl}>Telegram</a>
             <a href={siteConfig.whatsappUrl}>WhatsApp</a>
           </nav>
