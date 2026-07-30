@@ -12,6 +12,8 @@ import uuid
 import re
 import time
 import yaml
+import hashlib
+import hmac
 
 from dotenv import load_dotenv
 
@@ -30,7 +32,7 @@ from fastapi import UploadFile, File, Form
 from fastapi.responses import FileResponse
 
 from pydantic import BaseModel, Field, validator
-from urllib.parse import unquote
+from urllib.parse import parse_qsl, unquote
 
 # Claude AI imports
 try:
@@ -132,6 +134,54 @@ ADMIN_USERNAME = "sunny_admin"
 ADMIN_PASSWORD = "Marseloid812$$"
 AUTH_TOKEN = os.getenv("AUTH_TOKEN", "secret-auth-token-for-sunny-rentals")
 TG_WEBHOOK_URL = os.getenv("TG_WEBHOOK_URL","http://localhost:5001")
+WEBAPP_BOT_TOKEN = os.getenv("WEBAPP_BOT_TOKEN")
+
+
+def validate_telegram_init_data(init_data: Optional[str], max_age_seconds: int = 86400) -> Dict[str, Any]:
+    """Проверяет подпись Telegram Mini App и возвращает подтверждённого пользователя."""
+    if not init_data:
+        raise HTTPException(status_code=401, detail="Telegram authorization required")
+    if not WEBAPP_BOT_TOKEN:
+        raise HTTPException(status_code=503, detail="Telegram authorization is not configured")
+
+    parsed = dict(parse_qsl(init_data, keep_blank_values=True))
+    received_hash = parsed.pop("hash", None)
+    if not received_hash:
+        raise HTTPException(status_code=401, detail="Invalid Telegram authorization data")
+
+    data_check_string = "\n".join(f"{key}={value}" for key, value in sorted(parsed.items()))
+    secret_key = hmac.new(
+        b"WebAppData",
+        WEBAPP_BOT_TOKEN.encode("utf-8"),
+        hashlib.sha256,
+    ).digest()
+    calculated_hash = hmac.new(
+        secret_key,
+        data_check_string.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+    if not hmac.compare_digest(calculated_hash, received_hash):
+        raise HTTPException(status_code=401, detail="Invalid Telegram authorization signature")
+
+    try:
+        auth_date = int(parsed.get("auth_date", "0"))
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail="Invalid Telegram authorization date") from exc
+
+    now = int(time.time())
+    if auth_date <= 0 or auth_date > now + 60 or now - auth_date > max_age_seconds:
+        raise HTTPException(status_code=401, detail="Telegram authorization expired")
+
+    try:
+        user = json.loads(parsed.get("user", "{}"))
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=401, detail="Invalid Telegram user data") from exc
+
+    if not user.get("id"):
+        raise HTTPException(status_code=401, detail="Telegram user is missing")
+
+    return user
 # Load cars JSON
 try:
     with open(CARS_JSON, "r", encoding="utf-8") as f:
@@ -146,7 +196,7 @@ except Exception as e:
 
 # Claude AI Configuration
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY") or os.getenv("CLAUDE_API_KEY")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-20250514")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-5")
 
 # Claude client initialization
 claude_client = None
@@ -325,8 +375,10 @@ class DatesData(BaseModel):
 class LocationsData(BaseModel):
     pickupLocation: Optional[str] = 'airport'
     dropoffLocation: Optional[str] = 'airport'
+    returnLocation: Optional[str] = None
     pickupAddress: Optional[str] = ''
     dropoffAddress: Optional[str] = ''
+    returnAddress: Optional[str] = None
     
     class Config:
         populate_by_name = True
@@ -1262,6 +1314,100 @@ user_conversations = {}  # {user_id: {"status": "active/paused/ended", "history"
 user_sessions = {}       # {user_id: {"claude_initiated": bool, ...}}
 user_filters_cache = {}  # {user_id: {days, category, startDate, endDate, ...}}
 
+# Full chat history is persisted to JSONL. Keep only bounded, transient state
+# in RAM so a long-running uvicorn worker cannot grow indefinitely.
+MAX_CONVERSATION_MESSAGES = 40
+MAX_RUNTIME_USERS = 500
+RUNTIME_STATE_TTL_SECONDS = 24 * 60 * 60
+RUNTIME_CLEANUP_INTERVAL_SECONDS = 5 * 60
+_runtime_state_lock = threading.RLock()
+_runtime_last_seen = {}
+_runtime_last_cleanup = 0.0
+_claude_worker_slots = threading.BoundedSemaphore(8)
+_claude_jobs = set()
+
+
+def _trim_conversation_history(conversation: dict) -> None:
+    history = conversation.get("history")
+    if isinstance(history, list) and len(history) > MAX_CONVERSATION_MESSAGES:
+        del history[:-MAX_CONVERSATION_MESSAGES]
+
+
+def cleanup_runtime_state(force: bool = False) -> None:
+    """Evict stale/non-active Claude state and cap in-memory histories."""
+    global _runtime_last_cleanup
+    now = time.time()
+    with _runtime_state_lock:
+        if not force and now - _runtime_last_cleanup < RUNTIME_CLEANUP_INTERVAL_SECONDS:
+            return
+        _runtime_last_cleanup = now
+
+        for conversation in list(user_conversations.values()):
+            _trim_conversation_history(conversation)
+
+        stale_ids = [
+            user_id
+            for user_id, last_seen in _runtime_last_seen.items()
+            if now - last_seen > RUNTIME_STATE_TTL_SECONDS
+        ]
+        overflow = max(0, len(_runtime_last_seen) - MAX_RUNTIME_USERS)
+        if overflow:
+            remaining = sorted(
+                (
+                    (last_seen, user_id)
+                    for user_id, last_seen in _runtime_last_seen.items()
+                    if user_id not in stale_ids
+                ),
+                key=lambda item: item[0],
+            )
+            stale_ids.extend(user_id for _, user_id in remaining[:overflow])
+
+        for user_id in set(stale_ids):
+            user_conversations.pop(user_id, None)
+            user_sessions.pop(user_id, None)
+            user_filters_cache.pop(user_id, None)
+            _runtime_last_seen.pop(user_id, None)
+
+
+def touch_runtime_user(user_id) -> None:
+    if user_id is None:
+        return
+    with _runtime_state_lock:
+        _runtime_last_seen[user_id] = time.time()
+    cleanup_runtime_state()
+
+
+def release_runtime_user(user_id) -> None:
+    """Drop transient state after stop; durable chat/event logs remain."""
+    with _runtime_state_lock:
+        user_conversations.pop(user_id, None)
+        user_sessions.pop(user_id, None)
+        user_filters_cache.pop(user_id, None)
+        _runtime_last_seen.pop(user_id, None)
+
+
+def start_claude_background(user_id) -> bool:
+    """Start at most one job per user and at most eight Claude jobs globally."""
+    with _runtime_state_lock:
+        if user_id in _claude_jobs or not _claude_worker_slots.acquire(blocking=False):
+            return False
+        _claude_jobs.add(user_id)
+
+    def runner():
+        try:
+            handle_claude_best_options(user_id)
+        finally:
+            with _runtime_state_lock:
+                _claude_jobs.discard(user_id)
+            _claude_worker_slots.release()
+
+    threading.Thread(
+        target=runner,
+        daemon=True,
+        name=f"claude-start-{user_id}",
+    ).start()
+    return True
+
 # Claude client initialization
 claude_client = None
 if ANTHROPIC_API_KEY:
@@ -1281,6 +1427,7 @@ else:
 def initiate_claude_dialogue(user_id, user_filters=None):
     """Запускает диалог Claude с подбором машин"""
     print(f"🤖 Initiating Claude dialogue for user {user_id}")
+    touch_runtime_user(user_id)
     
     if user_id in user_conversations and user_conversations[user_id].get("status") == "active":
         print(f"Dialogue with user {user_id} is already active.")
@@ -1374,7 +1521,8 @@ def process_claude_message(user_id, user_input):
     """Обрабатывает сообщение через Claude API"""
     try:
         print(f"🚀 process_claude_message called for {user_id}")
-        
+        touch_runtime_user(user_id)
+
         if user_id not in user_conversations:
             print(f"❌ user_id {user_id} not in user_conversations!")
             return {"status": "error", "message": "Пользователь не найден в активных диалогах"}
@@ -1384,6 +1532,7 @@ def process_claude_message(user_id, user_input):
         
         conversation_history = user_conversations[user_id]["history"]
         conversation_history.append({"role": "user", "content": user_input})
+        _trim_conversation_history(user_conversations[user_id])
 
         # Формируем контекст с полной галереей
         cars_context = "\n\nДОСТУПНЫЕ МАШИНЫ:\n"
@@ -1476,7 +1625,14 @@ def process_claude_message(user_id, user_input):
             
             print(f"🤖 Response type: {type(result)}")
             print(f"🤖 Response content: {result}")
-            claude_response_raw = result["content"][0]["text"]
+            text_blocks = [
+                block.get("text", "")
+                for block in result.get("content", [])
+                if block.get("type") == "text" and block.get("text")
+            ]
+            if not text_blocks:
+                raise ValueError("Claude response did not contain a text block")
+            claude_response_raw = "\n".join(text_blocks)
         except Exception as e:
             print(f"❌ Claude API Error: {e}")
             print(f"❌ Error type: {type(e)}")
@@ -1528,6 +1684,7 @@ def process_claude_message(user_id, user_input):
 
         # Сохраняем в историю
         conversation_history.append({"role": "assistant", "content": claude_response_raw})
+        _trim_conversation_history(user_conversations[user_id])
         
         print(f"✅ Message processed for {user_id}")
         
@@ -2062,7 +2219,10 @@ async def get_logistics_summary():
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 @app.post(API_PREFIX + "/leads/track")
-def track_lead_event(request: LeadTrackRequest):
+def track_lead_event(
+    request: LeadTrackRequest,
+    telegram_init_data: Optional[str] = Header(None, alias="X-Telegram-Init-Data"),
+):
     """Track user events - ONE record per user"""
     try:
         # Handle both Telegram IDs (int) and session IDs (str)
@@ -2070,6 +2230,13 @@ def track_lead_event(request: LeadTrackRequest):
         event_type = request.event_type
         event_data = request.data or {}
         username = request.username
+
+        if telegram_init_data:
+            verified_user = validate_telegram_init_data(telegram_init_data)
+            user_id = verified_user["id"]
+            username = verified_user.get("username") or verified_user.get("first_name")
+        elif isinstance(user_id, int) or (isinstance(user_id, str) and user_id.isdigit()):
+            raise HTTPException(status_code=401, detail="Telegram authorization required")
 
         # Enhanced diagnostic logging
         print(f"🔍 track_lead_event: user_id={user_id} (type: {type(user_id).__name__}), event_type={event_type}")
@@ -2210,6 +2377,8 @@ def track_lead_event(request: LeadTrackRequest):
             "user_type": "telegram" if isinstance(user_id, int) else "web_session"
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"❌ Ошибка в track_lead_event: {e}")
         import traceback
@@ -3186,7 +3355,12 @@ async def api_start_claude(user_id: int):
     """Start Claude for a specific user"""
     try:
         print(f"🤖 Starting Claude for user {user_id}")
-        
+        touch_runtime_user(user_id)
+
+        # 0. Синхронизируем контекст (фильтры) и добавляем юзера в user_conversations
+        sync_user_context(user_id)
+        user_conversations[user_id]["status"] = "active"
+
         # 1. Обновляем статус в базе данных СРАЗУ
         update_dialog_status(user_id, claude_status="active")
         
@@ -3197,7 +3371,7 @@ async def api_start_claude(user_id: int):
         log_dialog_event(user_id, "claude_started", {"by": "manager"})
         
         # 4. Запускаем квалификацию
-        threading.Thread(target=handle_claude_best_options, args=(user_id,)).start()
+        start_claude_background(user_id)
         
         return {"status": "success", "message": f"Claude started for user {user_id}"}
     except Exception as e:
@@ -3218,6 +3392,7 @@ async def api_stop_claude(user_id: int):
         
         # 3. Записываем событие
         log_dialog_event(user_id, "claude_stopped", {"by": "manager"})
+        release_runtime_user(user_id)
         
         return {"status": "success", "message": f"Claude stopped for user {user_id}"}
     except Exception as e:
@@ -3229,6 +3404,7 @@ async def api_pause_claude(user_id: int):
     """Pause Claude for a specific user"""
     try:
         print(f"⏸️ Pausing Claude for user {user_id}")
+        touch_runtime_user(user_id)
         
         # 1. Обновляем статус в базе данных СРАЗУ
         update_dialog_status(user_id, claude_status="paused")
@@ -3249,6 +3425,7 @@ async def api_resume_claude(user_id: int):
     """Resume Claude for a specific user"""
     try:
         print(f"▶️ Resuming Claude for user {user_id}")
+        touch_runtime_user(user_id)
         
         # 1. Обновляем статус в базе данных СРАЗУ
         update_dialog_status(user_id, claude_status="active")
@@ -3273,6 +3450,7 @@ async def api_send_claude_message(request: Request):
         
         if not user_id or not message:
             raise HTTPException(status_code=400, detail="user_id and message required")
+        touch_runtime_user(user_id)
         
         # ✅ ВОССТАНАВЛИВАЕМ ДИАЛОГ, НО НЕ ЗАТИРАЕМ ФИЛЬТРЫ
         if user_id not in user_conversations:
@@ -3392,6 +3570,7 @@ async def api_get_claude_best_options(request: Request):
 
 def sync_user_context(user_id):
     """Подгружает актуальные фильтры из основной базы пользователей в память Клода"""
+    touch_runtime_user(user_id)
     if user_id not in user_conversations:
         # Пытаемся найти юзера в users.json
         try:
@@ -4207,6 +4386,11 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
         
         # Конвертируем Pydantic в dict
         form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
+        locations = form_data_dict.get("locations", {})
+        if locations.get("returnLocation"):
+            locations["dropoffLocation"] = locations["returnLocation"]
+        if locations.get("returnAddress"):
+            locations["dropoffAddress"] = locations["returnAddress"]
         
         bookings = load_bookings()
         
@@ -4407,100 +4591,153 @@ async def web_create_booking(booking_data: AdminBookingRequest):
 
 
 @app.post(API_PREFIX + "/bookings/telegram_webapp")
-async def telegram_webapp_create_booking(booking_data: AdminBookingRequest):
+async def telegram_webapp_create_booking(
+    booking_data: AdminBookingRequest,
+    telegram_init_data: Optional[str] = Header(None, alias="X-Telegram-Init-Data"),
+):
     """Создание брони из Telegram WebApp (предварительная бронь)"""
     try:
         print("=== START telegram_webapp_create_booking ===")
-        print(f"Successfully parsed request data: {booking_data}")
-        
+        telegram_user = validate_telegram_init_data(telegram_init_data)
+        user_id = telegram_user["id"]
+        username = telegram_user.get("username") or telegram_user.get("first_name")
+
+        if booking_data.user_id is not None and str(booking_data.user_id) != str(user_id):
+            raise HTTPException(status_code=403, detail="Telegram user mismatch")
+
         form_data = booking_data.form_data
-        print(f"Form data parsed successfully: {form_data}")
-        
         booking_id = booking_data.booking_id
-        
+
         if not form_data:
-            print("ERROR: form_data is missing")
             raise HTTPException(status_code=400, detail="form_data is missing")
-        
-        # ✅ НОВАЯ ПРОВЕРКА: Проверяем пересечение дат
+
         car_id = form_data.car.id
         start_date = form_data.dates.start
         end_date = form_data.dates.end
-        
+
         overlap_check = check_booking_overlap(
             car_id=car_id,
             start_date=start_date,
             end_date=end_date,
-            exclude_booking_id=booking_id  # При редактировании исключаем текущую бронь
+            exclude_booking_id=booking_id
         )
-        
+
         if not overlap_check["available"]:
             conflicts = overlap_check["conflicting_bookings"]
-            # ✅ Красивое сообщение
-            conflict_messages = []
-            for c in conflicts:
-                conflict_messages.append(
-                    f"• {c['customer_name']}: {c['start']} - {c['end']}"
-                )
-            
-            conflict_info = "\n".join(conflict_messages)  # ✅ Добавлены отступы
-            raise HTTPException(                           # ✅ Добавлены отступы
+            conflict_info = "\n".join(
+                f"• {conflict['customer_name']}: {conflict['start']} - {conflict['end']}"
+                for conflict in conflicts
+            )
+            raise HTTPException(
                 status_code=409,
                 detail=f"Машина уже забронирована на эти даты:\n{conflict_info}"
             )
-        
-        # Конвертируем Pydantic в dict
+
         form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
-        
+        locations = form_data_dict.get("locations", {})
+        if locations.get("returnLocation"):
+            locations["dropoffLocation"] = locations["returnLocation"]
+        if locations.get("returnAddress"):
+            locations["dropoffAddress"] = locations["returnAddress"]
+
         bookings = load_bookings()
-        
+        original_bookings = copy.deepcopy(bookings)
+        now_iso = datetime.utcnow().isoformat()
+
         if booking_id:
-            # Редактирование
-            print(f"Updating existing booking: {booking_id}")
             found = False
             for booking in bookings:
                 if booking.get('booking_id') == booking_id:
+                    if str(booking.get("user_id")) != str(user_id):
+                        raise HTTPException(status_code=403, detail="Booking does not belong to Telegram user")
                     booking['form_data'] = form_data_dict
-                    booking['updated_at'] = datetime.utcnow().isoformat()
+                    booking['updated_at'] = now_iso
                     found = True
-                    print(f"✓ Updated booking {booking_id}")
                     break
-            
+
             if not found:
-                print(f"ERROR: Booking {booking_id} not found")
                 raise HTTPException(status_code=404, detail="Booking not found")
         else:
-            # Создание
             booking_id = str(uuid.uuid4())[:8]
-            print(f"Creating new booking: {booking_id}")
-            
-            # Используем user_id из запроса или fallback
-            user_id = booking_data.user_id if booking_data.user_id else "telegram_user"
-            
             bookings.append({
                 "booking_id": booking_id,
-                "user_id": str(user_id),  # ✅ Сохраняем реальный user_id
+                "user_id": str(user_id),
                 "form_data": form_data_dict,
                 "status": "pre_booking",
-                "created_at": datetime.utcnow().isoformat(),
+                "created_at": now_iso,
                 "source": "telegram_webapp"
             })
-            print(f"✓ Created pre_booking {booking_id} for user {user_id}")
-        
-        # Сохраняем
+
+        users_data = load_json(USER_DATA_JSON)
+        if not isinstance(users_data, list):
+            users_data = []
+
+        user_record = next(
+            (user for user in users_data if str(user.get("user_id")) == str(user_id)),
+            None,
+        )
+        if user_record is None:
+            user_record = {
+                "user_id": user_id,
+                "created_at": now_iso,
+                "notes": [],
+                "marker": None,
+                "archived": False,
+                "source": "telegram_webapp",
+            }
+
+        car_data = form_data_dict.get("car", {})
+        car_name = " ".join(
+            str(car_data.get(field) or "").strip()
+            for field in ("brand", "model", "year", "color")
+        ).strip() or car_data.get("name") or car_data.get("id")
+
+        category = user_record.get("category_interested")
+        cars_data = as_cars_list(load_json(CARS_JSON))
+        matched_car = next(
+            (car for car in cars_data if str(car.get("id")) == str(car_data.get("id"))),
+            None,
+        )
+        if matched_car:
+            category = matched_car.get("class") or category
+
+        user_record.update({
+            "username": username,
+            "updated_at": now_iso,
+            "status": "pre_booking",
+            "form_started": True,
+            "booking_submitted": True,
+            "car_interested": car_name,
+            "category_interested": category,
+            "dates_selected": {
+                "start": form_data_dict["dates"].get("start"),
+                "end": form_data_dict["dates"].get("end"),
+                "days": form_data_dict["dates"].get("days", 1),
+            },
+            "source": "telegram_webapp",
+        })
+
+        updated_users = [
+            user for user in users_data if str(user.get("user_id")) != str(user_id)
+        ]
+        updated_users.append(user_record)
+
         with _lock:
             save_json(BOOKINGS_FILE, bookings)
-        print("✓ Bookings saved to JSON")
-        
-        # ✅ Уведомляем Telegram бота о новой предварительной брони
+            try:
+                save_json(USER_DATA_JSON, updated_users)
+            except Exception:
+                save_json(BOOKINGS_FILE, original_bookings)
+                raise
+
+        print(f"✓ Booking {booking_id} and CRM user {user_id} saved")
+
         try:
-            # Получаем username из user_data.json
-            users_data = load_json(USER_DATA_JSON)
-            user_record = next((u for u in users_data if str(u.get("user_id")) == str(user_id)), None)
-            display_name = user_record.get("username") if user_record else None
-            if not display_name:
-                display_name = booking_data.form_data.contact.name if booking_data.form_data.contact.name else str(user_id)
-            
+            display_name = (
+                username
+                or booking_data.form_data.contact.name
+                or str(user_id)
+            )
             notify_telegram_bot_about_booking(
                 booking_id=booking_id,
                 user_id=user_id,
@@ -4509,7 +4746,7 @@ async def telegram_webapp_create_booking(booking_data: AdminBookingRequest):
             )
         except Exception as e:
             print(f"Warning: Failed to notify bot about booking: {e}")
-        
+
         print("=== SUCCESS ===")
         return {
             "status": "ok",
@@ -5400,5 +5637,3 @@ if __name__ == "__main__":
     import uvicorn
     PORT = int(os.getenv("PORT", 5000))
     uvicorn.run("web_integration:app", host="0.0.0.0", port=PORT, reload=True)
-
-

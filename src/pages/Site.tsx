@@ -27,13 +27,6 @@ const Site = () => {
     returnLocation: '',
     days: 0
   });
-  const [selectedCar, setSelectedCar] = useState<any>(null);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isSubmittingBooking, setIsSubmittingBooking] = useState(false);
-  const [isBookingSubmitted, setIsBookingSubmitted] = useState(false);
-  const [bookingId, setBookingId] = useState<string | null>(null);
-  const [deepLinkCarId, setDeepLinkCarId] = useState<string | null>(null);
-
   const handleFiltersChange = useCallback((newFilters: any) => {
     setFilters(newFilters);
     if (selectedCategory && newFilters.startDate && newFilters.pickupLocation) {
@@ -122,18 +115,6 @@ const Site = () => {
             setShowResults={setShowResults}
             filters={filters}
             setFilters={setFilters}
-            selectedCar={selectedCar}
-            setSelectedCar={setSelectedCar}
-            isBookingModalOpen={isBookingModalOpen}
-            setIsBookingModalOpen={setIsBookingModalOpen}
-            isSubmittingBooking={isSubmittingBooking}
-            setIsSubmittingBooking={setIsSubmittingBooking}
-            isBookingSubmitted={isBookingSubmitted}
-            setIsBookingSubmitted={setIsBookingSubmitted}
-            bookingId={bookingId}
-            setBookingId={setBookingId}
-            deepLinkCarId={deepLinkCarId}
-            setDeepLinkCarId={setDeepLinkCarId}
           />
           <ReviewsSection />
           <WhyUsSection />

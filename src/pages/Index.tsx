@@ -12,6 +12,15 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCars } from '@/contexts/CarsContext';
 import { isValid } from 'date-fns';
 import { trackLeadEvent } from '@/api/api';
+import { parseTelegramHandoffPayload } from '@/utils/telegramHandoff';
+
+interface RentalFilters {
+  startDate: Date | null;
+  endDate: Date | null;
+  pickupLocation: string;
+  returnLocation: string;
+  days: number;
+}
 
 // --- Pricing helpers ---
 const determineSeason = (date: Date) => {
@@ -43,7 +52,7 @@ const Index = () => {
   
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<RentalFilters>({
     startDate: null,
     endDate: null,
     pickupLocation: '',
@@ -86,17 +95,38 @@ const Index = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const telegramStartParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
+    const handoff = parseTelegramHandoffPayload(
+      telegramStartParam ||
+      params.get('start_param') ||
+      params.get('tgWebAppStartParam')
+    );
     const carIdParam = params.get('carId');
     const durationParam = params.get('duration');
     const categoryParam = params.get('category');
     const pickupLocationParam = params.get('pickupLocation');
     const returnLocationParam = params.get('returnLocation');
 
-    let newFilters = {};
+    let newFilters: Partial<RentalFilters> = {};
     let categoryToSet = '';
     let hasParams = false;
 
-    if (durationParam) {
+    if (handoff) {
+      const days = Math.floor(
+        (handoff.endDate.getTime() - handoff.startDate.getTime()) / (1000 * 60 * 60 * 24)
+      ) + 1;
+      newFilters = {
+        startDate: handoff.startDate,
+        endDate: handoff.endDate,
+        pickupLocation: handoff.pickupLocation,
+        returnLocation: handoff.returnLocation,
+        days,
+      };
+      categoryToSet = handoff.category;
+      hasParams = true;
+    }
+
+    if (!handoff && durationParam) {
       const durationDays = parseInt(durationParam, 10);
       if (!isNaN(durationDays) && durationDays > 0) {
         const endDate = addDays(today, durationDays);
@@ -105,20 +135,25 @@ const Index = () => {
       }
     }
 
-    if (pickupLocationParam) {
+    if (!handoff && pickupLocationParam) {
       newFilters = { ...newFilters, pickupLocation: pickupLocationParam };
       hasParams = true;
     }
-    if (returnLocationParam) {
+    if (!handoff && returnLocationParam) {
       newFilters = { ...newFilters, returnLocation: returnLocationParam };
       hasParams = true;
     }
-    if (categoryParam) {
+    if (!handoff && categoryParam) {
       categoryToSet = categoryParam;
       hasParams = true;
     }
 
     setSelectedCategory(categoryToSet);
+
+    if (hasParams) {
+      setFilters((current) => ({ ...current, ...newFilters }));
+      setShowResults(true);
+    }
 
     if (carIdParam) {
       setDeepLinkCarId(carIdParam);
@@ -428,6 +463,37 @@ if (filters.startDate && filters.endDate &&
   };
 
   // ✅ ФИКС: Loading state
+  const telegramWebApp = window.Telegram?.WebApp;
+  const isTelegramAuthorized = Boolean(
+    telegramWebApp?.initData &&
+    telegramWebApp?.initDataUnsafe?.user?.id
+  );
+
+  if (!isTelegramAuthorized) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-orange-50 px-4">
+        <div className="w-full max-w-md rounded-3xl border border-sky-100 bg-white p-8 text-center shadow-2xl shadow-sky-950/10">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#229ED9] text-3xl">
+            ✈
+          </div>
+          <h1 className="mt-6 text-2xl font-black text-slate-900">
+            Откройте каталог в Telegram
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-slate-500">
+            Доступные варианты и бронирование открываются только после подтверждения профиля в
+            Telegram WebApp.
+          </p>
+          <a
+            href="https://t.me/webapp_rent_bot"
+            className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-[#229ED9] px-5 font-bold text-white transition hover:bg-[#168dcc]"
+          >
+            Перейти в Telegram
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   if (carsLoading) {
     return (
       <div className="flex items-center justify-center h-screen">

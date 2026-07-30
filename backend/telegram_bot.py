@@ -15,6 +15,7 @@ import uuid
 import yaml
 import threading
 import time
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 import requests
 from io import BytesIO
 # Claude AI imports
@@ -60,7 +61,7 @@ VIDEO_FILE_ID = "BAACAgIAAxkBAAI4iGkmEWxPerhmNL7xcN49Xx9_zoGGAAK-hQACd2M5SfFLM5c
 
 # Claude AI Configuration
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY") or os.getenv("CLAUDE_API_KEY")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-20250514")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-5")
 
 # Load prompts for compatibility
 try:
@@ -144,6 +145,119 @@ user_conversations = {}  # {user_id: {"status": "active/paused/ended", "history"
 user_sessions = {}       # {user_id: {"claude_initiated": bool, ...}}
 user_filters_cache = {}  # {user_id: {days, category, startDate, endDate, ...}}
 claude_init_timers = {}  # {user_id: timer}
+
+# Durable dialog data lives in backend files. Bound these process-local caches
+# so the polling process can run for months without retaining every user.
+MAX_CONVERSATION_MESSAGES = 40
+MAX_RUNTIME_USERS = 500
+RUNTIME_STATE_TTL_SECONDS = 24 * 60 * 60
+PENDING_BOOKING_TTL_SECONDS = 48 * 60 * 60
+RUNTIME_CLEANUP_INTERVAL_SECONDS = 5 * 60
+_runtime_state_lock = threading.RLock()
+_runtime_last_seen = {}
+_runtime_last_cleanup = 0.0
+_claude_worker_slots = threading.BoundedSemaphore(8)
+_claude_jobs = set()
+
+
+def _trim_conversation_history(conversation):
+    history = conversation.get("history")
+    if isinstance(history, list) and len(history) > MAX_CONVERSATION_MESSAGES:
+        del history[:-MAX_CONVERSATION_MESSAGES]
+
+
+def cleanup_runtime_state(force=False):
+    """Bound Telegram/Claude caches and cancel timers for evicted users."""
+    global _runtime_last_cleanup
+    now = time.time()
+    with _runtime_state_lock:
+        if not force and now - _runtime_last_cleanup < RUNTIME_CLEANUP_INTERVAL_SECONDS:
+            return
+        _runtime_last_cleanup = now
+
+        for conversation in list(user_conversations.values()):
+            _trim_conversation_history(conversation)
+
+        stale_ids = [
+            user_id
+            for user_id, last_seen in _runtime_last_seen.items()
+            if now - last_seen > RUNTIME_STATE_TTL_SECONDS
+        ]
+        overflow = max(0, len(_runtime_last_seen) - MAX_RUNTIME_USERS)
+        if overflow:
+            remaining = sorted(
+                (
+                    (last_seen, user_id)
+                    for user_id, last_seen in _runtime_last_seen.items()
+                    if user_id not in stale_ids
+                ),
+                key=lambda item: item[0],
+            )
+            stale_ids.extend(user_id for _, user_id in remaining[:overflow])
+
+        for user_id in set(stale_ids):
+            timer = claude_init_timers.pop(user_id, None)
+            if timer is not None:
+                timer.cancel()
+            user_timers.pop(user_id, None)
+            user_conversations.pop(user_id, None)
+            user_sessions.pop(user_id, None)
+            user_filters_cache.pop(user_id, None)
+            recent_webapp_entries.pop(user_id, None)
+            _runtime_last_seen.pop(user_id, None)
+
+        for booking_id, booking in list(pending_bookings.items()):
+            timestamp = booking.get("timestamp")
+            try:
+                created_at = datetime.fromisoformat(timestamp).timestamp()
+            except (TypeError, ValueError):
+                created_at = 0
+            if now - created_at > PENDING_BOOKING_TTL_SECONDS:
+                pending_bookings.pop(booking_id, None)
+
+
+def touch_runtime_user(user_id):
+    if user_id is None:
+        return
+    with _runtime_state_lock:
+        _runtime_last_seen[user_id] = time.time()
+    cleanup_runtime_state()
+
+
+def release_runtime_user(user_id):
+    with _runtime_state_lock:
+        timer = claude_init_timers.pop(user_id, None)
+        if timer is not None:
+            timer.cancel()
+        user_timers.pop(user_id, None)
+        user_conversations.pop(user_id, None)
+        user_sessions.pop(user_id, None)
+        user_filters_cache.pop(user_id, None)
+        recent_webapp_entries.pop(user_id, None)
+        _runtime_last_seen.pop(user_id, None)
+
+
+def start_claude_background(user_id):
+    """Avoid duplicate/unbounded helper threads from repeated CRM clicks."""
+    with _runtime_state_lock:
+        if user_id in _claude_jobs or not _claude_worker_slots.acquire(blocking=False):
+            return False
+        _claude_jobs.add(user_id)
+
+    def runner():
+        try:
+            handle_claude_best_options(user_id)
+        finally:
+            with _runtime_state_lock:
+                _claude_jobs.discard(user_id)
+            _claude_worker_slots.release()
+
+    threading.Thread(
+        target=runner,
+        daemon=True,
+        name=f"claude-start-{user_id}",
+    ).start()
+    return True
 
 
 # --- BOT MENU SETUP ---
@@ -614,11 +728,8 @@ def initiate_claude_dialogue(user_id, user_filters=None):
     print(f"🤖 Initiating Claude dialogue for user {user_id} via backend API")
     
     try:
-        # Вызываем API бэкенда для запуска Claude
-        result = call_backend_api("/api/claude/start", {
-            "user_id": user_id,
-            "filters": user_filters or {}
-        })
+        # Вызываем API бэкенда для запуска Claude (user_id в URL)
+        result = call_backend_api(f"/api/claude/start/{user_id}", method="POST")
         
         if result and result.get("status") == "success":
             print(f"✅ Claude dialogue initiated via backend for user {user_id}")
@@ -638,7 +749,7 @@ def handle_claude_best_options(user_id):
     print(f"🎯 Requesting Claude best options for {user_id} via backend API")
     
     try:
-        result = call_backend_api("/api/claude/best_options", {
+        result = call_backend_api("/api/crm/claude/best_options", {
             "user_id": user_id
         })
         
@@ -696,6 +807,39 @@ def process_claude_message(user_id, user_input):
     except Exception as e:
         print(f"❌ Error processing Claude message: {e}")
         safe_send_message(user_id, "Секунду, подвисло. Напиши ещё раз.")
+
+
+def is_claude_active_for_message(message):
+    """Restore Claude runtime state from backend after bot restarts."""
+    if message.chat.type != "private":
+        return False
+
+    user_id = message.chat.id
+    local_status = user_conversations.get(user_id, {}).get("status")
+    if local_status == "active":
+        return True
+    if local_status == "paused":
+        return False
+
+    status_data = call_backend_api(f"/api/claude/status/{user_id}", method="GET")
+    claude_status = ((status_data or {}).get("data") or {}).get("claude_status")
+
+    if claude_status == "active":
+        touch_runtime_user(user_id)
+        user_conversations[user_id] = {
+            **user_conversations.get(user_id, {}),
+            "status": "active",
+            "history": user_conversations.get(user_id, {}).get("history", []),
+            "filters": user_conversations.get(user_id, {}).get("filters", {}),
+        }
+        print(f"🔄 Restored active Claude state for {user_id} from backend")
+        return True
+
+    if claude_status in ("paused", "stopped", "idle"):
+        if user_id in user_conversations:
+            user_conversations[user_id]["status"] = claude_status
+
+    return False
 
 # ==============================
 # CALLBACK HANDLERS
@@ -821,6 +965,19 @@ def handle_start(message):
     source = 'telegram_web'
     if ' ' in message.text:
         source = message.text.split(' ', 1)[1]
+
+    webapp_url = URL_WEBAPP
+    if source.startswith("sr1_") and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", source):
+        url_parts = urlsplit(URL_WEBAPP)
+        query = dict(parse_qsl(url_parts.query, keep_blank_values=True))
+        query["start_param"] = source
+        webapp_url = urlunsplit((
+            url_parts.scheme,
+            url_parts.netloc,
+            url_parts.path,
+            urlencode(query),
+            url_parts.fragment,
+        ))
         
     text = (
         "👋 Привет! Добро пожаловать в <b>Sunny Rentals</b>\n\n"
@@ -833,8 +990,8 @@ def handle_start(message):
     # Кнопка webapp (inline)
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton(
-        "🚀 Открыть каталог",
-        web_app=WebAppInfo(URL_WEBAPP)
+        "🚀 Показать доступные варианты",
+        web_app=WebAppInfo(webapp_url)
     ))
 
     # Отправляем сообщение и сразу сохраняем его ID
@@ -866,7 +1023,7 @@ def handle_start(message):
             time.sleep(2*60)
             try:
                 bot.delete_message(chat_id, msg.message_id)
-                bot.send_message(chat_id,"Отправьте любое сообщение для начала диалога с менеджером, либо нажмите /start  для повторного открытия каталога.")
+                bot.send_message(chat_id,"👀 Менеджер подключается к чату...")
             except:
                 pass
         threading.Thread(target=delete_message_later, daemon=True).start()
@@ -1398,10 +1555,11 @@ def get_reply_keyboard():
     return markup
 
     
-@bot.message_handler(func=lambda message: user_conversations.get(message.chat.id, {}).get("status") == "active")
+@bot.message_handler(func=is_claude_active_for_message)
 def handle_claude_conversation(message):
     """Обработчик сообщений в активном диалоге Claude - теперь использует бэкенд API"""
     user_id = message.chat.id
+    touch_runtime_user(user_id)
     user_input = message.text
     
     status = user_conversations.get(user_id, {}).get("status")
@@ -1833,6 +1991,7 @@ async def notify_filters_used(request: Request):
         
         if not user_id:
             raise HTTPException(status_code=400, detail="user_id required")
+        touch_runtime_user(user_id)
         
         # ✅ СОХРАНЯЕМ ФИЛЬТРЫ В КЭШЕ ДЛЯ CLAUDE
         user_filters_cache[user_id] = {
@@ -1981,6 +2140,7 @@ async def notify_booking_submitted(request: Request):
         )
         
         # Сохраняем для обработки callback
+        touch_runtime_user(user_id)
         pending_bookings[booking_id] = {
             'user_id': user_id,
             'form_data': form_data,
@@ -2126,6 +2286,7 @@ async def internal_update_claude_status(request: Request):
         
         if not user_id or not status:
             raise HTTPException(status_code=400, detail="user_id and status are required")
+        touch_runtime_user(user_id)
         
         print(f"🔄 Updating Claude status for user {user_id}: {status}")
         
@@ -2145,6 +2306,7 @@ async def internal_update_claude_status(request: Request):
             if user_id in user_conversations:
                 user_conversations[user_id]["status"] = "stopped"
             handle_claude_stop(user_id)
+            release_runtime_user(user_id)
         
         return JSONResponse(content={"status": "ok", "message": f"Claude status updated to {status}"})
         
@@ -2162,6 +2324,7 @@ async def api_start_claude(request: Request):
     user_id = data.get('user_id')
     if not user_id:
         raise HTTPException(status_code=400, detail="user_id required")
+    touch_runtime_user(user_id)
     
     # Сброс и запуск
     user_conversations[user_id] = {"status": "active", "history": [], "filters": {}}
@@ -2169,7 +2332,7 @@ async def api_start_claude(request: Request):
         user_sessions[user_id]["claude_initiated"] = True
         
     # Сразу отправляем приветственные варианты
-    threading.Thread(target=handle_claude_best_options, args=(user_id,)).start()
+    start_claude_background(user_id)
     
     send_dialog_to_group(user_id, "started", "Claude активирован через CRM")
     
@@ -2182,6 +2345,7 @@ async def api_start_claude(request: Request):
 async def api_pause_claude(request: Request):
     data = await request.json()
     user_id = data.get('user_id')
+    touch_runtime_user(user_id)
     if user_id in user_conversations:
         user_conversations[user_id]["status"] = "paused"
         send_dialog_to_group(user_id, "paused", "Claude на паузе (ручное управление)")
@@ -2196,6 +2360,7 @@ async def api_pause_claude(request: Request):
 async def api_resume_claude(request: Request):
     data = await request.json()
     user_id = data.get('user_id')
+    touch_runtime_user(user_id)
     if user_id in user_conversations:
         user_conversations[user_id]["status"] = "active"
         send_dialog_to_group(user_id, "started", "Claude возобновил работу")
@@ -2216,6 +2381,7 @@ async def api_stop_claude(request: Request):
         
         # ОБНОВЛЯЕМ СТАТУС ДИАЛОГА
         handle_claude_stop(user_id)
+        release_runtime_user(user_id)
         
     return JSONResponse(content={"status": "ok"})
 

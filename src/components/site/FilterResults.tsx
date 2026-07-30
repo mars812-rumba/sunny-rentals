@@ -1,46 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Car, Star, ArrowUp } from 'lucide-react';
+import React, { useEffect, useCallback } from 'react';
+import { Search, ArrowUp, CalendarDays, MapPin, Send, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import FilterForm from '@/components/FilterForm';
-import CarList from '@/components/CarList';
-import BookingModal, { BookingModalProps } from '@/components/site/BookingModal';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useCars } from '@/contexts/CarsContext';
-import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { addDays, isValid } from 'date-fns';
-
-
-
-// Функция определения сезона на основе даты
-const getSeason = (date: Date | null | undefined): 'high_season' | 'low_season' => {
-  if (!date || !isValid(date)) {
-    return 'low_season'; // Default to low_season for invalid dates
-  }
-  const month = date.getMonth() + 1; // getMonth() возвращает 0-11, нужно 1-12
-
-  // Высокий сезон: ноябрь (11) - апрель (4)
-  // Низкий сезон: май (5) - октябрь (10)
-  if (month >= 11 || month <= 4) {
-    return 'high_season';
-  }
-  return 'low_season';
-};
-
-const getPriceForPeriod = (pricing: any, days: number, startDate?: Date) => {
-  // Определяем сезон на основе даты начала аренды
-  const season = startDate ? getSeason(startDate) : 'low_season';
-
-  // Если нет цен для определенного сезона, используем low_season как fallback
-  const seasonPricing = pricing[season] || pricing['low_season'];
-
-  if (days >= 30) return seasonPricing.price_30;
-  if (days >= 15) return seasonPricing.price_15_29;
-  if (days >= 7) return seasonPricing.price_7_14;
-  return seasonPricing.price_1_6;
-};
-
-const getDeliveryPrice = (location: string) => location === 'airport' ? 0 : 500;
+import { createTelegramHandoffLink } from '@/utils/telegramHandoff';
 
 interface FilterResultsProps {
   selectedCategory: string;
@@ -49,18 +14,6 @@ interface FilterResultsProps {
   setShowResults: (show: boolean) => void;
   filters: any;
   setFilters: (filters: any) => void;
-  selectedCar: any;
-  setSelectedCar: (car: any) => void;
-  isBookingModalOpen: boolean;
-  setIsBookingModalOpen: (open: boolean) => void;
-  isSubmittingBooking: boolean;
-  setIsSubmittingBooking: (submitting: boolean) => void;
-  isBookingSubmitted: boolean;
-  setIsBookingSubmitted: (submitted: boolean) => void;
-  bookingId: string | null;
-  setBookingId: (id: string | null) => void;
-  deepLinkCarId: string | null;
-  setDeepLinkCarId: (id: string | null) => void;
 }
 
 export const FilterResults = ({
@@ -69,29 +22,13 @@ export const FilterResults = ({
   showResults,
   setShowResults,
   filters,
-  setFilters,
-  selectedCar,
-  setSelectedCar,
-  isBookingModalOpen,
-  setIsBookingModalOpen,
-  isSubmittingBooking,
-  setIsSubmittingBooking,
-  isBookingSubmitted,
-  setIsBookingSubmitted,
-  bookingId,
-  setBookingId,
-  deepLinkCarId,
-  setDeepLinkCarId
+  setFilters
 }: FilterResultsProps) => {
     const { t, language } = useLanguage();
-    const { cars } = useCars();
-    const { toast } = useToast();
     const isMobile = useIsMobile();
-    const carListRef = useRef<HTMLDivElement>(null);
 
 useEffect(() => {
   const params = new URLSearchParams(window.location.search);
-  const carIdParam = params.get('carId');
   const durationParam = params.get('duration');
   const categoryParam = params.get('category');
   const pickupLocationParam = params.get('pickupLocation');
@@ -136,21 +73,10 @@ useEffect(() => {
     setSelectedCategory(categoryParam);
   }
   
-  if (carIdParam) {
-    setDeepLinkCarId(carIdParam);
-  }
-  
-  if (hasParams || carIdParam || categoryParam) {
+  if (hasParams || categoryParam) {
     window.history.replaceState(null, '', window.location.pathname);
   }
 }, []); // ✅ Пустой массив зависимостей
-      useEffect(() => {
-        if (deepLinkCarId && carListRef.current && cars.length > 0) {
-          const el = carListRef.current.querySelector(`[data-car-id="${deepLinkCarId}"]`);
-          el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          setDeepLinkCarId(null);
-        }
-      }, [deepLinkCarId, cars, showResults]);
     
       const categories = [
         { id: 'sedan', name: t('category_sedan') },
@@ -159,8 +85,6 @@ useEffect(() => {
         { id: '7s', name: t('category_7s') },
         { id: 'bikes', name: t('bikes') },
       ];
-    
-      const carsToDisplay = selectedCategory ? cars.filter((car: any) => car.class === selectedCategory) : [];
     
       const handleFiltersChange = useCallback((newFilters: any) => {
         setFilters(newFilters);
@@ -176,20 +100,28 @@ useEffect(() => {
         }
       }, [filters]);
     
-      const handleCarBooking = (car: any) => {
-        if (!showResults) {
-          toast({ title: t('toast_fill_filters'), variant: "destructive" });
-          return;
-        }
-        setSelectedCar(car);
-        setIsBookingSubmitted(false);
-        setBookingId(null);
-        window.open('https://t.me/webapp_rent_bot', '_blank', 'noopener,noreferrer');
-      };
-    
-    
-    
-      // Booking functionality removed - only main app should handle bookings
+      const hasCompleteHandoff = Boolean(
+        selectedCategory &&
+        filters.startDate instanceof Date &&
+        filters.endDate instanceof Date &&
+        isValid(filters.startDate) &&
+        isValid(filters.endDate) &&
+        filters.pickupLocation &&
+        filters.returnLocation
+      );
+
+      const telegramLink = hasCompleteHandoff
+        ? createTelegramHandoffLink({
+            category: selectedCategory,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
+            pickupLocation: filters.pickupLocation,
+            returnLocation: filters.returnLocation,
+          })
+        : 'https://t.me/webapp_rent_bot';
+
+      const categoryName = categories.find((category) => category.id === selectedCategory)?.name;
+
    return (
     <>
 
@@ -238,38 +170,68 @@ useEffect(() => {
                 </p>
               </motion.div>
             ) : (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
-                    {t('found_cars', { count: carsToDisplay.length, category: categories.find(c => c.id === selectedCategory)?.name })}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-sky-100 bg-white shadow-xl shadow-sky-950/10"
+              >
+                <div className="bg-gradient-to-br from-sky-600 to-blue-700 px-6 py-8 text-white md:px-10">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold">
+                    <ShieldCheck className="h-4 w-4" />
+                    Авторизация через Telegram
+                  </div>
+                  <h2 className="text-2xl font-black md:text-3xl">
+                    Варианты готовы к подбору
                   </h2>
-                  <p className="text-muted-foreground">
-                    {language === 'ru' ? 'Выберите транспорт и забронируйте через Telegram' : 'Select a vehicle and book via Telegram'}
+                  <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/75 md:text-base">
+                    Откройте Telegram WebApp — мы подтвердим профиль и покажем доступный транспорт
+                    по выбранным параметрам.
                   </p>
                 </div>
-                <CarList 
-                  ref={carListRef} 
-                  cars={carsToDisplay} 
-                  filters={filters} 
-                  onBooking={handleCarBooking} 
-                  isSubmitting={isSubmittingBooking} 
-                />
+
+                <div className="space-y-5 p-6 md:p-10">
+                  <div className="grid gap-3 text-sm sm:grid-cols-3">
+                    <div className="rounded-2xl bg-slate-50 p-4">
+                      <Search className="mb-2 h-5 w-5 text-sky-600" />
+                      <div className="font-bold text-slate-900">{categoryName || selectedCategory}</div>
+                      <div className="mt-1 text-xs text-slate-500">категория</div>
+                    </div>
+                    <div className="rounded-2xl bg-slate-50 p-4">
+                      <CalendarDays className="mb-2 h-5 w-5 text-sky-600" />
+                      <div className="font-bold text-slate-900">
+                        {filters.startDate?.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                        {' — '}
+                        {filters.endDate?.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}
+                      </div>
+                      <div className="mt-1 text-xs text-slate-500">{filters.days} дней</div>
+                    </div>
+                    <div className="rounded-2xl bg-slate-50 p-4">
+                      <MapPin className="mb-2 h-5 w-5 text-sky-600" />
+                      <div className="font-bold capitalize text-slate-900">{filters.pickupLocation}</div>
+                      <div className="mt-1 text-xs text-slate-500">место выдачи</div>
+                    </div>
+                  </div>
+
+                  <a
+                    href={telegramLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl bg-[#229ED9] px-5 text-base font-black text-white shadow-lg shadow-sky-600/25 transition hover:-translate-y-0.5 hover:bg-[#168dcc] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/50"
+                  >
+                    Показать варианты в Telegram
+                    <Send className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </a>
+
+                  <p className="text-center text-xs leading-relaxed text-slate-500">
+                    Telegram передаст только подтверждённый ID профиля. Бронь появится в CRM после
+                    вашего подтверждения в WebApp.
+                  </p>
+                </div>
               </motion.div>
             )}
           </div>
         </div>
       </section>
-
-      {/* Booking Modal */}
-      <BookingModal
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-        car={selectedCar}
-        filters={filters}
-        // Booking functionality removed - only main app should handle bookings
-        isSubmitted={isBookingSubmitted}
-        bookingId={bookingId}
-      />
     </>
   );
 };

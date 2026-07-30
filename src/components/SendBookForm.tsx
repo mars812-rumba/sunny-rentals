@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { trackLeadEvent, submitBooking } from '@/api/api';
+import { submitBooking } from '@/api/api';
 
 // --- Helper functions ---
 const determineSeason = (startDate: Date) => {
@@ -285,9 +285,6 @@ export const SendBookForm: React.FC<SendBookFormProps> = ({
         contact: contact,
         timestamp: new Date().toISOString(),
       };
-
-      // ✅ Трекаем отправку брони
-      await trackLeadEvent('booking_submitted', formData);
 
       // ✅ ОПРЕДЕЛЯЕМ ИСТОЧНИК: Telegram WebApp vs обычный браузер
       const isTelegram = typeof window !== 'undefined' && window.Telegram?.WebApp;

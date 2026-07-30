@@ -218,6 +218,9 @@ export async function trackLeadEvent(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(window.Telegram?.WebApp?.initData
+          ? { 'X-Telegram-Init-Data': window.Telegram.WebApp.initData }
+          : {}),
       },
       body: JSON.stringify({
         user_id: userId,
@@ -320,6 +323,9 @@ export async function submitBooking(formData: BookingFormData, bookingId?: strin
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${AUTH_TOKEN}`,
+      ...(bookingSource === 'telegram' && window.Telegram?.WebApp?.initData
+        ? { 'X-Telegram-Init-Data': window.Telegram.WebApp.initData }
+        : {}),
     },
     body: JSON.stringify({
       booking_id: bookingId,
