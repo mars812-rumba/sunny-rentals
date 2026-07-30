@@ -3,6 +3,9 @@
 
 import os
 
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
+
 # Конфигурация Google Sheets
 GOOGLE_SHEETS_CONFIG = {
     'SHEET_ID': '1HNI2qGBU36VMlivp9yQNH2Iy3yH3_ME6za3dRu2oxAs',
@@ -16,9 +19,9 @@ GOOGLE_SHEETS_CONFIG = {
 
 # Пути к файлам данных
 DATA_PATHS = {
-    'WEB_CARS_JSON': '../root/tgbot/webapp/public/data/web_cars.json',
-    'CAR_PHOTOS_JSON': '../root/tgbot/car_photos.json',
-    'CREDENTIALS_JSON': '../root/tgbot/credentials.json'
+    'WEB_CARS_JSON': os.path.join(BACKEND_DIR, 'data', 'web_cars.json'),
+    'CAR_PHOTOS_JSON': os.path.join(BACKEND_DIR, 'data', 'car_photos.json'),
+    'CREDENTIALS_JSON': os.path.join(BACKEND_DIR, 'creds.json')
 }
 
 # Альтернативные пути для поиска файлов
@@ -31,13 +34,11 @@ FALLBACK_PATHS = {
     ],
     'CAR_PHOTOS_JSON': [
         'car_photos.json',
-        '../car_photos.json',
-        '../root/tgbot/car_photos.json'
+        '../car_photos.json'
     ],
     'CREDENTIALS_JSON': [
         'credentials.json',
-        '../credentials.json',
-        '../root/tgbot/credentials.json'
+        '../credentials.json'
     ]
 }
 

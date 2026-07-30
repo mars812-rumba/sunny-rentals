@@ -13,6 +13,9 @@ from datetime import datetime, timedelta
 import os
 import sys
 
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
+
 # Конфигурация
 SHEET_ID = '1HNI2qGBU36VMlivp9yQNH2Iy3yH3_ME6za3dRu2oxAs'
 WORKSHEET_NAME = 'Bookings'
@@ -20,17 +23,17 @@ DAYS_TO_GENERATE = 365  # Количество дней для заголовк�
 
 # Пути к файлам
 WEB_CARS_JSON_PATHS = [
-    '../public/data/web_cars.json',
+    os.path.join(PROJECT_ROOT, 'public', 'data', 'web_cars.json'),
+    os.path.join(BACKEND_DIR, 'data', 'web_cars.json'),
     'public/data/web_cars.json',
     'data/web_cars.json',
-    'web_cars.json',
-    '../root/tgbot/webapp/public/data/web_cars.json'
+    'web_cars.json'
 ]
 
 CREDENTIALS_PATHS = [
+    os.path.join(BACKEND_DIR, 'creds.json'),
     'creds.json',
-    '../creds.json',
-    '../root/tgbot/creds.json'
+    '../creds.json'
 ]
 
 def find_file(paths, description):

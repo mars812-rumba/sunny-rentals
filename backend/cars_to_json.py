@@ -4,9 +4,13 @@ import json
 import re
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_IMAGES_PATH = PROJECT_ROOT / "public" / "images_web"
+DEFAULT_OUTPUT_PATH = PROJECT_ROOT / "public" / "data" / "web_cars.json"
+
 class CarScanner:
-    def __init__(self, base_path="/root/tgbot/webapp/public/images_web"):
-        self.base_path = base_path
+    def __init__(self, base_path=None):
+        self.base_path = str(base_path or DEFAULT_IMAGES_PATH)
         self.categories = ["compact", "sedan", "suv", "7s"]
         
         # Маппинг моделей к маркам
@@ -365,8 +369,9 @@ class CarScanner:
             }
         }
 
-    def save_json(self, data, output_path="/root/tgbot/webapp/public/data/web_cars.json"):
+    def save_json(self, data, output_path=None):
         """Сохраняет данные в JSON файл"""
+        output_path = str(output_path or DEFAULT_OUTPUT_PATH)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
         with open(output_path, 'w', encoding='utf-8') as f:

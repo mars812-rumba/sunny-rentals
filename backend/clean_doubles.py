@@ -10,8 +10,9 @@ from datetime import datetime
 from pathlib import Path
 
 # Путь к файлу
-USER_DATA_FILE = "/root/tgbot/webapp/backend/data/archive.json"
-BACKUP_FILE = "/root/tgbot/webapp/backend/data/archive_backup.json"
+DATA_DIR = Path(__file__).resolve().parent / "data"
+USER_DATA_FILE = str(DATA_DIR / "archive.json")
+BACKUP_FILE = str(DATA_DIR / "archive_backup.json")
 
 def load_json(filepath):
     """Загрузить JSON"""

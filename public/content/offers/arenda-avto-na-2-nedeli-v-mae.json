@@ -1,0 +1,18 @@
+{
+  "type": "offer",
+  "title": "Аренда авто на 2 недели в мае",
+  "slug": "arenda-avto-na-2-nedeli-v-mae",
+  "meta_description": "Аренда авто в Phuket на 14 дней - выгодные предложения от Sunny Rentals",
+  "meta_keywords": ["аренда авто на 2 недели в мае", "аренда авто Phuket", "прокат авто Пхукет"],
+  "content": "Вы авто на Пхукете! Сезон дождей ещё не начался, и вы можете наслаждаться солнечной погодой.\n\n### Что в наличии?\n\n LADA LARGUS с лестницей и чемоданом!</br> СТРАШНО! ЧЕТО((( - идите на хуй",
+  "url_params": {
+    "days": 14,
+    "location": "phuket",
+    "car_type": "compact",
+    "utm_source": "seo",
+    "utm_medium": "organic"
+  },
+  "cta": "Выберите даты и авто",
+  "cta_color": "primary",
+  "generated_at": "2026-05-04T10:54:48.171307"
+}

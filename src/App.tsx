@@ -14,6 +14,10 @@ import CRMPage from "@/pages/CRMPage";
 import OfferPage from "./pages/OfferPage";
 import OfferAdminPage from "./pages/OfferAdminPage";
 import DashboardPage from "./pages/DashboardPage";
+import OffersPage from "./pages/OffersPage";
+import BlogPage from "./pages/BlogPage";
+import OfferDetailPage from "./pages/offers/OfferDetailPage";
+import BlogDetailPage from "./pages/blog/BlogDetailPage";
 import React, { Suspense, useEffect } from 'react';
 import { trackLeadEvent } from '@/api/api';
 
@@ -68,6 +72,12 @@ const App = () => {
             <Route path="/offer" element={<OfferPage />} />
             <Route path="/admin/offer" element={<OfferAdminPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            
+            {/* SEO Контент */}
+            <Route path="/offers" element={<OffersPage />} />
+            <Route path="/offers/:slug" element={<OfferDetailPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogDetailPage />} />
             
             {/* Старые роуты - можно оставить или удалить */}
             <Route 

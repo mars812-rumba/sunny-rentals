@@ -51,10 +51,10 @@ interface BookingFormDialogProps {
 // ... (все импорты остаются прежними)
 
 export function BookingFormDialog({
-  isOpen, onClose, userId, userName, userContact, 
-  initialDateRange, carId, booking, onSuccess 
+  isOpen, onClose, userId, userName, userContact,
+  initialDateRange, carId, booking, onSuccess
 }: BookingFormDialogProps) {
-  
+   
   const isEditing = !!booking;
   
   // Data State
@@ -754,7 +754,7 @@ return (
                         <div className="text-sm font-medium text-gray-900 truncate">
                           {selectedTab === 'fleet' 
                             ? vehicles.find(v => v.id === selectedVehicleId)?.name 
-                            : manualData.name || '---'}
+                            : manualData.name || '......'}
                         </div>
                         <div className="text-xs text-gray-500">
                           {selectedTab === 'fleet' 
@@ -847,7 +847,7 @@ return (
                 disabled={isSubmitting}
                 onClick={handleSubmit}
               >
-                {isSubmitting ? 'Обработка...' : 'Сохранить изменения'}
+                {isSubmitting ? 'Обработка...' : 'Сохранить'}
               </Button>
             ) : (
               <Button

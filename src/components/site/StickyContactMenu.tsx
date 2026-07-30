@@ -94,7 +94,7 @@ export const StickyContactMenu = () => {
         aria-expanded={isOpen}
         aria-controls="sticky-contact-menu"
         aria-label={isOpen ? "Закрыть меню связи" : "Открыть меню бронирования"}
-        className="group relative flex h-16 items-center gap-3 rounded-full bg-slate-950 pl-4 pr-5 text-white shadow-[0_18px_45px_rgba(8,35,50,0.35)] transition hover:-translate-y-0.5 hover:bg-slate-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/60 motion-reduce:transform-none"
+        className="group relative grid h-14 w-14 place-items-center rounded-full bg-slate-950 text-white shadow-[0_16px_38px_rgba(8,35,50,0.38)] transition hover:-translate-y-0.5 hover:bg-slate-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/60 motion-reduce:transform-none"
       >
         {!isOpen && !prefersReducedMotion && (
           <>
@@ -102,18 +102,8 @@ export const StickyContactMenu = () => {
             <span className="absolute -inset-1 -z-20 rounded-full bg-sky-400/20 blur-md" />
           </>
         )}
-        <span className="grid h-10 w-10 place-items-center rounded-full bg-[#229ED9]">
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-[#229ED9] shadow-inner shadow-white/15">
           {isOpen ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
-        </span>
-        <span className="text-left">
-          <span className="block text-sm font-black leading-none">
-            {isOpen ? "Закрыть" : "Забронировать"}
-          </span>
-          {!isOpen && (
-            <span className="mt-1 block text-[10px] font-semibold text-white/55">
-              Telegram · WhatsApp
-            </span>
-          )}
         </span>
       </motion.button>
     </div>

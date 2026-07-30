@@ -1,0 +1,24 @@
+[Unit]
+Description=Sunny Rentals Telegram Bot
+After=network-online.target sunny-api.service
+Wants=network-online.target
+Requires=sunny-api.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/home/sunny-rentals/backend
+EnvironmentFile=-/home/sunny-rentals/backend/.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/sunny-rentals/backend/venv/bin/python -u telegram_bot.py
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=30
+MemoryHigh=384M
+MemoryMax=512M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

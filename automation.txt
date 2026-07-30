@@ -1,0 +1,525 @@
+/home/openclawbot/.openclaw/workspace/DEVELOPMENT_PLAN.md
+# 📋 ПЛАН РАЗРАБОТКИ SEO-КОНТЕНТА ДЛЯ SUNNY RENTALS
+
+## ОБЗОР
+Создать два React компонента для динамического отображения контента (офферы и блог статьи), которые будут получать данные из JSON файлов. Контент генерируется автоматически, проверяется, и затем отображается на сайте.
+
+---
+
+## ЧАСТЬ 1: СТРУКТУРА ДАННЫХ
+
+### 1.1 JSON структура для ОФФЕРОВ (offer_*.json)
+
+```json
+{
+  "type": "offer",
+  "title": "Аренда авто на 2 недели в мае",
+  "slug": "arenда-avto-na-2-nedeli-v-mae",
+  "meta_description": "Аренда авто в Phuket на 14 дней - выгодные предложения от Sunny Rentals",
+  "meta_keywords": ["аренда авто на 2 недели в мае", "аренда авто Phuket"],
+  "content": "## Заголовок\n\nТекст контента в Markdown...",
+  "url_params": {
+    "days": 14,
+    "location": "phuket",
+    "car_type": "compact",
+    "utm_source": "seo",
+    "utm_medium": "organic"
+  },
+  "cta": "Выберите даты и авто",
+  "cta_color": "primary",
+  "generated_at": "2026-05-04T10:54:48.171307"
+}
+```
+
+### 1.2 JSON структура для БЛОГА (blog_*.json)
+
+```json
+{
+  "type": "blog",
+  "title": "7 лучших мест для зимовщиков на Пхукете",
+  "slug": "7-luchshih-mest-dlya-zimovschikov-na-phukete",
+  "meta_description": "7 лучших мест для зимовщиков на Пхукете - полезные советы",
+  "meta_keywords": ["зимовка Пхукет", "где жить на Пхукете"],
+  "content": "## Заголовок\n\nТекст контента в Markdown с #2, #3 заголовками...",
+  "author": "Sunny Rentals Team",
+  "reading_time_minutes": 5,
+  "image_url": "/blog-images/winter-phuket.jpg",
+  "cta_text": "Поехали на машине!",
+  "cta_link": "/booking",
+  "generated_at": "2026-05-04T10:54:48.171307"
+}
+```
+
+---
+
+## ЧАСТЬ 2: СТРУКТУРА ПАПОК
+
+```
+src/
+├── components/
+│   ├── OfferCard.tsx        ← НОВЫЙ компонент для офферов
+│   ├── BlogCard.tsx         ← НОВЫЙ компонент для блога
+│   ├── OffersPage.tsx       ← НОВЫЙ: страница со всеми офферами
+│   └── BlogPage.tsx         ← НОВЫЙ: страница со всеми блогами
+├── pages/
+│   ├── offers/
+│   │   └── [slug].tsx       ← НОВЫЙ: динамическая страница оффера
+│   └── blog/
+│       └── [slug].tsx       ← НОВЫЙ: динамическая страница блога
+├── public/
+│   └── content/
+│       ├── offers/          ← JSON файлы офферов
+│       │   ├── offer_*.json
+│       │   └── ...
+│       └── blog/            ← JSON файлы блога
+│           ├── blog_*.json
+│           └── ...
+└── utils/
+    └── contentLoader.ts     ← НОВЫЙ: функции для загрузки JSON
+```
+
+---
+
+## ЧАСТЬ 3: ТРЕБОВАНИЯ К КОМПОНЕНТАМ
+
+### 3.1 Компонент OfferCard.tsx
+
+**Что делает:**
+- Отображает КАРТОЧКУ оффера (для главной или страницы офферов)
+- Показывает: название, описание, кнопку CTA
+
+**Структура:**
+```tsx
+interface OfferCardProps {
+  title: string;
+  slug: string;
+  content: string;        // Первые 150 символов
+  cta: string;
+  cta_link?: string;      // URL для кнопки
+  onClick?: () => void;   // Функция при клике
+}
+
+export const OfferCard: React.FC<OfferCardProps> = (...) => {
+  // Отобразить в виде красивой карточки
+  // С кнопкой "Подробнее" или直接 к форме
+}
+```
+
+**Дизайн:**
+- Карточка с тенью
+- Заголовок (жирный)
+- Короткое описание (обрезано до 150 символов)
+- Кнопка CTA с цветом (primary/secondary)
+- На клик → открыть полную страницу или форму бронирования
+
+---
+
+### 3.2 Компонент BlogCard.tsx
+
+**Что делает:**
+- Отображает КАРТОЧКУ блог статьи
+- Показывает: название, автор, время чтения, анонс
+
+**Структура:**
+```tsx
+interface BlogCardProps {
+  title: string;
+  slug: string;
+  author: string;
+  reading_time_minutes: number;
+  content: string;          // Первые 200 символов
+  image_url?: string;
+  onClick?: () => void;
+}
+
+export const BlogCard: React.FC<BlogCardProps> = (...) => {
+  // Отобразить в виде красивой карточки
+  // С изображением (если есть) и метаданными
+}
+```
+
+**Дизайн:**
+- Карточка с картинкой (если есть)
+- Заголовок
+- Информация: автор | 5 мин чтения
+- Анонс текста (обрезано)
+- На клик → открыть полную статью
+
+---
+
+### 3.3 Полная страница оффера (/offers/[slug].tsx)
+
+**Что делает:**
+- Загружает JSON оффера по slug
+- Отображает весь контент (Markdown → HTML)
+- Показывает красивый CTA блок внизу
+
+**Компоненты:**
+1. **Header с title и meta**
+2. **Контент (Markdown rendered)**
+3. **CTA блок:**
+   - Текст: "Забронируйте прямо сейчас!"
+   - Кнопка → на `/booking?days=14&location=phuket&car_type=compact` (с URL params)
+   - Или: встроенная форма бронирования
+
+**Требования:**
+- Использовать `next.js` dynamic routing
+- Загружать контент из `/public/content/offers/`
+- Генерировать SEO meta tags из JSON (title, description, keywords)
+- Красивый Markdown рендер (используй `react-markdown` или `next-mdx-remote`)
+
+---
+
+### 3.4 Полная страница блога (/blog/[slug].tsx)
+
+**Что делает:**
+- Загружает JSON статьи по slug
+- Отображает весь контент (Markdown → HTML)
+- Показывает боковую панель с рекомендациями
+
+**Компоненты:**
+1. **Header:**
+   - Название статьи
+   - Автор | Дата | Время чтения
+   - Картинка (если есть)
+
+2. **Контент (Markdown rendered)**
+
+3. **Bottom CTA:**
+   - "Нужна машина? Поехали!"
+   - Кнопка → на `/booking`
+
+4. **Боковая панель (опционально):**
+   - Рекомендуемые другие статьи
+   - Список офферов
+
+**Требования:**
+- next.js dynamic routing
+- SEO meta tags
+- Markdown рендер
+- Красивая типография
+
+---
+
+### 3.5 Страница ВСЕХ ОФФЕРОВ (/offers)
+
+**Что делает:**
+- Загружает все файлы из `/public/content/offers/`
+- Отображает сетку OfferCard компонентов
+- Фильтры (опционально): по дням, локации, цене
+
+**Компоненты:**
+- Grid (3 колонки на desktop, 2 на tablet, 1 на mobile)
+- Каждая карточка → click → к полной странице оффера или к форме
+- Pagination или infinite scroll (если много)
+
+---
+
+### 3.6 Страница ВСЕХ БЛОГОВ (/blog)
+
+**Что делает:**
+- Загружает все файлы из `/public/content/blog/`
+- Отображает список BlogCard компонентов
+- Сортировка по дате, популярности (опционально)
+
+**Компоненты:**
+- Список с BlogCard компонентами
+- Каждая карточка → click → к полной странице статьи
+- Pagination
+
+---
+
+## ЧАСТЬ 4: УТИЛИТЫ И ФУНКЦИИ
+
+### 4.1 contentLoader.ts - функции для загрузки контента
+
+```ts
+// Загрузить один оффер по slug
+export async function getOffer(slug: string): Promise<OfferData | null>
+
+// Загрузить все офферы
+export async function getAllOffers(): Promise<OfferData[]>
+
+// Загрузить одну статью по slug
+export async function getBlogPost(slug: string): Promise<BlogData | null>
+
+// Загрузить все статьи
+export async function getAllBlogPosts(): Promise<BlogData[]>
+
+// Генерировать URL для бронирования на основе params
+export function generateBookingUrl(params: UrlParams): string
+```
+
+**Как это работает:**
+- Читает JSON файлы из `/public/content/`
+- Кеширует результаты (чтобы не читать файлы каждый раз)
+- Возвращает распарсенные данные
+
+---
+
+## ЧАСТЬ 5: ИНТЕГРАЦИЯ В НАВИГАЦИЮ
+
+### 5.1 Обновить меню сайта
+
+```tsx
+// В главном меню добавить:
+<MenuItem>Офферы</MenuItem>  // → /offers
+<MenuItem>Блог</MenuItem>    // → /blog
+```
+
+### 5.2 На главной странице (HOME)
+
+```tsx
+// Добавить блоки:
+<Section title="Актуальные офферы">
+  <Grid>
+    {offers.map(offer => <OfferCard key={offer.slug} {...offer} />)}
+  </Grid>
+</Section>
+
+<Section title="Полезное из блога">
+  <Grid>
+    {blogs.slice(0, 3).map(blog => <BlogCard key={blog.slug} {...blog} />)}
+  </Grid>
+</Section>
+```
+
+---
+
+## ЧАСТЬ 6: SEO И META ТЕГИ
+
+### 6.1 Для каждой страницы оффера
+
+```tsx
+export const metadata = {
+  title: data.title,
+  description: data.meta_description,
+  keywords: data.meta_keywords,
+  openGraph: {
+    title: data.title,
+    description: data.meta_description,
+    url: `https://sunny-rentals.online/offers/${data.slug}`,
+  }
+}
+```
+
+### 6.2 Для каждой страницы блога
+
+```tsx
+export const metadata = {
+  title: data.title,
+  description: data.meta_description,
+  keywords: data.meta_keywords,
+  openGraph: {
+    title: data.title,
+    description: data.meta_description,
+    image: data.image_url,
+    url: `https://sunny-rentals.online/blog/${data.slug}`,
+  }
+}
+```
+
+---
+
+## ЧАСТЬ 7: WORKFLOW ПРОЦЕСС
+
+### 7.1 Как это работает:
+
+```
+1. Браток запускает скрипт:
+   python3 seo_content_generator.py
+   
+2. Генерируется контент:
+   /tmp/seo_content/offer_*.json
+   /tmp/seo_content/blog_*.json
+   
+3. Браток проверяет как копирайтер:
+   "Окей, текст норм" ✅
+   
+4. Контент попадает в:
+   public/content/offers/
+   public/content/blog/
+   
+5. Frontend читает JSON:
+   const offers = await getAllOffers()
+   
+6. React рендерит компоненты:
+   <OffersPage offers={offers} />
+   
+7. Пользователь видит:
+   https://sunny-rentals.online/offers/
+   https://sunny-rentals.online/blog/
+   
+8. Нажимает на статью → видит контент
+   https://sunny-rentals.online/offers/arenда-avto-na-2-nedeli-v-mae/
+   
+9. Есть кнопка "Забронируй" → на форму с параметрами
+   https://sunny-rentals.online/booking?days=14&location=phuket
+```
+
+---
+
+## ЧАСТЬ 8: ПРИМЕРЫ ФАЙЛОВ
+
+### 8.1 Пример компонента OfferCard.tsx
+
+```tsx
+import React from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+
+interface OfferCardProps {
+  title: string
+  slug: string
+  content: string
+  cta: string
+  cta_color?: 'primary' | 'secondary'
+}
+
+export const OfferCard: React.FC<OfferCardProps> = ({
+  title,
+  slug,
+  content,
+  cta,
+  cta_color = 'primary'
+}) => {
+  const preview = content.split('\n')[0].slice(0, 150) + '...'
+  
+  return (
+    <Card className="h-full flex flex-col p-6 hover:shadow-lg transition">
+      <h3 className="text-lg font-bold mb-2">{title}</h3>
+      <p className="text-gray-600 text-sm mb-4 flex-1">{preview}</p>
+      
+      <Link href={`/offers/${slug}`}>
+        <Button className={`w-full`} variant={cta_color === 'primary' ? 'default' : 'outline'}>
+          {cta}
+        </Button>
+      </Link>
+    </Card>
+  )
+}
+```
+
+### 8.2 Пример страницы оффера /offers/[slug].tsx
+
+```tsx
+import { getOffer, generateBookingUrl } from '@/utils/contentLoader'
+import { notFound } from 'next/navigation'
+import ReactMarkdown from 'react-markdown'
+import { Button } from '@/components/ui/button'
+
+interface PageProps {
+  params: {
+    slug: string
+  }
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  const offer = await getOffer(params.slug)
+  if (!offer) return {}
+  
+  return {
+    title: offer.title,
+    description: offer.meta_description,
+    keywords: offer.meta_keywords,
+  }
+}
+
+export default async function OfferPage({ params }: PageProps) {
+  const offer = await getOffer(params.slug)
+  
+  if (!offer) return notFound()
+  
+  const bookingUrl = generateBookingUrl(offer.url_params)
+  
+  return (
+    <div className="max-w-4xl mx-auto py-12 px-4">
+      <h1 className="text-4xl font-bold mb-6">{offer.title}</h1>
+      
+      <article className="prose prose-lg max-w-none mb-8">
+        <ReactMarkdown>{offer.content}</ReactMarkdown>
+      </article>
+      
+      <div className="bg-blue-50 p-8 rounded-lg text-center">
+        <h2 className="text-2xl font-bold mb-4">{offer.cta}</h2>
+        <Button 
+          size="lg" 
+          className="px-8"
+          onClick={() => window.location.href = bookingUrl}
+        >
+          Перейти на бронирование
+        </Button>
+      </div>
+    </div>
+  )
+}
+```
+
+---
+
+## ЧАСТЬ 9: ТЕСТИРОВАНИЕ
+
+1. **Создать вручную тестовый JSON файл** в `public/content/offers/test-offer.json`
+2. **Проверить:**
+   - Страница `/offers/test-offer` загружается ✅
+   - Текст Markdown рендерится правильно ✅
+   - Кнопка ведет на форму с параметрами ✅
+   - Meta теги генерируются правильно ✅
+
+3. **Тестовые файлы в `public/content/blog/`** - аналогично
+
+---
+
+## ЧАСТЬ 10: ДЕПЛОЙ
+
+1. **Создать папку структуру:**
+   ```bash
+   mkdir -p public/content/{offers,blog}
+   ```
+
+2. **Залить JSON файлы в папку** (когда они готовы)
+
+3. **Задеплоить сайт:**
+   ```bash
+   npm run build
+   npm run deploy
+   ```
+
+4. **Проверить на production:**
+   - https://sunny-rentals.online/offers/
+   - https://sunny-rentals.online/blog/
+   - https://sunny-rentals.online/offers/[slug]
+   - https://sunny-rentals.online/blog/[slug]
+
+---
+
+## ИТОГО
+
+✅ **Что нужно разработать:**
+1. OfferCard компонент
+2. BlogCard компонент
+3. Страница `/offers` - сетка всех офферов
+4. Страница `/offers/[slug]` - полная страница оффера с CTA
+5. Страница `/blog` - список всех статей
+6. Страница `/blog/[slug]` - полная статья
+7. Утилита `contentLoader.ts` для загрузки JSON
+8. Интеграция в меню навигации
+9. SEO meta теги для каждой страницы
+
+✅ **Что уже есть:**
+- Python скрипт для генерации контента
+- JSON структура
+- Backend готовит контент
+- Форма бронирования работает
+
+✅ **Workflow:**
+- Браток генерирует контент месячно
+- Проверяет как копирайтер
+- Кидает JSON в папку
+- Frontend автоматически рендерит
+- Пользователи видят в меню "Офферы" и "Блог"
+
+---
+
+**Готово к передаче Cline! 🚀**
