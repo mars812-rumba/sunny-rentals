@@ -521,6 +521,7 @@ if (!cars || cars.length === 0) {
               onFiltersChange={handleFiltersChange}
               selectedCategory={selectedCategory}
               onCategoryChange={handleCategoryChange}
+              initialFilters={filters}
             />
           </div>
           

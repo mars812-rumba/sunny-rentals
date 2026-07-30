@@ -27,6 +27,12 @@ interface FilterFormProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
   onCompletionChange?: (isComplete: boolean) => void;
+  initialFilters?: {
+    startDate?: Date | null;
+    endDate?: Date | null;
+    pickupLocation?: string;
+    returnLocation?: string;
+  };
 }
 
 const CalendarContent = ({ dateRange, setDateRange, onApply, onCancel, isMobile, t }) => (
@@ -53,7 +59,8 @@ const FilterForm = ({
   onFiltersChange, 
   selectedCategory, 
   onCategoryChange, 
-  onCompletionChange 
+  onCompletionChange,
+  initialFilters,
 }: FilterFormProps) => {
   const { t } = useLanguage();
 
@@ -83,7 +90,45 @@ const FilterForm = ({
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    if (sameLocation) setReturnLocation(pickupLocation);
+    const startDate = initialFilters?.startDate;
+    const endDate = initialFilters?.endDate;
+
+    if (startDate && endDate && isValid(startDate) && isValid(endDate)) {
+      setDateRange((currentRange) => {
+        if (
+          currentRange?.from?.getTime() === startDate.getTime() &&
+          currentRange?.to?.getTime() === endDate.getTime()
+        ) {
+          return currentRange;
+        }
+
+        return { from: startDate, to: endDate };
+      });
+    }
+
+    const nextPickupLocation = initialFilters?.pickupLocation;
+    const nextReturnLocation = initialFilters?.returnLocation;
+
+    if (nextPickupLocation) {
+      setPickupLocation(nextPickupLocation);
+    }
+
+    if (nextReturnLocation) {
+      setReturnLocation(nextReturnLocation);
+    }
+
+    if (nextPickupLocation && nextReturnLocation) {
+      setSameLocation(nextPickupLocation === nextReturnLocation);
+    }
+  }, [
+    initialFilters?.startDate,
+    initialFilters?.endDate,
+    initialFilters?.pickupLocation,
+    initialFilters?.returnLocation,
+  ]);
+
+  useEffect(() => {
+    if (sameLocation && pickupLocation) setReturnLocation(pickupLocation);
   }, [pickupLocation, sameLocation]);
 
   useEffect(() => {
