@@ -2310,6 +2310,14 @@ def track_lead_event(
             if "category" in event_data:
                 user_record["category_interested"] = event_data["category"]
                 print(f"🚗 Категория интереса: {event_data['category']}")
+
+            # Сохраняем интерес к конкретной машине из SEO → Telegram handoff
+            if "car" in event_data and isinstance(event_data["car"], dict):
+                car_info = event_data["car"]
+                car_id = car_info.get("id")
+                if car_id:
+                    user_record["car_interested"] = car_id
+                    print(f"🚙 Машина интереса: {car_id}")
             
             # Сохраняем выбранные даты
             if "startDate" in event_data and "endDate" in event_data:

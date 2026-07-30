@@ -2,6 +2,7 @@ import { format, parse } from "date-fns";
 
 const BOT_URL = "https://t.me/webapp_rent_bot";
 const HANDOFF_PREFIX = "sr1_";
+const MODEL_HANDOFF_PREFIX = "sr2_";
 
 const CATEGORY_TO_CODE: Record<string, string> = {
   sedan: "d",
@@ -31,6 +32,11 @@ export interface TelegramHandoffData {
   endDate: Date;
   pickupLocation: string;
   returnLocation: string;
+}
+
+export interface TelegramModelHandoffData {
+  category: string;
+  carId: string;
 }
 
 export const createTelegramHandoffPayload = ({
@@ -96,3 +102,25 @@ export const parseTelegramHandoffPayload = (
   };
 };
 
+export const parseTelegramModelHandoffPayload = (
+  rawPayload: string | null | undefined,
+): TelegramModelHandoffData | null => {
+  if (!rawPayload || !rawPayload.startsWith(MODEL_HANDOFF_PREFIX)) {
+    return null;
+  }
+
+  const match = rawPayload.match(/^sr2_([dsc7b])_([A-Za-z0-9_-]{1,48})$/);
+  if (!match) {
+    return null;
+  }
+
+  const category = CODE_TO_CATEGORY[match[1]];
+  if (!category) {
+    return null;
+  }
+
+  return {
+    category,
+    carId: match[2],
+  };
+};

@@ -12,7 +12,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCars } from '@/contexts/CarsContext';
 import { isValid } from 'date-fns';
 import { trackLeadEvent } from '@/api/api';
-import { parseTelegramHandoffPayload } from '@/utils/telegramHandoff';
+import {
+  parseTelegramHandoffPayload,
+  parseTelegramModelHandoffPayload,
+} from '@/utils/telegramHandoff';
 
 interface RentalFilters {
   startDate: Date | null;
@@ -61,6 +64,7 @@ const Index = () => {
   });
   const carListRef = useRef<HTMLDivElement>(null);
   const [deepLinkCarId, setDeepLinkCarId] = useState<string | null>(null);
+  const [handoffCarId, setHandoffCarId] = useState<string | null>(null);
   const [selectedCar, setSelectedCar] = useState(null);
   const [isSendBookFormOpen, setIsSendBookFormOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -96,11 +100,13 @@ const Index = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const telegramStartParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
-    const handoff = parseTelegramHandoffPayload(
-      telegramStartParam ||
+    const rawStartParam = telegramStartParam ||
       params.get('start_param') ||
-      params.get('tgWebAppStartParam')
+      params.get('tgWebAppStartParam');
+    const handoff = parseTelegramHandoffPayload(
+      rawStartParam
     );
+    const modelHandoff = parseTelegramModelHandoffPayload(rawStartParam);
     const carIdParam = params.get('carId');
     const durationParam = params.get('duration');
     const categoryParam = params.get('category');
@@ -124,9 +130,14 @@ const Index = () => {
       };
       categoryToSet = handoff.category;
       hasParams = true;
+    } else if (modelHandoff) {
+      categoryToSet = modelHandoff.category;
+      setDeepLinkCarId(modelHandoff.carId);
+      setHandoffCarId(modelHandoff.carId);
+      hasParams = true;
     }
 
-    if (!handoff && durationParam) {
+    if (!handoff && !modelHandoff && durationParam) {
       const durationDays = parseInt(durationParam, 10);
       if (!isNaN(durationDays) && durationDays > 0) {
         const endDate = addDays(today, durationDays);
@@ -135,15 +146,15 @@ const Index = () => {
       }
     }
 
-    if (!handoff && pickupLocationParam) {
+    if (!handoff && !modelHandoff && pickupLocationParam) {
       newFilters = { ...newFilters, pickupLocation: pickupLocationParam };
       hasParams = true;
     }
-    if (!handoff && returnLocationParam) {
+    if (!handoff && !modelHandoff && returnLocationParam) {
       newFilters = { ...newFilters, returnLocation: returnLocationParam };
       hasParams = true;
     }
-    if (!handoff && categoryParam) {
+    if (!handoff && !modelHandoff && categoryParam) {
       categoryToSet = categoryParam;
       hasParams = true;
     }
@@ -189,6 +200,31 @@ const Index = () => {
       }
     }
   }, [deepLinkCarId, cars, showResults]);
+
+  useEffect(() => {
+    if (!handoffCarId || !cars || cars.length === 0) {
+      return;
+    }
+
+    const selectedHandoffCar = cars.find((car) => car.id === handoffCarId);
+    const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+
+    if (!selectedHandoffCar || !telegramUserId) {
+      return;
+    }
+
+    trackLeadEvent('filters_used', {
+      category: selectedHandoffCar.class,
+      car: {
+        id: selectedHandoffCar.id,
+        name: selectedHandoffCar.name,
+        brand: selectedHandoffCar.brand,
+        model: selectedHandoffCar.model,
+        year: selectedHandoffCar.year,
+        color: selectedHandoffCar.color,
+      },
+    }).finally(() => setHandoffCarId(null));
+  }, [handoffCarId, cars]);
 
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);

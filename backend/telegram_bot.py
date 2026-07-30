@@ -967,7 +967,7 @@ def handle_start(message):
         source = message.text.split(' ', 1)[1]
 
     webapp_url = URL_WEBAPP
-    if source.startswith("sr1_") and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", source):
+    if source.startswith(("sr1_", "sr2_")) and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", source):
         url_parts = urlsplit(URL_WEBAPP)
         query = dict(parse_qsl(url_parts.query, keep_blank_values=True))
         query["start_param"] = source
