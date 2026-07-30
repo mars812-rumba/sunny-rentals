@@ -3,45 +3,38 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { getMessages, localePath, type Locale } from "@/lib/i18n";
+
 const slides = [
   {
     image: "/vehicles/compact.webp",
-    title: "Компакт",
-    description: "Экономия и лёгкая парковка",
     price: "425 ฿",
     category: "compact",
   },
   {
     image: "/vehicles/sedan.webp",
-    title: "Седан",
-    description: "Комфорт на маршрутах по острову",
     price: "425 ฿",
     category: "sedan",
   },
   {
     image: "/vehicles/7seat.webp",
-    title: "7+ мест",
-    description: "Для семьи и большой компании",
     price: "665 ฿",
     category: "7s",
   },
   {
     image: "/vehicles/suv.webp",
-    title: "SUV",
-    description: "Высокая посадка и больше пространства",
     price: "865 ฿",
     category: "suv",
   },
   {
     image: "/vehicles/bike.webp",
-    title: "Байк",
-    description: "Быстро по Пхукету без пробок",
     price: "204 ฿",
     category: "bikes",
   },
 ] as const;
 
-export function MarketingHero() {
+export function MarketingHero({ locale }: { locale: Locale }) {
+  const copy = getMessages(locale).hero;
   const [activeSlide, setActiveSlide] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -115,11 +108,12 @@ export function MarketingHero() {
   };
 
   const slide = slides[activeSlide];
+  const [slideTitle, slideDescription] = copy.slides[activeSlide];
 
   return (
     <>
       {!isReady ? (
-        <div className="hero-loader" role="status" aria-label="Загружаем Sunny Rentals">
+        <div className="hero-loader" role="status" aria-label={copy.loading}>
           <div className="hero-loader__mark">
             <span aria-hidden="true" />
             <img src="/logo.png" alt="" />
@@ -145,10 +139,10 @@ export function MarketingHero() {
           <div className="marketing-hero__copy">
             <div className="rating-pill">
               <span aria-hidden="true">★</span>
-              4,8 средний рейтинг партнёров
+              {copy.rating}
             </div>
-            <h1>Аренда авто и байков на Пхукете</h1>
-            <p>Подберите транспорт и зафиксируйте бронирование через Telegram.</p>
+            <h1>{copy.title}</h1>
+            <p>{copy.subtitle}</p>
           </div>
 
           <div className="hero-showcase" aria-live="polite">
@@ -157,31 +151,34 @@ export function MarketingHero() {
               <img
                 key={slide.image}
                 src={slide.image}
-                alt={`${slide.title} — аренда на Пхукете`}
+                alt={`${slideTitle} — ${copy.imageAlt}`}
               />
             </div>
 
-            <Link className="category-ticket" href={`/#category-${slide.category}`}>
+            <Link
+              className="category-ticket"
+              href={`${localePath(locale)}#category-${slide.category}`}
+            >
               <span>
-                <small>Категория</small>
-                <strong>{slide.title}</strong>
-                <em>{slide.description}</em>
+                <small>{copy.category}</small>
+                <strong>{slideTitle}</strong>
+                <em>{slideDescription}</em>
               </span>
               <span className="category-ticket__price">
-                <small>от</small>
+                <small>{copy.from}</small>
                 <strong>{slide.price}</strong>
-                <em>за сутки</em>
+                <em>{copy.perDay}</em>
               </span>
             </Link>
 
-            <div className="hero-dots" aria-label="Категории транспорта">
+            <div className="hero-dots" aria-label={copy.categoriesAria}>
               {slides.map((item, index) => (
                 <button
                   key={item.category}
                   type="button"
                   className={activeSlide === index ? "is-active" : undefined}
                   onClick={() => selectSlide(index)}
-                  aria-label={`Показать категорию ${item.title}`}
+                  aria-label={`${copy.showCategory} ${copy.slides[index][0]}`}
                   aria-current={activeSlide === index ? "true" : undefined}
                 />
               ))}
@@ -189,7 +186,7 @@ export function MarketingHero() {
 
             {!hasInteracted ? (
               <div className="swipe-hint">
-                <span>Свайпните категории</span>
+                <span>{copy.swipe}</span>
                 <span aria-hidden="true">→</span>
               </div>
             ) : null}

@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { getMessages, type Locale } from "@/lib/i18n";
 import { siteConfig } from "@/lib/site";
 
-export function StickyContactMenu() {
+export function StickyContactMenu({ locale }: { locale: Locale }) {
+  const copy = getMessages(locale).contact;
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -31,8 +33,8 @@ export function StickyContactMenu() {
       {isOpen ? (
         <div className="sticky-contact__menu" id="contact-actions">
           <div>
-            <strong>Бронь и связь</strong>
-            <span>Выберите удобный способ</span>
+            <strong>{copy.title}</strong>
+            <span>{copy.subtitle}</span>
           </div>
           <a
             className="sticky-contact__telegram"
@@ -41,7 +43,7 @@ export function StickyContactMenu() {
             rel="noopener noreferrer"
           >
             <img src="/telegram.webp" alt="" />
-            Забронировать через Telegram
+            {copy.telegram}
           </a>
           <a
             className="sticky-contact__whatsapp"
@@ -50,7 +52,7 @@ export function StickyContactMenu() {
             rel="noopener noreferrer"
           >
             <img src="/whatsapp.webp" alt="" />
-            Написать в WhatsApp
+            {copy.whatsapp}
           </a>
         </div>
       ) : null}
@@ -60,7 +62,7 @@ export function StickyContactMenu() {
         onClick={() => setIsOpen((current) => !current)}
         aria-expanded={isOpen}
         aria-controls="contact-actions"
-        aria-label={isOpen ? "Закрыть меню связи" : "Открыть меню бронирования"}
+        aria-label={isOpen ? copy.close : copy.open}
       >
         <span aria-hidden="true">{isOpen ? "×" : "✦"}</span>
       </button>

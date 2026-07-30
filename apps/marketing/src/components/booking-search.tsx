@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 
+import { getMessages, type Locale } from "@/lib/i18n";
 import { siteConfig } from "@/lib/site";
 
 const categoryCodes: Record<string, string> = {
@@ -21,7 +22,8 @@ const locationCodes: Record<string, string> = {
 
 const toCompactDate = (value: string) => value.replaceAll("-", "");
 
-export function BookingSearch() {
+export function BookingSearch({ locale }: { locale: Locale }) {
+  const copy = getMessages(locale).booking;
   const [category, setCategory] = useState("compact");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -39,12 +41,12 @@ export function BookingSearch() {
     event.preventDefault();
 
     if (!startDate || !endDate) {
-      setError("Укажите даты начала и окончания аренды.");
+      setError(copy.dateRequired);
       return;
     }
 
     if (endDate < startDate) {
-      setError("Дата возврата должна быть позже даты получения.");
+      setError(copy.dateOrder);
       return;
     }
 
@@ -66,25 +68,25 @@ export function BookingSearch() {
       <div className="shell">
         <div className="booking-search__panel">
           <div className="booking-search__heading">
-            <p className="eyebrow eyebrow--dark">Онлайн-подбор</p>
-            <h2>Транспорт на ваши даты</h2>
-            <p>Заполните параметры здесь, затем подтвердите профиль в Telegram.</p>
+            <p className="eyebrow eyebrow--dark">{copy.eyebrow}</p>
+            <h2>{copy.title}</h2>
+            <p>{copy.intro}</p>
           </div>
 
           <form onSubmit={handleSubmit}>
             <label>
-              <span>Категория</span>
+              <span>{copy.category}</span>
               <select value={category} onChange={(event) => setCategory(event.target.value)}>
-                <option value="compact">Компакт</option>
-                <option value="sedan">Седан</option>
-                <option value="suv">SUV</option>
-                <option value="7s">7+ мест</option>
-                <option value="bikes">Байк</option>
+                <option value="compact">{copy.categories[0]}</option>
+                <option value="sedan">{copy.categories[1]}</option>
+                <option value="suv">{copy.categories[2]}</option>
+                <option value="7s">{copy.categories[3]}</option>
+                <option value="bikes">{copy.categories[4]}</option>
               </select>
             </label>
 
             <label>
-              <span>Получение</span>
+              <span>{copy.pickupDate}</span>
               <input
                 type="date"
                 min={today}
@@ -97,7 +99,7 @@ export function BookingSearch() {
             </label>
 
             <label>
-              <span>Возврат</span>
+              <span>{copy.returnDate}</span>
               <input
                 type="date"
                 min={startDate || today}
@@ -107,35 +109,35 @@ export function BookingSearch() {
             </label>
 
             <label>
-              <span>Выдача</span>
+              <span>{copy.pickup}</span>
               <select value={pickup} onChange={(event) => setPickup(event.target.value)}>
-                <option value="airport">Аэропорт</option>
-                <option value="hotel">Отель</option>
-                <option value="villa">Вилла</option>
+                <option value="airport">{copy.locations[0]}</option>
+                <option value="hotel">{copy.locations[1]}</option>
+                <option value="villa">{copy.locations[2]}</option>
               </select>
             </label>
 
             <label>
-              <span>Возврат авто</span>
+              <span>{copy.returnLocation}</span>
               <select
                 value={returnLocation}
                 onChange={(event) => setReturnLocation(event.target.value)}
               >
-                <option value="airport">Аэропорт</option>
-                <option value="hotel">Отель</option>
-                <option value="villa">Вилла</option>
+                <option value="airport">{copy.locations[0]}</option>
+                <option value="hotel">{copy.locations[1]}</option>
+                <option value="villa">{copy.locations[2]}</option>
               </select>
             </label>
 
             <button type="submit">
-              Продолжить в Telegram
+              {copy.continue}
               <span aria-hidden="true">→</span>
             </button>
           </form>
 
           {error ? <p className="booking-search__error" role="alert">{error}</p> : null}
           <p className="booking-search__note">
-            Бронь попадёт в CRM только после вашего подтверждения в WebApp.
+            {copy.note}
           </p>
         </div>
       </div>

@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 
-import { FleetSection } from "@/components/fleet-section";
-import { SiteHeader } from "@/components/site-header";
+import { CatalogLanding } from "@/components/catalog-landing";
+import { languageAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Автопарк в аренду на Пхукете",
   description:
     "Автомобили, кроссоверы, семиместные машины и байки Sunny Rentals. Фотографии, цены и бронирование через Telegram.",
-  alternates: {
-    canonical: "/cars",
-  },
+  other: { "content-language": "ru" },
+  alternates: languageAlternates("ru", "/cars"),
   openGraph: {
+    locale: "ru_RU",
+    alternateLocale: ["en_US"],
     title: "Автопарк Sunny Rentals на Пхукете",
     description: "Выберите автомобиль или байк и продолжите бронирование в Telegram.",
     url: "/cars",
@@ -18,20 +19,5 @@ export const metadata: Metadata = {
 };
 
 export default function CarsPage() {
-  return (
-    <main>
-      <SiteHeader />
-      <header className="catalog-hero">
-        <div className="shell">
-          <p className="eyebrow">Sunny Rentals · Fleet</p>
-          <h1>Автопарк на Пхукете</h1>
-          <p>
-            От компактной Toyota Yaris до семиместных автомобилей и максискутеров.
-            Выберите модель, а даты и доставку подтвердите в Telegram WebApp.
-          </p>
-        </div>
-      </header>
-      <FleetSection />
-    </main>
-  );
+  return <CatalogLanding locale="ru" />;
 }

@@ -18,14 +18,14 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: CarPageProps): Promise<Metadata> {
   const { slug } = await params;
   const car = getCarBySlug(slug);
-  return car ? createVehicleMetadata(car, "ru") : {};
+  return car ? createVehicleMetadata(car, "en") : {};
 }
 
-export default async function CarPage({ params }: CarPageProps) {
+export default async function EnglishCarPage({ params }: CarPageProps) {
   const { slug } = await params;
   const car = getCarBySlug(slug);
 
   if (!car) notFound();
 
-  return <VehicleLanding car={car} locale="ru" />;
+  return <VehicleLanding car={car} locale="en" />;
 }

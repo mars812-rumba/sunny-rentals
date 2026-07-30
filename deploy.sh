@@ -4,21 +4,18 @@ set -Eeuo pipefail
 
 PROJECT_ROOT="/home/sunny-rentals"
 RELEASES_ROOT="${PROJECT_ROOT}/releases"
-CURRENT_LINK="${PROJECT_ROOT}/current"
 MARKETING_APP="${PROJECT_ROOT}/apps/marketing"
-SERVICE_SOURCE="${PROJECT_ROOT}/deploy/sunny-marketing.service"
-SERVICE_TARGET="/etc/systemd/system/sunny-marketing.service"
-NGINX_SOURCE="${PROJECT_ROOT}/deploy/nginx.sunny-rentals.online.conf"
-NGINX_TARGET="/etc/nginx/sites-available/sunny-rentals.online"
+DIST_PATH="${PROJECT_ROOT}/dist"
 RELEASE_ID="$(date -u +%Y%m%dT%H%M%SZ)"
 RELEASE_DIR="${RELEASES_ROOT}/${RELEASE_ID}"
-NEXT_LINK="${PROJECT_ROOT}/.current-${RELEASE_ID}"
+NEXT_LINK="${PROJECT_ROOT}/.dist-next-${RELEASE_ID}"
 PREVIOUS_RELEASE=""
-NGINX_BACKUP=""
+PREVIOUS_DIST=""
 SWITCHED=0
+DEPLOY_NPM_CACHE="/tmp/sunny-rentals-npm-cache"
 
 if [[ "${EUID}" -ne 0 ]]; then
-  echo "Deploy must run as root so systemd and nginx can be updated safely."
+  echo "Deploy must run through the privileged production release command."
   exit 1
 fi
 
@@ -31,6 +28,8 @@ if [[ "$(git branch --show-current)" != "marsel-collab" ]]; then
   exit 1
 fi
 
+mkdir -p "${DEPLOY_NPM_CACHE}"
+
 rollback() {
   local exit_code=$?
 
@@ -40,15 +39,16 @@ rollback() {
 
   echo "Deploy failed. Restoring the previous release where possible."
 
-  if [[ "${SWITCHED}" -eq 1 && -n "${PREVIOUS_RELEASE}" && -d "${PREVIOUS_RELEASE}" ]]; then
+  if [[ -n "${PREVIOUS_DIST}" && -d "${PREVIOUS_DIST}" ]]; then
+    if [[ -L "${DIST_PATH}" ]]; then
+      mv -T "${DIST_PATH}" "${NEXT_LINK}.failed"
+    fi
+    if [[ ! -e "${DIST_PATH}" ]]; then
+      mv -T "${PREVIOUS_DIST}" "${DIST_PATH}"
+    fi
+  elif [[ "${SWITCHED}" -eq 1 && -n "${PREVIOUS_RELEASE}" && -d "${PREVIOUS_RELEASE}" ]]; then
     ln -s "${PREVIOUS_RELEASE}" "${NEXT_LINK}.rollback"
-    mv -Tf "${NEXT_LINK}.rollback" "${CURRENT_LINK}"
-    systemctl restart sunny-marketing.service || true
-  fi
-
-  if [[ -n "${NGINX_BACKUP}" && -f "${NGINX_BACKUP}" ]]; then
-    cp "${NGINX_BACKUP}" "${NGINX_TARGET}"
-    nginx -t && systemctl reload nginx || true
+    mv -Tf "${NEXT_LINK}.rollback" "${DIST_PATH}"
   fi
 
   exit "${exit_code}"
@@ -56,68 +56,92 @@ rollback() {
 
 trap rollback EXIT
 
-mkdir -p "${RELEASE_DIR}/legacy" "${RELEASE_DIR}/marketing"
+mkdir -p "${RELEASE_DIR}/legacy" "${RELEASE_DIR}/site"
 
 echo "Installing Vite dependencies..."
-npm ci --no-audit --no-fund
+npm ci --cache "${DEPLOY_NPM_CACHE}" --no-audit --no-fund
 
 echo "Building the existing Vite WebApp..."
-npm run build -- --outDir "${RELEASE_DIR}/legacy"
+npm run build:vite -- --outDir "${RELEASE_DIR}/legacy" --logLevel warn
 
 echo "Installing pinned Next.js application dependencies..."
-npm install --prefix "${MARKETING_APP}" --no-package-lock --no-audit --no-fund
+npm install \
+  --prefix "${MARKETING_APP}" \
+  --cache "${DEPLOY_NPM_CACHE}" \
+  --no-package-lock \
+  --no-audit \
+  --no-fund
 
 echo "Building the Next.js marketing application..."
 npm run build --prefix "${MARKETING_APP}"
 
-echo "Preparing the minimal standalone Next.js runtime..."
-cp -a "${MARKETING_APP}/.next/standalone/." "${RELEASE_DIR}/marketing/"
-mkdir -p "${RELEASE_DIR}/marketing/.next"
-cp -a "${MARKETING_APP}/.next/static" "${RELEASE_DIR}/marketing/.next/static"
-cp -a "${MARKETING_APP}/public" "${RELEASE_DIR}/marketing/public"
+echo "Combining the exported Next.js site with legacy WebApp routes..."
+cp -a "${RELEASE_DIR}/legacy/." "${RELEASE_DIR}/site/"
+cp -a "${MARKETING_APP}/out/." "${RELEASE_DIR}/site/"
 
-test -f "${RELEASE_DIR}/legacy/index.html"
-test -f "${RELEASE_DIR}/marketing/server.js"
-test -d "${RELEASE_DIR}/marketing/.next/static"
+LEGACY_ROUTES=(
+  "app"
+  "admin"
+  "admin/app"
+  "admin/offer"
+  "admin/scheduler"
+  "dashboard"
+  "offer"
+  "blog"
+  "offers"
+)
 
-if [[ -L "${CURRENT_LINK}" ]]; then
-  PREVIOUS_RELEASE="$(readlink -f "${CURRENT_LINK}")"
+for route in "${LEGACY_ROUTES[@]}"; do
+  mkdir -p "${RELEASE_DIR}/site/${route}"
+  cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/${route}/index.html"
+done
+
+while IFS= read -r content_file; do
+  slug="$(basename "${content_file}" .json)"
+  mkdir -p "${RELEASE_DIR}/site/blog/${slug}"
+  cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/blog/${slug}/index.html"
+done < <(find "${PROJECT_ROOT}/public/content/blog" -maxdepth 1 -type f -name '*.json' ! -name 'index.json')
+
+while IFS= read -r content_file; do
+  slug="$(basename "${content_file}" .json)"
+  mkdir -p "${RELEASE_DIR}/site/offers/${slug}"
+  cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/offers/${slug}/index.html"
+done < <(find "${PROJECT_ROOT}/public/content/offers" -maxdepth 1 -type f -name '*.json' ! -name 'index.json')
+
+test -f "${RELEASE_DIR}/site/index.html"
+test -f "${RELEASE_DIR}/site/cars/index.html"
+test -f "${RELEASE_DIR}/site/cars/toyota-yaris/index.html"
+test -f "${RELEASE_DIR}/site/en/index.html"
+test -f "${RELEASE_DIR}/site/en/cars/index.html"
+test -f "${RELEASE_DIR}/site/en/cars/toyota-yaris/index.html"
+test -f "${RELEASE_DIR}/site/app/index.html"
+test -d "${RELEASE_DIR}/site/_next/static"
+
+if [[ -L "${DIST_PATH}" ]]; then
+  PREVIOUS_RELEASE="$(readlink -f "${DIST_PATH}")"
+elif [[ -d "${DIST_PATH}" ]]; then
+  PREVIOUS_DIST="${RELEASE_DIR}/previous-dist"
+  mv -T "${DIST_PATH}" "${PREVIOUS_DIST}"
+elif [[ -e "${DIST_PATH}" ]]; then
+  echo "Refusing to replace unexpected non-directory dist path."
+  exit 1
 fi
 
-ln -s "${RELEASE_DIR}" "${NEXT_LINK}"
-mv -Tf "${NEXT_LINK}" "${CURRENT_LINK}"
+ln -s "${RELEASE_DIR}/site" "${NEXT_LINK}"
+mv -Tf "${NEXT_LINK}" "${DIST_PATH}"
 SWITCHED=1
 
-install -m 0644 "${SERVICE_SOURCE}" "${SERVICE_TARGET}"
-systemctl daemon-reload
-systemctl enable sunny-marketing.service
-systemctl restart sunny-marketing.service
-
-echo "Checking the Next.js service..."
-curl --fail --silent --show-error --retry 10 --retry-delay 1 \
-  http://127.0.0.1:3100/healthz >/dev/null
-
-if [[ -f "${NGINX_TARGET}" ]]; then
-  NGINX_BACKUP="${NGINX_TARGET}.pre-next-${RELEASE_ID}"
-  cp "${NGINX_TARGET}" "${NGINX_BACKUP}"
-fi
-
-install -m 0644 "${NGINX_SOURCE}" "${NGINX_TARGET}"
-nginx -t
-systemctl reload nginx
-
-echo "Checking public Next.js and legacy WebApp routes through nginx..."
-curl --fail --silent --show-error --noproxy "*" \
-  --resolve sunny-rentals.online:443:127.0.0.1 \
+echo "Checking public Next.js pages and the legacy WebApp..."
+curl --fail --silent --show-error \
   https://sunny-rentals.online/ >/dev/null
-curl --fail --silent --show-error --noproxy "*" \
-  --resolve sunny-rentals.online:443:127.0.0.1 \
+curl --fail --silent --show-error \
   https://sunny-rentals.online/cars/toyota-yaris >/dev/null
-curl --fail --silent --show-error --noproxy "*" \
-  --resolve sunny-rentals.online:443:127.0.0.1 \
+curl --fail --silent --show-error \
+  https://sunny-rentals.online/en/cars/toyota-yaris >/dev/null
+curl --fail --silent --show-error \
   https://sunny-rentals.online/app >/dev/null
 
 trap - EXIT
 
-echo "Sunny Rentals release ${RELEASE_ID} is active."
+echo "Sunny Rentals static Next.js release ${RELEASE_ID} is active."
 echo "Previous release: ${PREVIOUS_RELEASE:-none}"

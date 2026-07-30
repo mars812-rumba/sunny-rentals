@@ -1,76 +1,29 @@
 import Link from "next/link";
 
+import { getMessages, localePath, type Locale } from "@/lib/i18n";
 import { siteConfig } from "@/lib/site";
 
-const benefits = [
-  {
-    title: "Проверенный транспорт",
-    text: "Показываем реальные фотографии и состояние автомобиля до подтверждения.",
-  },
-  {
-    title: "Понятная стоимость",
-    text: "Срок аренды, депозит и доставка фиксируются до создания брони.",
-  },
-  {
-    title: "Доставка по Пхукету",
-    text: "Передадим транспорт в аэропорту, у отеля или виллы.",
-  },
-  {
-    title: "Связь в Telegram",
-    text: "Профиль подтверждается через Telegram, а бронь сразу попадает в CRM.",
-  },
-];
+export function TrustContent({ locale }: { locale: Locale }) {
+  const copy = getMessages(locale);
 
-const questions = [
-  {
-    question: "Как забронировать автомобиль?",
-    answer:
-      "Выберите категорию, даты и место выдачи. Затем откройте Telegram, подтвердите профиль и отправьте бронь из WebApp.",
-  },
-  {
-    question: "Можно получить машину в аэропорту?",
-    answer:
-      "Да. При подборе выберите аэропорт как место получения или возврата. Итоговые условия доставки будут показаны до подтверждения.",
-  },
-  {
-    question: "Цена на странице окончательная?",
-    answer:
-      "В карточках указана цена «от» для длительной аренды в низкий сезон. Точная ставка зависит от дат и срока и рассчитывается в WebApp.",
-  },
-  {
-    question: "Какие документы нужны?",
-    answer:
-      "Обычно нужны паспорт и действующее водительское удостоверение соответствующей категории. Менеджер подтвердит требования к выбранному транспорту.",
-  },
-  {
-    question: "Когда бронь появляется в CRM?",
-    answer:
-      "После авторизации Telegram фиксирует интерес к модели. Полноценная бронь создаётся после подтверждения дат, доставки и автомобиля в WebApp.",
-  },
-];
-
-export function TrustContent() {
   return (
     <>
       <section className="benefit-section" id="why-us">
         <div className="shell">
           <div className="section-heading">
             <div>
-              <p className="eyebrow eyebrow--dark">Без сюрпризов</p>
-              <h2>Всё важное до поездки</h2>
+              <p className="eyebrow eyebrow--dark">{copy.trust.eyebrow}</p>
+              <h2>{copy.trust.title}</h2>
             </div>
-            <p>
-              Сайт помогает выбрать модель, Telegram подтверждает клиента, а CRM
-              сохраняет весь путь бронирования для менеджера.
-            </p>
+            <p>{copy.trust.intro}</p>
           </div>
 
           <div className="benefit-grid">
-            {benefits.map((benefit, index) => (
-              <article key={benefit.title}>
+            {copy.trust.benefits.map(([title, text], index) => (
+              <article key={title}>
                 <span>{String(index + 1).padStart(2, "0")}</span>
-                <h3>{benefit.title}</h3>
-                <p>{benefit.text}</p>
+                <h3>{title}</h3>
+                <p>{text}</p>
               </article>
             ))}
           </div>
@@ -80,19 +33,19 @@ export function TrustContent() {
       <section className="faq-section" id="faq">
         <div className="shell faq-section__layout">
           <div>
-            <p className="eyebrow">Помощь перед бронью</p>
-            <h2>Частые вопросы</h2>
-            <p>Если ответа нет, напишите нам — подскажем по машине и маршруту.</p>
+            <p className="eyebrow">{copy.trust.faqEyebrow}</p>
+            <h2>{copy.trust.faqTitle}</h2>
+            <p>{copy.trust.faqIntro}</p>
             <a href={siteConfig.whatsappUrl} target="_blank" rel="noopener noreferrer">
-              Написать в WhatsApp
+              {copy.trust.whatsapp}
             </a>
           </div>
 
           <div className="faq-list">
-            {questions.map((item) => (
-              <details key={item.question}>
-                <summary>{item.question}<span aria-hidden="true">+</span></summary>
-                <p>{item.answer}</p>
+            {copy.trust.questions.map(([question, answer]) => (
+              <details key={question}>
+                <summary>{question}<span aria-hidden="true">+</span></summary>
+                <p>{answer}</p>
               </details>
             ))}
           </div>
@@ -101,16 +54,16 @@ export function TrustContent() {
 
       <footer className="marketing-footer">
         <div className="shell marketing-footer__inner">
-          <Link className="brand" href="/">
+          <Link className="brand" href={localePath(locale)}>
             <img className="brand__logo" src="/logo.png" alt="" />
             <span>
               <strong>Sunny Rentals</strong>
               <small>Phuket</small>
             </span>
           </Link>
-          <nav aria-label="Навигация в подвале">
-            <Link href="/cars">Автопарк</Link>
-            <Link href="/#booking">Подобрать транспорт</Link>
+          <nav aria-label={copy.nav.footerAria}>
+            <Link href={localePath(locale, "/cars")}>{copy.nav.fleet}</Link>
+            <Link href={`${localePath(locale)}#booking`}>{copy.nav.booking}</Link>
             <a href={siteConfig.telegramBotUrl}>Telegram</a>
             <a href={siteConfig.whatsappUrl}>WhatsApp</a>
           </nav>
