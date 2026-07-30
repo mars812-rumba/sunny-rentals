@@ -1,33 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowDown, Star } from 'lucide-react';
+import { ArrowDown, ArrowRight, Star } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 import {
+  type CarouselApi,
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
 } from "@/components/ui/carousel";
 
 import heroImage from '@/assets/hero_bg.webp';
 import heroImageMob from '@/assets/hero_bg.png';
 import logo from '@/assets/logo.png';
 
-// Gallery images mobile
-import compactImg from '@/assets/classes/compact.png';
-import sedanImg from '@/assets/classes/sedan.png';
-import seatImg from '@/assets/classes/7seat.png';
-import suvImg from '@/assets/classes/suv.png';
-import bikeImg from '@/assets/classes/bike.png';
-// Gallery images 600px
-import compactImg600 from '@/assets/classes/compact_desk.png';
-import sedanImg600 from '@/assets/classes/sedan_desk.png';
-import seatImg600 from '@/assets/classes/7seat_desk.png';
-import suvImg600 from '@/assets/classes/suv_desk.png';
-import bikeImg600 from '@/assets/classes/bike_desk.png';
+import compactImg from '@/assets/classes/compact_realistic.webp';
+import sedanImg from '@/assets/classes/sedan_realistic.webp';
+import seatImg from '@/assets/classes/7seat_realistic.webp';
+import suvImg from '@/assets/classes/suv_realistic.webp';
+import bikeImg from '@/assets/classes/bike_realistic.webp';
 
 // Gallery data for vehicle classes
 interface HeroSectionProps {
@@ -38,6 +30,9 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
     const isMobile = useIsMobile();
     const reduceMotion = useReducedMotion();
     const [isHeroReady, setIsHeroReady] = useState(false);
+    const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+    const [activeSlide, setActiveSlide] = useState(0);
+    const [hasUsedCarousel, setHasUsedCarousel] = useState(false);
     const [useMobileAssets] = useState(() => (
       typeof window !== 'undefined'
         ? window.matchMedia('(max-width: 767px)').matches
@@ -45,11 +40,11 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
     ));
 
     const vehicleGallery = [
-    { imageMobile: compactImg, imageDesktop: compactImg600, title:  'Компакт' , description: 'Экономия и парковка', price: 'от 600฿' },
-    { imageMobile: sedanImg, imageDesktop: sedanImg600, title: 'Седан' , description: 'Комфорт и вместительность' , price: 'от 700฿' },
-    { imageMobile: seatImg, imageDesktop: seatImg600, title:  '7-местный' , description:  'Для семьи и большой компании', price: 'от 1,100฿' },
-    { imageMobile: suvImg, imageDesktop: suvImg600, title: 'SUV', description:   'Уверенность на дороге', price: 'от 1,400฿' },
-    { imageMobile: bikeImg, imageDesktop: bikeImg600, title: 'Байк', description: 'Быстрое передвижение', price: 'от 250฿' },
+    { image: compactImg, title: 'Компакт', description: 'Экономия и парковка', price: '600฿', shadowBottom: 22, shadowWidth: 58 },
+    { image: sedanImg, title: 'Седан', description: 'Комфорт и вместительность', price: '700฿', shadowBottom: 23, shadowWidth: 58 },
+    { image: seatImg, title: '7-местный', description: 'Для семьи и большой компании', price: '1,100฿', shadowBottom: 22, shadowWidth: 60 },
+    { image: suvImg, title: 'SUV', description: 'Уверенность на дороге', price: '1,400฿', shadowBottom: 22, shadowWidth: 56 },
+    { image: bikeImg, title: 'Байк', description: 'Быстрое передвижение', price: '250฿', shadowBottom: 12, shadowWidth: 42 },
   ];
 
   useEffect(() => {
@@ -72,7 +67,7 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
 
     const criticalImages = useMobileAssets
       ? [logo, heroImageMob, compactImg]
-      : [logo, heroImage, compactImg600];
+      : [logo, heroImage, compactImg];
 
     const minimumDisplay = new Promise<void>((resolve) => {
       window.setTimeout(resolve, reduceMotion ? 100 : 450);
@@ -96,6 +91,23 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
       window.clearTimeout(safetyTimeout);
     };
   }, [reduceMotion, useMobileAssets]);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+
+    const updateActiveSlide = () => {
+      setActiveSlide(carouselApi.selectedScrollSnap());
+    };
+
+    updateActiveSlide();
+    carouselApi.on('select', updateActiveSlide);
+    carouselApi.on('reInit', updateActiveSlide);
+
+    return () => {
+      carouselApi.off('select', updateActiveSlide);
+      carouselApi.off('reInit', updateActiveSlide);
+    };
+  }, [carouselApi]);
 
    return (
     <>
@@ -157,14 +169,21 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
             className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-100"
             style={{ backgroundImage: `url(${useMobileAssets ? heroImageMob : heroImage})` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-black/35 via-black/25 to-primary-dark/15" />
+          <div
+            className={cn(
+              "absolute inset-0",
+              isMobile
+                ? "bg-gradient-to-b from-slate-950/55 via-slate-950/20 to-slate-950/65"
+                : "bg-gradient-to-br from-black/40 via-black/25 to-primary-dark/25"
+            )}
+          />
           {/* Decorative gradient orbs */}
           <div className="absolute top-20 -left-32 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
           <div className="absolute bottom-20 -right-32 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
         </div>
 
         {/* Content */}
-          <div className="relative z-10 container mx-auto px-4 pt-1.5 pb-12 lg:pt-8 lg:pb-16">
+          <div className="relative z-10 container mx-auto px-4 pt-1.5 pb-24 lg:pt-8 lg:pb-16">
           <div className={cn(
             "grid gap-8 lg:gap-16 items-start",
             isMobile ? "grid-cols-1" : desktopForm ? "lg:grid-cols-2" : "lg:grid-cols-1"
@@ -196,8 +215,8 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
               </h1>
 
               <p className={cn(
-                "text-white/70 mb-4",
-                isMobile ? "text-base" : "text-lg"
+                "mb-4 text-white/85",
+                isMobile ? "text-lg font-medium leading-snug" : "text-xl"
               )}>
                 Расчет стоимости аренды в онлайн калькуляторе
               </p>
@@ -211,6 +230,8 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
               {/* Vehicle Gallery Carousel */}
               <div className="relative">
                 <Carousel
+                  setApi={setCarouselApi}
+                  onPointerDown={() => setHasUsedCarousel(true)}
                   opts={{
                     align: "center",
                     loop: true,
@@ -230,44 +251,92 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
                           className="flex flex-col items-center"
                         >
                           <div className={cn(
-                            "flex items-center justify-center mb-4",
-                            isMobile ? "w-[280px] h-[240px]" : "w-[500px] h-[400px]"
+                            "relative flex items-center justify-center",
+                            isMobile ? "mb-1 h-[210px] w-[270px]" : "mb-4 h-[360px] w-[500px]"
                           )}>
+                            <div
+                              aria-hidden="true"
+                              className="absolute left-1/2 h-3 -translate-x-1/2 rounded-full bg-slate-950/45 blur-lg"
+                              style={{
+                                bottom: `${vehicle.shadowBottom}%`,
+                                width: `${vehicle.shadowWidth}%`,
+                              }}
+                            />
                             <img
-                              src={isMobile ? vehicle.imageMobile : vehicle.imageDesktop}
+                              src={vehicle.image}
                               alt={vehicle.title}
-                              className="w-full h-full object-contain drop-shadow-2xl"
+                              className="relative z-10 h-full w-full object-contain drop-shadow-[0_14px_16px_rgba(2,12,24,0.34)]"
                             />
                           </div>
-                          <div className="p-3 text-center">
-                          <div className="font-semibold text-white text-sm mb-0.5">{vehicle.title}</div>
-                          <div className="text-white/60 text-xs mb-1">{vehicle.description}</div>
-                          <div className="text-blue font-bold text-sm">{vehicle.price} <span className="font-normal text-white/60">в сутки</span></div>
-                        </div>
+                          <div className="mx-auto flex w-full max-w-[320px] items-center justify-between gap-4 rounded-[18px] border border-white/30 bg-gradient-to-r from-white/20 via-slate-900/25 to-sky-950/35 px-4 py-2.5 text-left shadow-[0_14px_36px_rgba(2,14,28,0.24)] backdrop-blur-2xl sm:max-w-[360px]">
+                            <div className="min-w-0">
+                              <div className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-300">
+                                Категория
+                              </div>
+                              <div className="mt-0.5 text-base font-black leading-tight text-white">
+                                {vehicle.title}
+                              </div>
+                              <div className="mt-0.5 truncate text-[11px] font-medium text-white/65">
+                                {vehicle.description}
+                              </div>
+                            </div>
+                            <div className="shrink-0 border-l border-white/20 pl-4 text-right">
+                              <div className="text-[9px] font-black uppercase tracking-[0.18em] text-amber-300">
+                                от
+                              </div>
+                              <div className="mt-0.5 text-xl font-black leading-none text-white">
+                                {vehicle.price}
+                              </div>
+                              <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-white/50">
+                                за сутки
+                              </div>
+                            </div>
+                          </div>
                         </motion.div>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
 
-                  {/* Navigation arrows */}
-                  <>
-                    <CarouselPrevious
-                      className={cn(
-                        "bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 hover:text-white transition-all",
-                        isMobile
-                          ? "left-0 h-16 w-5 rounded-r-lg rounded-lg"
-                          : "left-4 h-10 w-10 rounded-full"
-                      )}
-                    />
-                    <CarouselNext
-                      className={cn(
-                        "bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/20 hover:text-white transition-all",
-                        isMobile
-                          ? "right-0 h-16 w-5 rounded-l-lg rounded-r-lg"
-                          : "right-4 h-10 w-10 rounded-full"
-                      )}
-                    />
-                  </>
+                  <div className="mt-4 flex items-center justify-center gap-2" aria-label="Категории транспорта">
+                    {vehicleGallery.map((vehicle, index) => (
+                      <button
+                        key={vehicle.title}
+                        type="button"
+                        onClick={() => {
+                          carouselApi?.scrollTo(index);
+                          setHasUsedCarousel(true);
+                        }}
+                        aria-label={`Показать категорию ${vehicle.title}`}
+                        aria-current={activeSlide === index ? 'true' : undefined}
+                        className={cn(
+                          "h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
+                          activeSlide === index
+                            ? "w-7 bg-amber-300"
+                            : "w-1.5 bg-white/35 hover:bg-white/60"
+                        )}
+                      />
+                    ))}
+                  </div>
+
+                  <AnimatePresence>
+                    {isMobile && !hasUsedCarousel && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.25 }}
+                        className="mt-3 flex items-center justify-center gap-2 text-xs font-bold text-white/65"
+                      >
+                        <span>Свайпните категории</span>
+                        <motion.span
+                          animate={reduceMotion ? undefined : { x: [0, 8, 0] }}
+                          transition={{ duration: 1.25, repeat: Infinity, ease: 'easeInOut' }}
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </motion.span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </Carousel>
               </div>
             </motion.div>
