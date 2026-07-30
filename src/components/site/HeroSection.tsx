@@ -14,6 +14,7 @@ import {
 
 import heroImage from '@/assets/hero_bg.webp';
 import heroImageMob from '@/assets/hero_bg.png';
+import logo from '@/assets/logo.png';
 
 // Gallery images mobile
 import compactImg from '@/assets/classes/compact.png';
@@ -70,8 +71,8 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
     });
 
     const criticalImages = useMobileAssets
-      ? [heroImageMob, compactImg]
-      : [heroImage, compactImg600];
+      ? [logo, heroImageMob, compactImg]
+      : [logo, heroImage, compactImg600];
 
     const minimumDisplay = new Promise<void>((resolve) => {
       window.setTimeout(resolve, reduceMotion ? 100 : 450);
@@ -117,10 +118,13 @@ export const HeroSection = ({ desktopForm }: HeroSectionProps) => {
                   transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
                   className="absolute inset-0 rounded-full border border-white/20 border-t-amber-300"
                 />
-                <motion.div
-                  animate={reduceMotion ? undefined : { scale: [0.9, 1.08, 0.9], opacity: [0.75, 1, 0.75] }}
+                <motion.img
+                  src={logo}
+                  alt=""
+                  aria-hidden="true"
+                  animate={reduceMotion ? undefined : { scale: [0.94, 1.04, 0.94] }}
                   transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-                  className="h-10 w-10 rounded-full bg-amber-300 shadow-[0_0_36px_rgba(252,211,77,0.6)]"
+                  className="h-16 w-16 object-contain drop-shadow-[0_8px_18px_rgba(2,22,45,0.45)]"
                 />
               </div>
 
