@@ -16,6 +16,10 @@ yarn-error.log*
 .npm
 dist/
 build/
+.next/
+releases/
+current
+.current-*
 
 # Secrets
 *.key

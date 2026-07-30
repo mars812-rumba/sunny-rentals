@@ -7,9 +7,7 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="shell site-header__inner">
         <Link className="brand" href="/" aria-label="Sunny Rentals — главная">
-          <span className="brand__sun" aria-hidden="true">
-            ☀
-          </span>
+          <img className="brand__logo" src="/logo.png" alt="" />
           <span>
             <strong>Sunny</strong>
             <small>Rentals · Phuket</small>
@@ -18,6 +16,7 @@ export function SiteHeader() {
 
         <nav className="site-nav" aria-label="Основная навигация">
           <Link href="/cars">Автопарк</Link>
+          <a href="/#booking">Подобрать</a>
           <a href={siteConfig.telegramBotUrl}>Telegram</a>
         </nav>
       </div>

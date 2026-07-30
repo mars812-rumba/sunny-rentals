@@ -29,6 +29,14 @@ path. Иначе после переключения перестанет заг
 
 До этапа переключения reverse proxy это приложение не влияет на production.
 
+Первый production cutover выполняется по allow-list:
+
+- Next.js: `/`, `/cars/*`, `/_next/*`, `/robots.txt`, `/sitemap.xml`.
+- Vite: `/app`, служебные маршруты, `/blog/*`, `/offers/*` и fallback.
+
+Next.js запускается standalone-сервисом на `127.0.0.1:3100`; nginx остаётся
+единственной публичной точкой входа.
+
 ## Локальный запуск
 
 ```bash

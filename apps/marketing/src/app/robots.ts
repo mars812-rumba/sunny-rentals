@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
         "/api",
         "/botapi",
         "/telegram",
-        "/offer",
+        "/offer$",
       ],
     },
     sitemap: absoluteUrl("/sitemap.xml"),

@@ -1,0 +1,24 @@
+[Unit]
+Description=Sunny Rentals Next.js Marketing
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/home/sunny-rentals/current/marketing
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+Environment=PORT=3100
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=30
+MemoryHigh=384M
+MemoryMax=512M
+TasksMax=128
+
+[Install]
+WantedBy=multi-user.target
