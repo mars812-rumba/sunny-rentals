@@ -1819,18 +1819,20 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   }
 
   .hero-showcase {
-    margin-top: -0.35rem;
+    margin-top: -0.7rem;
   }
 
   .hero-showcase__vehicle {
     width: 100%;
     height: clamp(13.5rem, 58vw, 18rem);
-    margin-top: -0.85rem;
-    margin-bottom: -1.8rem;
+    margin-top: -1.25rem;
+    margin-bottom: 0;
+    transform: translateY(-1rem);
   }
 
   .category-ticket {
     width: min(100%, 22rem);
+    margin-top: 0.75rem;
     padding: 0.72rem 0.9rem;
   }
 
