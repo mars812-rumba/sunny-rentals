@@ -43,6 +43,8 @@ export function CarRail({
         className="car-rail"
         ref={railRef}
         onPointerDown={(event) => {
+          if (event.pointerType !== "mouse") return;
+
           if (
             (event.target as HTMLElement).closest(
               '.car-gallery[data-gallery="interactive"]',

@@ -38,6 +38,7 @@ export function CarGallery({
       className="car-gallery"
       data-gallery={hasGallery ? "interactive" : "single"}
       onPointerDown={(event) => {
+        if (event.currentTarget.closest(".car-rail")) return;
         if (!hasGallery) return;
         pointerStart.current = event.clientX;
         didSwipe.current = false;

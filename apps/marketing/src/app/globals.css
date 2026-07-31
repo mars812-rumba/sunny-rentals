@@ -2186,8 +2186,12 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
     overscroll-behavior-inline: contain;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
-    touch-action: pan-y;
+    touch-action: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .car-rail .car-gallery {
+    touch-action: auto;
   }
 
   .car-rail:active {
@@ -2230,8 +2234,11 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
     scroll-snap-align: start;
   }
 
-  .car-gallery__arrow {
-    display: none;
+  .car-rail .car-gallery__arrow {
+    display: grid;
+    width: 1.85rem;
+    height: 1.85rem;
+    opacity: 0.9;
   }
 
   .catalog-hero {
