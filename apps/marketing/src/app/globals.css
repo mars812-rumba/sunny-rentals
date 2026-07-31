@@ -1645,6 +1645,99 @@ h1 {
   letter-spacing: -0.04em;
 }
 
+.price-grid {
+  min-width: 0;
+  margin-top: 1rem;
+  border-top: 1px solid #edf2f7;
+  padding-top: 0.9rem;
+}
+
+.price-grid__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.price-grid__header > strong {
+  color: var(--ocean-950);
+  font-size: 0.68rem;
+}
+
+.price-grid__seasons {
+  display: inline-flex;
+  flex: none;
+  gap: 0.2rem;
+  border-radius: 999px;
+  padding: 0.18rem;
+  background: #eef4f8;
+}
+
+.price-grid__seasons button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.34rem 0.48rem;
+  cursor: pointer;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.56rem;
+  font-weight: 800;
+  background: transparent;
+}
+
+.price-grid__seasons button[aria-pressed="true"] {
+  color: white;
+  background: var(--ocean-700);
+  box-shadow: 0 4px 10px rgba(3, 105, 161, 0.2);
+}
+
+.price-grid__seasons button:focus-visible {
+  outline: 3px solid rgba(56, 189, 248, 0.35);
+  outline-offset: 2px;
+}
+
+.price-grid ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0.65rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.price-grid li {
+  display: flex;
+  min-width: 0;
+  align-items: end;
+  justify-content: space-between;
+  gap: 0.35rem;
+  border-radius: 0.72rem;
+  padding: 0.52rem 0.55rem;
+  background: #f0f7fb;
+}
+
+.price-grid li span {
+  color: var(--muted);
+  font-size: 0.56rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.price-grid li strong {
+  color: var(--ocean-700);
+  font-size: 0.76rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.price-grid > small {
+  display: block;
+  margin-top: 0.55rem;
+  color: var(--muted);
+  font-size: 0.61rem;
+  font-weight: 700;
+}
+
 .car-card__specs {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

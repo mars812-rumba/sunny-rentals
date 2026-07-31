@@ -66,7 +66,7 @@ export const messages = {
       eyebrow: "Автопарк на острове",
       title: "Выберите свой маршрут",
       intro:
-        "Реальные автомобили Sunny Rentals. Цена «от» указана для аренды от 30 дней в низкий сезон.",
+        "Реальные автомобили Sunny Rentals. В каждой карточке показаны тарифы по сроку аренды для низкого и высокого сезона.",
       variants: "варианта",
       all: "Смотреть весь автопарк",
       details: "Подробнее",
@@ -84,6 +84,12 @@ export const messages = {
       deliveryBadge: "Доставка по Пхукету",
       previousCars: "Предыдущие автомобили",
       nextCars: "Следующие автомобили",
+      rates: "Цена в сутки",
+      ratesAria: "Сетка цен по сроку аренды",
+      seasonAria: "Выбор сезона",
+      lowSeason: "Низкий",
+      highSeason: "Высокий",
+      days: "дн.",
     },
     catalog: {
       eyebrow: "Sunny Rentals · Автопарк",
@@ -209,7 +215,7 @@ export const messages = {
       eyebrow: "Island fleet",
       title: "Choose your way around Phuket",
       intro:
-        "Real Sunny Rentals vehicles. “From” prices apply to rentals of 30 days or more during low season.",
+        "Real Sunny Rentals vehicles. Every card shows daily rates by rental period for low and high season.",
       variants: "options",
       all: "View the full fleet",
       details: "Details",
@@ -227,6 +233,12 @@ export const messages = {
       deliveryBadge: "Phuket delivery",
       previousCars: "Previous vehicles",
       nextCars: "Next vehicles",
+      rates: "Daily rates",
+      ratesAria: "Daily rates by rental period",
+      seasonAria: "Choose season",
+      lowSeason: "Low",
+      highSeason: "High",
+      days: "days",
     },
     catalog: {
       eyebrow: "Sunny Rentals · Fleet",

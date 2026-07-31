@@ -1,4 +1,21 @@
+import inventoryCatalog from "../../../../backend/data/web_cars.json";
+
 export type VehicleCategory = "compact" | "sedan" | "suv" | "7s" | "bikes";
+
+export type SeasonKey = "low_season" | "high_season";
+
+export interface SeasonRates {
+  price_1_6: number;
+  price_7_14: number;
+  price_15_29: number;
+  price_30: number;
+}
+
+export interface SeasonalPricing {
+  low_season: SeasonRates;
+  high_season: SeasonRates;
+  deposit: number;
+}
 
 export interface MarketingCar {
   slug: string;
@@ -16,6 +33,7 @@ export interface MarketingCar {
   images?: string[];
   fromPrice: number;
   deposit: number;
+  pricing: SeasonalPricing;
   seats: string;
   transmission: string;
   engine: string;
@@ -62,7 +80,7 @@ export const vehicleCategories: Array<{
   },
 ];
 
-export const marketingCars: MarketingCar[] = [
+const marketingCarDefinitions: Array<Omit<MarketingCar, "pricing">> = [
   {
     slug: "toyota-yaris",
     inventoryId: "toyota_yaris_2024_gray",
@@ -604,6 +622,27 @@ export const marketingCars: MarketingCar[] = [
     bestFor: "Ежедневных поездок, пляжей и движения по загруженным районам.",
   },
 ];
+
+type InventoryCar = {
+  pricing?: SeasonalPricing;
+};
+
+const inventoryCars = (inventoryCatalog as { cars: Record<string, InventoryCar> }).cars;
+
+export const marketingCars: MarketingCar[] = marketingCarDefinitions.map((car) => {
+  const pricing = inventoryCars[car.inventoryId]?.pricing;
+
+  if (!pricing?.low_season || !pricing.high_season) {
+    throw new Error(`Seasonal pricing is missing for ${car.inventoryId}`);
+  }
+
+  return {
+    ...car,
+    pricing,
+    fromPrice: pricing.low_season.price_30,
+    deposit: pricing.deposit,
+  };
+});
 
 export const getCarBySlug = (slug: string): MarketingCar | undefined =>
   marketingCars.find((car) => car.slug === slug);

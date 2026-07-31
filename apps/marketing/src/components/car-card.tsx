@@ -1,12 +1,14 @@
 import Link from "next/link";
 
 import { CarGallery } from "@/components/car-gallery";
+import { SeasonalPriceGrid } from "@/components/seasonal-price-grid";
 import {
   getLocalizedCar,
   getLocalizedCategory,
   type MarketingCar,
 } from "@/content/cars";
 import { getMessages, localePath, type Locale } from "@/lib/i18n";
+import { getPhuketSeason } from "@/lib/pricing";
 import { createModelHandoffLink } from "@/lib/telegram";
 
 export function CarCard({ car, locale }: { car: MarketingCar; locale: Locale }) {
@@ -49,11 +51,11 @@ export function CarCard({ car, locale }: { car: MarketingCar; locale: Locale }) 
           <li><SpecIcon type="engine" /><span>{localizedCar.engine}</span></li>
         </ul>
 
-        <div className="car-card__price">
-          <strong>{car.fromPrice.toLocaleString(copy.numberLocale)} ฿</strong>
-          <span>{copy.fleet.from} · {copy.fleet.perDay}</span>
-          <small>{copy.fleet.deposit}: {car.deposit.toLocaleString(copy.numberLocale)} ฿</small>
-        </div>
+        <SeasonalPriceGrid
+          pricing={car.pricing}
+          locale={locale}
+          initialSeason={getPhuketSeason()}
+        />
 
         <div className="car-card__actions">
           <a
