@@ -457,6 +457,7 @@ img {
 
 .hero-showcase__vehicle {
   position: relative;
+  z-index: 2;
   display: grid;
   width: min(100%, 38rem);
   height: clamp(20rem, 43vw, 31rem);
@@ -497,6 +498,8 @@ img {
 }
 
 .category-ticket {
+  position: relative;
+  z-index: 1;
   display: flex;
   width: min(100%, 25rem);
   align-items: center;
