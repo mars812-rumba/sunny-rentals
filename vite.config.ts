@@ -32,6 +32,10 @@ export default defineConfig(({ mode }) => ({
   
   // ✅ ДОБАВЬ ЭТО
   build: {
+    // `dist` is the symlink to the active combined production release.
+    // Keep standalone Vite builds isolated; deploy.sh overrides this path
+    // with its release-specific legacy directory.
+    outDir: ".dist-vite-local",
     rollupOptions: {
       output: {
         manualChunks: (id) => {
