@@ -1265,6 +1265,7 @@ h1 {
 
 .fleet-group {
   position: relative;
+  min-width: 0;
 }
 
 .fleet-group::before {
@@ -1319,10 +1320,23 @@ h1 {
 
 .car-rail-slider {
   position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .car-rail-viewport {
+  width: 100%;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.car-rail {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .car-rail-controls {
@@ -1994,8 +2008,6 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
 
 @media (max-width: 960px) {
   .car-rail-viewport {
-    margin-right: -1rem;
-    overflow: hidden;
     touch-action: pan-y;
   }
 
