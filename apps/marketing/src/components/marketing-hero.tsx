@@ -146,7 +146,10 @@ export function MarketingHero({ locale }: { locale: Locale }) {
           </div>
 
           <div className="hero-showcase" aria-live="polite">
-            <div className="hero-showcase__vehicle">
+            <div
+              className="hero-showcase__vehicle"
+              data-category={slide.category}
+            >
               <span className="hero-showcase__shadow" aria-hidden="true" />
               <img
                 key={slide.image}
