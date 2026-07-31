@@ -76,6 +76,10 @@ export const messages = {
       specsAria: "Основные характеристики",
       cardDetails: "Подробнее",
       imageAlt: "в аренду на Пхукете",
+      previousPhoto: "Предыдущее фото",
+      nextPhoto: "Следующее фото",
+      photo: "Фото",
+      deposit: "Депозит",
     },
     catalog: {
       eyebrow: "Sunny Rentals · Автопарк",
@@ -211,6 +215,10 @@ export const messages = {
       specsAria: "Key specifications",
       cardDetails: "Details",
       imageAlt: "for rent in Phuket",
+      previousPhoto: "Previous photo",
+      nextPhoto: "Next photo",
+      photo: "Photo",
+      deposit: "Deposit",
     },
     catalog: {
       eyebrow: "Sunny Rentals · Fleet",

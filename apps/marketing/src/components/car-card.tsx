@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CarGallery } from "@/components/car-gallery";
 import { getLocalizedCar, type MarketingCar } from "@/content/cars";
 import { getMessages, localePath, type Locale } from "@/lib/i18n";
 import { createModelHandoffLink } from "@/lib/telegram";
@@ -11,19 +12,15 @@ export function CarCard({ car, locale }: { car: MarketingCar; locale: Locale }) 
 
   return (
     <article className="car-card">
-      <Link
-        className="car-card__media"
+      <CarGallery
         href={carPath}
-        aria-label={`${copy.fleet.cardDetails}: ${car.brand} ${car.model}`}
-      >
-        {/* Public fleet photos remain served by the existing /images_web route. */}
-        <img
-          src={car.image}
-          alt={`${car.brand} ${car.model} ${car.year} ${copy.fleet.imageAlt}`}
-          loading="lazy"
-        />
-        <span className="car-card__year">{car.year}</span>
-      </Link>
+        images={car.images?.length ? car.images : [car.image]}
+        alt={`${car.brand} ${car.model} ${car.year} ${copy.fleet.imageAlt}`}
+        year={car.year}
+        previousLabel={copy.fleet.previousPhoto}
+        nextLabel={copy.fleet.nextPhoto}
+        photoLabel={copy.fleet.photo}
+      />
 
       <div className="car-card__body">
         <div className="car-card__heading">
@@ -45,6 +42,10 @@ export function CarCard({ car, locale }: { car: MarketingCar; locale: Locale }) 
           <li>{localizedCar.seats}</li>
           <li>{localizedCar.fuel}</li>
         </ul>
+
+        <p className="car-card__deposit">
+          {copy.fleet.deposit}: {car.deposit.toLocaleString(copy.numberLocale)} ฿
+        </p>
 
         <div className="car-card__actions">
           <Link className="text-link" href={carPath}>

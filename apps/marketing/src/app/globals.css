@@ -1321,7 +1321,7 @@ h1 {
   min-width: 0;
   overflow: hidden;
   border: 1px solid rgba(148, 163, 184, 0.28);
-  border-radius: 1.4rem;
+  border-radius: 1.75rem;
   background: white;
   box-shadow: 0 18px 50px rgba(15, 23, 42, 0.07);
   transition:
@@ -1332,6 +1332,152 @@ h1 {
 .car-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.13);
+}
+
+.car-gallery {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: #dbeafe;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.car-gallery::after {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  height: 28%;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(to top, rgba(8, 47, 73, 0.3), transparent);
+}
+
+.car-gallery__viewport,
+.car-gallery__track,
+.car-gallery__slide {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.car-gallery__viewport {
+  overflow: hidden;
+}
+
+.car-gallery__track {
+  display: flex;
+  transition: transform 420ms cubic-bezier(0.22, 0.8, 0.24, 1);
+  will-change: transform;
+}
+
+.car-gallery__slide {
+  flex: 0 0 100%;
+}
+
+.car-gallery__slide img {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  object-fit: cover;
+  transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.car-card:hover .car-gallery__slide img {
+  transform: scale(1.025);
+}
+
+.car-gallery__trust {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 4;
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.28rem;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  padding: 0.35rem 0.62rem;
+  color: var(--ocean-950);
+  font-size: 0.68rem;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 20px rgba(8, 47, 73, 0.16);
+  backdrop-filter: blur(10px);
+}
+
+.car-gallery__trust small {
+  color: var(--sun-400);
+  font-size: 0.72rem;
+}
+
+.car-gallery__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 5;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  color: white;
+  font: inherit;
+  font-size: 1.35rem;
+  line-height: 1;
+  background: rgba(8, 47, 73, 0.56);
+  opacity: 0;
+  backdrop-filter: blur(9px);
+  transform: translateY(-50%);
+  transition:
+    opacity 160ms ease,
+    background-color 160ms ease;
+}
+
+.car-gallery__arrow--previous {
+  left: 0.65rem;
+}
+
+.car-gallery__arrow--next {
+  right: 0.65rem;
+}
+
+.car-gallery:hover .car-gallery__arrow,
+.car-gallery__arrow:focus-visible {
+  opacity: 1;
+}
+
+.car-gallery__arrow:hover {
+  background: rgba(8, 47, 73, 0.82);
+}
+
+.car-gallery__arrow:focus-visible {
+  outline: 3px solid var(--sun-300);
+  outline-offset: 2px;
+}
+
+.car-gallery__progress {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.75rem;
+  left: 0.85rem;
+  z-index: 4;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.car-gallery__progress > span {
+  height: 2px;
+  flex: 1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  transition: background-color 180ms ease;
+}
+
+.car-gallery__progress > span.is-active {
+  background: var(--sun-300);
 }
 
 .car-card__media {
@@ -1365,7 +1511,7 @@ h1 {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  z-index: 1;
+  z-index: 4;
   border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 999px;
   padding: 0.35rem 0.55rem;
@@ -1377,7 +1523,7 @@ h1 {
 }
 
 .car-card__body {
-  padding: 1rem;
+  padding: 1.1rem;
 }
 
 .car-card__heading {
@@ -1437,6 +1583,13 @@ h1 {
   list-style: none;
 }
 
+.car-card__deposit {
+  margin: -0.25rem 0 0.85rem;
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+
 .car-card__specs li {
   border-radius: 999px;
   padding: 0.35rem 0.5rem;
@@ -1464,12 +1617,13 @@ h1 {
 
 .mini-cta {
   border-radius: 999px;
-  padding: 0.62rem 0.72rem;
+  padding: 0.68rem 0.88rem;
   color: var(--ink);
   font-size: 0.7rem;
   font-weight: 850;
   text-decoration: none;
-  background: var(--sun-300);
+  background: linear-gradient(135deg, var(--sun-300), var(--sun-400));
+  box-shadow: 0 8px 18px rgba(251, 191, 36, 0.2);
 }
 
 .fleet-section__footer {
@@ -1959,6 +2113,10 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
 
   .car-rail .car-card {
     scroll-snap-align: start;
+  }
+
+  .car-gallery__arrow {
+    display: none;
   }
 
   .catalog-hero {
