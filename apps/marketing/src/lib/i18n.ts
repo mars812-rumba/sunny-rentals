@@ -80,6 +80,10 @@ export const messages = {
       nextPhoto: "Следующее фото",
       photo: "Фото",
       deposit: "Депозит",
+      verified: "Проверено",
+      deliveryBadge: "Доставка по Пхукету",
+      previousCars: "Предыдущие автомобили",
+      nextCars: "Следующие автомобили",
     },
     catalog: {
       eyebrow: "Sunny Rentals · Автопарк",
@@ -219,6 +223,10 @@ export const messages = {
       nextPhoto: "Next photo",
       photo: "Photo",
       deposit: "Deposit",
+      verified: "Verified",
+      deliveryBadge: "Phuket delivery",
+      previousCars: "Previous vehicles",
+      nextCars: "Next vehicles",
     },
     catalog: {
       eyebrow: "Sunny Rentals · Fleet",

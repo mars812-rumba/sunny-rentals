@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { CarCard } from "@/components/car-card";
+import { CarRail } from "@/components/car-rail";
 import {
   getCarsByCategory,
   getLocalizedCategory,
@@ -44,11 +45,14 @@ export function FleetSection({
                 <span>{cars.length} {copy.variants}</span>
               </div>
 
-              <div className="car-rail">
+              <CarRail
+                previousLabel={copy.previousCars}
+                nextLabel={copy.nextCars}
+              >
                 {cars.map((car) => (
                   <CarCard car={car} locale={locale} key={car.slug} />
                 ))}
-              </div>
+              </CarRail>
             </section>
           )})}
         </div>
