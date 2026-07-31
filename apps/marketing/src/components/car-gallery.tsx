@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useState } from "react";
 
 export function CarGallery({
-  href,
   images,
   alt,
   year,
@@ -14,7 +12,6 @@ export function CarGallery({
   nextLabel,
   photoLabel,
 }: {
-  href: string;
   images: string[];
   alt: string;
   year: number;
@@ -26,7 +23,6 @@ export function CarGallery({
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const pointerStart = useRef<number | null>(null);
-  const didSwipe = useRef(false);
   const hasGallery = images.length > 1;
 
   const selectImage = (index: number) => {
@@ -38,10 +34,8 @@ export function CarGallery({
       className="car-gallery"
       data-gallery={hasGallery ? "interactive" : "single"}
       onPointerDown={(event) => {
-        if (event.currentTarget.closest(".car-rail")) return;
         if (!hasGallery) return;
         pointerStart.current = event.clientX;
-        didSwipe.current = false;
         event.currentTarget.setPointerCapture(event.pointerId);
       }}
       onPointerUp={(event) => {
@@ -51,21 +45,15 @@ export function CarGallery({
         pointerStart.current = null;
         if (Math.abs(delta) < 35) return;
 
-        didSwipe.current = true;
         selectImage(activeIndex + (delta < 0 ? 1 : -1));
       }}
       onPointerCancel={() => {
         pointerStart.current = null;
       }}
-      onClickCapture={(event) => {
-        if (!didSwipe.current) return;
-        event.preventDefault();
-        didSwipe.current = false;
-      }}
     >
-      <Link
+      <div
         className="car-gallery__viewport"
-        href={href}
+        role="group"
         aria-label={`${alt}. ${photoLabel} ${activeIndex + 1} / ${images.length}`}
       >
         <span
@@ -77,13 +65,14 @@ export function CarGallery({
               <img
                 src={image}
                 alt={`${alt} — ${photoLabel.toLowerCase()} ${index + 1}`}
-                loading="lazy"
+                loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "auto"}
                 draggable="false"
               />
             </span>
           ))}
         </span>
-      </Link>
+      </div>
 
       <span className="car-card__year">{year}</span>
       <span className="car-gallery__badges">

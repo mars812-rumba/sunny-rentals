@@ -1,41 +1,45 @@
 import Link from "next/link";
 
-import { CarGallery } from "@/components/car-gallery";
-import { SeasonalPriceGrid } from "@/components/seasonal-price-grid";
+import { CarPromoBadges } from "@/components/car-promo-badges";
+import { CompactPriceSummary } from "@/components/compact-price-summary";
 import {
   getLocalizedCar,
-  getLocalizedCategory,
   type MarketingCar,
 } from "@/content/cars";
 import { getMessages, localePath, type Locale } from "@/lib/i18n";
-import { getPhuketSeason } from "@/lib/pricing";
+import { toLocalDateKey } from "@/lib/pricing";
 import { createModelHandoffLink } from "@/lib/telegram";
 
 export function CarCard({ car, locale }: { car: MarketingCar; locale: Locale }) {
   const copy = getMessages(locale);
   const localizedCar = getLocalizedCar(car, locale);
-  const category = getLocalizedCategory(car.category, locale);
   const carPath = localePath(locale, `/cars/${car.slug}`);
+  const datesHref = `${localePath(locale)}?car=${encodeURIComponent(car.inventoryId)}#booking`;
 
   return (
     <article className="car-card">
-      <CarGallery
+      <Link
+        className="car-card__media"
         href={carPath}
-        images={car.images?.length ? car.images : [car.image]}
-        alt={`${car.brand} ${car.model} ${car.year} ${copy.fleet.imageAlt}`}
-        year={car.year}
-        rating={car.rating}
-        verifiedLabel={copy.fleet.verified}
-        previousLabel={copy.fleet.previousPhoto}
-        nextLabel={copy.fleet.nextPhoto}
-        photoLabel={copy.fleet.photo}
-      />
+        aria-label={`${car.brand} ${car.model} ${car.year} ${copy.fleet.imageAlt}`}
+      >
+        <img
+          src={car.image}
+          alt={`${car.brand} ${car.model} ${car.year} ${copy.fleet.imageAlt}`}
+          loading="lazy"
+        />
+        <span className="car-card__year">{car.year}</span>
+        <span className="car-gallery__badges">
+          <span className="car-gallery__trust">
+            <small aria-hidden="true">★</small>
+            <strong>{car.rating.toFixed(1)}</strong>
+          </span>
+          <span className="car-gallery__verified">{copy.fleet.verified}</span>
+        </span>
+      </Link>
 
       <div className="car-card__body">
-        <div className="car-card__badges">
-          <span>{category?.shortName}</span>
-          <span>{copy.fleet.deliveryBadge}</span>
-        </div>
+        <CarPromoBadges locale={locale} />
 
         <div className="car-card__heading">
           <h3>
@@ -51,10 +55,11 @@ export function CarCard({ car, locale }: { car: MarketingCar; locale: Locale }) 
           <li><SpecIcon type="engine" /><span>{localizedCar.engine}</span></li>
         </ul>
 
-        <SeasonalPriceGrid
+        <CompactPriceSummary
           pricing={car.pricing}
           locale={locale}
-          initialSeason={getPhuketSeason()}
+          initialDate={toLocalDateKey()}
+          datesHref={datesHref}
         />
 
         <div className="car-card__actions">

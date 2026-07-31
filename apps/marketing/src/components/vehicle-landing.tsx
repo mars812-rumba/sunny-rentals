@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CarCard } from "@/components/car-card";
+import { CarGallery } from "@/components/car-gallery";
+import { SeasonalPriceGrid } from "@/components/seasonal-price-grid";
 import { SiteHeader } from "@/components/site-header";
 import {
   getCarsByCategory,
@@ -16,6 +18,7 @@ import {
   type Locale,
 } from "@/lib/i18n";
 import { absoluteUrl } from "@/lib/site";
+import { getPhuketSeason } from "@/lib/pricing";
 import { createModelHandoffLink } from "@/lib/telegram";
 
 export function createVehicleMetadata(
@@ -162,9 +165,15 @@ export function VehicleLanding({
 
           <div className="vehicle-hero">
             <div className="vehicle-hero__media">
-              <img
-                src={car.image}
+              <CarGallery
+                images={car.images?.length ? car.images : [car.image]}
                 alt={`${car.brand} ${car.model} ${car.year} ${copy.vehicle.imageAlt}`}
+                year={car.year}
+                rating={car.rating}
+                verifiedLabel={copy.fleet.verified}
+                previousLabel={copy.fleet.previousPhoto}
+                nextLabel={copy.fleet.nextPhoto}
+                photoLabel={copy.fleet.photo}
               />
               <span>{category?.shortName}</span>
             </div>
@@ -191,6 +200,13 @@ export function VehicleLanding({
                   {car.deposit.toLocaleString(copy.numberLocale)} ฿
                 </p>
               </div>
+
+              <SeasonalPriceGrid
+                pricing={car.pricing}
+                locale={locale}
+                initialSeason={getPhuketSeason()}
+                variant="full"
+              />
 
               <a
                 className="button button--telegram"
