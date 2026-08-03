@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 
+import { useRentalDates } from "@/components/rental-dates-context";
 import { getMessages, type Locale } from "@/lib/i18n";
 import { siteConfig } from "@/lib/site";
 
@@ -22,7 +23,13 @@ const locationCodes: Record<string, string> = {
 
 const toCompactDate = (value: string) => value.replaceAll("-", "");
 
-export function BookingSearch({ locale }: { locale: Locale }) {
+export function BookingSearch({
+  locale,
+  variant = "section",
+}: {
+  locale: Locale;
+  variant?: "section" | "hero";
+}) {
   const copy = getMessages(locale).booking;
   const [category, setCategory] = useState("compact");
   const [startDate, setStartDate] = useState("");
@@ -30,6 +37,15 @@ export function BookingSearch({ locale }: { locale: Locale }) {
   const [pickup, setPickup] = useState("airport");
   const [returnLocation, setReturnLocation] = useState("airport");
   const [error, setError] = useState("");
+  const { setSelection } = useRentalDates();
+
+  const syncSelection = (nextStartDate: string, nextEndDate: string) => {
+    setSelection(
+      nextStartDate && nextEndDate && nextEndDate > nextStartDate
+        ? { startDate: nextStartDate, endDate: nextEndDate }
+        : null,
+    );
+  };
 
   const today = useMemo(() => {
     const localNow = new Date();
@@ -64,8 +80,8 @@ export function BookingSearch({ locale }: { locale: Locale }) {
   };
 
   return (
-    <section className="booking-search" id="booking">
-      <div className="shell">
+    <section className={`booking-search booking-search--${variant}`} id="booking">
+      <div className={variant === "hero" ? undefined : "shell"}>
         <div className="booking-search__panel">
           <div className="booking-search__heading">
             <p className="eyebrow eyebrow--dark">{copy.eyebrow}</p>
@@ -92,8 +108,11 @@ export function BookingSearch({ locale }: { locale: Locale }) {
                 min={today}
                 value={startDate}
                 onChange={(event) => {
-                  setStartDate(event.target.value);
-                  if (endDate && endDate < event.target.value) setEndDate("");
+                  const nextStartDate = event.target.value;
+                  const nextEndDate = endDate && endDate > nextStartDate ? endDate : "";
+                  setStartDate(nextStartDate);
+                  if (nextEndDate !== endDate) setEndDate(nextEndDate);
+                  syncSelection(nextStartDate, nextEndDate);
                 }}
               />
             </label>
@@ -104,7 +123,10 @@ export function BookingSearch({ locale }: { locale: Locale }) {
                 type="date"
                 min={startDate || today}
                 value={endDate}
-                onChange={(event) => setEndDate(event.target.value)}
+                onChange={(event) => {
+                  setEndDate(event.target.value);
+                  syncSelection(startDate, event.target.value);
+                }}
               />
             </label>
 

@@ -29,8 +29,18 @@ export const messages = {
     hero: {
       loading: "Загружаем Sunny Rentals",
       rating: "4,8 средний рейтинг партнёров",
-      title: "Арендуйте авто или байк на Пхукете",
-      subtitle: "Подберём транспорт под вашу поездку, доставим по острову и подтвердим бронь в Telegram.",
+      eyebrow: "Аренда авто и байков на Пхукете",
+      title: "Видишь машину — видишь цену.",
+      promise: "Без сюрпризов на выдаче.",
+      subtitle: "Выберите конкретный транспорт из нашего парка, рассчитайте аренду по датам и подтвердите условия с менеджером.",
+      proofAria: "Факты о каталоге Sunny Rentals",
+      fleetProof: "авто и байков в каталоге",
+      locationProof: "Пхукет, Таиланд",
+      realPhotosProof: "Фото конкретных машин",
+      realVehicle: "Из реального автопарка",
+      vehicleDetails: "Подробнее об автомобиле",
+      deposit: "Депозит",
+      depositSeparate: "не входит в стоимость аренды",
       category: "Категория",
       from: "от",
       perDay: "за сутки",
@@ -125,18 +135,40 @@ export const messages = {
       intro:
         "Сайт помогает выбрать модель, Telegram подтверждает клиента, а CRM сохраняет весь путь бронирования для менеджера.",
       benefits: [
-        ["Проверенный транспорт", "Показываем реальные фотографии и состояние автомобиля до подтверждения."],
-        ["Понятная стоимость", "Срок аренды, депозит и доставка фиксируются до создания брони."],
-        ["Доставка по Пхукету", "Передадим транспорт в аэропорту, у отеля или виллы."],
+        ["Конкретные автомобили", "Показываем модель, год и фотографии выбранной машины из каталога."],
+        ["Понятный расчёт", "Тариф зависит от сезона и срока аренды, а депозит указан отдельно."],
+        ["Условия без догадок", "Доступность машины, место и стоимость доставки подтверждает менеджер."],
         ["Связь в Telegram", "Профиль подтверждается через Telegram, а бронь сразу попадает в CRM."],
       ],
+      priceEyebrow: "Из чего складывается сумма",
+      priceTitle: "Цена по частям — до подтверждения брони",
+      priceIntro: "Аренду считаем по сроку и сезону. Остальные условия не прячем внутри красивой цены «от».",
+      priceParts: [
+        ["Аренда", "Ставка из каталога зависит от сезона и количества дней."],
+        ["Депозит", "Показываем отдельно для каждой машины и не включаем в расчёт стоимости аренды."],
+        ["Доставка", "Место, возможность и стоимость подтверждает менеджер после выбора дат."],
+        ["Дополнительные услуги", "Добавляем только после согласования — без автоматических и скрытых доплат."],
+      ],
+      guideEyebrow: "Перед поездкой",
+      guideTitle: "Сложные условия — простым языком",
+      guideIntro: "Достоверных данных по части условий пока нет в едином каталоге. Поэтому менеджер подтверждает их для выбранной машины до бронирования.",
+      guideItems: [
+        ["Депозит", "Сумма уже указана в каждой карточке и не смешивается с ценой аренды."],
+        ["Страховка и франшиза", "Состав покрытия и ответственность уточняются для конкретной машины."],
+        ["Доставка и возврат", "Укажите аэропорт, отель или виллу — менеджер подтвердит возможность и стоимость."],
+        ["МВУ и штрафы", "Требования к документам и правила для выбранной категории подтвердим до поездки."],
+      ],
+      contactEyebrow: "На связи",
+      contactTitle: "Выберите машину на сайте — продолжите с человеком",
+      contactIntro: "Telegram ведёт в бронирование, WhatsApp подходит для быстрого вопроса по условиям, документам или доставке.",
+      telegram: "Перейти к бронированию",
       faqEyebrow: "Помощь перед бронью",
       faqTitle: "Частые вопросы",
       faqIntro: "Если ответа нет, напишите нам — подскажем по машине и маршруту.",
       whatsapp: "Написать в WhatsApp",
       questions: [
         ["Как забронировать автомобиль?", "Выберите категорию, даты и место выдачи. Затем откройте Telegram, подтвердите профиль и отправьте бронь из WebApp."],
-        ["Можно получить машину в аэропорту?", "Да. При подборе выберите аэропорт как место получения или возврата. Итоговые условия доставки будут показаны до подтверждения."],
+        ["Можно получить машину в аэропорту?", "Укажите аэропорт как желаемое место получения или возврата. Возможность и стоимость доставки подтвердит менеджер."],
         ["Цена на странице окончательная?", "В карточках указана цена «от» для длительной аренды в низкий сезон. Точная ставка зависит от дат и срока и рассчитывается в WebApp."],
         ["Какие документы нужны?", "Обычно нужны паспорт и действующее водительское удостоверение соответствующей категории. Менеджер подтвердит требования к выбранному транспорту."],
         ["Когда бронь появляется в CRM?", "После авторизации Telegram фиксирует интерес к модели. Полноценная бронь создаётся после подтверждения дат, доставки и автомобиля в WebApp."],
@@ -200,8 +232,18 @@ export const messages = {
     hero: {
       loading: "Loading Sunny Rentals",
       rating: "4.8 average partner rating",
-      title: "Rent a car or scooter in Phuket",
-      subtitle: "Choose a vehicle for your trip, get island-wide delivery and confirm your booking in Telegram.",
+      eyebrow: "Car and scooter rental in Phuket",
+      title: "See the vehicle. See the price.",
+      promise: "No surprises at handover.",
+      subtitle: "Choose a specific vehicle from our fleet, calculate the rental for your dates and confirm the terms with a manager.",
+      proofAria: "Sunny Rentals catalogue facts",
+      fleetProof: "cars and scooters in the catalogue",
+      locationProof: "Phuket, Thailand",
+      realPhotosProof: "Photos of specific vehicles",
+      realVehicle: "From the real fleet",
+      vehicleDetails: "Vehicle details",
+      deposit: "Deposit",
+      depositSeparate: "shown separately from the rental price",
       category: "Category",
       from: "from",
       perDay: "per day",
@@ -296,18 +338,40 @@ export const messages = {
       intro:
         "The website helps you choose a model, Telegram verifies your profile, and our CRM keeps the complete booking history for the manager.",
       benefits: [
-        ["Verified vehicles", "See real photos and the vehicle condition before you confirm."],
-        ["Clear pricing", "Rental period, deposit and delivery are confirmed before booking."],
-        ["Delivery across Phuket", "Collect your vehicle at the airport, hotel or villa."],
+        ["Specific vehicles", "See the model, year and photos of the selected vehicle from the catalogue."],
+        ["Clear calculation", "The rate depends on season and rental length, with the deposit shown separately."],
+        ["No guessed terms", "A manager confirms vehicle availability, location and delivery price."],
         ["Telegram support", "Verify your profile in Telegram and send the booking straight to our CRM."],
       ],
+      priceEyebrow: "What makes up the total",
+      priceTitle: "Every part of the price, before you confirm",
+      priceIntro: "The rental rate follows the season and length. Other terms are not hidden inside an attractive “from” price.",
+      priceParts: [
+        ["Rental", "The catalogue rate depends on the season and number of rental days."],
+        ["Deposit", "Shown separately for each vehicle and excluded from the rental price calculation."],
+        ["Delivery", "A manager confirms the location, availability and price after you select dates."],
+        ["Extras", "Added only after you agree — no automatic or hidden charges."],
+      ],
+      guideEyebrow: "Before your trip",
+      guideTitle: "Complicated terms, explained clearly",
+      guideIntro: "Some terms are not yet stored in one verified catalogue. A manager therefore confirms them for your chosen vehicle before booking.",
+      guideItems: [
+        ["Deposit", "The amount is already shown on every vehicle card and kept separate from the rental price."],
+        ["Insurance and excess", "Coverage and liability are confirmed for the specific vehicle."],
+        ["Delivery and return", "Choose airport, hotel or villa; a manager confirms availability and price."],
+        ["IDP and fines", "We confirm document requirements and relevant rules for your chosen vehicle category."],
+      ],
+      contactEyebrow: "Talk to us",
+      contactTitle: "Choose on the website — continue with a person",
+      contactIntro: "Telegram takes you into booking. WhatsApp is ideal for a quick question about terms, documents or delivery.",
+      telegram: "Continue to booking",
       faqEyebrow: "Before you book",
       faqTitle: "Frequently asked questions",
       faqIntro: "Need anything else? Message us and we will help with the vehicle and route.",
       whatsapp: "Message us on WhatsApp",
       questions: [
         ["How do I book a car?", "Choose a category, dates and pick-up point. Then open Telegram, verify your profile and confirm the booking in the WebApp."],
-        ["Can I collect the car at the airport?", "Yes. Select the airport as your pick-up or return point. Final delivery terms are shown before confirmation."],
+        ["Can I collect the car at the airport?", "Choose the airport as your preferred pick-up or return point. A manager confirms availability and delivery price."],
         ["Is the listed price final?", "Cards show a “from” price for long-term rentals during low season. Your exact rate depends on dates and rental length and is calculated in the WebApp."],
         ["Which documents do I need?", "You will normally need a passport and a valid driving licence for the relevant vehicle class. A manager will confirm the exact requirements."],
         ["When does the booking appear in the CRM?", "Telegram records your interest after verification. The full booking is created after you confirm the dates, delivery and vehicle in the WebApp."],
@@ -353,9 +417,10 @@ export function getMessages(locale: Locale) {
 }
 
 export function localePath(locale: Locale, path = "/"): string {
-  if (locale === "ru") return path;
-  if (path === "/") return "/en";
-  return `/en${path}`;
+  const normalizedPath = path === "/" ? "/" : `/${path.replace(/^\/+|\/+$/g, "")}/`;
+  if (locale === "ru") return normalizedPath;
+  if (normalizedPath === "/") return "/en/";
+  return `/en${normalizedPath}`;
 }
 
 export function languageAlternates(locale: Locale, path = "/") {
@@ -373,5 +438,6 @@ export function absoluteLanguageUrls(path = "/") {
   return {
     ru: absoluteUrl(localePath("ru", path)),
     en: absoluteUrl(localePath("en", path)),
+    "x-default": absoluteUrl(localePath("ru", path)),
   };
 }

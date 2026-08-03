@@ -1,14 +1,17 @@
-import { BookingSearch } from "@/components/booking-search";
 import { FleetSection } from "@/components/fleet-section";
 import { MarketingHero } from "@/components/marketing-hero";
+import { RentalDatesProvider } from "@/components/rental-dates-context";
 import { SiteHeader } from "@/components/site-header";
 import { StickyContactMenu } from "@/components/sticky-contact-menu";
 import { TrustContent } from "@/components/trust-content";
+import { getCarBySlug, getLocalizedCar, marketingCars } from "@/content/cars";
 import { getMessages, localePath, type Locale } from "@/lib/i18n";
 import { absoluteUrl, siteConfig } from "@/lib/site";
 
 export function MarketingHomePage({ locale }: { locale: Locale }) {
   const copy = getMessages(locale);
+  const featuredSource = getCarBySlug("toyota-yaris") ?? marketingCars[0];
+  const featuredCar = getLocalizedCar(featuredSource, locale);
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "AutoRental",
@@ -39,9 +42,21 @@ export function MarketingHomePage({ locale }: { locale: Locale }) {
         }}
       />
       <SiteHeader locale={locale} />
-      <MarketingHero locale={locale} />
-      <BookingSearch locale={locale} />
-      <FleetSection locale={locale} />
+      <RentalDatesProvider>
+        <MarketingHero
+          locale={locale}
+          fleetSize={marketingCars.length}
+          vehicle={{
+            name: `${featuredCar.brand} ${featuredCar.model}`,
+            image: featuredCar.image,
+            slug: featuredCar.slug,
+            year: featuredCar.year,
+            fromPrice: featuredCar.fromPrice,
+            deposit: featuredCar.deposit,
+          }}
+        />
+        <FleetSection locale={locale} />
+      </RentalDatesProvider>
       <TrustContent locale={locale} />
       <StickyContactMenu locale={locale} />
     </main>
