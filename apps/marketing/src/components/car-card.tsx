@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CarPromoBadges } from "@/components/car-promo-badges";
 import { CompactPriceSummary } from "@/components/compact-price-summary";
 import {
   getLocalizedCar,
@@ -14,20 +15,22 @@ export function CarCard({ car, locale }: { car: MarketingCar; locale: Locale }) 
   const localizedCar = getLocalizedCar(car, locale);
   const carPath = localePath(locale, `/cars/${car.slug}`);
   const datesHref = `${localePath(locale)}?car=${encodeURIComponent(car.inventoryId)}#booking`;
+  const vehicleName = [car.brand, car.model, car.year].filter(Boolean).join(" ");
 
   return (
     <article className="car-card">
       <Link
         className="car-card__media"
         href={carPath}
-        aria-label={`${car.brand} ${car.model} ${car.year} ${copy.fleet.imageAlt}`}
+        aria-label={`${vehicleName} ${copy.fleet.imageAlt}`}
       >
         <img
           src={car.image}
-          alt={`${car.brand} ${car.model} ${car.year} ${copy.fleet.imageAlt}`}
+          alt={`${vehicleName} ${copy.fleet.imageAlt}`}
           loading="lazy"
         />
-        <span className="car-card__year">{car.year}</span>
+        <CarPromoBadges badges={car.terms.badges ?? []} locale={locale} />
+        {car.year ? <span className="car-card__year">{car.year}</span> : null}
       </Link>
 
       <div className="car-card__body">
@@ -35,7 +38,7 @@ export function CarCard({ car, locale }: { car: MarketingCar; locale: Locale }) 
           <h3>
             <Link href={carPath}>{car.brand} {car.model}</Link>
           </h3>
-          <p>{car.year} · {locale === "en" ? car.colorEn : car.color}</p>
+          <p>{[car.year, locale === "en" ? car.colorEn : car.color].filter(Boolean).join(" · ")}</p>
         </div>
 
         <ul className="car-card__specs" aria-label={copy.fleet.specsAria}>
@@ -51,6 +54,25 @@ export function CarCard({ car, locale }: { car: MarketingCar; locale: Locale }) 
           initialDate={toLocalDateKey()}
           datesHref={datesHref}
         />
+
+        <dl className="car-card__terms">
+          <div>
+            <dt>{copy.fleet.deposit}</dt>
+            <dd>{car.deposit.toLocaleString(copy.numberLocale)} ฿</dd>
+          </div>
+          {car.terms.insurance ? (
+            <div>
+              <dt>{copy.fleet.insurance}</dt>
+              <dd>{copy.fleet.insuranceClass}</dd>
+            </div>
+          ) : null}
+          {car.terms.insurance?.excessThb ? (
+            <div>
+              <dt>{copy.fleet.excess}</dt>
+              <dd>{car.terms.insurance.excessThb.toLocaleString(copy.numberLocale)} ฿</dd>
+            </div>
+          ) : null}
+        </dl>
 
         <div className="car-card__actions">
           <a

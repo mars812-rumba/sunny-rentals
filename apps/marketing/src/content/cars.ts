@@ -694,11 +694,11 @@ function selectVerifiedBadges(inventoryId: string, category: VehicleCategory) {
     { labelRu: "Аэропорт 0 ฿", labelEn: "Airport 0 ฿", source: PRODUCT_OWNER_TERMS_SOURCE, color: "blue" },
     { labelRu: "Хит", labelEn: "Popular", source: PRODUCT_OWNER_TERMS_SOURCE, color: "orange" },
     { labelRu: "Полный бак", labelEn: "Full tank", source: PRODUCT_OWNER_TERMS_SOURCE, color: "green" },
-    { labelRu: "Страховка класс 1", labelEn: "Class 1 insurance", source: PRODUCT_OWNER_TERMS_SOURCE, color: "green" },
     { labelRu: "Реальные фото", labelEn: "Real photos", source: PRODUCT_OWNER_TERMS_SOURCE, color: "white" },
     { labelRu: "Цена по сроку", labelEn: "Rate by rental term", source: PRODUCT_OWNER_TERMS_SOURCE, color: "blue" },
     ...(appliesToCars
       ? [
+          { labelRu: "Страховка класс 1", labelEn: "Class 1 insurance", source: PRODUCT_OWNER_TERMS_SOURCE, color: "green" as const },
           { labelRu: "Детское кресло 0 ฿", labelEn: "Child seat 0 ฿", source: PRODUCT_OWNER_TERMS_SOURCE, color: "blue" as const },
           { labelRu: "Чистая машина", labelEn: "Clean vehicle", source: PRODUCT_OWNER_TERMS_SOURCE, color: "white" as const },
         ]
@@ -742,16 +742,18 @@ function getVerifiedTerms(inventory: InventoryCar, category: VehicleCategory) {
   const childSeatAvailable = category !== "bikes";
 
   return {
-    insurance: {
-      class: "1" as const,
-      summary: "Страховка класса 1 действует при ДТП с участием двух сторон.",
-      summaryEn: "Class 1 insurance applies to two-party road accidents.",
-      requirements: ["Для страхового случая обязательно наличие второй стороны ДТП."],
-      requirementsEn: ["A second party to the road accident is required for an insurance claim."],
-      exclusions: ["Царапины и повреждения, полученные на парковке без второй стороны."],
-      exclusionsEn: ["Scratches and parking damage without an identified second party."],
-      excessThb,
-    },
+    insurance: childSeatAvailable
+      ? {
+          class: "1" as const,
+          summary: "Страховка класса 1 действует при ДТП с участием двух сторон.",
+          summaryEn: "Class 1 insurance applies to two-party road accidents.",
+          requirements: ["Для страхового случая обязательно наличие второй стороны ДТП."],
+          requirementsEn: ["A second party to the road accident is required for an insurance claim."],
+          exclusions: ["Царапины и повреждения, полученные на парковке без второй стороны."],
+          exclusionsEn: ["Scratches and parking damage without an identified second party."],
+          excessThb,
+        }
+      : undefined,
     childSeat: childSeatAvailable ? { available: true, priceThb: 0 } : undefined,
     handover: {
       fullTank: true,

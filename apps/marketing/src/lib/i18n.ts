@@ -176,7 +176,7 @@ export const messages = {
       guideIntro: "Подтверждённые базовые условия показываем сразу. Индивидуальные детали конкретной машины менеджер проверяет до бронирования.",
       guideItems: [
         ["Депозит", "Сумма уже указана в каждой карточке и не смешивается с ценой аренды."],
-        ["Страховка и франшиза", "Класс 1 покрывает ДТП при наличии второй стороны. Парковочные царапины без второй стороны не входят; франшиза зависит от класса машины."],
+        ["Страховка и франшиза", "Для автомобилей класс 1 покрывает ДТП при наличии второй стороны. Парковочные царапины без второй стороны не входят; франшиза зависит от класса машины. На байки страховки нет."],
         ["Доставка и возврат", "Аэропорт — 0 ฿, город, отель или вилла — 500 ฿. Время передачи менеджер подтвердит после выбора дат."],
         ["МВУ и штрафы", "Требования к документам и правила для выбранной категории подтвердим до поездки."],
       ],
@@ -401,7 +401,7 @@ export const messages = {
       guideIntro: "Verified baseline terms are shown immediately. A manager checks vehicle-specific details before booking.",
       guideItems: [
         ["Deposit", "The amount is already shown on every vehicle card and kept separate from the rental price."],
-        ["Insurance and excess", "Class 1 covers accidents with an identified second party. Parking scratches without a second party are excluded; the excess depends on vehicle class."],
+        ["Insurance and excess", "Cars have Class 1 cover for accidents with an identified second party. Parking scratches without a second party are excluded; the excess depends on vehicle class. Scooters are not insured."],
         ["Delivery and return", "Airport delivery is 0 ฿; city, hotel or villa delivery is 500 ฿. A manager confirms the handover time after you select dates."],
         ["IDP and fines", "We confirm document requirements and relevant rules for your chosen vehicle category."],
       ],
