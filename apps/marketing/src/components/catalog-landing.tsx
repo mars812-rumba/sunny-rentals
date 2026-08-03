@@ -1,5 +1,6 @@
-import { FleetSection } from "@/components/fleet-section";
+import { CatalogBrowser } from "@/components/catalog-browser";
 import { SiteHeader } from "@/components/site-header";
+import { marketingCars } from "@/content/cars";
 import { getMessages, type Locale } from "@/lib/i18n";
 
 export function CatalogLanding({ locale }: { locale: Locale }) {
@@ -15,7 +16,7 @@ export function CatalogLanding({ locale }: { locale: Locale }) {
           <p>{copy.catalog.intro}</p>
         </div>
       </header>
-      <FleetSection locale={locale} />
+      <CatalogBrowser cars={marketingCars} locale={locale} />
     </main>
   );
 }

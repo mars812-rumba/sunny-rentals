@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { BookingSearch } from "@/components/booking-search";
+import { HeroPreloader } from "@/components/hero-preloader";
 import { getMessages, localePath, type Locale } from "@/lib/i18n";
 
 interface HeroVehicle {
@@ -27,7 +28,9 @@ export function MarketingHero({
   const deposit = new Intl.NumberFormat(getMessages(locale).numberLocale).format(vehicle.deposit);
 
   return (
-    <section className="marketing-hero">
+    <>
+      <HeroPreloader label={copy.loading} vehicleImage={vehicle.image} />
+      <section className="marketing-hero">
       <div className="marketing-hero__backdrop" aria-hidden="true" />
       <div className="shell marketing-hero__content">
         <div className="marketing-hero__lead">
@@ -75,6 +78,7 @@ export function MarketingHero({
 
         <BookingSearch locale={locale} variant="hero" />
       </div>
-    </section>
+      </section>
+    </>
   );
 }
