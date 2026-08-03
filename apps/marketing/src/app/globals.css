@@ -2100,7 +2100,7 @@ h1 {
   object-fit: cover;
 }
 
-.vehicle-hero__media > span {
+.vehicle-category-pill {
   position: absolute;
   bottom: 1.25rem;
   left: 1.25rem;
@@ -2111,6 +2111,22 @@ h1 {
   font-size: 0.72rem;
   font-weight: 850;
   background: rgba(8, 47, 73, 0.78);
+  backdrop-filter: blur(12px);
+}
+
+.vehicle-photo-proof {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  z-index: 6;
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 999px;
+  padding: 0.55rem 0.75rem;
+  color: #164e63;
+  font-size: 0.68rem;
+  font-weight: 850;
+  background: rgba(236, 254, 255, 0.84);
+  box-shadow: 0 8px 22px rgba(8, 47, 73, 0.14);
   backdrop-filter: blur(12px);
 }
 
@@ -2246,6 +2262,128 @@ h1 {
   color: var(--ocean-950);
   font-size: 0.95rem;
   font-weight: 850;
+}
+
+.vehicle-terms {
+  margin-top: 6rem;
+}
+
+.vehicle-terms__grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+}
+
+.vehicle-terms__grid article {
+  min-width: 0;
+  min-height: 17rem;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  padding: 1.2rem;
+  background: white;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.055);
+}
+
+.vehicle-terms__grid article > span {
+  color: var(--ocean-700);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.vehicle-terms__grid h3 {
+  margin: 2.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.vehicle-terms__grid strong {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--ocean-950);
+  font-size: 1rem;
+}
+
+.vehicle-terms__grid p,
+.vehicle-terms__grid small {
+  display: block;
+  margin: 0.65rem 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.vehicle-terms__grid small {
+  border-top: 1px solid var(--line);
+  padding-top: 0.65rem;
+  color: #9f1239;
+}
+
+.vehicle-faq {
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.72fr) minmax(25rem, 1.28fr);
+  gap: clamp(2.5rem, 7vw, 7rem);
+  margin-top: 6rem;
+  border-radius: 2rem;
+  padding: clamp(2rem, 5vw, 4rem);
+  background: #eef8fb;
+}
+
+.vehicle-faq h2 {
+  margin: 0;
+  color: var(--ocean-950);
+  font-size: clamp(2.2rem, 4vw, 3.6rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.vehicle-faq > div:first-child > p:last-child {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.vehicle-faq__list {
+  border-top: 1px solid rgba(3, 105, 161, 0.2);
+}
+
+.vehicle-faq__list details {
+  border-bottom: 1px solid rgba(3, 105, 161, 0.2);
+}
+
+.vehicle-faq__list summary {
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  color: var(--ocean-950);
+  font-size: 0.9rem;
+  font-weight: 800;
+  list-style: none;
+}
+
+.vehicle-faq__list summary::-webkit-details-marker {
+  display: none;
+}
+
+.vehicle-faq__list summary span {
+  color: var(--ocean-700);
+  font-size: 1.25rem;
+  transition: transform 180ms ease;
+}
+
+.vehicle-faq__list details[open] summary span {
+  transform: rotate(45deg);
+}
+
+.vehicle-faq__list p {
+  margin: -0.2rem 0 1.4rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.7;
 }
 
 .related-section {
@@ -3338,11 +3476,51 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
     padding: 1.5rem;
   }
 
+  .vehicle-terms {
+    margin-top: 3.5rem;
+  }
+
+  .vehicle-terms__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vehicle-terms__grid article {
+    min-height: 0;
+  }
+
+  .vehicle-terms__grid h3 {
+    margin-top: 1.5rem;
+  }
+
+  .vehicle-faq {
+    grid-template-columns: 1fr;
+    margin-top: 3.5rem;
+    padding: 1.5rem;
+  }
+
   .related-section {
     margin-top: 3.5rem;
   }
 
   .related-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1100px) {
+  .vehicle-terms__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 960px) {
+  .vehicle-faq {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .vehicle-terms__grid {
     grid-template-columns: 1fr;
   }
 }

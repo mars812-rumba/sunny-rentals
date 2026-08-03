@@ -18,6 +18,7 @@ export interface SeasonalPricing {
 export interface PublicCarPhotoSet {
   main: string;
   gallery: string[];
+  realVehicle: boolean;
   /** Not populated until the inventory stores a separate photo verification date. */
   verifiedAt?: string;
 }

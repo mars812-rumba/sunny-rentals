@@ -865,6 +865,7 @@ function adaptInventoryCar(
     photos: {
       main: gallery[0],
       gallery,
+      realVehicle: true,
     },
     image: gallery[0],
     images: gallery,
