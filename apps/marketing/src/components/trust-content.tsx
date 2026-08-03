@@ -130,6 +130,9 @@ export function TrustContent({ locale }: { locale: Locale }) {
             <Link href={localePath(locale, "/deposit")}>{locale === "ru" ? "Депозит" : "Deposit"}</Link>
             <Link href={localePath(locale, "/delivery")}>{locale === "ru" ? "Доставка" : "Delivery"}</Link>
             <Link href={localePath(locale, "/faq")}>FAQ</Link>
+            <Link href={localePath(locale, "/phuket-airport-car-rental")}>{locale === "ru" ? "Аэропорт" : "Airport rental"}</Link>
+            <Link href={localePath(locale, "/long-term-car-rental-phuket")}>{locale === "ru" ? "На месяц" : "Long-term"}</Link>
+            <Link href={localePath(locale, "/car-rental-with-child-seat-phuket")}>{locale === "ru" ? "С детским креслом" : "With child seat"}</Link>
             <Link href={`${localePath(locale)}#booking`}>{copy.nav.booking}</Link>
             <a href={siteConfig.telegramBotUrl}>Telegram</a>
             <a href={siteConfig.whatsappUrl}>WhatsApp</a>

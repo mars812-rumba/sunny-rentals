@@ -1,3 +1,4 @@
+import type { VehicleCategory } from "@/content/cars";
 import type { Locale } from "@/lib/i18n";
 
 export interface TrustPageContent {
@@ -8,6 +9,7 @@ export interface TrustPageContent {
   description: string;
   eyebrow: string;
   intro: string;
+  vehicleCategories?: VehicleCategory[];
   sections: Array<{
     title: string;
     paragraphs: string[];

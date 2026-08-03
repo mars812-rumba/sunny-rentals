@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { indexableMarketingCars, marketingCars } from "@/content/cars";
-import { trustPages } from "@/content/trust-pages";
+import { contentPages } from "@/content/content-pages";
 import {
   absoluteLanguageUrls,
   localePath,
@@ -55,7 +55,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }));
   });
 
-  const trustPageEntries: MetadataRoute.Sitemap = trustPages.flatMap((localizedPage) =>
+  const contentPageEntries: MetadataRoute.Sitemap = contentPages.flatMap((localizedPage) =>
     languages.map((locale) => {
       const page = localizedPage[locale];
       const path = `/${page.slug}`;
@@ -69,5 +69,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  return [...staticPages, ...trustPageEntries, ...carPages];
+  return [...staticPages, ...contentPageEntries, ...carPages];
 }

@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { CarCard } from "@/components/car-card";
+import { RentalDatesProvider } from "@/components/rental-dates-context";
 import { SiteHeader } from "@/components/site-header";
+import { getCarsByCategory } from "@/content/cars";
+import { contentPages } from "@/content/content-pages";
 import { trustPages, type TrustPageContent } from "@/content/trust-pages";
 import { languageAlternates, localePath, type Locale } from "@/lib/i18n";
 import { absoluteUrl, siteConfig } from "@/lib/site";
@@ -30,18 +34,32 @@ export function TrustPageLanding({ page, locale }: { page: TrustPageContent; loc
   const pageUrl = absoluteUrl(localePath(locale, path));
   const labels = locale === "ru"
     ? {
-        home: "Главная", guides: "Полезная информация", fleet: "Выбрать транспорт",
+        home: "Главная", guides: "Аренда и условия", fleet: "Выбрать транспорт",
         telegram: "Продолжить в Telegram", whatsapp: "Задать вопрос в WhatsApp",
-        related: "Читайте также", updated: "Обновлено", footer: "Страницы доверия",
+        related: "Читайте также", updated: "Обновлено", footer: "Условия аренды",
+        matching: "Подходящие варианты",
+        matchingIntro: "Реальные машины из парка с ценами, депозитами и условиями.",
       }
     : {
-        home: "Home", guides: "Useful information", fleet: "Choose a vehicle",
+        home: "Home", guides: "Rental and terms", fleet: "Choose a vehicle",
         telegram: "Continue in Telegram", whatsapp: "Ask on WhatsApp",
         related: "Related guides", updated: "Updated", footer: "Trust and rental guides",
+        matching: "Matching vehicles",
+        matchingIntro: "Real fleet vehicles with rates, deposits and terms.",
       };
-  const relatedPages = trustPages
-    .map((item) => item[locale])
-    .filter((item) => item.slug !== page.slug);
+  const localizedPages = contentPages.map((item) => item[locale]);
+  const currentPageIndex = localizedPages.findIndex((item) => item.slug === page.slug);
+  const relatedPages = Array.from(
+    { length: Math.min(6, localizedPages.length - 1) },
+    (_, index) => localizedPages[(currentPageIndex + index + 1) % localizedPages.length],
+  );
+  const featuredCars = page.vehicleCategories
+    ? page.vehicleCategories.length === 1
+      ? getCarsByCategory(page.vehicleCategories[0]).slice(0, 4)
+      : page.vehicleCategories
+          .flatMap((category) => getCarsByCategory(category).slice(0, 1))
+          .slice(0, 4)
+    : [];
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -115,6 +133,25 @@ export function TrustPageLanding({ page, locale }: { page: TrustPageContent; loc
             <Link href={localePath(locale, "/cars")}>{labels.fleet}<span aria-hidden="true">→</span></Link>
           </aside>
         </div>
+
+        {featuredCars.length ? (
+          <section className="content-vehicles" aria-labelledby="content-vehicles-title">
+            <div className="shell">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow eyebrow--dark">Sunny Rentals · Phuket</p>
+                  <h2 id="content-vehicles-title">{labels.matching}</h2>
+                </div>
+                <p>{labels.matchingIntro}</p>
+              </div>
+              <RentalDatesProvider>
+                <div className="content-vehicles__grid">
+                  {featuredCars.map((car) => <CarCard car={car} locale={locale} key={car.slug} />)}
+                </div>
+              </RentalDatesProvider>
+            </div>
+          </section>
+        ) : null}
 
         <section className="trust-page__faq" aria-labelledby="trust-faq-title">
           <div className="shell trust-page__faq-layout">
