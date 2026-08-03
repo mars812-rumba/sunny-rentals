@@ -3525,6 +3525,322 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   }
 }
 
+.trust-page {
+  background: var(--sand-50);
+}
+
+.trust-page__hero {
+  padding: 9rem 0 clamp(4rem, 8vw, 7rem);
+  color: white;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(56, 189, 248, 0.2), transparent 30rem),
+    linear-gradient(135deg, #06283d, var(--ocean-900));
+}
+
+.trust-page__breadcrumbs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.72rem;
+}
+
+.trust-page__breadcrumbs a {
+  color: var(--sun-300);
+}
+
+.trust-page__hero h1 {
+  max-width: 60rem;
+  font-size: clamp(2.8rem, 7vw, 6rem);
+}
+
+.trust-page__hero > .shell > p:not(.eyebrow) {
+  max-width: 48rem;
+  margin: 1.5rem 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.65;
+}
+
+.trust-page__hero small {
+  display: block;
+  margin-top: 1.5rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.65rem;
+}
+
+.trust-page__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  align-items: start;
+  gap: clamp(2rem, 6vw, 6rem);
+  padding-top: clamp(4rem, 8vw, 7rem);
+  padding-bottom: clamp(4rem, 8vw, 7rem);
+}
+
+.trust-page__sections {
+  display: grid;
+  gap: 3.5rem;
+}
+
+.trust-page__sections section {
+  position: relative;
+  border-top: 1px solid var(--line);
+  padding-top: 1.5rem;
+}
+
+.trust-page__sections section > span {
+  color: var(--ocean-700);
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.trust-page__sections h2 {
+  margin: 0.6rem 0 0;
+  color: var(--ocean-950);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  letter-spacing: -0.04em;
+}
+
+.trust-page__sections p,
+.trust-page__sections li {
+  color: #526476;
+  font-size: 0.94rem;
+  line-height: 1.75;
+}
+
+.trust-page__sections p {
+  margin: 1rem 0 0;
+}
+
+.trust-page__sections ul {
+  display: grid;
+  gap: 0.65rem;
+  margin: 1.25rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.trust-page__aside {
+  position: sticky;
+  top: 7rem;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  background: white;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.07);
+}
+
+.trust-page__aside strong {
+  color: var(--ocean-950);
+  font-size: 1rem;
+}
+
+.trust-page__aside p {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.trust-page__aside a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 999px;
+  padding: 0.75rem 0.9rem;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-decoration: none;
+  background: var(--ocean-700);
+}
+
+.trust-page__faq {
+  padding: clamp(4rem, 8vw, 7rem) 0;
+  background: #eef8fb;
+}
+
+.trust-page__faq-layout {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.7fr) minmax(25rem, 1.3fr);
+  gap: clamp(2rem, 7vw, 7rem);
+}
+
+.trust-page__faq h2 {
+  margin: 0;
+  color: var(--ocean-950);
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  letter-spacing: -0.05em;
+}
+
+.trust-page__faq-list {
+  border-top: 1px solid rgba(3, 105, 161, 0.2);
+}
+
+.trust-page__faq-list details {
+  border-bottom: 1px solid rgba(3, 105, 161, 0.2);
+}
+
+.trust-page__faq-list summary {
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  color: var(--ocean-950);
+  font-size: 0.92rem;
+  font-weight: 800;
+  list-style: none;
+}
+
+.trust-page__faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.trust-page__faq-list summary span {
+  color: var(--ocean-700);
+  font-size: 1.25rem;
+  transition: transform 180ms ease;
+}
+
+.trust-page__faq-list details[open] summary span {
+  transform: rotate(45deg);
+}
+
+.trust-page__faq-list p {
+  margin: -0.15rem 0 1.4rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.trust-page__contact {
+  padding: 1rem 0;
+  color: white;
+  background: var(--ocean-950);
+}
+
+.trust-page__contact-inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1.5rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.trust-page__contact h2 {
+  max-width: 46rem;
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  letter-spacing: -0.04em;
+}
+
+.trust-page__contact-inner > div:last-child {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.trust-page__contact a {
+  min-width: 15rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 0.8rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-align: center;
+  text-decoration: none;
+}
+
+.trust-page__contact a:first-child {
+  border-color: #229ed9;
+  background: #229ed9;
+}
+
+.trust-page__related {
+  padding: clamp(4rem, 7vw, 6rem) 0;
+  background: white;
+}
+
+.trust-page__related nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.trust-page__related nav a {
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1rem;
+  color: var(--ocean-950);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.content-footer {
+  padding: 2rem 0;
+  color: white;
+  background: #041f31;
+}
+
+.content-footer > .shell {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 3rem;
+}
+
+.content-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem 1rem;
+}
+
+.content-footer nav a {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.65rem;
+  text-decoration: none;
+}
+
+@media (max-width: 700px) {
+  .trust-page__hero {
+    padding-top: 7rem;
+  }
+
+  .trust-page__body,
+  .trust-page__faq-layout,
+  .trust-page__contact-inner,
+  .content-footer > .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .trust-page__aside {
+    position: static;
+  }
+
+  .trust-page__related nav {
+    grid-template-columns: 1fr;
+  }
+
+  .trust-page__contact a {
+    display: block;
+    min-width: 0;
+  }
+
+  .content-footer nav {
+    justify-content: flex-start;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .button,
   .car-card,

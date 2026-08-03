@@ -125,6 +125,11 @@ export function TrustContent({ locale }: { locale: Locale }) {
           </address>
           <nav aria-label={copy.nav.footerAria}>
             <Link href={localePath(locale, "/cars")}>{copy.nav.fleet}</Link>
+            <Link href={localePath(locale, "/rental-terms")}>{locale === "ru" ? "Условия" : "Terms"}</Link>
+            <Link href={localePath(locale, "/insurance")}>{locale === "ru" ? "Страховка" : "Insurance"}</Link>
+            <Link href={localePath(locale, "/deposit")}>{locale === "ru" ? "Депозит" : "Deposit"}</Link>
+            <Link href={localePath(locale, "/delivery")}>{locale === "ru" ? "Доставка" : "Delivery"}</Link>
+            <Link href={localePath(locale, "/faq")}>FAQ</Link>
             <Link href={`${localePath(locale)}#booking`}>{copy.nav.booking}</Link>
             <a href={siteConfig.telegramBotUrl}>Telegram</a>
             <a href={siteConfig.whatsappUrl}>WhatsApp</a>
