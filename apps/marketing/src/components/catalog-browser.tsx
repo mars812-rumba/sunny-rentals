@@ -14,6 +14,7 @@ import { getMessages, type Locale } from "@/lib/i18n";
 import { calculateRentalPrice, getRentalDays, toLocalDateKey } from "@/lib/pricing";
 
 type CategoryFilter = "all" | VehicleCategory;
+type DeliveryZone = "all" | "airport" | "city";
 
 const priceOptions = [500, 750, 1000, 1500, 2000] as const;
 
@@ -46,6 +47,8 @@ function CatalogBrowserContent({ cars, locale }: { cars: MarketingCar[]; locale:
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
+  const [childSeatOnly, setChildSeatOnly] = useState(false);
+  const [deliveryZone, setDeliveryZone] = useState<DeliveryZone>("all");
   const [queryReady, setQueryReady] = useState(false);
   const today = useMemo(() => toLocalDateKey(), []);
 
@@ -63,6 +66,11 @@ function CatalogBrowserContent({ cars, locale }: { cars: MarketingCar[]; locale:
       if (priceOptions.includes(queryMaxPrice as (typeof priceOptions)[number])) {
         setMaxPrice(queryMaxPrice);
       }
+      setChildSeatOnly(query.get("childSeat") === "1");
+      const queryDelivery = query.get("delivery");
+      if (queryDelivery === "airport" || queryDelivery === "city") {
+        setDeliveryZone(queryDelivery);
+      }
       if (isDateKey(queryStart) && isDateKey(queryEnd) && queryEnd > queryStart) {
         setSelection({ startDate: queryStart, endDate: queryEnd });
       }
@@ -79,6 +87,8 @@ function CatalogBrowserContent({ cars, locale }: { cars: MarketingCar[]; locale:
     if (startDate) query.set("start", startDate);
     if (endDate) query.set("end", endDate);
     if (maxPrice) query.set("maxPrice", String(maxPrice));
+    if (childSeatOnly) query.set("childSeat", "1");
+    if (deliveryZone !== "all") query.set("delivery", deliveryZone);
     const suffix = query.size ? `?${query.toString()}` : "";
     window.history.replaceState(null, "", `${window.location.pathname}${suffix}`);
 
@@ -87,13 +97,14 @@ function CatalogBrowserContent({ cars, locale }: { cars: MarketingCar[]; locale:
         ? { startDate, endDate }
         : null,
     );
-  }, [category, startDate, endDate, maxPrice, queryReady, setSelection]);
+  }, [category, startDate, endDate, maxPrice, childSeatOnly, deliveryZone, queryReady, setSelection]);
 
   const selectedDays = startDate && endDate && endDate > startDate
     ? getRentalDays(startDate, endDate)
     : 0;
   const visibleCars = cars.filter((car) => {
     if (category !== "all" && car.category !== category) return false;
+    if (childSeatOnly && !car.terms.childSeat?.available) return false;
     if (!maxPrice) return true;
     if (!selectedDays) return car.fromPrice <= maxPrice;
     const calculation = calculateRentalPrice(car.pricing, startDate, endDate);
@@ -110,6 +121,8 @@ function CatalogBrowserContent({ cars, locale }: { cars: MarketingCar[]; locale:
     setStartDate("");
     setEndDate("");
     setMaxPrice(null);
+    setChildSeatOnly(false);
+    setDeliveryZone("all");
   };
 
   return (
@@ -168,6 +181,25 @@ function CatalogBrowserContent({ cars, locale }: { cars: MarketingCar[]; locale:
                 {priceOptions.map((price) => (
                   <option value={price} key={price}>{copy.catalog.upTo} {price.toLocaleString(copy.numberLocale)} ฿</option>
                 ))}
+              </select>
+            </label>
+            <label className="catalog-filters__check">
+              <input
+                type="checkbox"
+                checked={childSeatOnly}
+                onChange={(event) => setChildSeatOnly(event.target.checked)}
+              />
+              <span>{copy.catalog.childSeat}</span>
+            </label>
+            <label>
+              <span>{copy.catalog.deliveryZone}</span>
+              <select
+                value={deliveryZone}
+                onChange={(event) => setDeliveryZone(event.target.value as DeliveryZone)}
+              >
+                <option value="all">{copy.catalog.anyDelivery}</option>
+                <option value="airport">{copy.catalog.airportDelivery}</option>
+                <option value="city">{copy.catalog.cityDelivery}</option>
               </select>
             </label>
             <button type="button" onClick={reset}>{copy.catalog.reset}</button>

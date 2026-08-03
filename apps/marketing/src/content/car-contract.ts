@@ -24,7 +24,13 @@ export interface PublicCarPhotoSet {
 
 export interface VerifiedCarTerms {
   insurance?: {
+    class: "1";
     summary: string;
+    summaryEn: string;
+    requirements: string[];
+    requirementsEn: string[];
+    exclusions: string[];
+    exclusionsEn: string[];
     excessThb?: number;
   };
   mileage?: {
@@ -37,14 +43,19 @@ export interface VerifiedCarTerms {
     available: boolean;
     priceThb?: number;
   };
+  handover?: {
+    fullTank: boolean;
+    cleanVehicle: boolean;
+  };
   delivery?: Array<{
-    zone: string;
+    zone: "airport" | "city";
     priceThb: number;
   }>;
   badges?: Array<{
     labelRu: string;
     labelEn: string;
     source: string;
+    color: "orange" | "green" | "blue" | "white";
   }>;
   rating?: {
     value: number;
@@ -61,10 +72,11 @@ export interface MarketingCar {
   slug: string;
   inventoryId: string;
   published: true;
+  indexable: boolean;
   category: VehicleCategory;
   brand: string;
   model: string;
-  year: number;
+  year: number | null;
   color: string;
   colorEn: string;
   power: string;
@@ -75,12 +87,14 @@ export interface MarketingCar {
   fromPrice: number;
   deposit: number;
   pricing: SeasonalPricing;
-  seats: string;
+  seats?: string;
   transmission: string;
   engine: string;
   fuel: string;
   summary: string;
+  summaryEn: string;
   bestFor: string;
+  bestForEn: string;
   inventoryUpdatedAt: string;
   /** Separate editorial date is not available in the current inventory. */
   contentUpdatedAt?: string;
@@ -89,6 +103,7 @@ export interface MarketingCar {
 
 export interface InventoryCar {
   id?: string;
+  name?: string;
   brand?: string;
   model?: string;
   year?: string | number;
@@ -110,14 +125,9 @@ export interface InventoryCar {
 }
 
 export const unsupportedPublicCarFields = [
-  "insurance",
-  "insurance excess",
   "mileage limit and excess price",
   "minimum rental period",
-  "child seat availability and price",
-  "delivery zones and prices",
   "photo verification date",
-  "verified badges",
   "rating and reviews source",
   "editorial content update date",
 ] as const;

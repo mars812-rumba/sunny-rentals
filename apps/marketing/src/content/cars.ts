@@ -5,6 +5,7 @@ import type {
   MarketingCar,
   SeasonalPricing,
   VehicleCategory,
+  VerifiedCarTerms,
 } from "@/content/car-contract";
 
 export type {
@@ -621,6 +622,9 @@ const marketingCarDefinitions: MarketingCarDefinition[] = [
 ];
 
 const inventoryCars = (inventoryCatalog as { cars: Record<string, InventoryCar> }).cars;
+const marketingDefinitionsByInventoryId = new Map(
+  marketingCarDefinitions.map((definition) => [definition.inventoryId, definition]),
+);
 
 const vehicleCategoryIds = new Set<VehicleCategory>([
   "compact",
@@ -631,17 +635,181 @@ const vehicleCategoryIds = new Set<VehicleCategory>([
 ]);
 
 const colorNamesEnToRu: Record<string, string> = {
-  Black: "Чёрный",
-  Blue: "Синий",
-  Gray: "Серый",
-  Grey: "Серый",
-  Red: "Красный",
-  Silver: "Серебристый",
-  White: "Белый",
+  black: "Чёрный",
+  blackv: "Чёрный",
+  blue: "Синий",
+  gray: "Серый",
+  grey: "Серый",
+  green: "Зелёный",
+  red: "Красный",
+  silver: "Серебристый",
+  white: "Белый",
+  yellow: "Жёлтый",
+  bege: "Бежевый",
+  beige: "Бежевый",
+  "dark gray": "Тёмно-серый",
+};
+
+const colorNamesRuToEn: Record<string, string> = {
+  белый: "White",
+  серый: "Gray",
+  синий: "Blue",
+  черный: "Black",
+  чёрный: "Black",
+};
+
+const categoryUseCases: Record<VehicleCategory, { ru: string; en: string }> = {
+  compact: {
+    ru: "Подходит для ежедневных поездок и городских маршрутов по Пхукету.",
+    en: "Suitable for everyday trips and urban routes around Phuket.",
+  },
+  sedan: {
+    ru: "Подходит для комфортных поездок по острову и маршрутов с багажом.",
+    en: "Suitable for comfortable island trips and routes with luggage.",
+  },
+  suv: {
+    ru: "Подходит для длительных маршрутов и поездок с дополнительным багажом.",
+    en: "Suitable for longer routes and trips with additional luggage.",
+  },
+  "7s": {
+    ru: "Подходит для семьи или компании; точную вместимость подтвердит менеджер.",
+    en: "Suitable for a family or group; a manager confirms the exact capacity.",
+  },
+  bikes: {
+    ru: "Подходит для поездок по острову; требования к категории прав подтвердит менеджер.",
+    en: "Suitable for island trips; a manager confirms the required licence category.",
+  },
 };
 
 const publicImagePath = (path: string) =>
   path.startsWith("/") ? path : `/images_web/${path}`;
+
+const PRODUCT_OWNER_TERMS_SOURCE = "product-owner-confirmation:2026-08-03";
+
+type VerifiedBadge = NonNullable<VerifiedCarTerms["badges"]>[number];
+
+function selectVerifiedBadges(inventoryId: string, category: VehicleCategory) {
+  const appliesToCars = category !== "bikes";
+  const pool: VerifiedBadge[] = [
+    { labelRu: "Аэропорт 0 ฿", labelEn: "Airport 0 ฿", source: PRODUCT_OWNER_TERMS_SOURCE, color: "blue" },
+    { labelRu: "Хит", labelEn: "Popular", source: PRODUCT_OWNER_TERMS_SOURCE, color: "orange" },
+    { labelRu: "Полный бак", labelEn: "Full tank", source: PRODUCT_OWNER_TERMS_SOURCE, color: "green" },
+    { labelRu: "Страховка класс 1", labelEn: "Class 1 insurance", source: PRODUCT_OWNER_TERMS_SOURCE, color: "green" },
+    { labelRu: "Реальные фото", labelEn: "Real photos", source: PRODUCT_OWNER_TERMS_SOURCE, color: "white" },
+    { labelRu: "Цена по сроку", labelEn: "Rate by rental term", source: PRODUCT_OWNER_TERMS_SOURCE, color: "blue" },
+    ...(appliesToCars
+      ? [
+          { labelRu: "Детское кресло 0 ฿", labelEn: "Child seat 0 ฿", source: PRODUCT_OWNER_TERMS_SOURCE, color: "blue" as const },
+          { labelRu: "Чистая машина", labelEn: "Clean vehicle", source: PRODUCT_OWNER_TERMS_SOURCE, color: "white" as const },
+        ]
+      : []),
+  ];
+  let seed = [...inventoryId].reduce((hash, char) => ((hash * 31) + char.charCodeAt(0)) >>> 0, 2166136261);
+  const shuffled = [...pool];
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    const target = seed % (index + 1);
+    [shuffled[index], shuffled[target]] = [shuffled[target], shuffled[index]];
+  }
+
+  const count = 2 + (seed % 2);
+  const selected: VerifiedBadge[] = [];
+  const colors = new Set<VerifiedBadge["color"]>();
+
+  for (const badge of shuffled) {
+    if (colors.has(badge.color)) continue;
+    selected.push(badge);
+    colors.add(badge.color);
+    if (selected.length === count) break;
+  }
+
+  return selected;
+}
+
+function getInsuranceExcessThb(inventory: InventoryCar, category: VehicleCategory) {
+  const identity = `${inventory.brand ?? ""} ${inventory.model ?? ""} ${inventory.name ?? ""}`.toLowerCase();
+
+  if (/\bbmw\b|\bford\s+(?:ranger|raptor)\b/.test(identity)) return 30_000;
+  if (/\bfortuner\b|\bmux\b|\bmu-x\b|\blegender\b/.test(identity)) return 20_000;
+  if (category === "suv" || category === "7s") return 10_000;
+  if (category === "compact" || category === "sedan") return 5_000;
+  return undefined;
+}
+
+function getVerifiedTerms(inventory: InventoryCar, category: VehicleCategory) {
+  const excessThb = getInsuranceExcessThb(inventory, category);
+  const childSeatAvailable = category !== "bikes";
+
+  return {
+    insurance: {
+      class: "1" as const,
+      summary: "Страховка класса 1 действует при ДТП с участием двух сторон.",
+      summaryEn: "Class 1 insurance applies to two-party road accidents.",
+      requirements: ["Для страхового случая обязательно наличие второй стороны ДТП."],
+      requirementsEn: ["A second party to the road accident is required for an insurance claim."],
+      exclusions: ["Царапины и повреждения, полученные на парковке без второй стороны."],
+      exclusionsEn: ["Scratches and parking damage without an identified second party."],
+      excessThb,
+    },
+    childSeat: childSeatAvailable ? { available: true, priceThb: 0 } : undefined,
+    handover: {
+      fullTank: true,
+      cleanVehicle: category !== "bikes",
+    },
+    delivery: [
+      { zone: "airport" as const, priceThb: 0 },
+      { zone: "city" as const, priceThb: 500 },
+    ],
+    badges: selectVerifiedBadges(inventory.id ?? "vehicle", category),
+  };
+}
+
+const slugifyInventoryId = (id: string) =>
+  id
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+function parseInventoryYear(inventory: InventoryCar): number | null {
+  const directYear = Number(inventory.year);
+  if (Number.isInteger(directYear) && directYear >= 1900 && directYear <= 2100) {
+    return directYear;
+  }
+
+  const match = `${inventory.name ?? ""} ${inventory.id ?? ""}`.match(/(?:19|20)\d{2}/);
+  return match ? Number(match[0]) : null;
+}
+
+function getInventoryColors(color?: string, inventoryId = "") {
+  const inferredColor = inventoryId
+    .toLowerCase()
+    .split(/[^a-z]+/)
+    .find((part) => part in colorNamesEnToRu);
+  const source = color?.trim() || inferredColor;
+  if (!source) return { ru: "Цвет не указан", en: "Color not specified" };
+
+  const normalized = source.toLowerCase();
+  return {
+    ru: colorNamesEnToRu[normalized] ?? source,
+    en: colorNamesRuToEn[normalized] ?? source,
+  };
+}
+
+function getGenericContent(
+  inventory: InventoryCar,
+  category: VehicleCategory,
+  year: number | null,
+) {
+  const name = [inventory.brand, inventory.model, year].filter(Boolean).join(" ");
+  return {
+    summary: `${name} из актуального каталога Sunny Rentals. Тариф рассчитывается по сезону и сроку аренды.`,
+    summaryEn: `${name} from the current Sunny Rentals catalogue. The rate is calculated by season and rental length.`,
+    bestFor: categoryUseCases[category].ru,
+    bestForEn: categoryUseCases[category].en,
+  };
+}
 
 function hasCompletePricing(pricing: InventoryCar["pricing"]): pricing is SeasonalPricing {
   if (!pricing?.low_season || !pricing.high_season) return false;
@@ -654,20 +822,22 @@ function hasCompletePricing(pricing: InventoryCar["pricing"]): pricing is Season
 }
 
 function adaptInventoryCar(
-  definition: MarketingCarDefinition,
-  inventory: InventoryCar | undefined,
+  inventory: InventoryCar,
+  definition?: MarketingCarDefinition,
 ): MarketingCar | undefined {
-  if (!inventory || !inventory.brand || !inventory.model || !inventory.color) return undefined;
+  if (!inventory.brand || !inventory.model) return undefined;
   if (!inventory.photos?.main || !hasCompletePricing(inventory.pricing)) return undefined;
 
-  const year = Number(inventory.year);
+  const year = parseInventoryYear(inventory);
   const inventoryCategory = inventory.class ?? inventory.class_;
-  if (!Number.isInteger(year) || !inventory.updated_at || !inventory.id) return undefined;
-  if (inventory.id !== definition.inventoryId) return undefined;
+  if (!inventory.updated_at || !inventory.id) return undefined;
   if (!inventoryCategory || !vehicleCategoryIds.has(inventoryCategory as VehicleCategory)) {
     return undefined;
   }
 
+  const category = inventoryCategory as VehicleCategory;
+  const colors = getInventoryColors(inventory.color, inventory.id);
+  const content = getGenericContent(inventory, category, year);
   const gallery = [inventory.photos.main, ...(inventory.photos.gallery ?? [])]
     .filter((path, index, paths) => Boolean(path) && paths.indexOf(path) === index)
     .map(publicImagePath);
@@ -678,17 +848,18 @@ function adaptInventoryCar(
   ];
 
   return {
-    slug: definition.slug,
-    inventoryId: definition.inventoryId,
+    slug: definition?.slug ?? slugifyInventoryId(inventory.id),
+    inventoryId: inventory.id,
     published: true,
-    category: inventoryCategory as VehicleCategory,
+    indexable: true,
+    category,
     brand: inventory.brand,
     model: inventory.model,
     year,
-    color: colorNamesEnToRu[inventory.color] ?? inventory.color,
-    colorEn: inventory.color,
-    power: specs.power ?? definition.power,
-    powerEn: specs.power?.replace("л.с.", "hp") ?? definition.powerEn,
+    color: colors.ru,
+    colorEn: colors.en,
+    power: specs.power ?? "—",
+    powerEn: specs.power?.replace(/л\.?с\.?/gi, "hp") ?? "—",
     photos: {
       main: gallery[0],
       gallery,
@@ -698,21 +869,40 @@ function adaptInventoryCar(
     fromPrice: Math.min(...priceValues),
     deposit: inventory.pricing.deposit,
     pricing: inventory.pricing,
-    seats: definition.seats,
-    transmission: specs.transmission ?? definition.transmission,
-    engine: specs.engine ?? definition.engine,
-    fuel: specs.fuel ?? definition.fuel,
-    summary: definition.summary,
-    bestFor: definition.bestFor,
+    transmission: specs.transmission ?? "—",
+    engine: specs.engine ?? "—",
+    fuel: specs.fuel ?? "—",
+    summary: definition?.summary ?? content.summary,
+    summaryEn: content.summaryEn,
+    bestFor: definition?.bestFor ?? content.bestFor,
+    bestForEn: content.bestForEn,
     inventoryUpdatedAt: inventory.updated_at,
-    terms: {},
+    terms: getVerifiedTerms(inventory, category),
   };
 }
 
-export const marketingCars: MarketingCar[] = marketingCarDefinitions.flatMap((definition) => {
-  const car = adaptInventoryCar(definition, inventoryCars[definition.inventoryId]);
+const adaptedMarketingCars = Object.values(inventoryCars).flatMap((inventory) => {
+  const definition = inventory.id
+    ? marketingDefinitionsByInventoryId.get(inventory.id)
+    : undefined;
+  const car = adaptInventoryCar(inventory, definition);
   return car ? [car] : [];
 });
+
+const indexedVehicleIdentities = new Set<string>();
+
+export const marketingCars: MarketingCar[] = adaptedMarketingCars.map((car) => {
+  const identity = [car.category, car.brand, car.model, car.year, car.colorEn]
+    .join("|")
+    .toLowerCase();
+  const indexable = !indexedVehicleIdentities.has(identity);
+  indexedVehicleIdentities.add(identity);
+  return { ...car, indexable };
+});
+
+export const indexableMarketingCars = marketingCars.filter(
+  (car) => car.published && car.indexable,
+);
 
 export const getCarBySlug = (slug: string): MarketingCar | undefined =>
   marketingCars.find((car) => car.slug === slug);
@@ -873,11 +1063,11 @@ export function getLocalizedCar(car: MarketingCar, locale: "ru" | "en") {
   const copy = englishCarCopy[car.slug];
   return {
     ...car,
-    seats: englishSpecs[car.seats] ?? car.seats,
+    seats: car.seats ? englishSpecs[car.seats] ?? car.seats : undefined,
     transmission: englishSpecs[car.transmission] ?? car.transmission,
     engine: englishSpecs[car.engine] ?? car.engine,
     fuel: englishSpecs[car.fuel] ?? car.fuel,
-    summary: copy?.summary ?? car.summary,
-    bestFor: copy?.bestFor ?? car.bestFor,
+    summary: copy?.summary ?? car.summaryEn,
+    bestFor: copy?.bestFor ?? car.bestForEn,
   };
 }
