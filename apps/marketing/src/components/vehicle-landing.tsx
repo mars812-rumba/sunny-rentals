@@ -169,8 +169,6 @@ export function VehicleLanding({
                 images={car.images?.length ? car.images : [car.image]}
                 alt={`${car.brand} ${car.model} ${car.year} ${copy.vehicle.imageAlt}`}
                 year={car.year}
-                rating={car.rating}
-                verifiedLabel={copy.fleet.verified}
                 previousLabel={copy.fleet.previousPhoto}
                 nextLabel={copy.fleet.nextPhoto}
                 photoLabel={copy.fleet.photo}

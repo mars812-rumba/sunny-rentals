@@ -6,8 +6,6 @@ export function CarGallery({
   images,
   alt,
   year,
-  rating,
-  verifiedLabel,
   previousLabel,
   nextLabel,
   photoLabel,
@@ -15,8 +13,6 @@ export function CarGallery({
   images: string[];
   alt: string;
   year: number;
-  rating: number;
-  verifiedLabel: string;
   previousLabel: string;
   nextLabel: string;
   photoLabel: string;
@@ -75,13 +71,6 @@ export function CarGallery({
       </div>
 
       <span className="car-card__year">{year}</span>
-      <span className="car-gallery__badges">
-        <span className="car-gallery__trust">
-          <small>★</small>
-          <strong>{rating.toFixed(1)}</strong>
-        </span>
-        <span className="car-gallery__verified">{verifiedLabel}</span>
-      </span>
 
       {hasGallery ? (
         <>

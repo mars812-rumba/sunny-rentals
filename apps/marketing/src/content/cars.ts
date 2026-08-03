@@ -1,23 +1,21 @@
 import inventoryCatalog from "../../../../backend/data/web_cars.json";
 
-export type VehicleCategory = "compact" | "sedan" | "suv" | "7s" | "bikes";
+import type {
+  InventoryCar,
+  MarketingCar,
+  SeasonalPricing,
+  VehicleCategory,
+} from "@/content/car-contract";
 
-export type SeasonKey = "low_season" | "high_season";
+export type {
+  MarketingCar,
+  SeasonalPricing,
+  SeasonKey,
+  SeasonRates,
+  VehicleCategory,
+} from "@/content/car-contract";
 
-export interface SeasonRates {
-  price_1_6: number;
-  price_7_14: number;
-  price_15_29: number;
-  price_30: number;
-}
-
-export interface SeasonalPricing {
-  low_season: SeasonRates;
-  high_season: SeasonRates;
-  deposit: number;
-}
-
-export interface MarketingCar {
+interface MarketingCarDefinition {
   slug: string;
   inventoryId: string;
   category: VehicleCategory;
@@ -33,7 +31,6 @@ export interface MarketingCar {
   images?: string[];
   fromPrice: number;
   deposit: number;
-  pricing: SeasonalPricing;
   seats: string;
   transmission: string;
   engine: string;
@@ -80,7 +77,7 @@ export const vehicleCategories: Array<{
   },
 ];
 
-const marketingCarDefinitions: Array<Omit<MarketingCar, "pricing">> = [
+const marketingCarDefinitions: MarketingCarDefinition[] = [
   {
     slug: "toyota-yaris",
     inventoryId: "toyota_yaris_2024_gray",
@@ -623,25 +620,98 @@ const marketingCarDefinitions: Array<Omit<MarketingCar, "pricing">> = [
   },
 ];
 
-type InventoryCar = {
-  pricing?: SeasonalPricing;
-};
-
 const inventoryCars = (inventoryCatalog as { cars: Record<string, InventoryCar> }).cars;
 
-export const marketingCars: MarketingCar[] = marketingCarDefinitions.map((car) => {
-  const pricing = inventoryCars[car.inventoryId]?.pricing;
+const vehicleCategoryIds = new Set<VehicleCategory>([
+  "compact",
+  "sedan",
+  "suv",
+  "7s",
+  "bikes",
+]);
 
-  if (!pricing?.low_season || !pricing.high_season) {
-    throw new Error(`Seasonal pricing is missing for ${car.inventoryId}`);
+const colorNamesEnToRu: Record<string, string> = {
+  Black: "Чёрный",
+  Blue: "Синий",
+  Gray: "Серый",
+  Grey: "Серый",
+  Red: "Красный",
+  Silver: "Серебристый",
+  White: "Белый",
+};
+
+const publicImagePath = (path: string) =>
+  path.startsWith("/") ? path : `/images_web/${path}`;
+
+function hasCompletePricing(pricing: InventoryCar["pricing"]): pricing is SeasonalPricing {
+  if (!pricing?.low_season || !pricing.high_season) return false;
+  const values = [
+    ...Object.values(pricing.low_season),
+    ...Object.values(pricing.high_season),
+    pricing.deposit,
+  ];
+  return values.every((value) => Number.isFinite(value) && value >= 0);
+}
+
+function adaptInventoryCar(
+  definition: MarketingCarDefinition,
+  inventory: InventoryCar | undefined,
+): MarketingCar | undefined {
+  if (!inventory || !inventory.brand || !inventory.model || !inventory.color) return undefined;
+  if (!inventory.photos?.main || !hasCompletePricing(inventory.pricing)) return undefined;
+
+  const year = Number(inventory.year);
+  const inventoryCategory = inventory.class ?? inventory.class_;
+  if (!Number.isInteger(year) || !inventory.updated_at || !inventory.id) return undefined;
+  if (inventory.id !== definition.inventoryId) return undefined;
+  if (!inventoryCategory || !vehicleCategoryIds.has(inventoryCategory as VehicleCategory)) {
+    return undefined;
   }
 
+  const gallery = [inventory.photos.main, ...(inventory.photos.gallery ?? [])]
+    .filter((path, index, paths) => Boolean(path) && paths.indexOf(path) === index)
+    .map(publicImagePath);
+  const specs = inventory.specs ?? {};
+  const priceValues = [
+    ...Object.values(inventory.pricing.low_season),
+    ...Object.values(inventory.pricing.high_season),
+  ];
+
   return {
-    ...car,
-    pricing,
-    fromPrice: pricing.low_season.price_30,
-    deposit: pricing.deposit,
+    slug: definition.slug,
+    inventoryId: definition.inventoryId,
+    published: true,
+    category: inventoryCategory as VehicleCategory,
+    brand: inventory.brand,
+    model: inventory.model,
+    year,
+    color: colorNamesEnToRu[inventory.color] ?? inventory.color,
+    colorEn: inventory.color,
+    power: specs.power ?? definition.power,
+    powerEn: specs.power?.replace("л.с.", "hp") ?? definition.powerEn,
+    photos: {
+      main: gallery[0],
+      gallery,
+    },
+    image: gallery[0],
+    images: gallery,
+    fromPrice: Math.min(...priceValues),
+    deposit: inventory.pricing.deposit,
+    pricing: inventory.pricing,
+    seats: definition.seats,
+    transmission: specs.transmission ?? definition.transmission,
+    engine: specs.engine ?? definition.engine,
+    fuel: specs.fuel ?? definition.fuel,
+    summary: definition.summary,
+    bestFor: definition.bestFor,
+    inventoryUpdatedAt: inventory.updated_at,
+    terms: {},
   };
+}
+
+export const marketingCars: MarketingCar[] = marketingCarDefinitions.flatMap((definition) => {
+  const car = adaptInventoryCar(definition, inventoryCars[definition.inventoryId]);
+  return car ? [car] : [];
 });
 
 export const getCarBySlug = (slug: string): MarketingCar | undefined =>

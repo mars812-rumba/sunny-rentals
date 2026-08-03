@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { CarPromoBadges } from "@/components/car-promo-badges";
 import { CompactPriceSummary } from "@/components/compact-price-summary";
 import {
   getLocalizedCar,
@@ -29,18 +28,9 @@ export function CarCard({ car, locale }: { car: MarketingCar; locale: Locale }) 
           loading="lazy"
         />
         <span className="car-card__year">{car.year}</span>
-        <span className="car-gallery__badges">
-          <span className="car-gallery__trust">
-            <small aria-hidden="true">★</small>
-            <strong>{car.rating.toFixed(1)}</strong>
-          </span>
-          <span className="car-gallery__verified">{copy.fleet.verified}</span>
-        </span>
       </Link>
 
       <div className="car-card__body">
-        <CarPromoBadges locale={locale} />
-
         <div className="car-card__heading">
           <h3>
             <Link href={carPath}>{car.brand} {car.model}</Link>

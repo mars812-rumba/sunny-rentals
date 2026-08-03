@@ -137,10 +137,6 @@ export function MarketingHero({ locale }: { locale: Locale }) {
         <div className="marketing-hero__backdrop" aria-hidden="true" />
         <div className="shell marketing-hero__content">
           <div className="marketing-hero__copy">
-            <div className="rating-pill">
-              <span aria-hidden="true">★</span>
-              {copy.rating}
-            </div>
             <h1>{copy.title}</h1>
             <p>{copy.subtitle}</p>
           </div>
