@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarDays } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 
@@ -103,37 +104,53 @@ export function BookingSearch({
 
             <label>
               <span>{copy.pickupDate}</span>
-              <input
-                type="date"
-                min={today}
-                required
-                aria-invalid={Boolean(error)}
-                aria-describedby={error ? "booking-date-error booking-note" : "booking-note"}
-                value={startDate}
-                onChange={(event) => {
-                  const nextStartDate = event.target.value;
-                  const nextEndDate = endDate && endDate > nextStartDate ? endDate : "";
-                  setStartDate(nextStartDate);
-                  if (nextEndDate !== endDate) setEndDate(nextEndDate);
-                  syncSelection(nextStartDate, nextEndDate);
-                }}
-              />
+              <div className={`booking-search__date${startDate ? " has-value" : ""}`}>
+                <CalendarDays aria-hidden="true" />
+                {!startDate ? (
+                  <span className="booking-search__date-placeholder" aria-hidden="true">
+                    {copy.datePlaceholder}
+                  </span>
+                ) : null}
+                <input
+                  type="date"
+                  min={today}
+                  required
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? "booking-date-error booking-note" : "booking-note"}
+                  value={startDate}
+                  onChange={(event) => {
+                    const nextStartDate = event.target.value;
+                    const nextEndDate = endDate && endDate > nextStartDate ? endDate : "";
+                    setStartDate(nextStartDate);
+                    if (nextEndDate !== endDate) setEndDate(nextEndDate);
+                    syncSelection(nextStartDate, nextEndDate);
+                  }}
+                />
+              </div>
             </label>
 
             <label>
               <span>{copy.returnDate}</span>
-              <input
-                type="date"
-                min={startDate || today}
-                required
-                aria-invalid={Boolean(error)}
-                aria-describedby={error ? "booking-date-error booking-note" : "booking-note"}
-                value={endDate}
-                onChange={(event) => {
-                  setEndDate(event.target.value);
-                  syncSelection(startDate, event.target.value);
-                }}
-              />
+              <div className={`booking-search__date${endDate ? " has-value" : ""}`}>
+                <CalendarDays aria-hidden="true" />
+                {!endDate ? (
+                  <span className="booking-search__date-placeholder" aria-hidden="true">
+                    {copy.datePlaceholder}
+                  </span>
+                ) : null}
+                <input
+                  type="date"
+                  min={startDate || today}
+                  required
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? "booking-date-error booking-note" : "booking-note"}
+                  value={endDate}
+                  onChange={(event) => {
+                    setEndDate(event.target.value);
+                    syncSelection(startDate, event.target.value);
+                  }}
+                />
+              </div>
             </label>
 
             <label>
