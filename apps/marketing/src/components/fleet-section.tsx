@@ -12,9 +12,11 @@ import { getMessages, localePath, type Locale } from "@/lib/i18n";
 export function FleetSection({
   locale,
   compact = false,
+  previewLimit,
 }: {
   locale: Locale;
   compact?: boolean;
+  previewLimit?: number;
 }) {
   const copy = getMessages(locale).fleet;
   const categories = compact ? vehicleCategories.slice(0, 3) : vehicleCategories;
@@ -24,7 +26,6 @@ export function FleetSection({
       <div className="shell">
         <div className="section-heading">
           <div>
-            <p className="eyebrow eyebrow--dark">{copy.eyebrow}</p>
             <h2>{copy.title}</h2>
           </div>
           <p>{copy.intro}</p>
@@ -34,6 +35,7 @@ export function FleetSection({
           {categories.map((category) => {
             const localizedCategory = getLocalizedCategory(category.id, locale) ?? category;
             const cars = getCarsByCategory(category.id);
+            const visibleCars = previewLimit ? cars.slice(0, previewLimit) : cars;
 
             return (
             <section className="fleet-group" key={category.id} aria-labelledby={`category-${category.id}`}>
@@ -49,7 +51,7 @@ export function FleetSection({
                 previousLabel={copy.previousCars}
                 nextLabel={copy.nextCars}
               >
-                {cars.map((car) => (
+                {visibleCars.map((car) => (
                   <CarCard car={car} locale={locale} key={car.slug} />
                 ))}
               </CarRail>
@@ -57,7 +59,7 @@ export function FleetSection({
           )})}
         </div>
 
-        {compact ? (
+        {compact || previewLimit ? (
           <div className="fleet-section__footer">
             <Link className="button button--ink" href={localePath(locale, "/cars")}>
               {copy.all}

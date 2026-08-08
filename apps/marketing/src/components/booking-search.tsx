@@ -61,7 +61,7 @@ export function BookingSearch({
       return;
     }
 
-    if (endDate < startDate) {
+    if (endDate <= startDate) {
       setError(copy.dateOrder);
       return;
     }
@@ -106,6 +106,9 @@ export function BookingSearch({
               <input
                 type="date"
                 min={today}
+                required
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? "booking-date-error booking-note" : "booking-note"}
                 value={startDate}
                 onChange={(event) => {
                   const nextStartDate = event.target.value;
@@ -122,6 +125,9 @@ export function BookingSearch({
               <input
                 type="date"
                 min={startDate || today}
+                required
+                aria-invalid={Boolean(error)}
+                aria-describedby={error ? "booking-date-error booking-note" : "booking-note"}
                 value={endDate}
                 onChange={(event) => {
                   setEndDate(event.target.value);
@@ -157,8 +163,8 @@ export function BookingSearch({
             </button>
           </form>
 
-          {error ? <p className="booking-search__error" role="alert">{error}</p> : null}
-          <p className="booking-search__note">
+          {error ? <p className="booking-search__error" id="booking-date-error" role="alert">{error}</p> : null}
+          <p className="booking-search__note" id="booking-note">
             {copy.note}
           </p>
         </div>

@@ -12,7 +12,6 @@ export function TrustContent({ locale }: { locale: Locale }) {
         <div className="shell">
           <div className="section-heading">
             <div>
-              <p className="eyebrow eyebrow--dark">{copy.trust.priceEyebrow}</p>
               <h2 id="price-clarity-title">{copy.trust.priceTitle}</h2>
             </div>
             <p>{copy.trust.priceIntro}</p>
@@ -33,7 +32,6 @@ export function TrustContent({ locale }: { locale: Locale }) {
         <div className="shell">
           <div className="section-heading">
             <div>
-              <p className="eyebrow eyebrow--dark">{copy.trust.eyebrow}</p>
               <h2>{copy.trust.title}</h2>
             </div>
             <p>{copy.trust.intro}</p>
@@ -54,7 +52,6 @@ export function TrustContent({ locale }: { locale: Locale }) {
       <section className="rental-guide" aria-labelledby="rental-guide-title">
         <div className="shell rental-guide__layout">
           <div className="rental-guide__intro">
-            <p className="eyebrow eyebrow--dark">{copy.trust.guideEyebrow}</p>
             <h2 id="rental-guide-title">{copy.trust.guideTitle}</h2>
             <p>{copy.trust.guideIntro}</p>
           </div>

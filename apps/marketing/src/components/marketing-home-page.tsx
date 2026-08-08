@@ -63,7 +63,7 @@ export function MarketingHomePage({ locale }: { locale: Locale }) {
           fleetSize={marketingCars.length}
           vehicles={heroVehicles}
         />
-        <FleetSection locale={locale} />
+        <FleetSection locale={locale} previewLimit={3} />
       </RentalDatesProvider>
       <TrustContent locale={locale} />
       <StickyContactMenu locale={locale} />

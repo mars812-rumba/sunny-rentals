@@ -17,6 +17,7 @@ export function SiteHeader({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -24,7 +25,29 @@ export function SiteHeader({
     const previousOverflow = document.body.style.overflow;
     const menuButton = menuButtonRef.current;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsMenuOpen(false);
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab" || !menuRef.current) return;
+
+      const focusable = Array.from(
+        menuRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
     document.body.style.overflow = "hidden";
@@ -50,8 +73,8 @@ export function SiteHeader({
         >
           <img className="brand__logo" src="/logo.png" alt="" />
           <span>
-            <strong>Sunny</strong>
-            <small>Rentals · Phuket</small>
+            <strong>SUNNY RENTALS</strong>
+            <small>PHUKET RENT CAR</small>
           </span>
         </Link>
 
@@ -97,10 +120,12 @@ export function SiteHeader({
           <button
             className="site-menu-backdrop"
             type="button"
+            tabIndex={-1}
             aria-label={copy.nav.menuClose}
             onClick={closeMenu}
           />
           <aside
+            ref={menuRef}
             className="site-menu"
             id="site-menu"
             role="dialog"
@@ -115,8 +140,8 @@ export function SiteHeader({
               >
                 <img className="brand__logo" src="/logo.png" alt="" />
                 <span>
-                  <strong>Sunny Rentals</strong>
-                  <small>Phuket</small>
+                  <strong>SUNNY RENTALS</strong>
+                  <small>PHUKET RENT CAR</small>
                 </span>
               </Link>
               <button

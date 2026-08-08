@@ -27,7 +27,6 @@ export function MarketingHero({
       <div className="shell marketing-hero__content">
         <div className="marketing-hero__lead">
           <div className="marketing-hero__copy">
-            <p className="hero-kicker">{copy.eyebrow}</p>
             <h1>{copy.title}</h1>
             <strong className="hero-promise">{copy.promise}</strong>
             <p>{copy.subtitle}</p>
