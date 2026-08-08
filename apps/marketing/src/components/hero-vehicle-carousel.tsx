@@ -18,6 +18,9 @@ export interface HeroCarouselVehicle {
 
 interface HeroCarouselLabels {
   carousel: string;
+  proofAria: string;
+  fleetProof: string;
+  realPhotosProof: string;
   vehicleDetails: string;
   realVehicle: string;
   from: string;
@@ -76,10 +79,12 @@ export function HeroVehicleCarousel({
   vehicles,
   labels,
   numberLocale,
+  fleetSize,
 }: {
   vehicles: HeroCarouselVehicle[];
   labels: HeroCarouselLabels;
   numberLocale: string;
+  fleetSize: number;
 }) {
   const initialSlides = useMemo(() => firstVehicleFromEveryCategory(vehicles), [vehicles]);
   const [slides, setSlides] = useState(initialSlides);
@@ -201,6 +206,12 @@ export function HeroVehicleCarousel({
                   sizes="(max-width: 700px) calc(100vw - 2rem), (max-width: 1180px) 52vw, 640px"
                   priority={index === 0}
                 />
+                <div className="hero-proof hero-vehicle__proof" aria-label={labels.proofAria}>
+                  <span className="hero-proof__fleet">
+                    <strong>{fleetSize}</strong> {labels.fleetProof}
+                  </span>
+                  <span className="hero-proof__real">{labels.realPhotosProof}</span>
+                </div>
               </div>
               <div className="hero-vehicle__caption">
                 <span>

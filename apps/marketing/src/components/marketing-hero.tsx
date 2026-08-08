@@ -31,17 +31,17 @@ export function MarketingHero({
             <h1>{copy.title}</h1>
             <strong className="hero-promise">{copy.promise}</strong>
             <p>{copy.subtitle}</p>
-            <div className="hero-proof" aria-label={copy.proofAria}>
-              <span className="hero-proof__fleet"><strong>{fleetSize}</strong> {copy.fleetProof}</span>
-              <span className="hero-proof__real">{copy.realPhotosProof}</span>
-            </div>
           </div>
 
           <HeroVehicleCarousel
             vehicles={vehicles}
             numberLocale={messages.numberLocale}
+            fleetSize={fleetSize}
             labels={{
               carousel: copy.carouselAria,
+              proofAria: copy.proofAria,
+              fleetProof: copy.fleetProof,
+              realPhotosProof: copy.realPhotosProof,
               vehicleDetails: copy.vehicleDetails,
               realVehicle: copy.realVehicle,
               from: copy.from,
