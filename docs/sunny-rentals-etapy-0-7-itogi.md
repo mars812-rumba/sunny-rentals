@@ -209,13 +209,16 @@
 
 ## 11. Проверки зафиксированного состояния
 
-Выполнено 3 августа 2026 года:
+Последняя полная проверка выполнена 8 августа 2026 года:
 
 - `npx next typegen` — успешно;
 - `npx tsc --noEmit --incremental false` — успешно;
-- `npm run lint` — 0 ошибок, 9 предупреждений Next.js о существующих `<img>`;
+- `npm run lint` — 0 ошибок, 10 предупреждений Next.js о `<img>`;
 - `npx next build --webpack` — успешно, 160 статических страниц и ресурсов;
-- `npm run verify:seo` — успешно для 150 canonical URL;
+- `npm run verify:seo` — успешно для 104 canonical URL после master/detail-консолидации;
+- 61 единица транспорта объединена в 36 модельных master-страниц на язык;
+- detail-страницы проверены на `index,follow`, canonical на master и рабочие прямые URL;
+- schema `ProductGroup`/`Product`/`Offer`, sitemap и `/llms.txt` — успешно;
 - отдельная проверка 18 новых RU/EN коммерческих страниц — успешно;
 - canonical, RU/EN/x-default, schema, CTA и реальные изображения — успешно;
 - `git diff --check` — успешно.

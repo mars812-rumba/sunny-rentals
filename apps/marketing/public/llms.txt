@@ -1,0 +1,27 @@
+# Sunny Rentals
+
+> Bilingual catalogue and booking service for real cars and scooters in Phuket. Sunny Rentals acts as an aggregator; a manager confirms the selected vehicle and dates before booking.
+
+## Main pages
+
+- [Russian home](https://sunny-rentals.online/): Rental service overview, verified terms and booking entry point.
+- [English home](https://sunny-rentals.online/en/): English version of the rental service.
+- [Russian vehicle catalogue](https://sunny-rentals.online/cars/): Real cars and scooters with photos, seasonal rates and deposits.
+- [English vehicle catalogue](https://sunny-rentals.online/en/cars/): English vehicle catalogue.
+- [Rental terms](https://sunny-rentals.online/rental-terms/): Documents, deposit, insurance and handover terms.
+- [Insurance guide](https://sunny-rentals.online/insurance/): Class 1 car insurance and exclusions; scooters are supplied without insurance.
+- [Airport delivery](https://sunny-rentals.online/phuket-airport-car-rental/): Phuket Airport delivery information.
+
+## Verified service facts
+
+- Every vehicle page uses photos of the specific real vehicle.
+- Phuket Airport delivery is free; city, hotel or villa delivery costs 500 THB.
+- Vehicles are handed over clean and with a full tank.
+- Child seats are free where the vehicle data marks them as available.
+- Cars have Class 1 insurance for accidents with an identified second party. Scratches or parking damage without a second party are excluded.
+- Scooters are supplied without insurance.
+- Prices depend on vehicle, season and rental duration. Availability is confirmed by a manager for the requested dates.
+
+## Booking
+
+- [Sunny Rentals Telegram bot](https://t.me/webapp_rent_bot): Send selected vehicle and dates to a manager.

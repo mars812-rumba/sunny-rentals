@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 
-import { indexableMarketingCars, marketingCars } from "@/content/cars";
+import { marketingCars } from "@/content/cars";
 import { contentPages } from "@/content/content-pages";
+import { vehicleModelGroups } from "@/content/model-groups";
 import {
   absoluteLanguageUrls,
   localePath,
@@ -42,11 +43,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   );
 
-  const carPages: MetadataRoute.Sitemap = indexableMarketingCars.flatMap((car) => {
-    const path = `/cars/${car.slug}`;
+  const carPages: MetadataRoute.Sitemap = vehicleModelGroups.flatMap((group) => {
+    const path = `/cars/${group.slug}`;
     return languages.map((locale) => ({
       url: absoluteUrl(localePath(locale, path)),
-      lastModified: contentDate(car.contentUpdatedAt ?? car.inventoryUpdatedAt),
+      lastModified: contentDate(group.updatedAt),
       changeFrequency: "weekly" as const,
       priority: 0.8,
       alternates: {
