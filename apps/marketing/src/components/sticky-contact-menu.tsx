@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CarFront, X } from "lucide-react";
 
 import { getMessages, type Locale } from "@/lib/i18n";
 import { siteConfig } from "@/lib/site";
@@ -58,13 +59,18 @@ export function StickyContactMenu({ locale }: { locale: Locale }) {
       ) : null}
 
       <button
+        className="sticky-contact__trigger"
         type="button"
         onClick={() => setIsOpen((current) => !current)}
         aria-expanded={isOpen}
         aria-controls="contact-actions"
         aria-label={isOpen ? copy.close : copy.open}
       >
-        <span aria-hidden="true">{isOpen ? "×" : "✦"}</span>
+        {isOpen ? (
+          <X aria-hidden="true" />
+        ) : (
+          <CarFront aria-hidden="true" />
+        )}
       </button>
     </div>
   );
