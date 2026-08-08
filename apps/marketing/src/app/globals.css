@@ -831,8 +831,8 @@ img {
 
 .sticky-contact {
   position: fixed;
-  right: 1.4rem;
-  bottom: 1.4rem;
+  right: max(1.8rem, env(safe-area-inset-right));
+  bottom: max(1.8rem, env(safe-area-inset-bottom));
   z-index: 70;
   display: flex;
   align-items: end;
@@ -909,17 +909,17 @@ img {
 .sticky-contact > button {
   position: relative;
   display: grid;
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 3rem;
+  height: 3rem;
   place-items: center;
   border: 0;
   border-radius: 50%;
   padding: 0;
   cursor: pointer;
   color: white;
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   background: #20c76a;
-  box-shadow: 0 14px 34px rgba(32, 199, 106, 0.38);
+  box-shadow: 0 8px 20px rgba(19, 117, 64, 0.22);
   transition: background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
@@ -940,8 +940,8 @@ img {
 .sticky-contact > button svg {
   position: relative;
   z-index: 2;
-  width: 1.65rem;
-  height: 1.65rem;
+  width: 1.4rem;
+  height: 1.4rem;
   stroke-width: 2.35;
 }
 
@@ -951,12 +951,12 @@ img {
 
 .sticky-contact > button[aria-expanded="false"]::before {
   position: absolute;
-  inset: -0.22rem;
+  inset: -0.15rem;
   z-index: -1;
   border-radius: inherit;
   content: "";
-  border: 2px solid rgba(32, 199, 106, 0.42);
-  background: rgba(32, 199, 106, 0.2);
+  border: 1px solid rgba(32, 199, 106, 0.2);
+  background: rgba(32, 199, 106, 0.06);
   animation: contact-pulse 2.2s ease-out infinite;
 }
 
@@ -964,13 +964,13 @@ img {
   0%,
   100% {
     box-shadow:
-      0 14px 34px rgba(32, 199, 106, 0.38),
-      0 0 0 0 rgba(32, 199, 106, 0.5);
+      0 8px 20px rgba(19, 117, 64, 0.22),
+      0 0 0 0 rgba(32, 199, 106, 0.24);
   }
   70% {
     box-shadow:
-      0 14px 34px rgba(32, 199, 106, 0.38),
-      0 0 0 0.85rem rgba(32, 199, 106, 0);
+      0 8px 20px rgba(19, 117, 64, 0.22),
+      0 0 0 0.45rem rgba(32, 199, 106, 0);
   }
 }
 
@@ -978,7 +978,7 @@ img {
   70%,
   100% {
     opacity: 0;
-    transform: scale(1.35);
+    transform: scale(1.18);
   }
 }
 
@@ -3590,8 +3590,8 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   }
 
   .sticky-contact {
-    right: 1rem;
-    bottom: 1rem;
+    right: max(1.35rem, env(safe-area-inset-right));
+    bottom: max(1.35rem, env(safe-area-inset-bottom));
   }
 
   .benefit-grid {
