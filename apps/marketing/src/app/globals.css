@@ -379,7 +379,7 @@ img {
   overflow: hidden;
   isolation: isolate;
   color: white;
-  touch-action: pan-y;
+  touch-action: auto;
   background: var(--ocean-950);
 }
 
@@ -2641,11 +2641,27 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   backdrop-filter: blur(14px);
 }
 
+.hero-proof .hero-proof__fleet {
+  border-color: rgba(56, 189, 248, 0.42);
+  color: #e0f2fe;
+  background: rgba(14, 165, 233, 0.2);
+}
+
+.hero-proof .hero-proof__real {
+  border-color: rgba(251, 191, 36, 0.46);
+  color: #fef3c7;
+  background: rgba(245, 158, 11, 0.2);
+}
+
 .hero-proof strong {
   color: white;
 }
 
 .hero-vehicle {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
   display: block;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.24);
@@ -2656,6 +2672,57 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   box-shadow: 0 28px 70px rgba(1, 16, 28, 0.38);
   backdrop-filter: blur(18px);
   transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.hero-vehicle-carousel {
+  position: relative;
+  min-width: 0;
+  padding-bottom: 1.05rem;
+}
+
+.hero-vehicle-carousel__track {
+  display: flex;
+  overflow-x: auto;
+  border-radius: 1.6rem;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+  touch-action: pan-x pan-y;
+}
+
+.hero-vehicle-carousel__track::-webkit-scrollbar {
+  display: none;
+}
+
+.hero-vehicle-carousel__dots {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  display: flex;
+  gap: 0.38rem;
+  transform: translateX(-50%);
+}
+
+.hero-vehicle-carousel__dots button {
+  width: 0.42rem;
+  height: 0.42rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.34);
+  transition: width 180ms ease, background-color 180ms ease;
+}
+
+.hero-vehicle-carousel__dots button.is-active {
+  width: 1.15rem;
+  background: var(--sun-300);
+}
+
+.hero-vehicle-carousel__dots button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 3px;
 }
 
 .hero-vehicle:hover,
@@ -2994,7 +3061,7 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
     order: 2;
   }
 
-  .hero-vehicle {
+  .hero-vehicle-carousel {
     order: 3;
   }
 
@@ -4006,8 +4073,16 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   .button,
   .car-card,
   .car-card__media img,
-  .car-gallery__track {
+  .car-gallery__track,
+  .hero-vehicle,
+  .hero-vehicle__photo img,
+  .hero-vehicle-carousel__track,
+  .hero-vehicle-carousel__dots button {
     transition: none;
+  }
+
+  .hero-vehicle-carousel__track {
+    scroll-behavior: auto;
   }
 
   .hero-showcase__vehicle img,

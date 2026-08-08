@@ -11,7 +11,22 @@ import { absoluteUrl, siteConfig } from "@/lib/site";
 export function MarketingHomePage({ locale }: { locale: Locale }) {
   const copy = getMessages(locale);
   const featuredSource = getCarBySlug("toyota-yaris") ?? marketingCars[0];
-  const featuredCar = getLocalizedCar(featuredSource, locale);
+  const heroSources = [
+    featuredSource,
+    ...marketingCars.filter((car) => car.slug !== featuredSource.slug),
+  ];
+  const heroVehicles = heroSources.map((car) => {
+    const localizedCar = getLocalizedCar(car, locale);
+    return {
+      name: `${localizedCar.brand} ${localizedCar.model}`,
+      image: localizedCar.image,
+      href: localePath(locale, `/cars/${localizedCar.slug}`),
+      category: localizedCar.category,
+      year: localizedCar.year,
+      fromPrice: localizedCar.fromPrice,
+      deposit: localizedCar.deposit,
+    };
+  });
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "AutoRental",
@@ -46,14 +61,7 @@ export function MarketingHomePage({ locale }: { locale: Locale }) {
         <MarketingHero
           locale={locale}
           fleetSize={marketingCars.length}
-          vehicle={{
-            name: `${featuredCar.brand} ${featuredCar.model}`,
-            image: featuredCar.image,
-            slug: featuredCar.slug,
-            year: featuredCar.year,
-            fromPrice: featuredCar.fromPrice,
-            deposit: featuredCar.deposit,
-          }}
+          vehicles={heroVehicles}
         />
         <FleetSection locale={locale} />
       </RentalDatesProvider>
