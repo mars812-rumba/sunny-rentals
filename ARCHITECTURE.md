@@ -58,6 +58,35 @@ bookings.json + user_data.json
 **Source:** `telegram_webapp`
 **User ID:** `telegram_user`
 
+### Автостарт Claude после открытия WebApp
+
+```
+Telegram WebApp открывается
+        ↓
+App.tsx → trackLeadEvent("webapp_opened") с проверенным initData
+        ↓
+POST /api/leads/track
+        ↓
+web_integration.py → POST /botapi/notify/webapp-opened
+        ↓
+telegram_bot.py → WebAppClaudeOutreachScheduler (15 минут)
+        ↓
+GET /api/claude/status/{user_id}
+        ↓
+POST /api/claude/start/{user_id} → первое сообщение Claude
+```
+
+Правила защиты от повторных и неуместных сообщений:
+
+- таймер создаётся только для подтверждённого числового Telegram `user_id`;
+- администратор исключён из автоматического запуска;
+- повторное открытие WebApp заменяет предыдущий таймер;
+- сообщение клиента или отправка брони отменяют ожидающий запуск;
+- перед стартом повторно проверяются `claude_status`, число сообщений и наличие брони;
+- при недоступном статусе запуск не выполняется;
+- базовая задержка — 900 секунд; для тестового окружения её можно переопределить
+  переменной `CLAUDE_WEBAPP_INIT_DELAY_SECONDS`.
+
 ---
 
 ### Источник 2: Admin Scheduler → BookingFormDialog.tsx

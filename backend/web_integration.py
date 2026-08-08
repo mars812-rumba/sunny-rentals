@@ -1761,12 +1761,14 @@ def notify_telegram_bot_about_filters(user_id: Union[int, str], filters: dict, u
         return False
 
 
-def notify_telegram_bot_about_webapp_opened(user_id: Union[int, str], username: str = None) -> bool:
-    """Уведомляет Telegram бота о входе в webapp - для всех пользователей (Telegram и Web)"""
+def notify_telegram_bot_about_webapp_opened(
+    user_id: int,
+    username: str = None,
+    is_new: bool = False,
+) -> bool:
+    """Уведомляет Telegram-бота и запускает отложенный outreach для WebApp."""
     try:
-        # ✅ ИСПРАВЛЕНИЕ: Отправляем уведомления для всех пользователей (и Telegram, и Web)
         print(f"📤 Notifying bot about webapp opened: {user_id}")
-        print(f"📤 User type: {'Telegram' if isinstance(user_id, int) else 'Web Session'}")
         
         # ✅ ИСПРАВЛЕНИЕ: Правильное определение webhook URL
         TG_WEBHOOK_URL = os.getenv("TG_WEBHOOK_URL", "http://localhost:5001")
@@ -1780,7 +1782,7 @@ def notify_telegram_bot_about_webapp_opened(user_id: Union[int, str], username: 
         
         response = requests.post(
             url,
-            json={"user_id": user_id, "username": username},
+            json={"user_id": user_id, "username": username, "is_new": is_new},
             timeout=5,
             headers={"Content-Type": "application/json"}
         )
@@ -2290,11 +2292,17 @@ def track_lead_event(
         # 1. ОТКРЫТИЕ WEBAPP
         if event_type == "webapp_opened":
             print(f"📱 Пользователь {user_id} открыл webapp")
-            # Уведомляем только если это новый пользователь И это Telegram пользователь (int)
-            # ДИАГНОСТИКА: Отправляем уведомления для всех типов пользователей
-            if user_index is None:
-                print(f"🔍 DIAGNOSTIC: НОВЫЙ пользователь {user_id} (тип: {type(user_id).__name__}) - отправляем webapp_opened")
-                notify_result = notify_telegram_bot_about_webapp_opened(user_id, username)
+            user_record["webapp_opened_at"] = datetime.utcnow().isoformat()
+            user_record["updated_at"] = datetime.utcnow().isoformat()
+
+            # Только Telegram имеет chat_id, куда бот может отправить первое сообщение.
+            # Повторное открытие перезапускает 15-минутное ожидание в процессе бота.
+            if isinstance(user_id, int):
+                notify_result = notify_telegram_bot_about_webapp_opened(
+                    user_id,
+                    username,
+                    is_new=user_index is None,
+                )
                 print(f"🔍 DIAGNOSTIC: Результат уведомления webapp_opened: {notify_result}")
         
         # 2. ИСПОЛЬЗОВАНИЕ ФИЛЬТРОВ (теплый лид)
@@ -3533,6 +3541,11 @@ async def api_get_claude_status(user_id: int):
     """Получает статус из базы данных"""
     try:
         dialog_status = get_dialog_status(user_id)
+        users_data = load_json(USER_DATA_JSON)
+        user_record = next(
+            (user for user in users_data if str(user.get("user_id")) == str(user_id)),
+            {},
+        )
         
         return JSONResponse(content={
             "status": "success",
@@ -3540,7 +3553,9 @@ async def api_get_claude_status(user_id: int):
                 "user_id": user_id,
                 "claude_status": dialog_status["claude_status"],
                 "last_message_from": dialog_status["last_message_from"],
-                "message_count": dialog_status["message_count"]
+                "message_count": dialog_status["message_count"],
+                "booking_submitted": bool(user_record.get("booking_submitted")),
+                "lead_status": user_record.get("status"),
             }
         })
     except Exception as e:

@@ -36,6 +36,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from web_integration import update_dialog_status, get_dialog_status
+from webapp_claude_outreach import WebAppClaudeOutreachScheduler
 
 # --- CONFIGURATION ---
 load_dotenv()
@@ -144,7 +145,21 @@ tracker = UserTracker()
 user_conversations = {}  # {user_id: {"status": "active/paused/ended", "history": [], "filters": {}}}
 user_sessions = {}       # {user_id: {"claude_initiated": bool, ...}}
 user_filters_cache = {}  # {user_id: {days, category, startDate, endDate, ...}}
-claude_init_timers = {}  # {user_id: timer}
+
+try:
+    CLAUDE_WEBAPP_INIT_DELAY_SECONDS = int(
+        os.getenv("CLAUDE_WEBAPP_INIT_DELAY_SECONDS", "900")
+    )
+except ValueError:
+    CLAUDE_WEBAPP_INIT_DELAY_SECONDS = 900
+
+webapp_claude_outreach = WebAppClaudeOutreachScheduler(
+    delay_seconds=CLAUDE_WEBAPP_INIT_DELAY_SECONDS,
+    status_loader=lambda user_id: (
+        call_backend_api(f"/api/claude/status/{user_id}", method="GET") or {}
+    ).get("data"),
+    dialog_starter=lambda user_id: initiate_claude_dialogue(user_id),
+)
 
 # Durable dialog data lives in backend files. Bound these process-local caches
 # so the polling process can run for months without retaining every user.
@@ -196,9 +211,7 @@ def cleanup_runtime_state(force=False):
             stale_ids.extend(user_id for _, user_id in remaining[:overflow])
 
         for user_id in set(stale_ids):
-            timer = claude_init_timers.pop(user_id, None)
-            if timer is not None:
-                timer.cancel()
+            webapp_claude_outreach.cancel(user_id, "runtime state expired")
             user_timers.pop(user_id, None)
             user_conversations.pop(user_id, None)
             user_sessions.pop(user_id, None)
@@ -226,9 +239,7 @@ def touch_runtime_user(user_id):
 
 def release_runtime_user(user_id):
     with _runtime_state_lock:
-        timer = claude_init_timers.pop(user_id, None)
-        if timer is not None:
-            timer.cancel()
+        webapp_claude_outreach.cancel(user_id, "runtime state released")
         user_timers.pop(user_id, None)
         user_conversations.pop(user_id, None)
         user_sessions.pop(user_id, None)
@@ -735,13 +746,16 @@ def initiate_claude_dialogue(user_id, user_filters=None):
             print(f"✅ Claude dialogue initiated via backend for user {user_id}")
             # Отправляем уведомление в группу диалогов
             send_dialog_to_group(user_id, "started", "Claude начал подбор вариантов")
+            return True
         else:
             print(f"❌ Failed to initiate Claude via backend for user {user_id}")
+            return False
             
     except Exception as e:
         print(f"❌ Error initiating Claude dialogue: {e}")
         import traceback
         traceback.print_exc()
+        return False
 
 
 def handle_claude_best_options(user_id):
@@ -1062,6 +1076,7 @@ def handle_photo_message(message):
         # Пропускаем админов (они не отправляют фото как клиенты)
         if is_admin_user(user_id):
             return
+        webapp_claude_outreach.cancel(user_id, "client sent a photo")
             
         print(f"📸 Получена фотография от пользователя {user_id}")
         
@@ -1159,6 +1174,7 @@ def handle_document_message(message):
         # Пропускаем админов
         if is_admin_user(user_id):
             return
+        webapp_claude_outreach.cancel(user_id, "client sent a document")
             
         print(f"📄 Получен документ от пользователя {user_id}")
         
@@ -1343,9 +1359,7 @@ def handle_start_userbot_command(admin_chat_id, user_id):
     """Обработчик команды запуска UserBot"""
     try:
         # Отменяем любые активные таймеры Claude для этого пользователя
-        if user_id in claude_init_timers:
-            claude_init_timers[user_id].cancel()
-            del claude_init_timers[user_id]
+        webapp_claude_outreach.cancel(user_id, "UserBot started by manager")
         
         # Получаем команду для UserBot
         cmd = user_sessions.get(user_id, {}).get('userbot_command', f'/start_dialog {user_id}')
@@ -1462,9 +1476,7 @@ def handle_start_userbot(call):
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
         
         # Отменяем любые активные таймеры Claude для этого пользователя
-        if user_id in claude_init_timers:
-            claude_init_timers[user_id].cancel()
-            del claude_init_timers[user_id]
+        webapp_claude_outreach.cancel(user_id, "UserBot started by manager")
         
         # Получаем команду для UserBot
         cmd = user_sessions.get(user_id, {}).get('userbot_command', f'/start_dialog {user_id}')
@@ -1559,6 +1571,7 @@ def get_reply_keyboard():
 def handle_claude_conversation(message):
     """Обработчик сообщений в активном диалоге Claude - теперь использует бэкенд API"""
     user_id = message.chat.id
+    webapp_claude_outreach.cancel(user_id, "client sent a message")
     touch_runtime_user(user_id)
     user_input = message.text
     
@@ -1890,6 +1903,8 @@ def universal_handler(message):
     if message.chat.type != "private":
         print(f"Ignoring message from non-admin in non-private chat {chat_id}")
         return
+
+    webapp_claude_outreach.cancel(message.from_user.id, "client sent a message")
     
     # === ОБЫЧНЫЕ ПОЛЬЗОВАТЕЛИ ===
     # Claude НЕ активен - отправляем сообщение на бэкенд молча
@@ -1938,18 +1953,25 @@ async def notify_webapp_opened(request: Request):
         data = await request.json()
         user_id = data.get('user_id')
         username = data.get('username')
+        is_new = bool(data.get('is_new'))
         
         print(f"📱 Webhook: webapp_opened - user {user_id} (@{username})")
         
         if not user_id:
             raise HTTPException(status_code=400, detail="user_id required")
+
+        scheduled = False
+        if not is_admin_user(user_id):
+            scheduled = webapp_claude_outreach.schedule(user_id)
+        else:
+            print(f"Skipping Claude WebApp outreach for admin {user_id}")
         
         # Формируем ссылку на пользователя
         user_link = f"@{username}" if username else f'<a href="tg://user?id={user_id}">{user_id}</a>'
         
         # ✅ ОПЦИОНАЛЬНО: Отправка уведомления в группу/админу
         # Если не хочешь спамить - просто убери этот блок или отправь только в лог
-        if ADMIN_ID:  # Или WARM_LEADS_CHAT_ID если хочешь в группу
+        if ADMIN_ID and is_new:  # Не дублируем уведомление при повторном открытии
             message = (
                 f"📱 <b>Новый вход в webapp</b>\n\n"
                 f"👤 {user_link}\n"
@@ -1967,7 +1989,11 @@ async def notify_webapp_opened(request: Request):
             )
             print(f"✅ Sent webapp_opened notification for {user_id}")
         
-        return JSONResponse(content={"status": "ok"})
+        return JSONResponse(content={
+            "status": "ok",
+            "claude_scheduled": scheduled,
+            "delay_seconds": CLAUDE_WEBAPP_INIT_DELAY_SECONDS,
+        })
         
     except Exception as e:
         print(f"❌ Error in notify_webapp_opened: {e}")
@@ -2085,6 +2111,8 @@ async def notify_booking_submitted(request: Request):
         
         if not booking_id or not user_id:
             raise HTTPException(status_code=400, detail="booking_id and user_id required")
+
+        webapp_claude_outreach.cancel(user_id, "booking submitted")
         
         # Получаем данные
         car_info = form_data.get('car', {})

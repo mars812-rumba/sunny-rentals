@@ -255,6 +255,7 @@ sunny-rentals/
 - ✅ CRM с чатами и лидами
 - ✅ Offer flow (CRM → Cars → Offer → Booking)
 - ✅ Telegram Mini App
+- ✅ Отложенный автостарт Claude через 15 минут после открытия Telegram WebApp
 - ✅ Защита от дубликатов броней
 - ✅ Попап успеха при бронировании
 - ✅ User_id передаётся через всю цепочку
