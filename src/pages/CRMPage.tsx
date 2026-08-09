@@ -87,6 +87,28 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   'archive': { label: 'ARCHIVE', color: '#94a3b8', bg: 'bg-slate-200' }
 };
 
+const chatMessageKey = (message: any) => {
+  if (message?.id) return String(message.id);
+  if (message?.external_message_id) {
+    return `telegram:${message.user_id}:${message.external_message_id}`;
+  }
+  const content = typeof message?.content === 'string'
+    ? message.content
+    : JSON.stringify(message?.content ?? message?.text ?? '');
+  return `${message?.user_id}:${message?.role}:${message?.timestamp}:${content}`;
+};
+
+const uniqueChatMessages = (messages: any[]) => {
+  const seen = new Set<string>();
+  return messages.filter((message) => {
+    if (!message) return false;
+    const key = chatMessageKey(message);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
 const CRMPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]); // Все пользователи для индикаторов
@@ -290,14 +312,7 @@ const fetchChatHistory = async (userId: number | string, silent: boolean = false
     const response = await fetch(`/api/crm/chats/${userId}`);
     const data = await response.json();
     if (data.status === 'ok' && data.chats) {
-      // Добавляем проверку m !== null
-      const uniqueChats = data.chats.filter((msg, index, self) =>
-        msg && index === self.findIndex((m) => m && (
-          (m.id && m.id === msg.id) ||
-          (m.timestamp === msg.timestamp && (m.content === msg.content || m.text === msg?.text))
-        ))
-      );
-      setChats(uniqueChats);
+      setChats(uniqueChatMessages(data.chats));
     }
   } catch (e) {
     console.error("Ошибка:", e);
@@ -325,7 +340,7 @@ const loadUserDetails = async (user: any) => {
 
     if (cData.status === 'ok' && cData.chats) {
       // Enhanced filtering for better performance
-      const validChats = cData.chats
+      const validChats = uniqueChatMessages(cData.chats)
         .filter(msg => msg !== null && (msg.content || msg.text || msg.media))
         .slice(-100); // Limit to last 100 messages for performance
       setChats(validChats);
@@ -1908,7 +1923,7 @@ const handleUpdateNote = async () => {
 
       return (
         <div
-          key={`msg-${i}-${msg.timestamp || Date.now()}`}
+          key={chatMessageKey(msg)}
           className={`flex flex-col ${msg.role === 'user' ? 'items-start' : 'items-end'} max-w-full overflow-hidden`}
         >
           <div

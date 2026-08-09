@@ -695,7 +695,7 @@ def handle_claude_stop(user_id: int):
         print(f"❌ Ошибка остановки Claude {user_id}: {e}")
 
 
-def log_chat_to_file(user_id, role, content):
+def log_chat_to_file(user_id, role, content, **metadata):
     """Логирует сообщение в файл chat_logs.jsonl."""
     if not LOGS_FILE:
         print(f"⚠️ LOGS_FILE не определен. Логирование в файл отключено.")
@@ -705,7 +705,8 @@ def log_chat_to_file(user_id, role, content):
             "timestamp": datetime.now().isoformat(),
             "user_id": user_id,
             "role": role,  # "user" или "assistant"
-            "content": content
+            "content": content,
+            **metadata,
         }
         # 'a' - append (добавление в конец файла)
         with open(LOGS_FILE, 'a', encoding='utf-8') as f:
@@ -1321,7 +1322,8 @@ def handle_document_message(message):
         log_chat_to_file(user_id, "user", {
             "content": f"[Документ: {file_name}]",
             "media": media_info
-        })
+        }, id=f"telegram:{user_id}:{message.message_id}",
+           external_message_id=message.message_id, source="telegram")
         
         # Отправка в группу активных диалогов
         if ACTIVE_DIALOGS_CHAT_ID:
@@ -1693,7 +1695,14 @@ def handle_claude_conversation(message):
 
     # Логируем сообщение пользователя
     try:
-        log_chat_to_file(user_id, "user", user_input)
+        log_chat_to_file(
+            user_id,
+            "user",
+            user_input,
+            id=f"telegram:{user_id}:{message.message_id}",
+            external_message_id=message.message_id,
+            source="telegram",
+        )
         
         if ACTIVE_DIALOGS_CHAT_ID:
             user_data = tracker.get_user(user_id)

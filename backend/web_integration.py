@@ -35,6 +35,7 @@ from pydantic import BaseModel, Field, validator
 from urllib.parse import parse_qsl, unquote
 from booking_time import normalize_booking_dates, validate_time_value
 from booking_notifications import build_booking_claude_context, select_active_booking
+from chat_messages import deduplicate_chat_entries
 
 # Claude AI imports
 try:
@@ -1667,7 +1668,6 @@ def process_claude_message(user_id, user_input):
 
         # Логирование
         try:
-            log_chat_to_file(user_id, "user", user_input)
             log_chat_to_file(user_id, "assistant", claude_response_raw)
             
             # TODO: Добавить уведомление в группу если нужно
@@ -5597,7 +5597,8 @@ async def get_user_chats_fast(user_id: str):
         except Exception as e:
             print(f"⚠️ Ошибка чтения файла чатов: {e}")
 
-        print(f"📤 [DEBUG] Returning {len(chats)} chats for user {user_id}")
+        chats = deduplicate_chat_entries(chats)
+        print(f"📤 [DEBUG] Returning {len(chats)} unique chats for user {user_id}")
         return {"status": "ok", "chats": chats}
     except Exception as e:
         print(f"❌ Get chats error: {e}")
