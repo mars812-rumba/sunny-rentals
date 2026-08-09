@@ -130,7 +130,7 @@ class BookingNotificationTests(unittest.TestCase):
         self.assertIn("Получение: 16.08.2026, время не указано", context)
         self.assertIn("Возврат: 29.08.2026, время не указано", context)
 
-    def test_select_active_booking_uses_newest_pending_or_confirmed(self):
+    def test_latest_rejected_booking_does_not_revive_older_booking(self):
         bookings = [
             {
                 "booking_id": "old",
@@ -151,7 +151,24 @@ class BookingNotificationTests(unittest.TestCase):
                 "created_at": "2026-08-09T10:00:00",
             },
         ]
-        self.assertEqual(select_active_booking(bookings, 42)["booking_id"], "new")
+        self.assertIsNone(select_active_booking(bookings, 42))
+
+    def test_latest_pending_booking_is_selected(self):
+        bookings = [
+            {
+                "booking_id": "old-confirmed",
+                "user_id": "42",
+                "status": "confirmed",
+                "created_at": "2026-08-08T10:00:00",
+            },
+            {
+                "booking_id": "latest",
+                "user_id": 42,
+                "status": "pre_booking",
+                "created_at": "2026-08-10T10:00:00",
+            },
+        ]
+        self.assertEqual(select_active_booking(bookings, 42)["booking_id"], "latest")
 
     def test_existing_pending_booking_message_has_no_catalogue_cta(self):
         message = build_existing_booking_message(

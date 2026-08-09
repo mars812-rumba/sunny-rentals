@@ -4954,6 +4954,20 @@ async def reject_booking(booking_id: str, data: dict = None):
             save_json(USER_DATA_JSON, users_data)
         print("✓ Saved to JSON")
 
+        # Отклонённая последняя заявка завершает текущий booking-контекст Claude.
+        # Старые pre_booking/confirmed записи не должны самопроизвольно оживать.
+        if user_id and not select_active_booking(bookings, user_id):
+            update_dialog_status(user_id, active=False, claude_status="stopped")
+            log_dialog_event(user_id, "claude_stopped", {
+                "by": "booking_rejected",
+                "booking_id": booking_id,
+            })
+            release_runtime_user(user_id)
+            try:
+                notify_bot_status_sync(user_id, "idle")
+            except Exception as error:
+                print(f"⚠️ Failed to sync Claude stop after rejection: {error}")
+
         return {
             "status": "ok",
             "booking_id": booking_id,

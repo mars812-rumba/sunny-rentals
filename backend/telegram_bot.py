@@ -787,6 +787,14 @@ def load_active_booking_for_user(user_id):
 
 def start_booking_claude_fallback(user_id, booking_id, form_data):
     """Let Claude continue a hot lead only while the manager is still silent."""
+    current_booking = load_active_booking_for_user(user_id)
+    if not current_booking or str(current_booking.get("booking_id")) != str(booking_id):
+        print(
+            f"⏭️ Booking fallback {booking_id} skipped: it is no longer the "
+            f"current booking for {user_id}"
+        )
+        return False
+
     car = form_data.get("car") or {}
     car_name = car.get("name") or " ".join(
         str(car.get(field) or "").strip()

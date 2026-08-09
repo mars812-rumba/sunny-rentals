@@ -124,24 +124,24 @@ def select_active_booking(
     bookings: Iterable[Dict[str, Any]],
     user_id: Any,
 ) -> Optional[Dict[str, Any]]:
-    """Return the newest booking that should suppress another catalogue CTA."""
+    """Return the latest booking intent only when that intent is still active."""
     matching = [
         booking
         for booking in bookings
         if str(booking.get("user_id")) == str(user_id)
-        and booking.get("status") in ACTIVE_BOOKING_STATUSES
     ]
     if not matching:
         return None
-    return max(
+    latest = max(
         matching,
         key=lambda booking: str(
-            booking.get("updated_at")
-            or booking.get("created_at")
+            booking.get("created_at")
             or (booking.get("form_data") or {}).get("timestamp")
+            or booking.get("updated_at")
             or ""
         ),
     )
+    return latest if latest.get("status") in ACTIVE_BOOKING_STATUSES else None
 
 
 def build_existing_booking_message(booking: Dict[str, Any]) -> str:
