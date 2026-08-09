@@ -36,6 +36,14 @@ from urllib.parse import parse_qsl, unquote
 from booking_time import normalize_booking_dates, validate_time_value
 from booking_notifications import build_booking_claude_context, select_active_booking
 from chat_messages import deduplicate_chat_entries
+from customer_outreach_campaign import (
+    CAMPAIGN_ID as OUTREACH_CAMPAIGN_ID,
+    GREETING as OUTREACH_GREETING,
+    append_event as append_outreach_event,
+    load_campaign_state,
+    load_recipients as load_outreach_recipients,
+    select_recipient_batch,
+)
 
 # Claude AI imports
 try:
@@ -117,6 +125,9 @@ USER_DATA_JSON = DATA / "user_data.json"
 CHAT_LOGS_JSONL = DATA / "chat_logs.jsonl"
 ARCHIVE_JSON = DATA / "archive.json"
 CAR_OWNERS_JSON = DATA / "car_owners.json"
+OUTREACH_LOG_JSONL = DATA / "campaigns" / f"{OUTREACH_CAMPAIGN_ID}.jsonl"
+OUTREACH_BATCH_MAX = 100
+_outreach_campaign_lock = threading.Lock()
 
 if not ARCHIVE_JSON.exists():
     with open(ARCHIVE_JSON, "w", encoding="utf-8") as f:
@@ -492,6 +503,9 @@ class SendMessageRequest(BaseModel):
     text: str
     role: str = "manager"
     timestamp: str
+
+class OutreachSendRequest(BaseModel):
+    count: int = Field(default=20, ge=1, le=OUTREACH_BATCH_MAX)
     
 class MediaUploadRequest(BaseModel):
     user_id: Union[int, str]
@@ -2460,6 +2474,175 @@ def crm_admin_required(admin_id: str = Query(..., description="Telegram User ID 
     return admin_id
 
 
+def _outreach_status_payload() -> Dict[str, Any]:
+    recipients = load_outreach_recipients(DATA)
+    campaign_state = load_campaign_state(OUTREACH_LOG_JSONL)
+    delivered = sum(
+        1 for user_id in recipients if campaign_state.get(user_id, {}).get("delivered")
+    )
+    activated = sum(
+        1 for user_id in recipients if campaign_state.get(user_id, {}).get("claude_active")
+    )
+    return {
+        "campaign_id": OUTREACH_CAMPAIGN_ID,
+        "audience": len(recipients),
+        "delivered": delivered,
+        "claude_active": activated,
+        "remaining": max(0, len(recipients) - delivered),
+        "default_count": 20,
+        "max_batch": OUTREACH_BATCH_MAX,
+        "message": OUTREACH_GREETING,
+        "running": _outreach_campaign_lock.locked(),
+    }
+
+
+def _ensure_outreach_user_in_crm(user_id: int, source_record: Dict[str, Any]) -> None:
+    """Rehydrate archive context only after Telegram accepted the greeting."""
+    users_data = load_json(USER_DATA_JSON)
+    if any(str(user.get("user_id")) == str(user_id) for user in users_data):
+        return
+
+    record = copy.deepcopy(source_record)
+    previous_status = record.get("status")
+    for key in ("_campaign_source", "archived", "archived_at"):
+        record.pop(key, None)
+    record.update({
+        "user_id": user_id,
+        "status": "new",
+        "source": "outreach_archive",
+        "outreach_previous_status": previous_status,
+        "updated_at": datetime.utcnow().isoformat(),
+        "archived": False,
+    })
+    users_data.append(record)
+    save_json(USER_DATA_JSON, users_data)
+
+
+def _deliver_outreach_greeting(user_id: int) -> bool:
+    bot_url = os.getenv("TG_WEBHOOK_URL", "http://localhost:5001").rstrip("/")
+    response = requests.post(
+        f"{bot_url}/internal/send_message",
+        json={"user_id": user_id, "text": OUTREACH_GREETING},
+        timeout=15,
+        headers={"Content-Type": "application/json"},
+    )
+    return response.status_code == 200
+
+
+@app.get(API_PREFIX + "/crm/outreach/status")
+def get_outreach_status(_: str = Depends(admin_required)):
+    return {"status": "ok", **_outreach_status_payload()}
+
+
+@app.post(API_PREFIX + "/crm/outreach/send")
+def send_outreach_batch(request: OutreachSendRequest, _: str = Depends(admin_required)):
+    """Send one resumable campaign batch and enable Claude without a second greeting."""
+    if not _outreach_campaign_lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="Рассылка уже выполняется")
+
+    try:
+        recipients = load_outreach_recipients(DATA)
+        campaign_state = load_campaign_state(OUTREACH_LOG_JSONL)
+        batch = select_recipient_batch(recipients, campaign_state, request.count)
+        delivered_count = 0
+        activated_count = 0
+        activation_retried = 0
+        failed_count = 0
+        errors = []
+
+        for user_id, state in campaign_state.items():
+            if user_id not in recipients or not state.get("delivered") or state.get("claude_active"):
+                continue
+            retry_event = {
+                "campaign_id": OUTREACH_CAMPAIGN_ID,
+                "timestamp": datetime.now(UTC).isoformat(),
+                "user_id": user_id,
+                "source": recipients[user_id].get("_campaign_source"),
+                "delivered": True,
+                "claude_active": False,
+                "activation_retry": True,
+            }
+            try:
+                _ensure_outreach_user_in_crm(user_id, recipients[user_id])
+                retry_event["claude_active"] = bool(
+                    update_dialog_status(user_id, claude_status="active")
+                )
+                notify_bot_status_sync(user_id, "active")
+                if retry_event["claude_active"]:
+                    activation_retried += 1
+                    log_dialog_event(user_id, "claude_resumed", {"by": "outreach_campaign_retry"})
+                else:
+                    failed_count += 1
+            except Exception as error:
+                failed_count += 1
+                retry_event["error"] = str(error)
+                errors.append({"user_id": user_id, "error": str(error)})
+            finally:
+                append_outreach_event(OUTREACH_LOG_JSONL, retry_event)
+
+        for user_id, source_record in batch:
+            event = {
+                "campaign_id": OUTREACH_CAMPAIGN_ID,
+                "timestamp": datetime.now(UTC).isoformat(),
+                "user_id": user_id,
+                "source": source_record.get("_campaign_source"),
+                "delivered": False,
+                "claude_active": False,
+            }
+            try:
+                if not _deliver_outreach_greeting(user_id):
+                    raise RuntimeError("Telegram bot rejected the message")
+
+                event["delivered"] = True
+                delivered_count += 1
+                _ensure_outreach_user_in_crm(user_id, source_record)
+
+                log_chat_entry = {
+                    "id": f"campaign:{OUTREACH_CAMPAIGN_ID}:{user_id}",
+                    "timestamp": event["timestamp"],
+                    "user_id": user_id,
+                    "role": "manager",
+                    "content": OUTREACH_GREETING,
+                    "source": "outreach_campaign",
+                    "campaign_id": OUTREACH_CAMPAIGN_ID,
+                }
+                with open(CHAT_LOGS_JSONL, "a", encoding="utf-8") as handle:
+                    handle.write(json.dumps(log_chat_entry, ensure_ascii=False) + "\n")
+
+                status_saved = update_dialog_status(user_id, claude_status="active")
+                notify_bot_status_sync(user_id, "active")
+                event["claude_active"] = bool(status_saved)
+                if event["claude_active"]:
+                    activated_count += 1
+                    log_dialog_event(user_id, "claude_resumed", {"by": "outreach_campaign"})
+                else:
+                    failed_count += 1
+                    errors.append({"user_id": user_id, "error": "Claude status was not saved"})
+            except Exception as error:
+                failed_count += 1
+                event["error"] = str(error)
+                errors.append({"user_id": user_id, "error": str(error)})
+            finally:
+                append_outreach_event(OUTREACH_LOG_JSONL, event)
+            time.sleep(0.2)
+
+        campaign_payload = _outreach_status_payload()
+        campaign_payload["running"] = False
+        return {
+            "status": "ok",
+            "requested": request.count,
+            "selected": len(batch),
+            "delivered": delivered_count,
+            "claude_active": activated_count,
+            "activation_retried": activation_retried,
+            "failed": failed_count,
+            "errors": errors[:10],
+            "campaign": campaign_payload,
+        }
+    finally:
+        _outreach_campaign_lock.release()
+
+
 # Вспомогательная функция для вычисления статуса из истории событий
 def get_computed_dialog_data(user_id: int):
     """
@@ -3379,17 +3562,19 @@ async def call_bot_and_log(user_id: int, bot_path: str, event_name: str):
 
 # В web_integration.py
 
-def notify_bot_status_sync(user_id: int, status: str):
+def notify_bot_status_sync(user_id: int, status: str) -> bool:
     """Отправляет сигнал в процесс бота на порт 5001"""
     try:
         # Убедись, что порт 5001 — это порт твоего бота
         bot_url = "http://127.0.0.1:5001/internal/update_claude_status"
-        requests.post(bot_url, json={
+        response = requests.post(bot_url, json={
             "user_id": user_id,
             "status": status
         }, timeout=2)
+        return response.status_code == 200
     except Exception as e:
         print(f"⚠️ Не удалось синхронизировать статус с ботом: {e}")
+        return False
 
 # Claude endpoints that match frontend expectations
 @app.post("/api/claude/start/{user_id}")

@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -79,6 +80,18 @@ interface User {
 }
 
 const MAIN_STATUSES = ['new', 'in_work', 'pre_booking', 'confirmed', 'archive'];
+const OUTREACH_ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY || 'sunny2025';
+
+interface OutreachStatus {
+  audience: number;
+  delivered: number;
+  claude_active: number;
+  remaining: number;
+  default_count: number;
+  max_batch: number;
+  message: string;
+  running: boolean;
+}
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   'new': { label: 'NEW', color: '#64748b', bg: 'bg-slate-100' },
   'in_work': { label: 'WORK', color: '#7c3aed', bg: 'bg-green-50' },
@@ -124,6 +137,12 @@ const CRMPage: React.FC = () => {
   const [managerMessage, setManagerMessage] = useState('');
   const [loadingAction, setLoadingAction] = useState<Record<string, boolean>>({});
   const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [outreachOpen, setOutreachOpen] = useState(false);
+  const [outreachCount, setOutreachCount] = useState(20);
+  const [outreachStatus, setOutreachStatus] = useState<OutreachStatus | null>(null);
+  const [outreachLoading, setOutreachLoading] = useState(false);
+  const [outreachError, setOutreachError] = useState('');
+  const [outreachResult, setOutreachResult] = useState<any>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
@@ -141,6 +160,58 @@ const CRMPage: React.FC = () => {
   const [editingBooking, setEditingBooking] = useState<any | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+
+  const loadOutreachStatus = async () => {
+    setOutreachLoading(true);
+    setOutreachError('');
+    try {
+      const response = await fetch(`/api/crm/outreach/status?key=${encodeURIComponent(OUTREACH_ADMIN_KEY)}`);
+      const data = await response.json();
+      if (!response.ok || data.status !== 'ok') {
+        throw new Error(data.detail || data.message || 'Не удалось загрузить аудиторию');
+      }
+      setOutreachStatus(data);
+      setOutreachCount(Math.min(data.default_count || 20, data.remaining || 20));
+    } catch (error) {
+      setOutreachError(error instanceof Error ? error.message : 'Не удалось загрузить аудиторию');
+    } finally {
+      setOutreachLoading(false);
+    }
+  };
+
+  const openOutreachDialog = () => {
+    setOutreachOpen(true);
+    setOutreachResult(null);
+    void loadOutreachStatus();
+  };
+
+  const handleOutreachSend = async () => {
+    const maxAllowed = Math.min(outreachStatus?.max_batch || 100, outreachStatus?.remaining || 0);
+    const count = Math.min(maxAllowed, Math.max(1, Math.trunc(outreachCount)));
+    if (!count || outreachLoading) return;
+
+    setOutreachLoading(true);
+    setOutreachError('');
+    setOutreachResult(null);
+    try {
+      const response = await fetch(`/api/crm/outreach/send?key=${encodeURIComponent(OUTREACH_ADMIN_KEY)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ count }),
+      });
+      const data = await response.json();
+      if (!response.ok || data.status !== 'ok') {
+        throw new Error(data.detail || data.message || 'Рассылка не запустилась');
+      }
+      setOutreachResult(data);
+      setOutreachStatus(data.campaign);
+      await loadMainData();
+    } catch (error) {
+      setOutreachError(error instanceof Error ? error.message : 'Ошибка сети при рассылке');
+    } finally {
+      setOutreachLoading(false);
+    }
+  };
 
   // User Documents from Media Files
   const userDocuments = React.useMemo(() => {
@@ -1262,15 +1333,29 @@ const handleUpdateNote = async () => {
               </div>
             </div>
 
-            {/* Help button */}
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              onClick={() => setTutorialOpen(true)} 
-              className="h-6 w-6 shrink-0 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
-            >
-              <Info className="w-3 h-3" />
-            </Button>
+            <div className="flex items-center gap-0.5 shrink-0">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={openOutreachDialog}
+                className="h-6 w-6 text-amber-600 hover:bg-amber-50 hover:text-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500"
+                aria-label="Открыть рассылку клиентам"
+                title="Рассылка клиентам"
+              >
+                <Send className="w-3 h-3" />
+              </Button>
+
+              {/* Help button */}
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setTutorialOpen(true)}
+                className="h-6 w-6 text-slate-400 hover:bg-blue-50 hover:text-blue-500"
+                aria-label="Открыть справку по CRM"
+              >
+                <Info className="w-3 h-3" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -2197,6 +2282,114 @@ const handleUpdateNote = async () => {
     </Tabs>
   </DialogContent>
 </Dialog>
+
+      <Dialog open={outreachOpen} onOpenChange={setOutreachOpen}>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md rounded-2xl border-0 p-0 overflow-hidden shadow-2xl">
+          <DialogHeader className="px-5 pt-5 pb-4 text-left bg-slate-950 text-white">
+            <DialogTitle className="flex items-center gap-2 text-base font-bold">
+              <Send className="h-4 w-4 text-amber-400" />
+              Рассылка клиентам
+            </DialogTitle>
+            <DialogDescription className="text-xs leading-relaxed text-slate-300">
+              Приветствие уйдёт следующим клиентам по свежести. После доставки Claude будет отвечать в диалоге.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 px-5 py-5">
+            {outreachLoading && !outreachStatus ? (
+              <div className="flex min-h-28 items-center justify-center gap-2 text-sm text-slate-500" role="status">
+                <RefreshCw className="h-4 w-4 animate-spin text-blue-500" />
+                Загружаю аудиторию…
+              </div>
+            ) : (
+              <>
+                {outreachStatus && (
+                  <div className="grid grid-cols-3 gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                      <div className="text-lg font-black tabular-nums text-slate-900">{outreachStatus.remaining}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Осталось</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-black tabular-nums text-emerald-600">{outreachStatus.delivered}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Доставлено</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-black tabular-nums text-blue-600">{outreachStatus.claude_active}</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Claude</div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <label htmlFor="outreach-count" className="text-sm font-semibold text-slate-800">
+                    Количество человек
+                  </label>
+                  <Input
+                    id="outreach-count"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    max={Math.min(outreachStatus?.max_batch || 100, outreachStatus?.remaining || 20)}
+                    value={outreachCount}
+                    onChange={(event) => setOutreachCount(Number(event.target.value))}
+                    className="h-11 text-base font-bold tabular-nums"
+                    aria-describedby="outreach-count-help"
+                  />
+                  <p id="outreach-count-help" className="text-xs text-slate-500">
+                    От 1 до {Math.min(outreachStatus?.max_batch || 100, outreachStatus?.remaining || 20)} за один запуск.
+                  </p>
+                </div>
+
+                {outreachStatus?.message && (
+                  <div className="rounded-xl bg-slate-50 px-3.5 py-3">
+                    <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">Текст сообщения</div>
+                    <p className="text-sm leading-relaxed text-slate-700">{outreachStatus.message}</p>
+                  </div>
+                )}
+
+                {outreachResult && (
+                  <div className="flex items-start gap-2 rounded-xl bg-emerald-50 px-3.5 py-3 text-emerald-900" role="status" aria-live="polite">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0" />
+                    <p className="text-sm">
+                      Доставлено: <strong>{outreachResult.delivered}</strong>. Claude включён: <strong>{outreachResult.claude_active}</strong>.
+                      {outreachResult.failed > 0 && <> Ошибок: <strong>{outreachResult.failed}</strong>.</>}
+                    </p>
+                  </div>
+                )}
+
+                {outreachError && (
+                  <div className="flex items-start gap-2 rounded-xl bg-red-50 px-3.5 py-3 text-red-800" role="alert">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <p className="text-sm leading-relaxed">{outreachError}</p>
+                  </div>
+                )}
+
+                <Button
+                  onClick={handleOutreachSend}
+                  disabled={
+                    outreachLoading ||
+                    !outreachStatus ||
+                    outreachStatus.running ||
+                    outreachStatus.remaining <= 0 ||
+                    !Number.isFinite(outreachCount) ||
+                    outreachCount < 1 ||
+                    outreachCount > Math.min(outreachStatus.max_batch, outreachStatus.remaining)
+                  }
+                  className="h-11 w-full bg-blue-600 text-sm font-bold hover:bg-blue-700 disabled:cursor-not-allowed"
+                >
+                  {outreachLoading ? (
+                    <><RefreshCw className="mr-2 h-4 w-4 animate-spin" /> Отправляю…</>
+                  ) : outreachStatus?.remaining === 0 ? (
+                    'Аудитория обработана'
+                  ) : (
+                    <><Send className="mr-2 h-4 w-4" /> Отправить {outreachCount || 0}</>
+                  )}
+                </Button>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Диалог создания/редактирования заявки */}
       {isBookingDialogOpen && (
