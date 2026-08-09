@@ -1,5 +1,6 @@
 print("!!!!!!!!!! TEST PRINT !!!!!!!!!!!")
 from pathlib import Path
+import html
 import os
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, InputMediaVideo, InputMediaPhoto, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
@@ -37,6 +38,14 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from web_integration import update_dialog_status, get_dialog_status
 from webapp_claude_outreach import WebAppClaudeOutreachScheduler
+from booking_notifications import (
+    BookingFallbackScheduler,
+    booking_car_name,
+    build_booking_rejected_message,
+    build_customer_booking_received,
+    build_manager_started_message,
+    format_booking_date,
+)
 
 # --- CONFIGURATION ---
 load_dotenv()
@@ -153,12 +162,27 @@ try:
 except ValueError:
     CLAUDE_WEBAPP_INIT_DELAY_SECONDS = 900
 
+try:
+    BOOKING_MANAGER_RESPONSE_TIMEOUT_SECONDS = int(
+        os.getenv("BOOKING_MANAGER_RESPONSE_TIMEOUT_SECONDS", "300")
+    )
+except ValueError:
+    BOOKING_MANAGER_RESPONSE_TIMEOUT_SECONDS = 300
+
 webapp_claude_outreach = WebAppClaudeOutreachScheduler(
     delay_seconds=CLAUDE_WEBAPP_INIT_DELAY_SECONDS,
     status_loader=lambda user_id: (
         call_backend_api(f"/api/claude/status/{user_id}", method="GET") or {}
     ).get("data"),
     dialog_starter=lambda user_id: initiate_claude_dialogue(user_id),
+)
+
+booking_manager_fallback = BookingFallbackScheduler(
+    delay_seconds=BOOKING_MANAGER_RESPONSE_TIMEOUT_SECONDS,
+    status_loader=lambda booking_id: load_booking_status(booking_id),
+    fallback_starter=lambda user_id, booking_id, form_data: (
+        start_booking_claude_fallback(user_id, booking_id, form_data)
+    ),
 )
 
 # Durable dialog data lives in backend files. Bound these process-local caches
@@ -226,6 +250,7 @@ def cleanup_runtime_state(force=False):
             except (TypeError, ValueError):
                 created_at = 0
             if now - created_at > PENDING_BOOKING_TTL_SECONDS:
+                booking_manager_fallback.cancel(booking_id, "pending booking expired")
                 pending_bookings.pop(booking_id, None)
 
 
@@ -403,6 +428,15 @@ def safe_send_message(chat_id, text, **kwargs):
         else:
             print(f"❌ Error sending message to {chat_id}: {e}")
             raise e
+
+
+def deliver_message_safely(chat_id, text, **kwargs):
+    """Return a delivery flag without letting one Telegram target break the flow."""
+    try:
+        return safe_send_message(chat_id, text, **kwargs) is not None
+    except Exception as error:
+        print(f"❌ Isolated Telegram delivery failure for {chat_id}: {error}")
+        return False
 
 
 def safe_send_photo(chat_id, photo, **kwargs):
@@ -734,6 +768,31 @@ def call_backend_api(endpoint, data=None, method="POST"):
         print(f"❌ Error calling backend API {endpoint}: {e}")
         return None
 
+
+def load_booking_status(booking_id):
+    """Return the durable booking status used by the fallback timer."""
+    result = call_backend_api(f"/api/bookings/{booking_id}", method="GET") or {}
+    booking = result.get("booking") or {}
+    return booking.get("status")
+
+
+def start_booking_claude_fallback(user_id, booking_id, form_data):
+    """Let Claude continue a hot lead only while the manager is still silent."""
+    car = form_data.get("car") or {}
+    car_name = car.get("name") or " ".join(
+        str(car.get(field) or "").strip()
+        for field in ("brand", "model", "year")
+    ).strip() or "выбранный транспорт"
+    prompt = (
+        f"Клиент уже отправил заявку #{booking_id} на {car_name}. "
+        "Менеджер пока не подключился. Начни ответ СТРОГО с фразы: "
+        "'Вижу твою заявку — она у нас.' Не обещай доступность машины и не называй "
+        "бронь подтверждённой. Коротко скажи, что проверка идёт, и задай ОДИН "
+        "полезный вопрос о поездке или получении машины."
+    )
+    return bool(process_claude_message(user_id, prompt))
+
+
 def initiate_claude_dialogue(user_id, user_filters=None):
     """Запускает диалог Claude через бэкенд API"""
     print(f"🤖 Initiating Claude dialogue for user {user_id} via backend API")
@@ -812,15 +871,20 @@ def process_claude_message(user_id, user_input):
             if response_text:
                 bot.send_chat_action(user_id, 'typing')
                 time.sleep(1)
-                safe_send_message(user_id, response_text)
+                delivered = deliver_message_safely(user_id, response_text)
+            else:
+                delivered = False
                 
             print(f"✅ Claude message processed and sent to {user_id}")
+            return delivered
         else:
             print(f"❌ Failed to process Claude message via backend for {user_id}")
+            return False
             
     except Exception as e:
         print(f"❌ Error processing Claude message: {e}")
-        safe_send_message(user_id, "Секунду, подвисло. Напиши ещё раз.")
+        deliver_message_safely(user_id, "Секунду, подвисло. Напиши ещё раз.")
+        return False
 
 
 def is_claude_active_for_message(message):
@@ -1262,6 +1326,9 @@ def handle_document_message(message):
         traceback.print_exc()
 
 
+@bot.callback_query_handler(
+    func=lambda call: call.data.startswith(("approve_", "reject_"))
+)
 def handle_booking_confirmation(call):
     """Обработка подтверждения/отклонения заявки"""
     try:
@@ -1269,17 +1336,34 @@ def handle_booking_confirmation(call):
         action = parts[0]  # approve или reject
         booking_id = '_'.join(parts[1:])  # остальное - это ID
 
-        # Проверяем что заявка существует
-        if booking_id not in pending_bookings:
-            bot.answer_callback_query(call.id, "⚠️ Заявка уже обработана")
-            print(f"⚠️ Booking {booking_id} not found in pending_bookings")
-            return
+        # После рестарта бота восстанавливаем заявку из долговременного backend.
+        booking_info = pending_bookings.get(booking_id)
+        if booking_info is None:
+            result = call_backend_api(f"/api/bookings/{booking_id}", method="GET") or {}
+            booking = result.get("booking") or {}
+            if booking.get("status") != "pre_booking":
+                bot.answer_callback_query(call.id, "⚠️ Заявка уже обработана")
+                print(f"⚠️ Booking {booking_id} is not pending")
+                return
+            booking_info = {
+                "user_id": booking.get("user_id"),
+                "form_data": booking.get("form_data") or {},
+                "timestamp": booking.get("created_at") or datetime.now().isoformat(),
+            }
+            pending_bookings[booking_id] = booking_info
 
-        booking_info = pending_bookings[booking_id]
         user_id = booking_info.get('user_id', 'unknown')
 
         if action == 'approve':
-            # ✅ В работе
+            result = call_backend_api(
+                f"/api/admin/bookings/{booking_id}/confirm",
+                method="POST",
+            )
+            if not result or result.get("status") != "ok":
+                bot.answer_callback_query(call.id, "⚠️ Не удалось обновить бронь")
+                return
+
+            booking_manager_fallback.cancel(booking_id, "manager started")
             bot.answer_callback_query(call.id, "✅ Заявка в работе!")
             
             # Убираем кнопки
@@ -1293,7 +1377,7 @@ def handle_booking_confirmation(call):
                 pass
             
             # Отправляем подтверждение
-            safe_send_message(
+            deliver_message_safely(
                 call.message.chat.id, 
                 f"✅ <b>Заявка #{booking_id} принята в работу</b>\n\n"
                 f"👤 Клиент: {user_id}\n"
@@ -1302,17 +1386,32 @@ def handle_booking_confirmation(call):
             )
             
             # Уведомляем админа лично (если это группа)
-            if call.message.chat.id != int(ADMIN_ID):
-                safe_send_message(
+            if ADMIN_ID and str(call.message.chat.id) != str(ADMIN_ID):
+                deliver_message_safely(
                     ADMIN_ID,
                     f"✅ Заявка #{booking_id} взята в работу\n"
                     f"👤 Обработал: @{call.from_user.username or call.from_user.id}"
                 )
+
+            deliver_message_safely(
+                user_id,
+                build_manager_started_message(booking_id),
+                parse_mode="HTML",
+            )
             
             print(f"✅ Booking {booking_id} approved by {call.from_user.id}")
 
         elif action == 'reject':
-            # ❌ Не удалось
+            result = call_backend_api(
+                f"/api/admin/bookings/{booking_id}/reject",
+                data={},
+                method="POST",
+            )
+            if not result or result.get("status") != "ok":
+                bot.answer_callback_query(call.id, "⚠️ Не удалось обновить бронь")
+                return
+
+            booking_manager_fallback.cancel(booking_id, "booking rejected")
             bot.answer_callback_query(call.id, "❌ Заявка отклонена")
             
             # Убираем кнопки
@@ -1326,7 +1425,7 @@ def handle_booking_confirmation(call):
                 pass
             
             # Отправляем подтверждение
-            safe_send_message(
+            deliver_message_safely(
                 call.message.chat.id,
                 f"❌ <b>Заявка #{booking_id} отклонена</b>\n\n"
                 f"👤 Клиент: {user_id}\n"
@@ -1336,17 +1435,23 @@ def handle_booking_confirmation(call):
             )
             
             # Уведомляем админа лично (если это группа)
-            if call.message.chat.id != int(ADMIN_ID):
-                safe_send_message(
+            if ADMIN_ID and str(call.message.chat.id) != str(ADMIN_ID):
+                deliver_message_safely(
                     ADMIN_ID,
                     f"❌ Заявка #{booking_id} отклонена\n"
                     f"👤 Обработал: @{call.from_user.username or call.from_user.id}"
                 )
+
+            deliver_message_safely(
+                user_id,
+                build_booking_rejected_message(booking_id),
+                parse_mode="HTML",
+            )
             
             print(f"❌ Booking {booking_id} rejected by {call.from_user.id}")
 
         # Удаляем заявку из pending
-        del pending_bookings[booking_id]
+        pending_bookings.pop(booking_id, None)
         print(f"🗑️ Removed booking {booking_id} from pending. Remaining: {len(pending_bookings)}")
 
     except Exception as e:
@@ -1503,34 +1608,6 @@ def handle_start_userbot(call):
         bot.answer_callback_query(call.id, "⚠️ Ошибка запуска UserBot")
 
 
-
-
-def handle_booking_confirmation_callback(call):
-    """Обработка подтверждения/отклонения заявки из callback"""
-    try:
-        parts = call.data.split('_')
-        action = parts[0]
-        booking_id = '_'.join(parts[1:])
-
-        if booking_id not in pending_bookings:
-            bot.answer_callback_query(call.id, "⚠️ Заявка уже обработана")
-            return
-
-        if action == 'approve':
-            bot.answer_callback_query(call.id, "✅ В работе!")
-            bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
-            safe_send_message(call.message.chat.id, "✅ <b>Заявка принята в работу</b>", parse_mode="HTML")
-
-        elif action == 'reject':
-            bot.answer_callback_query(call.id, "❌ Не удалось")
-            bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None)
-            safe_send_message(call.message.chat.id, "❌ <b>Заявка отклонена</b>", parse_mode="HTML")
-
-        del pending_bookings[booking_id]
-
-    except Exception as e:
-        print(f"Error in booking confirmation: {e}")
-        bot.answer_callback_query(call.id, "⚠️ Ошибка")
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "show_main_menu_from_start")
@@ -2122,18 +2199,15 @@ async def notify_booking_submitted(request: Request):
         locations_info = form_data.get('locations', {})
         
         username = form_data.get('username')
-        user_link = f"@{username}" if username else f'<a href="tg://user?id={user_id}">{user_id}</a>'
+        safe_user_id = html.escape(str(user_id))
+        user_link = (
+            f"@{html.escape(str(username))}"
+            if username
+            else f'<a href="tg://user?id={safe_user_id}">{safe_user_id}</a>'
+        )
         
-        # Форматируем даты
-        try:
-            start_date = dates_info.get('start', '').split('T')[0]
-            end_date = dates_info.get('end', '').split('T')[0]
-            start_formatted = datetime.strptime(start_date, '%Y-%m-%d').strftime('%d.%m.%Y')
-            end_formatted = datetime.strptime(end_date, '%Y-%m-%d').strftime('%d.%m.%Y')
-
-        except:
-            start_formatted = dates_info.get('start', '-')
-            end_formatted = dates_info.get('end', '-')
+        start_formatted = format_booking_date(dates_info.get('start'))
+        end_formatted = format_booking_date(dates_info.get('end'))
         
         # Маппинг локаций
         location_map = {
@@ -2143,10 +2217,15 @@ async def notify_booking_submitted(request: Request):
             'other': '📍 Другое'
         }
         
-        pickup = locations_info.get('pickup', 'не указано')
-        return_loc = locations_info.get('return', 'не указано')
-        pickup_formatted = location_map.get(pickup, pickup)
-        return_formatted = location_map.get(return_loc, return_loc)
+        pickup = locations_info.get('pickupLocation', 'не указано')
+        return_loc = (
+            locations_info.get('returnLocation')
+            or locations_info.get('dropoffLocation')
+            or 'не указано'
+        )
+        pickup_formatted = html.escape(str(location_map.get(pickup, pickup)))
+        return_formatted = html.escape(str(location_map.get(return_loc, return_loc)))
+        contact_value = html.escape(str(contact_info.get('value') or '-'))
         
         # ✅ ОДНО сообщение в группу HOT BOOKINGS с кнопками
         admin_message = (
@@ -2154,11 +2233,11 @@ async def notify_booking_submitted(request: Request):
             f"{user_link}\n"
             f"<code>{user_id}</code>\n"
             f"{datetime.now().strftime('%d.%m %H:%M')}\n\n"
-            f"{car_info.get('name', f"{car_info.get('brand', '')} {car_info.get('model', '')}")}\n"
+            f"{booking_car_name(form_data)}\n"
             f"{start_formatted} - {end_formatted} ({dates_info.get('days', '?')} дн.)\n"
             f"{pickup_formatted} → {return_formatted}\n\n"
-            f"<b>{pricing_info.get('grandTotal', 0):,} ฿</b>\n"
-            f"{contact_info.get('value', '-')}"
+            f"<b>{int(pricing_info.get('grandTotal') or 0):,} ฿</b>\n"
+            f"{contact_value}"
         )
         
         markup = InlineKeyboardMarkup()
@@ -2167,25 +2246,66 @@ async def notify_booking_submitted(request: Request):
             InlineKeyboardButton("❌ Не удалось", callback_data=f"reject_{booking_id}")
         )
         
+        existing_pending = pending_bookings.get(booking_id) or {}
+
         # Сохраняем для обработки callback
         touch_runtime_user(user_id)
         pending_bookings[booking_id] = {
             'user_id': user_id,
             'form_data': form_data,
-            'timestamp': datetime.now().isoformat()
+            'timestamp': existing_pending.get('timestamp') or datetime.now().isoformat(),
+            'client_notified': bool(existing_pending.get('client_notified')),
+            'group_notified': bool(existing_pending.get('group_notified')),
         }
-        
-        # ✅ ОДНА отправка в группу
-        if HOT_BOOKINGS_CHAT_ID:
-            safe_send_message(
+
+        client_notified = pending_bookings[booking_id]['client_notified']
+        if not client_notified:
+            client_notified = deliver_message_safely(
+                user_id,
+                build_customer_booking_received(booking_id, form_data),
+                parse_mode="HTML",
+            )
+            pending_bookings[booking_id]['client_notified'] = client_notified
+
+        group_notified = pending_bookings[booking_id]['group_notified']
+        if HOT_BOOKINGS_CHAT_ID and not group_notified:
+            group_notified = deliver_message_safely(
                 HOT_BOOKINGS_CHAT_ID,
                 admin_message,
                 parse_mode="HTML",
                 reply_markup=markup
             )
+            pending_bookings[booking_id]['group_notified'] = group_notified
+
+        if group_notified:
             print(f"✅ Sent booking to hot group with buttons")
-        
-        return JSONResponse(content={"status": "ok", "booking_id": booking_id})
+        else:
+            print(f"❌ Booking {booking_id} was not delivered to HOT bookings group")
+            if ADMIN_ID:
+                deliver_message_safely(
+                    ADMIN_ID,
+                    f"⚠️ Бронь #{booking_id} не доставлена в HOT-группу. "
+                    f"Клиент: {user_id}",
+                )
+
+        fallback_scheduled = booking_manager_fallback.schedule(
+            booking_id,
+            user_id,
+            form_data,
+        )
+
+        response_payload = {
+            "status": "ok" if group_notified else "partial",
+            "booking_id": booking_id,
+            "client_notified": client_notified,
+            "group_notified": group_notified,
+            "fallback_scheduled": fallback_scheduled,
+            "fallback_delay_seconds": BOOKING_MANAGER_RESPONSE_TIMEOUT_SECONDS,
+        }
+        return JSONResponse(
+            status_code=200 if group_notified else 502,
+            content=response_payload,
+        )
         
     except Exception as e:
         print(f"❌ Error in notify_booking_submitted: {e}")

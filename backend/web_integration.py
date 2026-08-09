@@ -1826,14 +1826,15 @@ def notify_telegram_bot_about_booking(booking_id: str, user_id: Union[int, str],
         print(f"📤 User ID: {user_id}")
         print(f"📤 Username: {username}")
         
-        form_data['username'] = username
+        notification_form_data = dict(form_data)
+        notification_form_data['username'] = username
         
         response = requests.post(
             url,
             json={
                 "booking_id": booking_id,
                 "user_id": user_id,
-                "form_data": form_data
+                "form_data": notification_form_data
             },
             timeout=5,
             headers={"Content-Type": "application/json"}
@@ -1844,7 +1845,7 @@ def notify_telegram_bot_about_booking(booking_id: str, user_id: Union[int, str],
             action="booking_submitted",
             initiated_by="user",
             booking_id=booking_id,
-            form_data=form_data,
+            form_data=notification_form_data,
             username=username
         )
         
