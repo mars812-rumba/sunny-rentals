@@ -44,6 +44,7 @@ from customer_outreach_campaign import (
     load_recipients as load_outreach_recipients,
     select_recipient_batch,
 )
+from claude_dialog import build_pricing_context, parse_claude_output, requests_manager_handoff
 
 # Claude AI imports
 try:
@@ -210,7 +211,7 @@ except Exception as e:
 
 # Claude AI Configuration
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY") or os.getenv("CLAUDE_API_KEY")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-5")
 
 # Claude client initialization
 claude_client = None
@@ -915,14 +916,15 @@ def determine_category(car_name: str) -> str:
         return 'bikes'
     return 'sedan'
 
-def log_chat_to_file(user_id, role, content):
+def log_chat_to_file(user_id, role, content, **metadata):
     """Логирует сообщение в файл chat_logs.jsonl."""
     try:
         log_entry = {
             "timestamp": datetime.now().isoformat(),
             "user_id": user_id,
             "role": role,  # "user" или "assistant"
-            "content": content
+            "content": content,
+            **metadata,
         }
         # 'a' - append (добавление в конец файла)
         with open(CHAT_LOGS_JSONL, 'a', encoding='utf-8') as f:
@@ -1214,18 +1216,24 @@ def get_dialog_status_from_history(user_id: int):
         claude_status = "stopped"
         messages_marked_read = False
 
-        # Определяем статус Claude из событий
+        # Определяем статус Claude по самому свежему статусному событию.
+        # events уже отсортированы от новых к старым.
+        status_found = False
         for event in events:
             action = event.get("action")
-            if action == "claude_started":
+            if not status_found and action == "claude_started":
                 claude_status = "active"
-            elif action == "claude_paused":
+                status_found = True
+            elif not status_found and action == "claude_paused":
                 claude_status = "paused"
-            elif action == "claude_stopped":
+                status_found = True
+            elif not status_found and action == "claude_stopped":
                 claude_status = "stopped"
-            elif action == "claude_resumed":
+                status_found = True
+            elif not status_found and action == "claude_resumed":
                 claude_status = "active"
-            elif action == "messages_marked_read":
+                status_found = True
+            if action == "messages_marked_read":
                 messages_marked_read = True
 
         # Анализируем сообщения
@@ -1551,6 +1559,36 @@ def handle_claude_best_options(user_id):
         return {"status": "error", "message": str(e)}
     
     
+def record_manager_handoff(user_id: Union[int, str], response_text: str) -> bool:
+    """Persist a real CRM handoff instead of leaving it as an AI promise."""
+    try:
+        now = datetime.utcnow().isoformat()
+        current_user = get_user_latest_record(user_id) or {}
+        current_status = current_user.get("status")
+        if current_status not in {"in_work", "pre_booking", "confirmed", "booked"}:
+            update_all_user_records(user_id, {"status": "in_work", "updated_at": now})
+
+        update_dialog_status(
+            user_id,
+            active=True,
+            has_new_messages=True,
+            last_message_at=now,
+            last_message_from="claude",
+            claude_status="paused",
+        )
+        log_dialog_event(user_id, "manager_handoff_requested", {
+            "response": response_text,
+            "source": "claude",
+        })
+        log_dialog_event(user_id, "claude_paused", {
+            "reason": "manager_handoff",
+        })
+        return True
+    except Exception as exc:
+        print(f"❌ Failed to record manager handoff for {user_id}: {exc}")
+        return False
+
+
 def process_claude_message(user_id, user_input):
     """Обрабатывает сообщение через Claude API"""
     try:
@@ -1580,19 +1618,14 @@ def process_claude_message(user_id, user_input):
                 name = car.get('name', 'Без названия')
                 car_class = car.get('class', '').upper()
                 
-                # Цены
+                # Цены: передаём обе реальные сезонные сетки. Каталожное
+                # available не является проверкой доступности на даты.
                 pricing = car.get('pricing', {})
-                season_pricing = pricing.get('high_season', {}) or pricing.get('low_season', {})
-                
-                p_1_6 = season_pricing.get('price_1_6', 0)
-                p_7_14 = season_pricing.get('price_7_14', 0)
-                p_15_29 = season_pricing.get('price_15_29', 0)
-                p_30 = season_pricing.get('price_30_plus', 0)
                 deposit = pricing.get('deposit', 5000)
                 
                 cars_context += (
                     f"\n{name} ({car_class})\n"
-                    f"Цены: 1-6д={p_1_6}฿ | 7-14д={p_7_14}฿ | 15-29д={p_15_29}฿ | 30+д={p_30}฿\n"
+                    f"{build_pricing_context(pricing)}\n"
                     f"Депозит: {deposit}฿\n"
                 )
                 
@@ -1612,6 +1645,15 @@ def process_claude_message(user_id, user_input):
         
         # Системный промпт с инструкциями
         system_prompt = CLAUDE_SYSTEM_PROMPT + cars_context
+        system_prompt += """
+
+ФАКТИЧЕСКИЙ СТАТУС ДАННЫХ:
+- Клиент уже пишет нам в Telegram: Telegram-чат является известным контактом. НЕ спрашивай телефон, email или Telegram повторно. Другой контакт запрашивай только если клиент сам просит связаться другим способом.
+- Поле available выше означает только присутствие транспорта в каталоге. Проверка занятости на конкретные даты здесь НЕ выполнена. Не говори «доступен/свободен на даты»; скажи, что менеджер подтвердит даты.
+- Низкий сезон: апрель–октябрь. Высокий сезон: ноябрь–март.
+- Для аренды, пересекающей сезоны, не выбирай один тариф на весь период и не выдумывай смешанный итог. Назови подтверждённые тарифы обоих сезонов либо передай точный расчёт менеджеру.
+- Если в сетке есть значение 30+д, никогда не говори, что месячной цены нет.
+"""
         active_booking = select_active_booking(load_bookings(), user_id)
         if active_booking:
             system_prompt += "\n\n" + build_booking_claude_context(
@@ -1680,46 +1722,23 @@ def process_claude_message(user_id, user_input):
             traceback.print_exc()
             raise
 
-        # Логирование
+        # Сначала очищаем ответ, затем логируем то, что реально увидит клиент.
+        text_to_send, photos_to_send = parse_claude_output(claude_response_raw)
+        print(f"📸 Found {len(photos_to_send)} unique photos to send")
+        handoff_requested = requests_manager_handoff(text_to_send)
+
         try:
-            log_chat_to_file(user_id, "assistant", claude_response_raw)
-            
-            # TODO: Добавить уведомление в группу если нужно
-            # if ACTIVE_DIALOGS_CHAT_ID:
-            #     safe_send_message(
-            #         ACTIVE_DIALOGS_CHAT_ID,
-            #         f"👤 {user_id}: {user_input[:100]}\n\n🤖 Claude: {claude_response_raw[:150]}...",
-            #         parse_mode="HTML"
-            #     )
+            log_chat_to_file(
+                user_id,
+                "assistant",
+                text_to_send,
+                photos=photos_to_send,
+                handoff_requested=handoff_requested,
+            )
         except Exception as e:
             print(f"⚠️ Logging error: {e}")
 
-        # Убираем **
-        claude_response_raw = claude_response_raw.replace('**', '')
-        
-        # Парсим фото - поддерживаем оба формата: [image:path] и ![alt](image:path)
-        photos_to_send = []
-        text_to_send = claude_response_raw
-        
-        if '[image:' in claude_response_raw or '](image:' in claude_response_raw:
-            import re
-            # Ищем оба формата: [image:path] и ![alt](image:path)
-            image_matches = re.findall(r'\[image:([^\]]+)\]', claude_response_raw)
-            markdown_matches = re.findall(r'!\[[^\]]*\]\((image:[^)]+)\)', claude_response_raw)
-            all_matches = image_matches + markdown_matches
-            
-            # Убираем дубликаты но сохраняем порядок
-            seen = set()
-            photos_to_send = []
-            for p in all_matches:
-                if p not in seen:
-                    seen.add(p)
-                    photos_to_send.append(p)
-            
-            # Удаляем оба формата из текста
-            text_to_send = re.sub(r'\[image:[^\]]+\]', '', claude_response_raw)
-            text_to_send = re.sub(r'!\[[^\]]*\]\([^)]+\)', '', text_to_send).strip()
-            print(f"📸 Found {len(photos_to_send)} unique photos to send")
+        handoff_recorded = record_manager_handoff(user_id, text_to_send) if handoff_requested else False
 
         # Сохраняем в историю
         conversation_history.append({"role": "assistant", "content": claude_response_raw})
@@ -1738,7 +1757,9 @@ def process_claude_message(user_id, user_input):
             "message": "Сообщение обработано",
             "response_text": text_to_send,
             "photos": photos_to_send,
-            "raw_response": claude_response_raw
+            "raw_response": claude_response_raw,
+            "handoff_requested": handoff_requested,
+            "handoff_recorded": handoff_recorded,
         }
 
     except Exception as e:

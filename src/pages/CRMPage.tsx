@@ -1990,18 +1990,36 @@ const handleUpdateNote = async () => {
         msg?.content?.media ||  // Новый формат
         msg?.media ||           // На верхнем уровне
         null;
+      const storedCataloguePhotos: string[] = Array.isArray(msg?.photos)
+        ? msg.photos.filter((path: unknown): path is string => typeof path === 'string' && path.length > 0)
+        : [];
 
       // ✅ УНИВЕРСАЛЬНОЕ ИЗВЛЕЧЕНИЕ ТЕКСТА (проверяем все варианты)
-      const messageText = 
+      const rawMessageText = 
         msg?.text ||                           // Прямо в msg
         msg?.content?.text ||                  // В content.text
         msg?.content?.message ||               // В content.message
         (typeof msg?.content === 'string' ? msg.content : null) ||  // content - строка
         (msg?.content?.content && msg.content.content !== '[Медиафайл]' && msg.content.content !== '[Фотография]' 
           ? msg.content.content : null);       // Вложенный content.content
+      const legacyCataloguePhotos = typeof rawMessageText === 'string'
+        ? [
+            ...Array.from(rawMessageText.matchAll(/\[image:([^\]]+)\]/g), (match) => match[1].trim()),
+            ...Array.from(rawMessageText.matchAll(/!\[[^\]]*\]\(image:([^)]+)\)/g), (match) => match[1].trim()),
+          ]
+        : [];
+      const cataloguePhotos = Array.from(new Set([...storedCataloguePhotos, ...legacyCataloguePhotos]));
+      const messageText = typeof rawMessageText === 'string'
+        ? rawMessageText
+            .replace(/\*\*/g, '')
+            .replace(/\[image:[^\]]+\]/g, '')
+            .replace(/!\[[^\]]*\]\(image:[^)]+\)/g, '')
+            .replace(/\n{3,}/g, '\n\n')
+            .trim()
+        : rawMessageText;
 
       // ✅ Пропускаем только если нет ни медиа, ни текста
-      if (!messageText && !media) {
+      if (!messageText && !media && cataloguePhotos.length === 0) {
         console.warn(`⚠️ [SKIP] Empty message ${i}`);
         return null;
       }
@@ -2018,6 +2036,22 @@ const handleUpdateNote = async () => {
                 : 'bg-blue-600 text-white rounded-br-none'
             }`}
           >
+            {cataloguePhotos.length > 0 && (
+              <div className="grid grid-cols-1 gap-2 mb-2">
+                {cataloguePhotos.map((photoPath) => {
+                  const photoUrl = `/images_web/${photoPath.split('/').map(encodeURIComponent).join('/')}`;
+                  return (
+                    <img
+                      key={photoPath}
+                      src={photoUrl}
+                      alt="Фото транспорта из каталога"
+                      className="max-w-full h-auto rounded-lg cursor-pointer border border-white/20 object-contain"
+                      onClick={() => window.open(photoUrl, '_blank')}
+                    />
+                  );
+                })}
+              </div>
+            )}
             {/* ===== MEDIA MESSAGE ===== */}
             {media && media.download_url ? (
               <div className="space-y-2 max-w-full overflow-hidden">
@@ -2087,7 +2121,7 @@ const handleUpdateNote = async () => {
               </div>
             ) : (
               /* ===== TEXT ONLY MESSAGE ===== */
-              <p className="break-words overflow-wrap-anywhere">{messageText}</p>
+              messageText ? <p className="break-words overflow-wrap-anywhere">{messageText}</p> : null
             )}
             
             {/* Checkmarks for manager messages */}

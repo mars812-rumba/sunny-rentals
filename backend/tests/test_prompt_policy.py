@@ -23,6 +23,15 @@ class PromptPolicyTests(unittest.TestCase):
         self.assertIn("Наличие модели в каталоге НЕ означает доступность", self.prompt)
         self.assertIn("только после фактической проверки доступности", self.prompt)
 
+    def test_known_telegram_contact_is_not_requested_again(self):
+        self.assertIn("Telegram-чат является известным контактом", self.prompt)
+        self.assertIn("НЕ спрашивай телефон, email или Telegram", self.prompt)
+
+    def test_monthly_and_cross_season_pricing_rules_are_present(self):
+        self.assertIn("Низкий сезон: апрель–октябрь", self.prompt)
+        self.assertIn("Высокий сезон: ноябрь–март", self.prompt)
+        self.assertIn("тариф 30+ дней", self.prompt)
+
 
 if __name__ == "__main__":
     unittest.main()

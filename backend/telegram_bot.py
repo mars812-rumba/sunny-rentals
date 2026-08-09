@@ -74,7 +74,7 @@ VIDEO_FILE_ID = "BAACAgIAAxkBAAI4iGkmEWxPerhmNL7xcN49Xx9_zoGGAAK-hQACd2M5SfFLM5c
 
 # Claude AI Configuration
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY") or os.getenv("CLAUDE_API_KEY")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-5")
 
 # Load prompts for compatibility
 try:
@@ -870,6 +870,7 @@ def process_claude_message(user_id, user_input):
             # Получаем ответ от Claude и отправляем пользователю
             response_text = result.get("response_text", "")
             photos = result.get("photos", [])
+            handoff_recorded = bool(result.get("handoff_recorded"))
             
             # ОБНОВЛЯЕМ СТАТУС ДИАЛОГА ПРИ ОТВЕТЕ CLAUDE
             handle_dialog_claude_message(user_id, response_text)
@@ -894,6 +895,14 @@ def process_claude_message(user_id, user_input):
                 delivered = deliver_message_safely(user_id, response_text)
             else:
                 delivered = False
+
+            if handoff_recorded:
+                user_conversations.setdefault(user_id, {})["status"] = "paused"
+                send_dialog_to_group(
+                    user_id,
+                    "analysis",
+                    "AI передал клиента менеджеру. Нужен ответ человеку.",
+                )
                 
             print(f"✅ Claude message processed and sent to {user_id}")
             return delivered
