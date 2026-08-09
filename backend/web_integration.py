@@ -33,6 +33,8 @@ from fastapi.responses import FileResponse
 
 from pydantic import BaseModel, Field, validator
 from urllib.parse import parse_qsl, unquote
+from booking_time import normalize_booking_dates, validate_time_value
+from booking_notifications import build_booking_claude_context, select_active_booking
 
 # Claude AI imports
 try:
@@ -196,7 +198,7 @@ except Exception as e:
 
 # Claude AI Configuration
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY") or os.getenv("CLAUDE_API_KEY")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-5")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5")
 
 # Claude client initialization
 claude_client = None
@@ -371,6 +373,23 @@ class DatesData(BaseModel):
     start: str  # ISO datetime string
     end: str
     days: int
+    pickupTime: str = '13:00'
+    returnTime: str = '13:00'
+
+    @validator('pickupTime', 'returnTime')
+    def validate_booking_time(cls, value):
+        return validate_time_value(value)
+
+    @validator('returnTime')
+    def validate_datetime_order(cls, value, values):
+        if values.get('start') and values.get('end') and values.get('pickupTime'):
+            normalize_booking_dates({
+                'start': values['start'],
+                'end': values['end'],
+                'pickupTime': values['pickupTime'],
+                'returnTime': value,
+            })
+        return value
 
 class LocationsData(BaseModel):
     pickupLocation: Optional[str] = 'airport'
@@ -1578,6 +1597,12 @@ def process_claude_message(user_id, user_input):
         
         # Системный промпт с инструкциями
         system_prompt = CLAUDE_SYSTEM_PROMPT + cars_context
+        active_booking = select_active_booking(load_bookings(), user_id)
+        if active_booking:
+            system_prompt += "\n\n" + build_booking_claude_context(
+                active_booking.get("booking_id") or "—",
+                active_booking.get("form_data") or {},
+            )
         system_prompt += """
 
 ПРАВИЛА ОТПРАВКИ ФОТО:
@@ -4382,9 +4407,15 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
             raise HTTPException(status_code=400, detail="form_data is missing")
         
         # ✅ НОВАЯ ПРОВЕРКА: Проверяем пересечение дат
+        form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
+        try:
+            form_data_dict['dates'] = normalize_booking_dates(form_data_dict.get('dates') or {})
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error))
+
         car_id = form_data.car.id
-        start_date = form_data.dates.start
-        end_date = form_data.dates.end
+        start_date = form_data_dict['dates']['start']
+        end_date = form_data_dict['dates']['end']
         
         overlap_check = check_booking_overlap(
             car_id=car_id,
@@ -4409,7 +4440,6 @@ async def admin_create_booking(booking_data: AdminBookingRequest):
             )
         
         # Конвертируем Pydantic в dict
-        form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
         locations = form_data_dict.get("locations", {})
         if locations.get("returnLocation"):
             locations["dropoffLocation"] = locations["returnLocation"]
@@ -4511,9 +4541,15 @@ async def web_create_booking(booking_data: AdminBookingRequest):
             raise HTTPException(status_code=400, detail="form_data is missing")
         
         # ✅ НОВАЯ ПРОВЕРКА: Проверяем пересечение дат
+        form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
+        try:
+            form_data_dict['dates'] = normalize_booking_dates(form_data_dict.get('dates') or {})
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error))
+
         car_id = form_data.car.id
-        start_date = form_data.dates.start
-        end_date = form_data.dates.end
+        start_date = form_data_dict['dates']['start']
+        end_date = form_data_dict['dates']['end']
         
         overlap_check = check_booking_overlap(
             car_id=car_id,
@@ -4536,9 +4572,6 @@ async def web_create_booking(booking_data: AdminBookingRequest):
                 status_code=409,
                 detail=f"Машина уже забронирована на эти даты:\n{conflict_info}"
             )
-        
-        # Конвертируем Pydantic в dict
-        form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
         
         bookings = load_bookings()
         
@@ -4635,9 +4668,15 @@ async def telegram_webapp_create_booking(
         if not form_data:
             raise HTTPException(status_code=400, detail="form_data is missing")
 
+        form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
+        try:
+            form_data_dict['dates'] = normalize_booking_dates(form_data_dict.get('dates') or {})
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error))
+
         car_id = form_data.car.id
-        start_date = form_data.dates.start
-        end_date = form_data.dates.end
+        start_date = form_data_dict['dates']['start']
+        end_date = form_data_dict['dates']['end']
 
         overlap_check = check_booking_overlap(
             car_id=car_id,
@@ -4657,7 +4696,6 @@ async def telegram_webapp_create_booking(
                 detail=f"Машина уже забронирована на эти даты:\n{conflict_info}"
             )
 
-        form_data_dict = form_data.model_dump() if hasattr(form_data, 'model_dump') else form_data.dict()
         locations = form_data_dict.get("locations", {})
         if locations.get("returnLocation"):
             locations["dropoffLocation"] = locations["returnLocation"]
@@ -4737,6 +4775,8 @@ async def telegram_webapp_create_booking(
                 "start": form_data_dict["dates"].get("start"),
                 "end": form_data_dict["dates"].get("end"),
                 "days": form_data_dict["dates"].get("days", 1),
+                "pickupTime": form_data_dict["dates"].get("pickupTime", "13:00"),
+                "returnTime": form_data_dict["dates"].get("returnTime", "13:00"),
             },
             "source": "telegram_webapp",
         })

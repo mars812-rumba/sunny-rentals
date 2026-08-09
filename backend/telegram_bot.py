@@ -41,10 +41,13 @@ from webapp_claude_outreach import WebAppClaudeOutreachScheduler
 from booking_notifications import (
     BookingFallbackScheduler,
     booking_car_name,
+    build_booking_claude_context,
     build_booking_rejected_message,
     build_customer_booking_received,
+    build_existing_booking_message,
     build_manager_started_message,
     format_booking_date,
+    select_active_booking,
 )
 
 # --- CONFIGURATION ---
@@ -71,7 +74,7 @@ VIDEO_FILE_ID = "BAACAgIAAxkBAAI4iGkmEWxPerhmNL7xcN49Xx9_zoGGAAK-hQACd2M5SfFLM5c
 
 # Claude AI Configuration
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY") or os.getenv("CLAUDE_API_KEY")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-5")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5")
 
 # Load prompts for compatibility
 try:
@@ -776,6 +779,12 @@ def load_booking_status(booking_id):
     return booking.get("status")
 
 
+def load_active_booking_for_user(user_id):
+    """Load the durable active booking used to make /start idempotent."""
+    result = call_backend_api(f"/api/crm/bookings/{user_id}", method="GET") or {}
+    return select_active_booking(result.get("bookings") or [], user_id)
+
+
 def start_booking_claude_fallback(user_id, booking_id, form_data):
     """Let Claude continue a hot lead only while the manager is still silent."""
     car = form_data.get("car") or {}
@@ -783,7 +792,9 @@ def start_booking_claude_fallback(user_id, booking_id, form_data):
         str(car.get(field) or "").strip()
         for field in ("brand", "model", "year")
     ).strip() or "выбранный транспорт"
+    booking_context = build_booking_claude_context(booking_id, form_data)
     prompt = (
+        f"{booking_context}\n\n"
         f"Клиент уже отправил заявку #{booking_id} на {car_name}. "
         "Менеджер пока не подключился. Начни ответ СТРОГО с фразы: "
         "'Вижу твою заявку — она у нас.' Не обещай доступность машины и не называй "
@@ -1039,6 +1050,20 @@ def handle_start(message):
     except:
         pass
 
+    # Повторный /start после заявки не должен снова открывать воронку каталога.
+    active_booking = load_active_booking_for_user(user_id)
+    if active_booking:
+        safe_send_message(
+            chat_id,
+            build_existing_booking_message(active_booking),
+            parse_mode="HTML",
+        )
+        print(
+            f"📋 /start for {user_id}: active booking "
+            f"{active_booking.get('booking_id')}, catalogue CTA suppressed"
+        )
+        return
+
     # Трекаем вход
     source = 'telegram_web'
     if ' ' in message.text:
@@ -1095,16 +1120,6 @@ def handle_start(message):
                 print(f"⚠️ Не удалось убрать клавиатуру: {e}")
 
         threading.Thread(target=remove_keyboard_after_delay, daemon=True).start()
-
-        # Опционально: полное удаление сообщения через 3 минуты (если хочешь супер-чистоту)
-        def delete_message_later():
-            time.sleep(2*60)
-            try:
-                bot.delete_message(chat_id, msg.message_id)
-                bot.send_message(chat_id,"👀 Менеджер подключается к чату...")
-            except:
-                pass
-        threading.Thread(target=delete_message_later, daemon=True).start()
 
     except Exception as e:
         print(f"Ошибка отправки стартового сообщения: {e}")
@@ -2208,6 +2223,8 @@ async def notify_booking_submitted(request: Request):
         
         start_formatted = format_booking_date(dates_info.get('start'))
         end_formatted = format_booking_date(dates_info.get('end'))
+        pickup_time = html.escape(str(dates_info.get('pickupTime') or '13:00'))
+        return_time = html.escape(str(dates_info.get('returnTime') or '13:00'))
         
         # Маппинг локаций
         location_map = {
@@ -2234,7 +2251,8 @@ async def notify_booking_submitted(request: Request):
             f"<code>{user_id}</code>\n"
             f"{datetime.now().strftime('%d.%m %H:%M')}\n\n"
             f"{booking_car_name(form_data)}\n"
-            f"{start_formatted} - {end_formatted} ({dates_info.get('days', '?')} дн.)\n"
+            f"{start_formatted} {pickup_time} — {end_formatted} {return_time} "
+            f"({dates_info.get('days', '?')} дн.)\n"
             f"{pickup_formatted} → {return_formatted}\n\n"
             f"<b>{int(pricing_info.get('grandTotal') or 0):,} ฿</b>\n"
             f"{contact_value}"
