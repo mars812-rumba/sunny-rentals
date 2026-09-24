@@ -3,7 +3,6 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { MessageCircle, X } from "lucide-react";
 
 import telegramIcon from "@/assets/icons/telegram_ico.webp";
-import whatsappIcon from "@/assets/icons/wa_ico.webp";
 
 export const StickyContactMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -69,16 +68,16 @@ export const StickyContactMenu = () => {
               </a>
 
               <a
-                href="https://wa.me/66842039140"
+                href="https://t.me/marseloid"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsOpen(false)}
-                className="group flex min-h-14 items-center gap-3 rounded-2xl bg-[#25D366] px-4 text-sm font-bold text-white transition hover:bg-[#1fbd5b] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/50"
+                className="group flex min-h-14 items-center gap-3 rounded-2xl bg-[#1877A9] px-4 text-sm font-bold text-white transition hover:bg-[#12658f] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300/50"
               >
                 <span className="grid h-9 w-9 place-items-center rounded-full bg-white/16">
-                  <img src={whatsappIcon} alt="" className="h-6 w-6" />
+                  <img src={telegramIcon} alt="" className="h-6 w-6" />
                 </span>
-                Написать в WhatsApp
+                Написать @marseloid
               </a>
             </div>
           </motion.div>

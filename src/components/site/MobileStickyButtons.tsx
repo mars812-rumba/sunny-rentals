@@ -15,11 +15,11 @@ export const MobileStickyButtons = () => {
         </a>
       </div>
 
-      {/* WhatsApp FAB */}
+      {/* Personal Telegram FAB */}
       <a 
-        href="https://wa.me/66842039140"
-        className="fixed bottom-20 md:bottom-8 right-4 z-50 w-14 h-14 bg-tropical-green hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all"
-        aria-label="Contact via WhatsApp"
+        href="https://t.me/marseloid"
+        className="fixed bottom-20 md:bottom-8 right-4 z-50 w-14 h-14 bg-[#229ED9] hover:bg-[#168dcc] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all"
+        aria-label="Написать @marseloid в Telegram"
       >
         <MessageCircle className="w-7 h-7 text-white" />
       </a>

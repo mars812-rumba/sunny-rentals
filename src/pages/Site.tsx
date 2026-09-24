@@ -78,8 +78,11 @@ const Site = () => {
               "ratingValue": "4.8",
               "reviewCount": "100"
             },
-            "telephone": "+66842039140",
-            "url": "https://sunny-rentals.online"
+            "url": "https://sunny-rentals.online",
+            "sameAs": [
+              "https://t.me/webapp_rent_bot",
+              "https://t.me/marseloid"
+            ]
           }`}
         </script>
       </Helmet>

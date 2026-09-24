@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button-variants";
 import telegramIcon from "@/assets/icons/telegram_ico.webp";
-import whatsappIcon from "@/assets/icons/wa_ico.webp";
 
 export const FinalCTASection = () => {
   return (
@@ -32,13 +31,13 @@ export const FinalCTASection = () => {
               Забронировать через Telegram
             </a>
             <a
-              href="https://wa.me/66842039140"
+              href="https://t.me/marseloid"
               target="_blank"
               rel="noopener noreferrer"
-              className={cn(buttonVariants({ size: "xl" }), "gap-2 bg-[#25D366] text-white hover:bg-[#1fbd5b] shadow-lg")}
+              className={cn(buttonVariants({ size: "xl" }), "gap-2 bg-[#1877A9] text-white hover:bg-[#12658f] shadow-lg")}
             >
-              <img src={whatsappIcon} alt="" className="h-6 w-6" />
-              Написать в WhatsApp
+              <img src={telegramIcon} alt="" className="h-6 w-6" />
+              Написать @marseloid
             </a>
           </div>
           

@@ -4,9 +4,10 @@ export const siteConfig = {
   locale: "ru_RU",
   title: "Аренда авто и байков на Пхукете",
   description:
-    "Аренда автомобилей и байков на Пхукете с прозрачными ценами, доставкой и поддержкой 24/7.",
+    "Автомобили и байки в аренду на Пхукете: фотографии, сезонные тарифы и бронирование через Telegram.",
   telegramBotUrl: "https://t.me/webapp_rent_bot",
-  whatsappUrl: "https://wa.me/66842039140",
+  managerTelegramUrl: "https://t.me/marseloid",
+  managerTelegramHandle: "@marseloid",
 } as const;
 
 export function absoluteUrl(path = "/"): string {

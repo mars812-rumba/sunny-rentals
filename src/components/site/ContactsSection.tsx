@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { ExternalLink, Clock } from "lucide-react";
 
 // Импорт иконок
-import waIcon from "@/assets/icons/wa_ico.png";
 import botIcon from "@/assets/icons/bot_ico.png";
 import channelIcon from "@/assets/icons/tgk_ico.png";
 import telegramIcon from "@/assets/icons/telegram_ico.png";
@@ -25,13 +24,6 @@ const contacts = [
     link: "https://t.me/marseloid",
     icon: telegramIcon,
     online: true,
-  },
-  {
-    title: "WhatsApp",
-    subtitle: "Звонки и чат",
-    value: "+66 84 203 9140",
-    link: "https://wa.me/66842039140",
-    icon: waIcon,
   },
   {
     title: "Наш канал",

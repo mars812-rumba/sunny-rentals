@@ -18,9 +18,9 @@ export const Footer = () => {
 
   const contactLinks = [
     { href: "https://t.me/webapp_rent_bot", label: "Telegram бот" },
+    { href: "https://t.me/marseloid", label: "Telegram @marseloid" },
     { href: "https://t.me/carbook_in_phuket", label: "Telegram канал" },
     { href: "https://instagram.com/sunny.rentals.phuket", label: "Instagram" },
-    { href: "https://wa.me/66842039140", label: "WhatsApp" }, // Заменили Email на WA
   ];
 
   return (

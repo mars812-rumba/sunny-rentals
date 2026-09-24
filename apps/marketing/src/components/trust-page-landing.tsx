@@ -35,14 +35,14 @@ export function TrustPageLanding({ page, locale }: { page: TrustPageContent; loc
   const labels = locale === "ru"
     ? {
         home: "Главная", guides: "Аренда и условия", fleet: "Выбрать транспорт",
-        telegram: "Продолжить в Telegram", whatsapp: "Задать вопрос в WhatsApp",
+        telegram: "Продолжить в Telegram", whatsapp: "Написать @marseloid",
         related: "Читайте также", updated: "Обновлено", footer: "Условия аренды",
         matching: "Подходящие варианты",
         matchingIntro: "Реальные машины из парка с ценами, депозитами и условиями.",
       }
     : {
         home: "Home", guides: "Rental and terms", fleet: "Choose a vehicle",
-        telegram: "Continue in Telegram", whatsapp: "Ask on WhatsApp",
+        telegram: "Continue in Telegram", whatsapp: "Message @marseloid",
         related: "Related guides", updated: "Updated", footer: "Trust and rental guides",
         matching: "Matching vehicles",
         matchingIntro: "Real fleet vehicles with rates, deposits and terms.",
@@ -178,7 +178,7 @@ export function TrustPageLanding({ page, locale }: { page: TrustPageContent; loc
             </div>
             <div>
               <a href={siteConfig.telegramBotUrl}>{labels.telegram}</a>
-              <a href={siteConfig.whatsappUrl} target="_blank" rel="noopener noreferrer">{labels.whatsapp}</a>
+              <a href={siteConfig.managerTelegramUrl} target="_blank" rel="noopener noreferrer">{labels.whatsapp}</a>
             </div>
           </div>
         </section>
