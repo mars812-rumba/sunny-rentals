@@ -187,7 +187,7 @@ export function VehicleLanding({
   const deliveryAirport = car.terms.delivery?.find((item) => item.zone === "airport")?.priceThb;
   const deliveryCity = car.terms.delivery?.find((item) => item.zone === "city")?.priceThb;
 
-  const createProduct = (variant: MarketingCar, variantOf = false) => {
+  const createProduct = (variant: MarketingCar) => {
     const localizedVariant = getLocalizedCar(variant, locale);
     const variantName = [variant.brand, variant.model, variant.year].filter(Boolean).join(" ");
     const variantUrl = absoluteUrl(localePath(locale, `/cars/${variant.slug}`));
@@ -201,7 +201,7 @@ export function VehicleLanding({
       inLanguage: copy.htmlLang,
       brand: { "@type": "Brand", name: variant.brand },
       category: getLocalizedCategory(variant.category, locale)?.name,
-      ...(variantOf ? { isVariantOf: { "@id": `${canonicalPageUrl}#model-group` } } : {}),
+      color: locale === "en" ? variant.colorEn : variant.color,
       additionalProperty: [
         { "@type": "PropertyValue", name: locale === "ru" ? "Год" : "Year", value: variant.year },
         { "@type": "PropertyValue", name: locale === "ru" ? "Цвет" : "Colour", value: locale === "ru" ? variant.color : variant.colorEn },
@@ -212,6 +212,7 @@ export function VehicleLanding({
         url: variantUrl,
         priceCurrency: "THB",
         price: variant.fromPrice,
+        availability: "https://schema.org/LimitedAvailability",
         businessFunction: "http://purl.org/goodrelations/v1#LeaseOut",
         priceSpecification: {
           "@type": "UnitPriceSpecification",
@@ -223,19 +224,19 @@ export function VehicleLanding({
     };
   };
 
-  const productNode = master && group.variants.length > 1
+  const productNode = group.variants.length > 1
     ? {
         "@type": "ProductGroup",
         "@id": `${canonicalPageUrl}#model-group`,
         name: localizedGroup.name,
-        productGroupID: group.key,
+        productGroupID: group.slug,
         description: localizedGroup.summary,
         inLanguage: copy.htmlLang,
         brand: { "@type": "Brand", name: group.brand },
         variesBy: ["https://schema.org/color"],
-        hasVariant: group.variants.map((variant) => createProduct(variant, true)),
+        hasVariant: group.variants.map((variant) => createProduct(variant)),
       }
-    : createProduct(car, group.variants.length > 1);
+    : createProduct(car);
 
   const structuredData = {
     "@context": "https://schema.org",

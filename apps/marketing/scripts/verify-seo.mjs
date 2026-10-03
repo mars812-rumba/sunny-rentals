@@ -136,7 +136,19 @@ for (const entry of entries) {
       if (!products.length || products.some((item) => !item?.offers || item.offers.priceCurrency !== "THB")) {
         errors.push(`${loc}: invalid Product or ProductGroup Offer JSON-LD`);
       }
-      if (productGroup && (!productGroup.productGroupID || variants.length < 2)) {
+      if (products.some((item) => !item.color)) {
+        errors.push(`${loc}: Product JSON-LD is missing color`);
+      }
+      if (products.some((item) => item.offers?.availability !== "https://schema.org/LimitedAvailability")) {
+        errors.push(`${loc}: Product Offer JSON-LD is missing truthful rental availability`);
+      }
+      if (products.some((item) => item.isVariantOf && item.isVariantOf["@type"] !== "ProductGroup")) {
+        errors.push(`${loc}: Product JSON-LD has an invalid isVariantOf reference`);
+      }
+      if (productGroup && (
+        !/^[A-Za-z0-9_-]{1,50}$/.test(productGroup.productGroupID ?? "")
+        || variants.length < 2
+      )) {
         errors.push(`${loc}: incomplete ProductGroup JSON-LD`);
       }
       if (!breadcrumbs?.itemListElement?.length) errors.push(`${loc}: invalid Breadcrumb JSON-LD`);
