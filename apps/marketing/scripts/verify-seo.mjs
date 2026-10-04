@@ -83,6 +83,26 @@ for (const entry of entries) {
   }
 
   const html = readFileSync(htmlPath, "utf8");
+  if (pathname === "/" || pathname === "/en/") {
+    const logo = html.match(/<img\b[^>]*class="brand__logo"[^>]*>/)?.[0] ?? "";
+    if (!/fetchpriority="high"/i.test(logo) || !/width="192"/.test(logo) || !/height="192"/.test(logo)) {
+      errors.push(`${loc}: logo is missing priority or intrinsic dimensions`);
+    }
+    const preload = [...html.matchAll(/<link\b[^>]*>/g)].some(([tag]) =>
+      /rel="preload"/.test(tag) && /href="\/logo\.png\.webp"/.test(tag) && /fetchpriority="high"/i.test(tag),
+    );
+    if (!preload) errors.push(`${loc}: logo preload is missing`);
+    if (!html.includes('rel="preconnect" href="https://fonts.gstatic.com"')) {
+      errors.push(`${loc}: font preconnect is missing`);
+    }
+    for (const [, path] of html.matchAll(/href="([^"?]+\.css)(?:\?[^" ]*)?"/g)) {
+      if (!path.startsWith("/")) continue;
+      const css = readFileSync(new URL(`.${path}`, outputDirectory), "utf8");
+      if (/@import[^;]*fonts\.googleapis\.com/.test(css)) {
+        errors.push(`${loc}: font discovery still waits for CSS @import`);
+      }
+    }
+  }
   const canonical = getMatch(html, /<link rel="canonical" href="([^"]+)"/);
   if (canonical !== loc) errors.push(`${loc}: canonical is ${canonical || "missing"}`);
   if (/name="robots" content="[^"]*noindex/i.test(html)) {

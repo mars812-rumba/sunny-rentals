@@ -71,7 +71,15 @@ export function SiteHeader({
           href={localePath(locale)}
           aria-label={copy.nav.homeLabel}
         >
-          <img className="brand__logo" src="/logo.png.webp" alt="" />
+          <img
+            className="brand__logo"
+            src="/logo.png.webp"
+            alt=""
+            width={192}
+            height={192}
+            loading="eager"
+            fetchPriority="high"
+          />
           <span>
             <strong>SUNNY RENTALS</strong>
             <small>PHUKET RENT CAR</small>

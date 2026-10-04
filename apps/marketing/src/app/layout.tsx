@@ -48,6 +48,16 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="ru">
+      <head>
+        {/* Discover fonts from HTML, rather than waiting for the main CSS. */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap"
+        />
+        <link rel="preload" as="image" href="/logo.png.webp" fetchPriority="high" />
+      </head>
       <body>{children}</body>
     </html>
   );
