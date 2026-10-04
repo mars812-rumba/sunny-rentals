@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../shared/webp-image";
 import React, { useState, useEffect, useMemo } from 'react';
 import { Star, Fuel, Settings, Users, ArrowRight, Zap, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import useEmblaCarousel from 'embla-carousel-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { carPromoBadges, selectRandomCarPromoBadges } from '../../shared/car-promo-badges';
 
 interface CarCardProps {
   car: any;
@@ -61,7 +63,7 @@ const ImageCarousel = ({ photos, carName, t, carId }: { photos: string[], carNam
       <div className="embla__viewport h-full" ref={emblaRef}>
         <div className="embla__container h-full">
           {photos.map((photo, index) => {
-            const imageUrl = `${API_URL}/images_web/${photo}?v=${imageTimestamp}`;
+            const imageUrl = `${API_URL}/images_web/${webpImagePath(photo)}?v=${imageTimestamp}`;
             
             return (
               <div className="embla__slide" key={index}>
@@ -73,7 +75,7 @@ const ImageCarousel = ({ photos, carName, t, carId }: { photos: string[], carNam
                     const target = e.target as HTMLImageElement;
                     // Пробуем без параметров
                     if (target.src.includes('?v=')) {
-                      target.src = `${API_URL}/images_web/${photo}`;
+                      target.src = `${API_URL}/images_web/${webpImagePath(photo)}`;
                     }
                   }}
                 />
@@ -108,23 +110,6 @@ const ImageCarousel = ({ photos, carName, t, carId }: { photos: string[], carNam
     </div>
   );
 };
-
-const photoBadges = [
-  { textKey: 'badge_free_cancellation', color: 'green' },
-  { textKey: 'badge_hit_2025', color: 'orange' },
-  { textKey: 'badge_great_price', color: 'orange' },
-  { textKey: 'badge_no_prepayment', color: 'blue' },
-  { textKey: 'badge_payment_options', color: 'white' },
-  { textKey: 'badge_unlimited_mileage', color: 'green' },
-  { textKey: 'badge_province_travel', color: 'green' },
-  { textKey: 'badge_child_seats_free', color: 'blue' },
-  { textKey: 'badge_car_wash_included', color: 'blue' },
-  { textKey: 'badge_night_delivery', color: 'white' },
-  { textKey: 'badge_new_car', color: 'orange' },
-  { textKey: 'badge_top_choice', color: 'orange' },
-  { textKey: 'badge_full_tank', color: 'blue' },
-  { textKey: 'badge_no_deposit', color: 'green' }
-];
 
 const getBadgeColorClasses = (color: string) => {
   const colorMap: Record<string, string> = {
@@ -188,13 +173,10 @@ const CarCard = ({ car, rentalDays, onBooking, isSubmitting }: CarCardProps) => 
     ? car.photos.gallery 
     : (car.photos?.main ? [car.photos.main] : []);
 
-  const [randomBadges, setRandomBadges] = useState<{ textKey: string; color: string }[]>([]);
+  const [randomBadges, setRandomBadges] = useState(carPromoBadges.slice(0, 0));
 
   useEffect(() => {
-    const count = Math.random() > 0.5 ? 2 : 3;
-    const shuffled = [...photoBadges].sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, count);
-    setRandomBadges(selected);
+    setRandomBadges(selectRandomCarPromoBadges());
   }, []);
 
   return (

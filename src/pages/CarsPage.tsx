@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../shared/webp-image";
 import { useEffect, useState, useMemo,useCallback } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,7 +18,7 @@ import { format, addDays } from "date-fns";
 import { ru } from "date-fns/locale";
 import CarForm from "@/components/admin/CarForm";
 import { useCars } from "@/contexts/CarsContext";
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo.png.webp';
 
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -618,7 +619,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
     if (path.startsWith("http")) return path;
     const cacheBuster = lastUpdated ? new Date(lastUpdated).getTime() : Date.now();
     if (path.startsWith("images_web/")) return `${API_URL}/${path}?v=${cacheBuster}`;
-    return `${API_URL}/images_web/${path}?v=${cacheBuster}`;
+    return `${API_URL}/images_web/${webpImagePath(path)}?v=${cacheBuster}`;
   };
 
   const handleSave = async (car) => {

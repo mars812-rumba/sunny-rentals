@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../../shared/webp-image";
 import React, { useState, useEffect, useMemo } from 'react';
 import { format, addDays, parse, eachDayOfInterval } from 'date-fns';
 import { Settings2, MapPinned, Trash2, X, Car as CarIcon, Search, Copy,Plus, Contact2, User as UserIcon, Clock, ChevronRight,  Receipt, Check, Filter, Camera } from 'lucide-react';
@@ -33,7 +34,7 @@ const getPhotoUrl = (filename: string | null | undefined): string => {
   if (!filename) return '';
   if (filename.startsWith('http')) return filename;
   const API_BASE = import.meta.env.VITE_API_URL || '';
-  return `${API_BASE}/images_web/${filename}`;
+  return `${API_BASE}/images_web/${webpImagePath(filename)}`;
 };
 
 interface BookingFormDialogProps {

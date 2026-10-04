@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { ExternalLink, Clock } from "lucide-react";
 
 // Импорт иконок
-import botIcon from "@/assets/icons/bot_ico.png";
-import channelIcon from "@/assets/icons/tgk_ico.png";
-import telegramIcon from "@/assets/icons/telegram_ico.png";
-import instagramIcon from "@/assets/icons/instagram_ico.png";
+import botIcon from "@/assets/icons/bot_ico.png.webp";
+import channelIcon from "@/assets/icons/tgk_ico.png.webp";
+import telegramIcon from "@/assets/icons/telegram_ico.png.webp";
+import instagramIcon from "@/assets/icons/instagram_ico.png.webp";
 
 const contacts = [
   {

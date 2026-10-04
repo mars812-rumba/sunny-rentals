@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../shared/webp-image";
 import { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -688,7 +689,7 @@ const getImageUrl = (path: string, lastUpdated?: string) => {
     return `${API_URL}/${path}?v=${cacheBuster}`;
   }
 
-  return `${API_URL}/images_web/${path}?v=${cacheBuster}`;
+  return `${API_URL}/images_web/${webpImagePath(path)}?v=${cacheBuster}`;
 };
 
 const handleSave = async (car: any) => {

@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/carousel";
 
 import heroImage from '@/assets/hero_bg.webp';
-import heroImageMob from '@/assets/hero_bg.png';
-import logo from '@/assets/logo.png';
+import heroImageMob from '@/assets/hero_bg.png.webp';
+import logo from '@/assets/logo.png.webp';
 
 import compactImg from '@/assets/classes/compact_realistic.webp';
 import sedanImg from '@/assets/classes/sedan_realistic.webp';

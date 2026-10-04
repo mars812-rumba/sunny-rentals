@@ -23,7 +23,7 @@ import {
 import { MarkerType } from '@/types/crm';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 import { CRMTutorialSheet } from '@/components/admin/CRMTutorialSheet';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo.png.webp';
 
 // TypeScript интерфейсы для работы с диалогами
 interface DialogEvent {

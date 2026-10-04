@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../../shared/webp-image";
 // src/components/CarCardCompact.tsx
 import React, { useMemo } from 'react';
 import { Star, Fuel, Settings, Zap } from 'lucide-react';
@@ -23,7 +24,7 @@ const ImageSingle = ({ photo, carName, carId }: { photo: string, carName: string
     );
   }
 
-  const imageUrl = `${API_URL}/images_web/${photo}?v=${imageTimestamp}`;
+  const imageUrl = `${API_URL}/images_web/${webpImagePath(photo)}?v=${imageTimestamp}`;
 
   return (
     <div className="aspect-[16/10] overflow-hidden bg-muted">
@@ -34,7 +35,7 @@ const ImageSingle = ({ photo, carName, carId }: { photo: string, carName: string
         onError={(e) => {
           const target = e.target as HTMLImageElement;
           if (target.src.includes('?v=')) {
-            target.src = `${API_URL}/images_web/${photo}`;
+            target.src = `${API_URL}/images_web/${webpImagePath(photo)}`;
           }
         }}
       />

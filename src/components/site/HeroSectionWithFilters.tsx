@@ -20,20 +20,20 @@ import {
 } from "@/components/ui/carousel";
 
 import heroImage from '@/assets/hero_bg.webp';
-import heroImageMob from '@/assets/hero_bg.png';
+import heroImageMob from '@/assets/hero_bg.png.webp';
 
 // Gallery images mobile
-import compactImg from '@/assets/classes/compact.png';
-import sedanImg from '@/assets/classes/sedan.png';
-import seatImg from '@/assets/classes/7seat.png';
-import suvImg from '@/assets/classes/suv.png';
-import bikeImg from '@/assets/classes/bike.png';
+import compactImg from '@/assets/classes/compact.png.webp';
+import sedanImg from '@/assets/classes/sedan.png.webp';
+import seatImg from '@/assets/classes/7seat.png.webp';
+import suvImg from '@/assets/classes/suv.png.webp';
+import bikeImg from '@/assets/classes/bike.png.webp';
 // Gallery images 600px
-import compactImg600 from '@/assets/classes/compact_desk.png';
-import sedanImg600 from '@/assets/classes/sedan_desk.png';
-import seatImg600 from '@/assets/classes/7seat_desk.png';
-import suvImg600 from '@/assets/classes/suv_desk.png';
-import bikeImg600 from '@/assets/classes/bike_desk.png';
+import compactImg600 from '@/assets/classes/compact_desk.png.webp';
+import sedanImg600 from '@/assets/classes/sedan_desk.png.webp';
+import seatImg600 from '@/assets/classes/7seat_desk.png.webp';
+import suvImg600 from '@/assets/classes/suv_desk.png.webp';
+import bikeImg600 from '@/assets/classes/bike_desk.png.webp';
 
 const getPriceForPeriod = (pricing: any, days: number) => {
   const season = 'low_season';

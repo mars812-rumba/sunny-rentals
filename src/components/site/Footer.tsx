@@ -1,7 +1,7 @@
 import React from 'react';
 // Импортируем логотип.
 // Если файла еще нет, можно временно использовать основной логотип или закомментировать импорт
-import footerLogo from "@/assets/footer_logo.png"; 
+import footerLogo from "@/assets/footer_logo.png.webp";
 
 // Если файл assets/footer/logo.png еще не создан, раскомментируйте строчку ниже, чтобы использовать заглушку:
 // const footerLogo = "https://placehold.co/200x50/111827/ffffff?text=Sunny+Rentals"; 

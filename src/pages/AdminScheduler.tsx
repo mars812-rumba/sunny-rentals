@@ -9,7 +9,7 @@ import { MonthCalendarView } from '@/components/admin/MonthCalendarView';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 import { DayDetailsModal } from '@/components/admin/DayDetailsModal';
 import { fetchCars, fetchBookings, fetchCarOwners, Car, Booking, fetchBookingsLogistics, fetchOwnersList } from '@/api/api.ts';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo.png.webp';
 
 const CAR_CLASSES = [
   { id: 'all', name: 'Все классы' },

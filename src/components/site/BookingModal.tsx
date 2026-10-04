@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../../shared/webp-image";
 import React, { useState, useEffect } from 'react';
 import { Car, Calendar, MapPin, CreditCard, CheckCircle, MessageCircleWarning, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -64,7 +65,7 @@ const BookingConfirmationContent = ({ car, filters, onClose, onBookingSubmit, is
       <div className="flex items-start gap-3">
         <div className="w-24 h-16 bg-muted rounded overflow-hidden">
           <img
-            src={`/images_web/${car.photos.main}`}
+            src={`/images_web/${webpImagePath(car.photos.main)}`}
             alt={car.name}
             className="w-full h-full object-cover"
             onError={(e) => { e.currentTarget.style.display = 'none'; }}

@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/og-image.jpg.webp",
         width: 1200,
         height: 630,
         alt: "Sunny Rentals — аренда транспорта на Пхукете",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteConfig.title,
     description: siteConfig.description,
-    images: ["/og-image.jpg"],
+    images: ["/og-image.jpg.webp"],
   },
 };
 

@@ -16,8 +16,8 @@ export function HeroPreloader({
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const mobile = window.matchMedia("(max-width: 700px)").matches;
     const images = [
-      "/logo.png",
-      mobile ? "/hero_bg_mobile.png" : "/hero_bg.webp",
+      "/logo.png.webp",
+      mobile ? "/hero_bg_mobile.png.webp" : "/hero_bg.webp",
       vehicleImage,
     ];
     const preload = (src: string) => new Promise<void>((resolve) => {
@@ -51,7 +51,7 @@ export function HeroPreloader({
     <div className="hero-loader" role="status" aria-label={label}>
       <div className="hero-loader__mark">
         <span aria-hidden="true" />
-        <img src="/logo.png" alt="" />
+        <img src="/logo.png.webp" alt="" />
       </div>
       <strong>Sunny Rentals</strong>
       <small>Phuket</small>

@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../shared/webp-image";
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { format, differenceInDays } from "date-fns";
@@ -200,7 +201,7 @@ export default function OfferAdminPage() {
   const getImageUrl = (path: string) => {
     if (!path) return "/placeholder.svg";
     if (path.startsWith("http")) return path;
-    return `${API_URL}/images_web/${path}`;
+    return `${API_URL}/images_web/${webpImagePath(path)}`;
   };
 
   const allPhotos = useMemo(() => {

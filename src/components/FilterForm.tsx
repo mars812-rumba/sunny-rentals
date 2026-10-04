@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, CalendarDays } from 'lucide-react';
+import { MapPin, CalendarDays, Clock3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -16,11 +16,11 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Category icons
-import bikeIco from '@/assets/classes/bike_ico.png';
-import sedanIco from '@/assets/classes/sedan_ico.png';
-import compactIco from '@/assets/classes/compact_ico.png';
-import suvIco from '@/assets/classes/suv_ico.png';
-import seat7Ico from '@/assets/classes/7seat_ico.png';
+import bikeIco from '@/assets/classes/bike_ico.png.webp';
+import sedanIco from '@/assets/classes/sedan_ico.png.webp';
+import compactIco from '@/assets/classes/compact_ico.png.webp';
+import suvIco from '@/assets/classes/suv_ico.png.webp';
+import seat7Ico from '@/assets/classes/7seat_ico.png.webp';
 
 interface FilterFormProps {
   onFiltersChange: (filters: any) => void;
@@ -32,6 +32,8 @@ interface FilterFormProps {
     endDate?: Date | null;
     pickupLocation?: string;
     returnLocation?: string;
+    pickupTime?: string;
+    returnTime?: string;
   };
 }
 
@@ -85,6 +87,8 @@ const FilterForm = ({
   const [pickupLocation, setPickupLocation] = useState('');
   const [returnLocation, setReturnLocation] = useState('');
   const [sameLocation, setSameLocation] = useState(true);
+  const [pickupTime, setPickupTime] = useState('13:00');
+  const [returnTime, setReturnTime] = useState('13:00');
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [progress, setProgress] = useState({ delivery: false, dates: false, category: false });
   const isMobile = useIsMobile();
@@ -120,11 +124,21 @@ const FilterForm = ({
     if (nextPickupLocation && nextReturnLocation) {
       setSameLocation(nextPickupLocation === nextReturnLocation);
     }
+
+    if (initialFilters?.pickupTime) {
+      setPickupTime(initialFilters.pickupTime);
+    }
+
+    if (initialFilters?.returnTime) {
+      setReturnTime(initialFilters.returnTime);
+    }
   }, [
     initialFilters?.startDate,
     initialFilters?.endDate,
     initialFilters?.pickupLocation,
     initialFilters?.returnLocation,
+    initialFilters?.pickupTime,
+    initialFilters?.returnTime,
   ]);
 
   useEffect(() => {
@@ -133,21 +147,29 @@ const FilterForm = ({
 
   useEffect(() => {
     const deliveryComplete = !!pickupLocation && (sameLocation || !!returnLocation);
-    const datesComplete = !!(dateRange?.from && dateRange?.to);
+    const sameDay = Boolean(
+      dateRange?.from &&
+      dateRange?.to &&
+      format(dateRange.from, 'yyyy-MM-dd') === format(dateRange.to, 'yyyy-MM-dd')
+    );
+    const timeRangeValid = !sameDay || returnTime > pickupTime;
+    const datesComplete = !!(dateRange?.from && dateRange?.to && pickupTime && returnTime && timeRangeValid);
     const categoryComplete = !!selectedCategory;
     const newProgress = { delivery: deliveryComplete, dates: datesComplete, category: categoryComplete };
     setProgress(newProgress);
     onCompletionChange?.(Object.values(newProgress).every(Boolean));
-    if (deliveryComplete && datesComplete) {
+    if (deliveryComplete && dateRange?.from && dateRange?.to) {
       onFiltersChange({
         startDate: dateRange.from,
         endDate: dateRange.to,
         pickupLocation,
         returnLocation,
+        pickupTime,
+        returnTime,
         days: getDaysCount()
       });
     }
-  }, [dateRange, pickupLocation, returnLocation, sameLocation, selectedCategory]);
+  }, [dateRange, pickupLocation, returnLocation, pickupTime, returnTime, sameLocation, selectedCategory]);
 
   const handleApplyCalendar = () => setIsCalendarOpen(false);
   const handleCancelCalendar = () => setIsCalendarOpen(false);
@@ -202,6 +224,20 @@ const FilterForm = ({
   );
 
   const calendarContentProps = { dateRange, setDateRange, onApply: handleApplyCalendar, onCancel: handleCancelCalendar, isMobile, t };
+  const timeOptions = React.useMemo(() => {
+    const options: string[] = [];
+    for (let hour = 0; hour <= 23; hour += 1) {
+      options.push(`${String(hour).padStart(2, '0')}:00`);
+      options.push(`${String(hour).padStart(2, '0')}:30`);
+    }
+    return options;
+  }, []);
+  const isSameRentalDay = Boolean(
+    dateRange?.from &&
+    dateRange?.to &&
+    format(dateRange.from, 'yyyy-MM-dd') === format(dateRange.to, 'yyyy-MM-dd')
+  );
+  const hasTimeOrderError = isSameRentalDay && returnTime <= pickupTime;
 
   return (
     <div className="space-y-4">
@@ -301,6 +337,53 @@ const FilterForm = ({
                 <PopoverContent className="w-auto p-0"><CalendarContent {...calendarContentProps} /></PopoverContent>
               </Popover>
             )}
+
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <label htmlFor="pickup-time" className="space-y-1.5">
+                <span className="block text-xs font-semibold text-gray-600">{t('pickup_time')}</span>
+                <Select value={pickupTime} onValueChange={setPickupTime}>
+                  <SelectTrigger
+                    id="pickup-time"
+                    aria-describedby={hasTimeOrderError ? 'rental-time-error' : undefined}
+                    aria-invalid={hasTimeOrderError}
+                    className="h-11 rounded-xl border-2 border-gray-200 bg-gray-50"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Clock3 className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                      <SelectValue />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeOptions.map((time) => <SelectItem key={time} value={time}>{time}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </label>
+
+              <label htmlFor="return-time" className="space-y-1.5">
+                <span className="block text-xs font-semibold text-gray-600">{t('return_time')}</span>
+                <Select value={returnTime} onValueChange={setReturnTime}>
+                  <SelectTrigger
+                    id="return-time"
+                    aria-describedby={hasTimeOrderError ? 'rental-time-error' : undefined}
+                    aria-invalid={hasTimeOrderError}
+                    className="h-11 rounded-xl border-2 border-gray-200 bg-gray-50"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Clock3 className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                      <SelectValue />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeOptions.map((time) => <SelectItem key={time} value={time}>{time}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </label>
+            </div>
+            {hasTimeOrderError ? (
+              <p id="rental-time-error" role="alert" className="mt-2 text-xs font-medium text-red-600">
+                {t('time_order_error')}
+              </p>
+            ) : null}
           </div>
 
           <div className={cn("border-t border-gray-200", isMobile ? "my-4" : "my-6")} />

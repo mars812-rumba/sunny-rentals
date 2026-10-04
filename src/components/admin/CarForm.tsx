@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../../shared/webp-image";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +31,7 @@ const getImageUrl = (path: string | undefined, timestamp?: number): string => {
     return timestamp ? `${url}?t=${timestamp}` : url;
   }
   const ts = timestamp !== undefined ? timestamp : Date.now();
-  return `${API_URL}/images_web/${path}?t=${ts}`;
+  return `${API_URL}/images_web/${webpImagePath(path)}?t=${ts}`;
 };
 
 const getClassLabel = (className: string) => {

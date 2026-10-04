@@ -755,7 +755,7 @@ img {
 
 .booking-search form {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 0.9fr 0.9fr 1.25fr;
+  grid-template-columns: 1.1fr 1fr 1fr 0.8fr 0.8fr;
   gap: 0.65rem;
   margin-top: 2rem;
 }
@@ -792,6 +792,7 @@ img {
 }
 
 .booking-search button {
+  grid-column: span 3;
   align-self: end;
   display: inline-flex;
   align-items: center;
@@ -903,7 +904,7 @@ img {
 }
 
 .sticky-contact__whatsapp {
-  background: #25d366;
+  background: #1877a9;
 }
 
 .sticky-contact > button {
@@ -3053,7 +3054,7 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   .marketing-hero__backdrop {
     background:
       linear-gradient(180deg, rgba(2, 24, 40, 0.97), rgba(4, 65, 91, 0.88)),
-      url("/hero_bg_mobile.png") center / cover no-repeat;
+      url("/hero_bg_mobile.png.webp") center / cover no-repeat;
   }
 
   .marketing-hero__content {
@@ -3507,7 +3508,7 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   .marketing-hero__backdrop {
     background:
       linear-gradient(180deg, rgba(2, 15, 30, 0.58), rgba(2, 28, 52, 0.16) 42%, rgba(2, 18, 35, 0.78)),
-      url("/hero_bg_mobile.png") center / cover no-repeat;
+      url("/hero_bg_mobile.png.webp") center / cover no-repeat;
   }
 
   .marketing-hero__content {
@@ -4306,6 +4307,26 @@ body {
   position: relative;
 }
 
+.booking-search__time {
+  position: relative;
+}
+
+.booking-search__time > svg {
+  position: absolute;
+  top: 50%;
+  left: 0.78rem;
+  z-index: 2;
+  width: 1rem;
+  height: 1rem;
+  color: #087eae;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.booking-search__time select {
+  padding-left: 2.25rem;
+}
+
 .booking-search__date > svg {
   position: absolute;
   top: 50%;
@@ -4623,7 +4644,7 @@ body {
   .marketing-hero__backdrop {
     background:
       linear-gradient(180deg, rgba(2, 22, 37, 0.96), rgba(4, 55, 79, 0.82) 58%, rgba(2, 24, 40, 0.97)),
-      url("/hero_bg_mobile.png") center / cover no-repeat;
+      url("/hero_bg_mobile.png.webp") center / cover no-repeat;
   }
 
   .marketing-hero__content {

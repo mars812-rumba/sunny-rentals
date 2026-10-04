@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../../shared/webp-image";
 import React, { useState, useEffect, useMemo } from 'react';
 import { format, addDays, parse, eachDayOfInterval } from 'date-fns';
 import { 
@@ -35,7 +36,7 @@ const getPhotoUrl = (filename: string | null | undefined): string => {
   if (!filename) return '';
   if (filename.startsWith('http')) return filename;
   const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  return `${API_BASE}/images_web/${filename}`;
+  return `${API_BASE}/images_web/${webpImagePath(filename)}`;
 };
 interface BookingFormDialogProps {
   isOpen: boolean;

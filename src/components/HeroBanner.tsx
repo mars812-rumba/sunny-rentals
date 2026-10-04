@@ -1,7 +1,7 @@
 // webapp/src/components/HeroBanner.tsx
 import React from 'react';
-import heroBg from '@/assets/hero_bg.jpg';
-import heroMob from '@/assets/hero_mob.jpg';
+import heroBg from '@/assets/hero_bg.jpg.webp';
+import heroMob from '@/assets/hero_mob.jpg.webp';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { CircleDollarSign, CreditCard, MousePointerClick, Star, Users } from 'lucide-react';

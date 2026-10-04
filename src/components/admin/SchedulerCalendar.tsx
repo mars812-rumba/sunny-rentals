@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../../shared/webp-image";
 import React, { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 import { format, isSameDay } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -11,7 +12,7 @@ const getPhotoUrl = (filename: string | null | undefined): string | null => {
   if (filename.startsWith('http')) return filename;
   
   const API_BASE = import.meta.env.VITE_API_URL || '';
-  return `${API_BASE}/images_web/${filename}`;
+  return `${API_BASE}/images_web/${webpImagePath(filename)}`;
 };
 
 interface SchedulerCalendarProps {
@@ -110,7 +111,7 @@ export function SchedulerCalendar({
     
     const startStr = `${String(start.getDate()).padStart(2, '0')}.${String(start.getMonth() + 1).padStart(2, '0')}`;
     const endStr = `${String(end.getDate()).padStart(2, '0')}.${String(end.getMonth() + 1).padStart(2, '0')}`;
-    const pickupTime = format(start, 'HH:mm');
+    const pickupTime = fd.dates.pickupTime || format(start, 'HH:mm');
     
     const line1Parts = [];
     line1Parts.push(`${startStr}-${endStr}`);

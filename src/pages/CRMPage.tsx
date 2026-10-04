@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../shared/webp-image";
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +25,7 @@ import {
 import { MarkerType } from '@/types/crm';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 import { CRMTutorialSheet } from '@/components/admin/CRMTutorialSheet';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo.png.webp';
 
 // TypeScript интерфейсы для работы с диалогами
 interface DialogEvent {
@@ -1641,7 +1642,7 @@ const handleUpdateNote = async () => {
 </main>
 
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-  <DialogContent className="max-w-none w-full max-w-[100vw] h-screen m-0 p-0 flex flex-col border-none rounded-none overflow-hidden">
+  <DialogContent className="max-w-none w-full max-w-[100vw] h-screen h-[100dvh] m-0 p-0 flex flex-col border-none rounded-none overflow-hidden">
     
     <div className="sr-only">
       <DialogTitle>Карточка клиента @{selectedUser?.username}</DialogTitle>
@@ -1977,9 +1978,9 @@ const handleUpdateNote = async () => {
 </TabsContent>
 
           {/* ВКЛАДКА ЧАТ (CORRECTED MEDIA RENDERING) */}
-<TabsContent value="chat" className="m-0 h-full flex flex-col bg-slate-100 overflow-hidden w-full max-w-full">
+<TabsContent value="chat" className="m-0 h-full min-h-0 flex flex-col bg-slate-100 overflow-hidden w-full max-w-full">
     {/* Чат занимает всё свободное место - обычный div вместо ScrollArea */}
-    <div className="flex-1 p-2 w-full h-full overflow-y-auto overflow-x-hidden" style={{ maxWidth: '100vw' }}>
+    <div className="min-h-0 flex-1 p-2 w-full overflow-y-auto overflow-x-hidden" style={{ maxWidth: '100vw' }}>
   <div className="w-full max-w-[100vw] mx-auto space-y-3 pb-4 box-border overflow-x-hidden">
     {chats.map((msg, i) => {
       // ✅ ЗАЩИТА ОТ NULL
@@ -2039,7 +2040,7 @@ const handleUpdateNote = async () => {
             {cataloguePhotos.length > 0 && (
               <div className="grid grid-cols-1 gap-2 mb-2">
                 {cataloguePhotos.map((photoPath) => {
-                  const photoUrl = `/images_web/${photoPath.split('/').map(encodeURIComponent).join('/')}`;
+                  const photoUrl = `/images_web/${webpImagePath(photoPath.split('/').map(encodeURIComponent).join('/'))}`;
                   return (
                     <img
                       key={photoPath}

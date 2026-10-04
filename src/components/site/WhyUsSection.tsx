@@ -3,12 +3,12 @@ import React from "react";
 import { motion } from "framer-motion";
 
 // ======= ИМПОРТ ТВОИХ ИКОНОК (проверь пути!) =======
-import depoIcon from "../../assets/icons/depo_ico.png";
-import prepayIcon from "../../assets/icons/prepay_ico.png";
-import insIcon from "../../assets/icons/ins_ico.png";
-import helpIcon from "../../assets/icons/help_ico.png";
-import checkIcon from "../../assets/icons/check_ico.png";
-import bookIcon from "../../assets/icons/book_ico.png";
+import depoIcon from "../../assets/icons/depo_ico.png.webp";
+import prepayIcon from "../../assets/icons/prepay_ico.png.webp";
+import insIcon from "../../assets/icons/ins_ico.png.webp";
+import helpIcon from "../../assets/icons/help_ico.png.webp";
+import checkIcon from "../../assets/icons/check_ico.png.webp";
+import bookIcon from "../../assets/icons/book_ico.png.webp";
 
 // ======= ДАННЫЕ =======
 const features = [

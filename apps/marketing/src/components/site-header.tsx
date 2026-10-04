@@ -71,7 +71,7 @@ export function SiteHeader({
           href={localePath(locale)}
           aria-label={copy.nav.homeLabel}
         >
-          <img className="brand__logo" src="/logo.png" alt="" />
+          <img className="brand__logo" src="/logo.png.webp" alt="" />
           <span>
             <strong>SUNNY RENTALS</strong>
             <small>PHUKET RENT CAR</small>
@@ -138,7 +138,7 @@ export function SiteHeader({
                 href={localePath(locale)}
                 onClick={closeMenu}
               >
-                <img className="brand__logo" src="/logo.png" alt="" />
+                <img className="brand__logo" src="/logo.png.webp" alt="" />
                 <span>
                   <strong>SUNNY RENTALS</strong>
                   <small>PHUKET RENT CAR</small>
@@ -180,7 +180,9 @@ export function SiteHeader({
 
             <div className="site-menu__contacts">
               <a href={siteConfig.telegramBotUrl}>{copy.nav.telegram}</a>
-              <a href={siteConfig.whatsappUrl}>{copy.nav.whatsapp}</a>
+              <a href={siteConfig.managerTelegramUrl} target="_blank" rel="noopener noreferrer">
+                {copy.nav.whatsapp}
+              </a>
             </div>
           </aside>
         </div>

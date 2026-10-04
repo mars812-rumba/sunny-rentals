@@ -1,3 +1,4 @@
+import { webpImagePath } from "../../shared/webp-image";
 import React, { useState, useEffect } from 'react';
 import { Car, Calendar, MapPin, CreditCard, CheckCircle, MessageCircleWarning, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -79,7 +80,7 @@ const BookingConfirmationContent = ({
       <div className="flex items-start gap-3">
         <div className="w-24 h-16 bg-muted rounded overflow-hidden">
           <img
-            src={`/images_web/${car.photos.main}`}
+            src={`/images_web/${webpImagePath(car.photos.main)}`}
             alt={car.name}
             className="w-full h-full object-cover"
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
@@ -96,6 +97,10 @@ const BookingConfirmationContent = ({
           <div className="flex justify-between">
             <span className="text-muted-foreground">{t('rental_dates_label')}</span>
             <span className="font-medium">{format(filters.startDate, 'd MMM', { locale: ru })} - {format(filters.endDate, 'd MMM', { locale: ru })} ({t('days_short', { days: filters.days })})</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">{t('pickup_time')} / {t('return_time')}</span>
+            <span className="font-medium">{filters.pickupTime} / {filters.returnTime}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">{t('delivery_and_return')}</span>
@@ -169,7 +174,14 @@ const ThankYouContent = ({ car, bookingId, formData, onClose }: { car: any; book
   };
 
   const carName = car ? `${car.brand || ''} ${car.model || ''} ${car.year || ''}`.trim() : '';
-  const dates = formData?.dates ? `${formData.dates.start} — ${formData.dates.end}` : '';
+  const formatStoredDate = (value?: string) => {
+    const [year, month, day] = String(value || '').slice(0, 10).split('-');
+    return year && month && day ? `${day}.${month}.${year}` : value || '';
+  };
+  const dates = formData?.dates
+    ? `${formatStoredDate(formData.dates.start)} в ${formData.dates.pickupTime || '13:00'} — ` +
+      `${formatStoredDate(formData.dates.end)} в ${formData.dates.returnTime || '13:00'}`
+    : '';
   const days = formData?.dates?.days ? `(${formData.dates.days} дн.)` : '';
 
   return (
@@ -243,6 +255,14 @@ export const SendBookForm: React.FC<SendBookFormProps> = ({
       return;
     }
 
+    if (
+      format(filters.startDate, 'yyyy-MM-dd') === format(filters.endDate, 'yyyy-MM-dd') &&
+      filters.returnTime <= filters.pickupTime
+    ) {
+      console.error('Return date and time must be later than pickup');
+      return;
+    }
+
     setIsSubmittingBooking(true);
 
     try {
@@ -264,9 +284,11 @@ export const SendBookForm: React.FC<SendBookFormProps> = ({
           color: car.color 
         },
         dates: { 
-          start: filters.startDate.toISOString(), 
-          end: filters.endDate.toISOString(), 
-          days: filters.days 
+          start: `${format(filters.startDate, 'yyyy-MM-dd')}T${filters.pickupTime}:00+07:00`,
+          end: `${format(filters.endDate, 'yyyy-MM-dd')}T${filters.returnTime}:00+07:00`,
+          days: filters.days,
+          pickupTime: filters.pickupTime,
+          returnTime: filters.returnTime,
         },
         locations: {
           pickupLocation: filters.pickupLocation,

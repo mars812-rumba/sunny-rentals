@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Menu, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.png.webp";
 
 export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

@@ -200,7 +200,7 @@ export function TrustPageLanding({ page, locale }: { page: TrustPageContent; loc
       <footer className="content-footer">
         <div className="shell">
           <Link className="brand" href={localePath(locale)}>
-            <img className="brand__logo" src="/logo.png" alt="" />
+            <img className="brand__logo" src="/logo.png.webp" alt="" />
             <span><strong>Sunny Rentals</strong><small>Phuket</small></span>
           </Link>
           <nav aria-label={labels.footer}>

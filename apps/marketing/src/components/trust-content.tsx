@@ -72,7 +72,7 @@ export function TrustContent({ locale }: { locale: Locale }) {
             <p className="eyebrow">{copy.trust.faqEyebrow}</p>
             <h2>{copy.trust.faqTitle}</h2>
             <p>{copy.trust.faqIntro}</p>
-            <a href={siteConfig.whatsappUrl} target="_blank" rel="noopener noreferrer">
+            <a href={siteConfig.managerTelegramUrl} target="_blank" rel="noopener noreferrer">
               {copy.trust.whatsapp}
             </a>
           </div>
@@ -100,7 +100,7 @@ export function TrustContent({ locale }: { locale: Locale }) {
               {copy.trust.telegram}
               <span aria-hidden="true">→</span>
             </a>
-            <a href={siteConfig.whatsappUrl} target="_blank" rel="noopener noreferrer">
+            <a href={siteConfig.managerTelegramUrl} target="_blank" rel="noopener noreferrer">
               {copy.trust.whatsapp}
             </a>
           </div>
@@ -110,7 +110,7 @@ export function TrustContent({ locale }: { locale: Locale }) {
       <footer className="marketing-footer">
         <div className="shell marketing-footer__inner">
           <Link className="brand" href={localePath(locale)}>
-            <img className="brand__logo" src="/logo.png" alt="" />
+            <img className="brand__logo" src="/logo.png.webp" alt="" />
             <span>
               <strong>Sunny Rentals</strong>
               <small>Phuket</small>
@@ -118,7 +118,9 @@ export function TrustContent({ locale }: { locale: Locale }) {
           </Link>
           <address>
             <span>Phuket, Thailand</span>
-            <a href="tel:+66842039140">+66 84 203 9140</a>
+            <a href={siteConfig.managerTelegramUrl} target="_blank" rel="noopener noreferrer">
+              {siteConfig.managerTelegramHandle}
+            </a>
           </address>
           <nav aria-label={copy.nav.footerAria}>
             <Link href={localePath(locale, "/cars")}>{copy.nav.fleet}</Link>
@@ -132,7 +134,9 @@ export function TrustContent({ locale }: { locale: Locale }) {
             <Link href={localePath(locale, "/car-rental-with-child-seat-phuket")}>{locale === "ru" ? "С детским креслом" : "With child seat"}</Link>
             <Link href={`${localePath(locale)}#booking`}>{copy.nav.booking}</Link>
             <a href={siteConfig.telegramBotUrl}>Telegram</a>
-            <a href={siteConfig.whatsappUrl}>WhatsApp</a>
+            <a href={siteConfig.managerTelegramUrl} target="_blank" rel="noopener noreferrer">
+              Telegram {siteConfig.managerTelegramHandle}
+            </a>
           </nav>
           <p>© {new Date().getFullYear()} Sunny Rentals</p>
         </div>
