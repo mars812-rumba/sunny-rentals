@@ -1,0 +1,9 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Sunny Rentals",
+    "documentationUrl": "https://sunny-rentals.online/llms.txt",
+    "logoUrl": "https://sunny-rentals.online/logo.png.webp"
+  },
+  "entries": []
+}

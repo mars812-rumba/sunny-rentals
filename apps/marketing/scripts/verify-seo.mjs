@@ -193,9 +193,52 @@ if (!existsSync(llmsPath)) {
   }
 }
 
+// This discovers AI protocol artifacts, not rental inventory. Do not advertise
+// an MCP/A2A endpoint until the site actually publishes one.
+const catalogPaths = ["ai-catalog.json", ".well-known/ai-catalog.json", ".well-known/ard.json"];
+let canonicalCatalog;
+for (const path of catalogPaths) {
+  try {
+    const catalog = JSON.parse(readFileSync(new URL(path, outputDirectory), "utf8"));
+    if (catalog.specVersion !== "1.0" || !Array.isArray(catalog.entries)) {
+      errors.push(`${path}: invalid AI catalog version or entries`);
+    }
+    if (catalog.entries?.length !== 0 || catalog.host?.displayName !== "Sunny Rentals") {
+      errors.push(`${path}: unexpected publisher or unpublished agent capabilities`);
+    }
+    if (Object.keys(catalog).some((key) => !["specVersion", "host", "entries"].includes(key))) {
+      errors.push(`${path}: unsupported catalog property`);
+    }
+    for (const field of ["documentationUrl", "logoUrl"]) {
+      const resource = new URL(catalog.host[field]);
+      if (resource.origin !== origin || !existsSync(new URL(`.${resource.pathname}`, outputDirectory))) {
+        errors.push(`${path}: ${field} does not point to an exported local resource`);
+      }
+    }
+    const serialized = JSON.stringify(catalog);
+    canonicalCatalog ??= serialized;
+    if (serialized !== canonicalCatalog) errors.push(`${path}: discovery aliases differ`);
+  } catch (error) {
+    errors.push(`${path}: missing or malformed JSON (${error.message})`);
+  }
+}
+
 const httpBaseUrl = process.env.SEO_BASE_URL;
 if (httpBaseUrl) {
   const baseUrl = new URL(httpBaseUrl);
+  for (const path of catalogPaths) {
+    const target = new URL(`/${path}`, baseUrl);
+    try {
+      const response = await fetch(target, { redirect: "manual" });
+      if (response.status !== 200 || !response.headers.get("content-type")?.includes("application/json")) {
+        errors.push(`${target}: expected HTTP 200 and application/json`);
+      }
+      const catalog = await response.json();
+      if (JSON.stringify(catalog) !== canonicalCatalog) errors.push(`${target}: catalog differs from export`);
+    } catch (error) {
+      errors.push(`${target}: ${error instanceof Error ? error.message : "request failed"}`);
+    }
+  }
   for (const { loc } of entries) {
     const target = new URL(new URL(loc).pathname, baseUrl);
     try {
