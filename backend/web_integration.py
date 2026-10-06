@@ -44,7 +44,14 @@ from customer_outreach_campaign import (
     load_recipients as load_outreach_recipients,
     select_recipient_batch,
 )
-from claude_dialog import build_pricing_context, parse_claude_output, requests_manager_handoff
+from claude_dialog import (
+    build_pricing_context,
+    find_offered_car_main_photo,
+    is_short_affirmative,
+    offers_to_show_photo,
+    parse_claude_output,
+    requests_manager_handoff,
+)
 
 # Claude AI imports
 try:
@@ -1603,6 +1610,24 @@ def process_claude_message(user_id, user_input):
             return {"status": "error", "message": "Claude клиент не инициализирован"}
         
         conversation_history = user_conversations[user_id]["history"]
+        previous_assistant_text = next(
+            (
+                str(item.get("content") or "")
+                for item in reversed(conversation_history)
+                if item.get("role") == "assistant"
+            ),
+            "",
+        )
+        photo_confirmation = (
+            is_short_affirmative(user_input)
+            and offers_to_show_photo(previous_assistant_text)
+        )
+        confirmed_photo_path = ""
+        if photo_confirmation:
+            confirmed_photo_path = find_offered_car_main_photo(
+                previous_assistant_text,
+                (CAR_LIST_JSON or {}).get("cars", {}),
+            )
         conversation_history.append({"role": "user", "content": user_input})
         _trim_conversation_history(user_conversations[user_id])
 
@@ -1670,10 +1695,18 @@ def process_claude_message(user_id, user_input):
 - Можешь отправить 2-6 фото одной машины если клиент просит
 - НЕ отправляй все фото сразу без запроса
 """
+        if photo_confirmation:
+            system_prompt += """
+
+ТЕКУЩЕЕ ОБЯЗАТЕЛЬНОЕ ДЕЙСТВИЕ:
+Клиент утвердительно ответил на твоё предложение показать фото. Сейчас обязательно отправь ГЛАВНОЕ фото именно последней предложенной машины, используя точный маркер [image:путь] из каталога. Не повторяй подбор и не спрашивай разрешение ещё раз.
+"""
         
         # Определяем это первое сообщение или нет
         is_first_message = len(conversation_history) == 1
-        max_tokens = 300 if is_first_message else 250
+        # The output limit includes thinking tokens. A 250–300 token budget
+        # can be exhausted before Sonnet produces any customer-facing text.
+        max_tokens = 4096
         
         # Вызов Claude
         print(f"🤖 Calling Claude API (first_msg={is_first_message}, max_tokens={max_tokens})...")
@@ -1720,10 +1753,30 @@ def process_claude_message(user_id, user_input):
             print(f"❌ Error type: {type(e)}")
             import traceback
             traceback.print_exc()
-            raise
+            if photo_confirmation and confirmed_photo_path:
+                # The customer asked for a concrete catalogue asset. Deliver it
+                # even when the language-model request is temporarily slow/down.
+                claude_response_raw = (
+                    "Вот фото выбранной машины. Подходит этот вариант?\n"
+                    f"[image:{confirmed_photo_path}]"
+                )
+                log_dialog_event(user_id, "claude_photo_fallback", {
+                    "reason": type(e).__name__,
+                    "photo": confirmed_photo_path,
+                })
+            else:
+                raise
 
         # Сначала очищаем ответ, затем логируем то, что реально увидит клиент.
         text_to_send, photos_to_send = parse_claude_output(claude_response_raw)
+        photo_fallback_used = False
+        if photo_confirmation and not photos_to_send:
+            if confirmed_photo_path:
+                photos_to_send = [confirmed_photo_path]
+                photo_fallback_used = True
+                print(f"📸 Restored requested catalogue photo: {confirmed_photo_path}")
+            else:
+                print("⚠️ Client confirmed a photo request, but the offered catalogue car was not resolved")
         print(f"📸 Found {len(photos_to_send)} unique photos to send")
         handoff_requested = requests_manager_handoff(text_to_send)
 
@@ -1760,12 +1813,17 @@ def process_claude_message(user_id, user_input):
             "raw_response": claude_response_raw,
             "handoff_requested": handoff_requested,
             "handoff_recorded": handoff_recorded,
+            "photo_fallback_used": photo_fallback_used,
         }
 
     except Exception as e:
         print(f"❌ Error in process_claude_message: {e}")
         import traceback
         traceback.print_exc()
+        log_dialog_event(user_id, "claude_response_failed", {
+            "reason": type(e).__name__,
+            "dialog_status": "active",
+        })
         return {"status": "error", "message": f"Ошибка обработки сообщения: {str(e)}"}
 
 # ==============================
