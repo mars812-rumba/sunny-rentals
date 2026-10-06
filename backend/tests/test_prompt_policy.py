@@ -32,6 +32,11 @@ class PromptPolicyTests(unittest.TestCase):
         self.assertIn("Высокий сезон: ноябрь–март", self.prompt)
         self.assertIn("тариф 30+ дней", self.prompt)
 
+    def test_quote_followup_and_currency_wording(self):
+        self.assertIn("Проверю ваши даты и точную стоимость. Скоро вернусь с ответом.", self.prompt)
+        self.assertIn("873 бата", self.prompt)
+        self.assertNotIn("500฿", self.prompt)
+
 
 if __name__ == "__main__":
     unittest.main()
