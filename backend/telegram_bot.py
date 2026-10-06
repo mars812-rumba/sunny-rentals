@@ -750,16 +750,17 @@ def log_dialog_event(*args, **kwargs):
         return False
 
 
-def call_backend_api(endpoint, data=None, method="POST"):
+def call_backend_api(endpoint, data=None, method="POST", timeout=10):
     """Вызывает API эндпойнт бэкенда"""
     try:
         backend_url = "http://localhost:5000"
         url = f"{backend_url}{endpoint}"
+        headers = {"X-Booking-Bot-Token": BOT_TOKEN} if endpoint.startswith("/api/customer/bookings/") and BOT_TOKEN else {}
         
         if method == "POST":
-            response = requests.post(url, json=data, timeout=10)
+            response = requests.post(url, json=data, headers=headers, timeout=timeout)
         elif method == "GET":
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, headers=headers, timeout=timeout)
         else:
             raise ValueError(f"Unsupported method: {method}")
             
@@ -788,12 +789,8 @@ def load_active_booking_for_user(user_id):
 
 def start_booking_claude_fallback(user_id, booking_id, form_data):
     """Let Claude continue a hot lead only while the manager is still silent."""
-    current_booking = load_active_booking_for_user(user_id)
-    if not current_booking or str(current_booking.get("booking_id")) != str(booking_id):
-        print(
-            f"⏭️ Booking fallback {booking_id} skipped: it is no longer the "
-            f"current booking for {user_id}"
-        )
+    if load_booking_status(booking_id) != "pre_booking":
+        print(f"⏭️ Booking fallback {booking_id} skipped: no longer pending")
         return False
 
     car = form_data.get("car") or {}
@@ -861,10 +858,14 @@ def process_claude_message(user_id, user_input):
     print(f"🚀 Processing Claude message for {user_id} via backend API")
     
     try:
-        result = call_backend_api("/api/claude/send_message", {
-            "user_id": user_id,
-            "message": user_input
-        })
+        result = call_backend_api(
+            "/api/claude/send_message",
+            {
+                "user_id": user_id,
+                "message": user_input,
+            },
+            timeout=40,
+        )
         
         if result and result.get("status") == "success":
             # Получаем ответ от Claude и отправляем пользователю
@@ -876,6 +877,7 @@ def process_claude_message(user_id, user_input):
             handle_dialog_claude_message(user_id, response_text)
             
             # Отправляем фото если есть
+            photo_delivered = False
             if photos:
                 for photo_path in photos[:6]:  # Лимит 6 фото
                     try:
@@ -883,8 +885,10 @@ def process_claude_message(user_id, user_input):
                         if os.path.exists(full_path):
                             with open(full_path, 'rb') as photo_file:
                                 bot.send_chat_action(user_id, 'upload_photo')
-                                safe_send_photo(user_id, photo_file)
+                                photo_delivered = safe_send_photo(user_id, photo_file) is not None or photo_delivered
                                 time.sleep(0.5)
+                        else:
+                            print(f"⚠️ Catalogue photo not found: {full_path}")
                     except Exception as e:
                         print(f"❌ Error sending photo {photo_path}: {e}")
             
@@ -905,9 +909,19 @@ def process_claude_message(user_id, user_input):
                 )
                 
             print(f"✅ Claude message processed and sent to {user_id}")
-            return delivered
+            return delivered or photo_delivered
         else:
             print(f"❌ Failed to process Claude message via backend for {user_id}")
+            log_dialog_event(
+                user_id,
+                "claude_response_failed",
+                reason="backend_error_or_timeout",
+                dialog_status="active",
+            )
+            deliver_message_safely(
+                user_id,
+                "Не получилось ответить с первого раза. Я остаюсь в диалоге — напиши ещё раз.",
+            )
             return False
             
     except Exception as e:
@@ -1041,6 +1055,96 @@ def debug_chat_id(message):
 
 
 # ==============================
+# Customer booking management (identity comes from Telegram, never callback data).
+# ==============================
+def show_customer_bookings(user_id, chat_id, offset=0):
+    result = call_backend_api(f"/api/customer/bookings/{user_id}", method="GET")
+    if not result or result.get("status") != "ok":
+        safe_send_message(chat_id, "Не удалось загрузить заявки. Попробуйте /bookings ещё раз.")
+        return
+    bookings = result.get("bookings") or []
+    if not bookings:
+        safe_send_message(chat_id, "Активных заявок нет. Через /start можно выбрать транспорт и отправить новую заявку.")
+        return
+    for booking in bookings[offset:offset + 10]:
+        booking_id = str(booking.get("booking_id"))
+        markup = InlineKeyboardMarkup()
+        label = "Запросить отмену брони" if booking.get("status") == "confirmed" else "Отменить эту заявку"
+        if not booking.get("cancellation_requested_at"):
+            markup.add(InlineKeyboardButton(label, callback_data=f"bc_ask:{booking_id}"))
+        dates = (booking.get("form_data") or {}).get("dates") or {}
+        state = "Подтверждена" if booking.get("status") == "confirmed" else "Ожидает подтверждения"
+        if booking.get("cancellation_requested_at"):
+            state += "; запрос отмены отправлен"
+        safe_send_message(chat_id,
+            f"<b>Заявка #{html.escape(booking_id)}</b>\n"
+            f"{booking_car_name(booking.get('form_data') or {})}\n"
+            f"{format_booking_date(dates.get('start'))} — {format_booking_date(dates.get('end'))}\n"
+            f"{state}", parse_mode="HTML", reply_markup=markup)
+    if offset + 10 < len(bookings):
+        markup = InlineKeyboardMarkup()
+        markup.add(InlineKeyboardButton("Следующие заявки", callback_data=f"my_bookings:{offset + 10}"))
+        safe_send_message(chat_id, "Есть ещё заявки:", reply_markup=markup)
+
+
+@bot.message_handler(commands=['bookings'])
+def handle_customer_bookings(message):
+    if message.chat.type != "private":
+        return
+    show_customer_bookings(message.from_user.id, message.chat.id)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith(("my_bookings:", "bc_ask:", "bc_yes:", "bc_no:")))
+def handle_customer_booking_action(call):
+    if not call.message or call.message.chat.type != "private":
+        bot.answer_callback_query(call.id, "Откройте личный чат с ботом")
+        return
+    action, value = call.data.split(":", 1)
+    user_id = call.from_user.id
+    chat_id = call.message.chat.id
+    if action == "my_bookings":
+        bot.answer_callback_query(call.id)
+        show_customer_bookings(user_id, chat_id, int(value) if value.isdigit() else 0)
+        return
+    if not re.fullmatch(r"[A-Za-z0-9_-]{1,40}", value):
+        bot.answer_callback_query(call.id, "Некорректная заявка")
+        return
+    if action == "bc_no":
+        bot.answer_callback_query(call.id, "Оставили заявку без изменений")
+        bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=None)
+        return
+    if action == "bc_ask":
+        result = call_backend_api(f"/api/customer/bookings/{user_id}", method="GET") or {}
+        booking = next((b for b in result.get("bookings", []) if str(b.get("booking_id")) == value), None)
+        if not booking:
+            bot.answer_callback_query(call.id, "Заявка уже закрыта или недоступна")
+            return
+        markup = InlineKeyboardMarkup()
+        markup.row(InlineKeyboardButton("Да, отменить", callback_data=f"bc_yes:{value}"),
+                   InlineKeyboardButton("Нет, оставить", callback_data=f"bc_no:{value}"))
+        text = "Отменить эту неподтверждённую заявку?" if booking.get("status") != "confirmed" else (
+            "Отправить запрос на отмену подтверждённой брони? До ответа она остаётся действующей. "
+            "Для авто в высокий сезон предоплата 1000 бат при отмене клиентом не возвращается.")
+        safe_send_message(chat_id, f"Заявка #{html.escape(value)}\n{booking_car_name(booking.get('form_data') or {})}\n{text}", parse_mode="HTML", reply_markup=markup)
+        bot.answer_callback_query(call.id)
+        return
+    result = call_backend_api(f"/api/customer/bookings/{user_id}/{value}/cancel")
+    if not result or result.get("status") != "ok":
+        bot.answer_callback_query(call.id, "Не удалось отменить: обновите /bookings", show_alert=True)
+        return
+    requested = result.get("outcome") == "requested"
+    bot.answer_callback_query(call.id, "Запрос отмены отправлен" if requested else "Заявка отменена")
+    bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=None)
+    if not requested:
+        booking_manager_fallback.cancel(value, "customer cancelled")
+        pending_bookings.pop(value, None)
+    safe_send_message(chat_id, ("Запрос отмены отправлен. Подтверждённая бронь остаётся действующей до ответа; условия возврата средств проверяются отдельно."
+                               if requested else "Эта заявка отменена. Другие брони не изменены. Через /start можно отправить новую заявку."))
+    if result.get("changed"):
+        notification = f"Клиент {user_id}: " + ("запрос отмены подтверждённой брони" if requested else "отменил заявку") + f" #{value}."
+        safe_send_message(HOT_BOOKINGS_CHAT_ID or ADMIN_ID, notification)
+
+
 # /START HANDLER - ЧИСТАЯ ВЕРСИЯ
 # ==============================
 @bot.message_handler(commands=['start'])
@@ -1068,19 +1172,7 @@ def handle_start(message):
     except:
         pass
 
-    # Повторный /start после заявки не должен снова открывать воронку каталога.
-    active_booking = load_active_booking_for_user(user_id)
-    if active_booking:
-        safe_send_message(
-            chat_id,
-            build_existing_booking_message(active_booking),
-            parse_mode="HTML",
-        )
-        print(
-            f"📋 /start for {user_id}: active booking "
-            f"{active_booking.get('booking_id')}, catalogue CTA suppressed"
-        )
-        return
+    # Existing bookings do not prevent another vehicle/date selection.
 
     # Трекаем вход
     source = 'telegram_web'
@@ -1114,6 +1206,7 @@ def handle_start(message):
         "🚀 Показать доступные варианты",
         web_app=WebAppInfo(webapp_url)
     ))
+    markup.add(InlineKeyboardButton("Мои заявки / отменить", callback_data="my_bookings:0"))
 
     # Отправляем сообщение и сразу сохраняем его ID
     try:
@@ -2308,6 +2401,7 @@ async def notify_booking_submitted(request: Request):
                 user_id,
                 build_customer_booking_received(booking_id, form_data),
                 parse_mode="HTML",
+                reply_markup=InlineKeyboardMarkup().add(InlineKeyboardButton("Мои заявки / отменить", callback_data="my_bookings:0")),
             )
             pending_bookings[booking_id]['client_notified'] = client_notified
 

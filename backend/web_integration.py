@@ -35,6 +35,7 @@ from pydantic import BaseModel, Field, validator
 from urllib.parse import parse_qsl, unquote
 from booking_time import normalize_booking_dates, validate_time_value
 from booking_notifications import build_booking_claude_context, select_active_booking
+from customer_bookings import require_bot_token, customer_bookings, cancel_customer_booking, customer_crm_status
 from chat_messages import deduplicate_chat_entries
 from customer_outreach_campaign import (
     CAMPAIGN_ID as OUTREACH_CAMPAIGN_ID,
@@ -1680,12 +1681,14 @@ def process_claude_message(user_id, user_input):
 - Если в сетке есть значение 30+д, никогда не говори, что месячной цены нет.
 - В любом ответе клиенту пиши «бат», «бата» или «батов» после суммы, никогда не знак ฿.
 """
-        active_booking = select_active_booking(load_bookings(), user_id)
-        if active_booking:
-            system_prompt += "\n\n" + build_booking_claude_context(
-                active_booking.get("booking_id") or "—",
-                active_booking.get("form_data") or {},
-            )
+        active_bookings = customer_bookings(load_bookings(), user_id)
+        if active_bookings:
+            system_prompt += "\n\nУ клиента может быть несколько независимых заявок. Наличие брони не запрещает новую заявку. Не заменяй и не отменяй другие заявки автоматически. Если непонятно, какую заявку клиент хочет изменить, уточни номер или автомобиль и даты. Для отмены направь в /bookings; не утверждай, что отменил её сам.\n"
+            for active_booking in active_bookings:
+                system_prompt += "\n" + build_booking_claude_context(
+                    active_booking.get("booking_id") or "—",
+                    active_booking.get("form_data") or {},
+                )
         system_prompt += """
 
 ПРАВИЛА ОТПРАВКИ ФОТО:
@@ -2058,6 +2061,40 @@ def get_bookings(user_id: str | None = None):
         )
 
 
+def authenticate_booking_bot(token):
+    try:
+        require_bot_token(token, WEBAPP_BOT_TOKEN)
+    except PermissionError as error:
+        raise HTTPException(status_code=401, detail=str(error))
+
+
+@app.get(API_PREFIX + "/customer/bookings/{user_id}")
+def list_customer_bookings(user_id: int, bot_token: Optional[str] = Header(None, alias="X-Booking-Bot-Token")):
+    authenticate_booking_bot(bot_token)
+    return {"status": "ok", "bookings": customer_bookings(load_bookings(), user_id)}
+
+
+@app.post(API_PREFIX + "/customer/bookings/{user_id}/{booking_id}/cancel")
+def customer_cancel_booking(user_id: int, booking_id: str, bot_token: Optional[str] = Header(None, alias="X-Booking-Bot-Token")):
+    authenticate_booking_bot(bot_token)
+    with _lock:
+        bookings = load_bookings()
+        try:
+            booking, outcome, changed = cancel_customer_booking(
+                bookings, user_id, booking_id, datetime.utcnow().isoformat())
+        except LookupError as error:
+            raise HTTPException(status_code=404, detail=str(error))
+        except ValueError as error:
+            raise HTTPException(status_code=409, detail=str(error))
+        if changed:
+            save_json(BOOKINGS_FILE, bookings)
+        user_status = customer_crm_status(bookings, user_id)
+    if changed:
+        update_all_user_records(user_id, {"status": user_status})
+        log_dialog_event(user_id, "customer_booking_cancel" if outcome == "cancelled" else "customer_cancellation_requested", {"booking_id": booking_id})
+    return {"status": "ok", "outcome": outcome, "changed": changed, "booking_id": booking_id}
+
+
 @app.post(API_PREFIX + "/bookings/offer-create")
 async def create_offer_booking(request: Request):
     """
@@ -2110,11 +2147,11 @@ async def create_offer_booking(request: Request):
                     existing_start = datetime.fromisoformat(existing_dates.get("start", "").replace('Z', '+00:00'))
                     existing_end = datetime.fromisoformat(existing_dates.get("end", "").replace('Z', '+00:00'))
                     
-                    # Проверяем пересечение дат
-                    if not (new_end <= existing_start or new_start >= existing_end):
+                    # Only exact repeated submissions are duplicates, not a user limit.
+                    if new_start == existing_start and new_end == existing_end:
                         return {
                             "status": "exists",
-                            "message": "У вас уже есть активная бронь на этот автомобиль на эти даты",
+                            "message": "Эта заявка уже отправлена. Другой автомобиль или другие даты можно оформить отдельной заявкой.",
                             "existing_booking_id": existing.get("booking_id")
                         }
 
@@ -5031,7 +5068,7 @@ async def telegram_webapp_create_booking(
         user_record.update({
             "username": username,
             "updated_at": now_iso,
-            "status": "pre_booking",
+            "status": customer_crm_status(bookings, user_id),
             "form_started": True,
             "booking_submitted": True,
             "car_interested": car_name,
@@ -5052,6 +5089,20 @@ async def telegram_webapp_create_booking(
         updated_users.append(user_record)
 
         with _lock:
+            current_bookings = load_bookings()
+            original_bookings = copy.deepcopy(current_bookings)
+            submitted_booking = next(b for b in bookings if b.get('booking_id') == booking_id)
+            persisted_booking = next((b for b in current_bookings if b.get('booking_id') == booking_id), None)
+            if persisted_booking is not None:
+                if str(persisted_booking.get('user_id')) != str(user_id):
+                    raise HTTPException(status_code=403, detail="Booking does not belong to Telegram user")
+                if persisted_booking.get('status') != 'pre_booking':
+                    raise HTTPException(status_code=409, detail="Заявка уже обработана; создайте новую заявку")
+                persisted_booking.update(form_data=form_data_dict, updated_at=now_iso)
+            else:
+                current_bookings.append(submitted_booking)
+            bookings = current_bookings
+            user_record['status'] = customer_crm_status(bookings, user_id)
             save_json(BOOKINGS_FILE, bookings)
             try:
                 save_json(USER_DATA_JSON, updated_users)
@@ -5124,7 +5175,13 @@ async def confirm_booking(booking_id: str):
         
         # Сохраняем
         with _lock:
-            save_json(BOOKINGS_FILE, bookings)
+            # Re-read under the lock: a client may have just cancelled this request.
+            current_bookings = load_bookings()
+            current_booking = next((b for b in current_bookings if b.get('booking_id') == booking_id), None)
+            if not current_booking or current_booking.get('status') != 'pre_booking':
+                raise HTTPException(status_code=409, detail="Заявка уже обработана или отменена")
+            current_booking.update(status='confirmed', confirmed_at=booking['confirmed_at'], updated_at=booking['updated_at'])
+            save_json(BOOKINGS_FILE, current_bookings)
         print("✓ Bookings saved to JSON")
 
         # Обновляем статус пользователя на confirmed
@@ -5215,13 +5272,23 @@ async def reject_booking(booking_id: str, data: dict = None):
 
         # Сохраняем
         with _lock:
+            current_bookings = load_bookings()
+            current_booking = next((b for b in current_bookings if b.get('booking_id') == booking_id), None)
+            if not current_booking or current_booking.get('status') not in ['pre_booking', 'confirmed', 'new']:
+                raise HTTPException(status_code=409, detail="Заявка уже обработана или отменена")
+            current_booking.update(status='rejected', rejected_at=booking['rejected_at'], updated_at=booking['updated_at'])
+            bookings = current_bookings
+            if customer_bookings(bookings, user_id):
+                for user in users_data:
+                    if str(user.get('user_id')) == str(user_id):
+                        user['status'] = customer_crm_status(bookings, user_id)
+                        user.pop('archived_at', None)
             save_json(BOOKINGS_FILE, bookings)
             save_json(USER_DATA_JSON, users_data)
         print("✓ Saved to JSON")
 
-        # Отклонённая последняя заявка завершает текущий booking-контекст Claude.
-        # Старые pre_booking/confirmed записи не должны самопроизвольно оживать.
-        if user_id and not select_active_booking(bookings, user_id):
+        # Stop booking context only when no other active customer booking remains.
+        if user_id and not customer_bookings(bookings, user_id):
             update_dialog_status(user_id, active=False, claude_status="stopped")
             log_dialog_event(user_id, "claude_stopped", {
                 "by": "booking_rejected",
@@ -5336,8 +5403,8 @@ async def admin_create_booking_simple(request: Request):
                     existing_dates = existing_form.get("dates", {})
                     existing_start = datetime.fromisoformat(existing_dates.get("start", "").replace('Z', '+00:00'))
                     existing_end = datetime.fromisoformat(existing_dates.get("end", "").replace('Z', '+00:00'))
-                    if not (new_end <= existing_start or new_start >= existing_end):
-                        return {"status": "exists", "message": "Уже есть бронь на эти даты"}
+                    if new_start == existing_start and new_end == existing_end:
+                        return {"status": "exists", "message": "Эта заявка уже отправлена", "existing_booking_id": existing.get("booking_id")}
         
         booking_id = gen_booking_id()
         new_booking = {
