@@ -1,5 +1,7 @@
-import type { VehicleCategory } from "@/content/cars";
+import type { VehicleCategory } from "@/content/car-contract";
 import type { Locale } from "@/lib/i18n";
+import { getPageFaq } from "@/content/audit-faq";
+import { contentUpdatedAt, policyCopy } from "@/content/rental-policy";
 
 export interface TrustPageContent {
   slug: string;
@@ -10,221 +12,138 @@ export interface TrustPageContent {
   eyebrow: string;
   intro: string;
   vehicleCategories?: VehicleCategory[];
-  sections: Array<{
-    title: string;
-    paragraphs: string[];
-    items?: string[];
-  }>;
+  requiresChildSeat?: boolean;
+  sections: Array<{ title: string; paragraphs: string[]; items?: string[] }>;
   faq: Array<{ question: string; answer: string }>;
 }
+export type LocalizedTrustPage = Record<Locale, TrustPageContent>;
+type EditorialPage = Omit<TrustPageContent, "slug" | "published" | "updatedAt" | "faq">;
 
-type LocalizedTrustPage = Record<Locale, TrustPageContent>;
+export function localizePage(slug: string, ru: EditorialPage, en: EditorialPage): LocalizedTrustPage {
+  return {
+    ru: { ...ru, slug, published: true, updatedAt: contentUpdatedAt, faq: getPageFaq(slug, "ru") },
+    en: { ...en, slug, published: true, updatedAt: contentUpdatedAt, faq: getPageFaq(slug, "en") },
+  };
+}
 
-const updatedAt = "2026-08-03";
+const ruPolicy = policyCopy("ru");
+const enPolicy = policyCopy("en");
 
 export const trustPages: LocalizedTrustPage[] = [
-  {
-    ru: {
-      slug: "rental-terms", published: true, updatedAt,
-      title: "Условия аренды авто и байков на Пхукете",
-      description: "Порядок аренды Sunny Rentals: выбор машины, документы, цена, депозит, получение, полный бак и возврат транспорта на Пхукете.",
-      eyebrow: "До бронирования",
-      intro: "Sunny Rentals работает как агрегатор: помогает выбрать конкретный транспорт из каталога и передаёт заявку менеджеру. Доступность выбранной машины подтверждается после проверки дат.",
-      sections: [
-        { title: "Как проходит аренда", paragraphs: ["Вы выбираете конкретную машину или байк, даты и место получения. Telegram сохраняет выбранную модель и передаёт заявку менеджеру."], items: ["Выбор транспорта и расчёт по датам на сайте.", "Подтверждение модели, времени и места передачи менеджером.", "Получение транспорта и фиксация его состояния.", "Возврат в согласованное время и место."] },
-        { title: "Цена и депозит", paragraphs: ["Ставка зависит от сезона и срока: 1–6, 7–14, 15–29 или 30+ дней. Депозит показывается отдельно в карточке конкретной машины и не включается в стоимость аренды."], items: ["Аэропорт Пхукета — доставка 0 ฿.", "Город, отель или вилла — доставка 500 ฿.", "Дополнительные условия согласуются до подтверждения брони."] },
-        { title: "Получение и возврат", paragraphs: ["Автомобили передаются чистыми и с полным баком. Все фотографии в каталоге показывают реальные машины. При получении стоит вместе с менеджером осмотреть транспорт и зафиксировать его состояние."], items: ["Проверьте кузов, стёкла, колёса и салон.", "Сверьте уровень топлива.", "Уточните контакт менеджера на время аренды.", "Возвращайте транспорт в согласованном состоянии и месте."] },
-        { title: "Документы", paragraphs: ["Обычно требуются паспорт и действующее водительское удостоверение нужной категории. Требования к международному водительскому удостоверению и конкретной категории прав необходимо подтвердить до поездки."] },
-      ],
-      faq: [
-        { question: "Можно забронировать конкретную машину?", answer: "Да. Сайт и Telegram передают ID выбранной машины. Фактическую доступность на ваши даты подтверждает менеджер." },
-        { question: "Цена на сайте окончательная?", answer: "Аренда рассчитывается по сезону и сроку. Депозит указывается отдельно, доставка стоит 0 ฿ в аэропорт или 500 ฿ по городу." },
-        { question: "Машина будет с фотографий?", answer: "В каталоге используются реальные фотографии конкретного транспорта. Доступность именно этой машины подтверждается после выбора дат." },
-      ],
-    },
-    en: {
-      slug: "rental-terms", published: true, updatedAt,
-      title: "Car and scooter rental terms in Phuket",
-      description: "Sunny Rentals process: choosing a vehicle, documents, pricing, deposit, handover, full tank and return in Phuket.",
-      eyebrow: "Before you book",
-      intro: "Sunny Rentals operates as an aggregator: we help you choose a specific catalogue vehicle and pass the request to a manager. Availability is confirmed after your dates are checked.",
-      sections: [
-        { title: "How the rental works", paragraphs: ["Choose a specific car or scooter, dates and handover location. Telegram keeps the selected vehicle and sends your request to a manager."], items: ["Choose a vehicle and calculate your dates on the website.", "A manager confirms the model, time and handover location.", "Collect the vehicle and record its condition.", "Return it at the agreed time and place."] },
-        { title: "Price and deposit", paragraphs: ["The rate depends on season and rental term: 1–6, 7–14, 15–29 or 30+ days. The deposit is shown separately on each vehicle page and is not included in the rental price."], items: ["Phuket Airport delivery: 0 THB.", "City, hotel or villa delivery: 500 THB.", "Any additional terms are agreed before confirmation."] },
-        { title: "Handover and return", paragraphs: ["Cars are supplied clean and with a full tank. Every catalogue image is a real photo of the listed vehicle. Inspect and record the vehicle condition together with the manager at handover."], items: ["Check bodywork, glass, wheels and interior.", "Confirm the fuel level.", "Save the manager's contact details.", "Return the vehicle in the agreed condition and location."] },
-        { title: "Documents", paragraphs: ["A passport and a valid driving licence for the relevant category are normally required. Confirm international driving permit and licence-category requirements before the trip."] },
-      ],
-      faq: [
-        { question: "Can I request a specific vehicle?", answer: "Yes. The website and Telegram pass the selected vehicle ID. A manager confirms its availability for your dates." },
-        { question: "Is the website price final?", answer: "Rental is calculated by season and term. The deposit is separate; delivery is 0 THB to the airport or 500 THB in the city." },
-        { question: "Will I receive the vehicle in the photos?", answer: "The catalogue uses real photos of specific vehicles. A manager confirms that vehicle's availability after you select dates." },
-      ],
-    },
-  },
-  {
-    ru: {
-      slug: "insurance", published: true, updatedAt,
-      title: "Страховка и франшиза при аренде на Пхукете",
-      description: "Как работает страховка класса 1 у автомобилей Sunny Rentals, что такое франшиза и почему байки передаются без страховки.",
-      eyebrow: "Страхование без догадок",
-      intro: "У автомобилей действует страховка класса 1 при ДТП с участием двух сторон. На байки страховка не предоставляется.",
-      sections: [
-        { title: "Когда действует страховка", paragraphs: ["Обязательное условие страхового случая — наличие идентифицированной второй стороны ДТП. Нужно сразу связаться с менеджером и следовать инструкции по оформлению происшествия."], items: ["Не покидайте место происшествия без согласования.", "Зафиксируйте участников и повреждения.", "Свяжитесь с менеджером.", "Соблюдайте порядок оформления страхового случая."] },
-        { title: "Что не входит", paragraphs: ["Царапины и повреждения на парковке без установленной второй стороны в страховое покрытие не входят. Это относится и к другим повреждениям, для которых отсутствует вторая сторона ДТП."] },
-        { title: "Размер франшизы", paragraphs: ["Франшиза показывается отдельно от депозита и цены аренды."], items: ["Компакт и седан — 5 000 ฿.", "Паркетники и автомобили на 7 мест — 10 000 ฿.", "Fortuner, MUX и Legender — 20 000 ฿.", "BMW и Ford Ranger/Raptor — 30 000 ฿."] },
-        { title: "Байки", paragraphs: ["Байки Sunny Rentals передаются без страховки. Перед бронированием необходимо учитывать личную ответственность за транспорт и возможный ущерб."] },
-      ],
-      faq: [
-        { question: "Страховка покрывает царапину на парковке?", answer: "Нет, если нет идентифицированной второй стороны происшествия." },
-        { question: "Франшиза и депозит — одно и то же?", answer: "Нет. Депозит — отдельная сумма по конкретной машине, франшиза определяет часть ответственности в страховом случае." },
-        { question: "Есть ли страховка на байки?", answer: "Нет. Байки передаются без страховки." },
-      ],
-    },
-    en: {
-      slug: "insurance", published: true, updatedAt,
-      title: "Rental insurance and excess in Phuket",
-      description: "How Class 1 insurance works for Sunny Rentals cars, excess amounts and why scooters are supplied without insurance.",
-      eyebrow: "Insurance without guesswork",
-      intro: "Cars have Class 1 insurance for accidents with an identified second party. Scooters are supplied without insurance.",
-      sections: [
-        { title: "When insurance applies", paragraphs: ["An identified second party to the road accident is required for an insurance claim. Contact the manager immediately and follow the incident-reporting instructions."], items: ["Do not leave the scene without agreement.", "Record participants and damage.", "Contact the manager.", "Follow the required insurance procedure."] },
-        { title: "What is excluded", paragraphs: ["Parking scratches and damage without an identified second party are excluded. The same applies to other damage where there is no second party to the accident."] },
-        { title: "Excess amounts", paragraphs: ["The excess is separate from both the deposit and rental price."], items: ["Compact cars and sedans: 5,000 THB.", "Crossovers and seven-seat vehicles: 10,000 THB.", "Fortuner, MUX and Legender: 20,000 THB.", "BMW and Ford Ranger/Raptor: 30,000 THB."] },
-        { title: "Scooters", paragraphs: ["Sunny Rentals scooters are supplied without insurance. Consider your personal liability for the vehicle and possible damage before booking."] },
-      ],
-      faq: [
-        { question: "Does insurance cover a parking scratch?", answer: "No, when there is no identified second party to the incident." },
-        { question: "Are the excess and deposit the same?", answer: "No. The deposit is set for a specific vehicle; the excess defines part of the liability for an insured event." },
-        { question: "Are scooters insured?", answer: "No. Scooters are supplied without insurance." },
-      ],
-    },
-  },
-  {
-    ru: {
-      slug: "deposit", published: true, updatedAt,
-      title: "Депозит при аренде автомобиля на Пхукете",
-      description: "Чем депозит отличается от цены аренды и страховой франшизы, где посмотреть сумму для конкретной машины Sunny Rentals.",
-      eyebrow: "Отдельно от цены аренды",
-      intro: "Депозит указывается для каждой машины в каталоге и всегда показывается отдельной суммой. Мы не смешиваем его с тарифом аренды или доставкой.",
-      sections: [
-        { title: "Где посмотреть сумму", paragraphs: ["Точный депозит находится в карточке и на странице выбранной машины. Суммы различаются, поэтому ориентироваться нужно на конкретный транспорт, а не на среднее значение по категории."] },
-        { title: "Депозит, аренда и доставка", paragraphs: ["Это три разные части условий."], items: ["Аренда рассчитывается по сезону и количеству дней.", "Депозит показывается отдельно для конкретной машины.", "Доставка в аэропорт стоит 0 ฿, по городу — 500 ฿."] },
-        { title: "Депозит и франшиза", paragraphs: ["Депозит и страховая франшиза — не одно и то же. Франшиза относится к ответственности при страховом случае, а депозит указан отдельным полем выбранной машины."] },
-        { title: "Что проверить до оплаты", paragraphs: ["До подтверждения бронирования сверьте модель, даты, стоимость аренды, депозит, франшизу, доставку и условия возврата. Если условия конкретной машины отличаются, менеджер должен сообщить об этом до бронирования."] },
-      ],
-      faq: [
-        { question: "Депозит входит в стоимость аренды?", answer: "Нет. Он показывается и учитывается отдельно." },
-        { question: "У всех машин одинаковый депозит?", answer: "Нет. Точная сумма указана в карточке конкретной машины." },
-        { question: "Депозит равен франшизе?", answer: "Не обязательно. Это разные условия, и обе суммы показываются отдельно." },
-      ],
-    },
-    en: {
-      slug: "deposit", published: true, updatedAt,
-      title: "Vehicle rental deposits in Phuket",
-      description: "How the deposit differs from rental price and insurance excess, and where to find the amount for each Sunny Rentals vehicle.",
-      eyebrow: "Separate from rental price",
-      intro: "Every vehicle's deposit is shown in the catalogue as a separate amount. It is not merged with the rental rate or delivery price.",
-      sections: [
-        { title: "Where to find the amount", paragraphs: ["The exact deposit appears on the selected vehicle's card and page. Amounts vary, so use the specific vehicle rather than an average for its category."] },
-        { title: "Deposit, rental and delivery", paragraphs: ["These are three separate parts of the terms."], items: ["Rental is calculated by season and number of days.", "The deposit is shown separately for the specific vehicle.", "Airport delivery is 0 THB; city delivery is 500 THB."] },
-        { title: "Deposit and insurance excess", paragraphs: ["The deposit and insurance excess are not the same. The excess concerns liability in an insured event, while the deposit is a separate field for the selected vehicle."] },
-        { title: "What to check before payment", paragraphs: ["Before confirmation, check the model, dates, rental price, deposit, excess, delivery and return terms. A manager must disclose any vehicle-specific difference before booking."] },
-      ],
-      faq: [
-        { question: "Is the deposit included in the rental price?", answer: "No. It is shown and accounted for separately." },
-        { question: "Do all vehicles have the same deposit?", answer: "No. The exact amount is shown on the specific vehicle's card." },
-        { question: "Is the deposit equal to the excess?", answer: "Not necessarily. They are separate terms and both amounts are displayed independently." },
-      ],
-    },
-  },
-  {
-    ru: {
-      slug: "delivery", published: true, updatedAt,
-      title: "Доставка и возврат автомобиля на Пхукете",
-      description: "Стоимость доставки Sunny Rentals: аэропорт Пхукета бесплатно, город, отель или вилла — 500 бат. Порядок получения и возврата.",
-      eyebrow: "Понятная стоимость",
-      intro: "Доставка в аэропорт Пхукета бесплатна. Доставка по городу, к отелю или вилле стоит 500 ฿.",
-      sections: [
-        { title: "Аэропорт Пхукета", paragraphs: ["Стоимость доставки в аэропорт — 0 ฿. Укажите аэропорт как место получения или возврата при заполнении формы. Время и точку встречи менеджер согласует после проверки дат."] },
-        { title: "Город, отель или вилла", paragraphs: ["Стоимость доставки по городу, к отелю или вилле — 500 ฿. Перед подтверждением сообщите точное название и адрес места передачи."] },
-        { title: "Как проходит передача", paragraphs: ["Менеджер подтверждает доступность машины и время встречи. При получении осмотрите транспорт, зафиксируйте состояние и проверьте уровень топлива."], items: ["Автомобили передаются чистыми.", "Транспорт передаётся с полным баком.", "В каталоге используются реальные фотографии.", "Место возврата согласуется заранее."] },
-        { title: "Изменение места", paragraphs: ["Если место получения или возврата меняется, сообщите менеджеру заранее. Новые время и точка должны быть подтверждены до передачи транспорта."] },
-      ],
-      faq: [
-        { question: "Сколько стоит доставка в аэропорт?", answer: "0 ฿ — доставка в аэропорт Пхукета бесплатна." },
-        { question: "Сколько стоит доставка к отелю?", answer: "500 ฿, как и доставка по городу или к вилле." },
-        { question: "Можно вернуть машину в другом месте?", answer: "Новое место нужно заранее согласовать с менеджером." },
-      ],
-    },
-    en: {
-      slug: "delivery", published: true, updatedAt,
-      title: "Vehicle delivery and return in Phuket",
-      description: "Sunny Rentals delivery: Phuket Airport is free; city, hotel or villa delivery is 500 THB. Handover and return process.",
-      eyebrow: "Clear delivery pricing",
-      intro: "Phuket Airport delivery is free. City, hotel or villa delivery costs 500 THB.",
-      sections: [
-        { title: "Phuket Airport", paragraphs: ["Airport delivery costs 0 THB. Select the airport as your pick-up or return location in the form. A manager agrees the meeting time and point after checking your dates."] },
-        { title: "City, hotel or villa", paragraphs: ["City, hotel or villa delivery costs 500 THB. Provide the exact property name and address before confirmation."] },
-        { title: "How handover works", paragraphs: ["A manager confirms availability and meeting time. Inspect and record the vehicle condition and check the fuel level at handover."], items: ["Cars are supplied clean.", "Vehicles are supplied with a full tank.", "The catalogue uses real photos.", "Agree the return location in advance."] },
-        { title: "Changing location", paragraphs: ["Tell the manager in advance if the pick-up or return location changes. The new time and point must be confirmed before handover."] },
-      ],
-      faq: [
-        { question: "How much is airport delivery?", answer: "0 THB — Phuket Airport delivery is free." },
-        { question: "How much is hotel delivery?", answer: "500 THB, the same as city or villa delivery." },
-        { question: "Can I return the car somewhere else?", answer: "Agree the new return location with the manager in advance." },
-      ],
-    },
-  },
-  {
-    ru: {
-      slug: "faq", published: true, updatedAt,
-      title: "Вопросы об аренде авто и байков на Пхукете",
-      description: "Ответы Sunny Rentals о бронировании, ценах, доставке, депозите, страховке, документах, автомобилях и байках.",
-      eyebrow: "Sunny Rentals · FAQ",
-      intro: "Короткие ответы на основные вопросы до выбора транспорта и отправки заявки.",
-      sections: [
-        { title: "Выбор и бронирование", paragraphs: ["На сайте можно сравнить конкретные машины и байки, выбрать даты и передать выбранную модель в Telegram. Менеджер проверит доступность и подтвердит детали."] },
-        { title: "Что уже известно заранее", paragraphs: ["В карточках опубликованы реальные фотографии, сезонные тарифы и депозит."], items: ["Аэропорт — доставка 0 ฿.", "Город, отель или вилла — 500 ฿.", "Детское кресло для автомобиля — бесплатно.", "Автомобили передаются чистыми и с полным баком."] },
-        { title: "Автомобили и байки", paragraphs: ["На автомобили распространяется страховка класса 1 при наличии второй стороны ДТП. Байки передаются без страховки. Франшиза автомобиля зависит от его класса и модели."] },
-      ],
-      faq: [
-        { question: "Как отправить заявку?", answer: "Выберите машину или категорию, укажите даты и продолжите в Telegram. Менеджер подтвердит доступность." },
-        { question: "Как рассчитывается цена?", answer: "По сезону и сроку аренды: 1–6, 7–14, 15–29 или 30+ дней." },
-        { question: "Депозит входит в аренду?", answer: "Нет, депозит показывается отдельно для каждой машины." },
-        { question: "Доставка в аэропорт бесплатна?", answer: "Да, аэропорт — 0 ฿. Город, отель или вилла — 500 ฿." },
-        { question: "Есть ли бесплатное детское кресло?", answer: "Да, для автомобилей кресло предоставляется бесплатно по запросу." },
-        { question: "Какая страховка у автомобиля?", answer: "Класс 1 при ДТП с установленной второй стороной. Парковочные повреждения без второй стороны не входят." },
-        { question: "Есть ли страховка на байки?", answer: "Нет, байки передаются без страховки." },
-        { question: "Фотографии настоящие?", answer: "Да, в каталоге опубликованы реальные фотографии конкретного транспорта." },
-      ],
-    },
-    en: {
-      slug: "faq", published: true, updatedAt,
-      title: "Phuket car and scooter rental FAQ",
-      description: "Sunny Rentals answers about booking, rates, delivery, deposits, insurance, documents, cars and scooters in Phuket.",
-      eyebrow: "Sunny Rentals · FAQ",
-      intro: "Straight answers to the main questions before you select a vehicle and send a request.",
-      sections: [
-        { title: "Choosing and booking", paragraphs: ["Compare specific cars and scooters, select dates and pass the chosen model into Telegram. A manager checks availability and confirms the details."] },
-        { title: "What is clear upfront", paragraphs: ["Cards show real photos, seasonal rates and the deposit."], items: ["Airport delivery: 0 THB.", "City, hotel or villa: 500 THB.", "A child seat for a car is free.", "Cars are supplied clean and with a full tank."] },
-        { title: "Cars and scooters", paragraphs: ["Cars have Class 1 insurance when there is an identified second party to the accident. Scooters are supplied without insurance. A car's excess depends on its class and model."] },
-      ],
-      faq: [
-        { question: "How do I send a request?", answer: "Choose a vehicle or category, select dates and continue in Telegram. A manager confirms availability." },
-        { question: "How is the price calculated?", answer: "By season and rental term: 1–6, 7–14, 15–29 or 30+ days." },
-        { question: "Is the deposit included?", answer: "No. Each vehicle's deposit is shown separately." },
-        { question: "Is airport delivery free?", answer: "Yes, airport delivery is 0 THB. City, hotel or villa delivery is 500 THB." },
-        { question: "Is a child seat free?", answer: "Yes, a child seat for a car is available free on request." },
-        { question: "What insurance do cars have?", answer: "Class 1 for accidents with an identified second party. Parking damage without a second party is excluded." },
-        { question: "Are scooters insured?", answer: "No. Scooters are supplied without insurance." },
-        { question: "Are the photos real?", answer: "Yes. The catalogue shows real photos of the specific vehicles." },
-      ],
-    },
-  },
+  localizePage("rental-terms", {
+    title: "Условия аренды авто и байков на Пхукете",
+    description: "Заявка и подтверждение аренды Sunny Rentals: документы, оплата, депозит, осмотр и возврат автомобиля или байка.",
+    eyebrow: "До бронирования",
+    intro: "Sunny Rentals помогает выбрать конкретный транспорт из каталога. Заявка на сайте ещё не подтверждает бронь: сначала проверяются даты, доступность и условия выбранного предложения.",
+    sections: [
+      { title: "От выбора до выдачи", paragraphs: ["Выбранная машина и параметры сохраняются при переходе в Telegram. Проверьте данные и отправьте заявку."], items: ["Выберите транспорт, даты, время и обе точки передачи.", "Получите подтверждение конкретного транспорта, полной стоимости и условий.", "Сверьте договор, осмотрите транспорт и оформите передачу.", "Верните транспорт в согласованные время и место."] },
+      { title: "Деньги до подтверждения", paragraphs: ["Аренда, согласованные услуги и депозит — отдельные суммы. До оплаты получите порядок подтверждения брони и досрочного возврата в условиях выбранного предложения.", ruPolicy.carBooking, ruPolicy.delivery] },
+      { title: "Документы и водители", paragraphs: ["Документы для законного управления, требования выдачи и условия страховщика — разные проверки. Перед поездкой проверьте допустимость удостоверения в Таиланде и категорию для выбранного транспорта. Для мотоцикла автомобильная категория сама по себе не подтверждает допуск.", "До подтверждения согласуйте возраст и стаж, оригиналы документов, порядок обращения с паспортом и включение дополнительного водителя в договор. Разрешение арендатора не заменяет согласование второго водителя."] },
+      { title: "Осмотр и возврат", paragraphs: ["Сверьте машину и договор. Снимите кузов, стёкла, колёса, салон, уровень топлива и оборудование; внесите существующие повреждения в акт.", "Перед поездкой сохраните контакт помощи. Проверьте правила топлива, мойки, дополнительных часов, продления, пробега и разрешённых маршрутов в своём договоре. Не считайте поездки за пределы острова автоматически разрешёнными."] },
+    ],
+  }, {
+    title: "Car and scooter rental terms in Phuket",
+    description: "Sunny Rentals requests and booking confirmation: documents, payment, deposit, inspection and return of cars and scooters.",
+    eyebrow: "Before booking",
+    intro: "Sunny Rentals helps you choose a specific catalogue vehicle. A website request is not a confirmed booking: dates, availability and the selected offer's terms are checked first.",
+    sections: [
+      { title: "From selection to handover", paragraphs: ["Your vehicle and request details are kept when you continue in Telegram. Check them and send the request."], items: ["Choose a vehicle, dates, times and both meeting points.", "Obtain confirmation of the specific vehicle, total cost and terms.", "Check the agreement, inspect the vehicle and record handover.", "Return it at the agreed time and place."] },
+      { title: "Money before confirmation", paragraphs: ["Rental, agreed extras and the deposit are separate amounts. Before paying, obtain the selected offer's rules for booking confirmation and early return.", enPolicy.carBooking, enPolicy.delivery] },
+      { title: "Documents and drivers", paragraphs: ["Legal driving documents, rental handover requirements and insurer conditions are separate checks. Check that your licence is valid in Thailand and covers the selected vehicle. A car entitlement alone does not establish permission to ride a motorcycle.", "Agree age and experience requirements, original documents, passport handling and additional drivers before confirmation. The renter's permission does not replace approval of a second driver."] },
+      { title: "Inspection and return", paragraphs: ["Match the car and agreement. Photograph bodywork, glass, wheels, interior, fuel and equipment, and record existing damage at handover.", "Save the assistance contact before driving. Check your agreement's fuel, cleaning, additional-hour, extension, mileage and route rules. Do not assume travel outside the island is automatically permitted."] },
+    ],
+  }),
+  localizePage("deposit", {
+    title: "Депозит при аренде автомобиля на Пхукете",
+    description: "Депозит выбранного транспорта Sunny Rentals: отдельная сумма, отличие от аренды и франшизы, проверка внесения и возврата.",
+    eyebrow: "Отдельно от аренды",
+    intro: "Депозит указан у конкретного транспорта. Это обеспечение по договору, а не цена аренды и не страховая франшиза.",
+    sections: [
+      { title: "Сумма конкретного предложения", paragraphs: ["Откройте карточку выбранной машины или байка: у вариантов одной модели могут быть разные депозиты. Используйте сумму этого экземпляра, а не среднюю по классу."] },
+      { title: "Четыре разных понятия", paragraphs: ["Аренда — плата за период. Предоплата, если она предусмотрена, относится к подтверждению брони. Депозит обеспечивает обязательства по договору. Франшиза относится к расходам при покрываемом страховом случае; она не является универсальным пределом ответственности."] },
+      { title: "Внесение, возврат и удержания", paragraphs: [ruPolicy.depositReturn, "До оплаты получите условия выбранного предложения: способ и момент внесения, срок и способ возврата, основания удержаний и документы, подтверждающие ущерб. Проверьте отдельно валюту и банковские комиссии.", "При получении и сдаче фиксируйте состояние транспорта и сохраняйте акт. Размер депозита не означает автоматический размер любого удержания."] },
+      { title: "Предоплата — не депозит", paragraphs: [ruPolicy.carBooking] },
+    ],
+  }, {
+    title: "Vehicle rental deposits in Phuket",
+    description: "Sunny Rentals vehicle deposits: separate amounts, rental and insurance excess differences, payment and refund checks.",
+    eyebrow: "Separate from rental",
+    intro: "The deposit is listed for the specific vehicle. It is security under the agreement, not rental price or insurance excess.",
+    sections: [
+      { title: "The selected offer's amount", paragraphs: ["Open the selected car or scooter's card. Variants of one model can have different deposits. Use that vehicle's value rather than an average for the category."] },
+      { title: "Four separate concepts", paragraphs: ["Rental pays for the period. An advance payment, if required, relates to booking confirmation. The deposit secures obligations under the agreement. The excess concerns costs for a covered insurance claim; it is not a universal liability limit."] },
+      { title: "Payment, refund and deductions", paragraphs: [enPolicy.depositReturn, "Before paying, obtain the selected offer's payment method and timing, refund method and deadline, deduction grounds and evidence required for damage. Check currency and bank fees separately.", "Record the condition at collection and return and keep the handover record. The deposit amount does not automatically determine every deduction."] },
+      { title: "Booking advance is not the deposit", paragraphs: [enPolicy.carBooking] },
+    ],
+  }),
+  localizePage("insurance", {
+    title: "Страховка и франшиза при аренде на Пхукете",
+    description: "Опубликованные условия страхования Sunny Rentals: вторая сторона ДТП, франшиза, исключения и отдельные условия байков.",
+    eyebrow: "Покрытие и ответственность",
+    intro: ruPolicy.insurance,
+    sections: [
+      { title: "Проверяйте конкретный полис", paragraphs: ["Название «класс 1» не заменяет условия договора. До аренды проверьте покрываемые события, франшизу и её применение, исключения, коммерческую аренду и порядок обращения.", "Отдельно проверьте парковочные повреждения, ДТП без второй стороны, кражу, стёкла и шины, воду и нарушения условий водителем. Наличие покрытия этих случаев здесь не обещается."] },
+      { title: "Франшиза и депозит", paragraphs: ["Сумма франшизы берётся из условий конкретной машины и показана в карточке рядом с депозитом. У обычного седана, BMW и большого SUV могут быть разные значения.", "Депозит не равен франшизе. Франшиза не означает, что расходы при любом повреждении ограничены этой суммой."] },
+      { title: "При происшествии", paragraphs: ["При непосредственной опасности или травмах сначала нужна экстренная помощь. Затем сообщите по контакту из договора, зафиксируйте обстоятельства и согласуйте оформление.", "Не ремонтируйте транспорт самостоятельно до фиксации повреждений и согласования."] },
+      { title: "Байк и медицинская страховка", paragraphs: [ruPolicy.scooterCover, "Медицинская страховка путешественника — отдельный договор. Проверьте у своего страховщика категорию прав, объём двигателя и покрытие водителя и пассажира."] },
+    ],
+  }, {
+    title: "Rental insurance and excess in Phuket",
+    description: "Sunny Rentals published insurance terms: identified second party, excess, exclusions and separate scooter conditions.",
+    eyebrow: "Coverage and liability",
+    intro: enPolicy.insurance,
+    sections: [
+      { title: "Check the specific policy", paragraphs: ["The Class 1 name does not replace agreement terms. Check covered events, excess and how it applies, exclusions, commercial rental and reporting procedures before renting.", "Check parking damage, accidents without another party, theft, glass and tyres, water and breaches of driver conditions separately. This page does not promise cover for those events."] },
+      { title: "Excess and deposit", paragraphs: ["The excess follows the specific car's terms and appears beside the deposit on its card. A standard sedan, BMW and large SUV can have different values.", "The deposit and excess are not equal by definition. The excess does not limit costs for every kind of damage."] },
+      { title: "After an incident", paragraphs: ["In immediate danger or injury, emergency assistance comes first. Then use the contact in your agreement, record the circumstances and agree reporting steps.", "Do not arrange repairs before damage is recorded and the next steps are agreed."] },
+      { title: "Scooters and medical insurance", paragraphs: [enPolicy.scooterCover, "Travel medical insurance is a separate agreement. Check licence category, engine size and driver and passenger cover with your insurer."] },
+    ],
+  }),
+  localizePage("delivery", {
+    title: "Доставка и возврат автомобиля на Пхукете",
+    description: "Тариф доставки Sunny Rentals, отдельные места получения и возврата, встреча в аэропорту и изменение точки передачи.",
+    eyebrow: "Обе точки передачи",
+    intro: ruPolicy.delivery,
+    sections: [
+      { title: "Получение и возврат отдельно", paragraphs: [ruPolicy.delivery, "При получении в аэропорту и возврате в городе оплачивается одна городская передача. При получении и возврате в городе — две. До подтверждения в итоговых условиях должны быть указаны каждая операция и сумма за обе."] },
+      { title: "Встреча и связь", paragraphs: ["Укажите точные даты, время и карту обеих точек. Для аэропорта добавьте рейс и терминал; до вылета сохраните подтверждение встречи и рабочий контакт.", "Ночную выдачу, ожидание при задержке рейса и возможные дополнительные сборы согласуйте заранее. При переносе рейса получите подтверждение нового времени."] },
+      { title: "Передача и изменение места", paragraphs: ["Осмотрите транспорт, снимите состояние и уровень топлива, проверьте согласованное оборудование. До изменения точки возврата согласуйте новое место, время и стоимость."] },
+    ],
+  }, {
+    title: "Vehicle delivery and return in Phuket",
+    description: "Sunny Rentals delivery rates, separate pick-up and return locations, airport meetings and changing handover points.",
+    eyebrow: "Both handover points",
+    intro: enPolicy.delivery,
+    sections: [
+      { title: "Pick-up and return separately", paragraphs: [enPolicy.delivery, "Airport collection and city return mean one city handover charge. City collection and city return mean two. Obtain separate charges and the total for both operations before confirmation."] },
+      { title: "Meeting and contact", paragraphs: ["Provide exact dates, times and map pins for both points. For the airport, include your flight and terminal; save the meeting confirmation and working contact before departure.", "Agree night handover, flight-delay waiting and any additional fees beforehand. If the flight changes, obtain confirmation of the revised time."] },
+      { title: "Handover and location changes", paragraphs: ["Inspect the vehicle, record condition and fuel, and check agreed equipment. Agree the new point, time and cost before changing the return location."] },
+    ],
+  }),
+  localizePage("faq", {
+    title: "Вопросы об аренде авто и байков на Пхукете",
+    description: "Стоимость, подтверждение заявки, депозит, страховка, доставка и выбор машины или байка Sunny Rentals.",
+    eyebrow: "Ответы по темам",
+    intro: "Начните с вопроса, который влияет на выбор. Подробные условия вынесены на отдельные страницы, а суммы конкретного транспорта — в его карточку.",
+    sections: [
+      { title: "Цена и бронирование", paragraphs: ["Сравнивайте сумму за весь период. Депозит и согласованные услуги учитывайте отдельно. Открытие Telegram и отправленная заявка ещё не подтверждают наличие."] },
+      { title: "Деньги и покрытие", paragraphs: ["Депозит, предоплата и франшиза — разные условия. Их сумма и правила применения должны быть понятны до оплаты. Ограничения полиса важнее названия класса."] },
+      { title: "Получение и выбор", paragraphs: ["Укажите обе точки передачи, пассажиров и багаж. Семь мест не гарантируют большой багажник, а байку нужны собственные документы и экипировка."] },
+    ],
+  }, {
+    title: "Phuket car and scooter rental FAQ",
+    description: "Sunny Rentals costs, requests and confirmation, deposits, insurance, delivery and choosing a car or scooter.",
+    eyebrow: "Questions by topic",
+    intro: "Start with the question that affects your choice. Detailed terms have their own pages, and vehicle-specific amounts appear on the vehicle card.",
+    sections: [
+      { title: "Price and booking", paragraphs: ["Compare totals for the whole period. Budget separately for the deposit and agreed extras. Opening Telegram or submitting a request does not confirm availability."] },
+      { title: "Money and coverage", paragraphs: ["Deposit, advance payment and excess are different terms. Amounts and rules should be clear before payment. Policy limitations matter more than the class name."] },
+      { title: "Collection and selection", paragraphs: ["Specify both meeting points, passengers and luggage. Seven seats do not guarantee a large boot; scooters require their own documents and equipment."] },
+    ],
+  }),
 ];
 
 export const trustPageSlugs = trustPages.map((page) => page.ru.slug);
-
 export function getTrustPage(slug: string, locale: Locale) {
   return trustPages.find((page) => page[locale].slug === slug)?.[locale];
 }

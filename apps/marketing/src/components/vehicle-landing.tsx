@@ -26,6 +26,9 @@ import {
 import { absoluteUrl } from "@/lib/site";
 import { getPhuketSeason } from "@/lib/pricing";
 import { createModelHandoffLink } from "@/lib/telegram";
+import { getAuditFaq } from "@/content/audit-faq";
+import { ContextLinks } from "@/components/context-links";
+import { policyCopy } from "@/content/rental-policy";
 
 function createVehicleFaq(
   car: MarketingCar,
@@ -34,70 +37,36 @@ function createVehicleFaq(
   group: VehicleModelGroup,
   master: boolean,
 ) {
+  const detail = car.verifiedDetails;
+  const selection = getAuditFaq(
+    car.category === "bikes" ? ["B2", "B3"]
+    : car.category === "7s" ? ["G1", "G3"]
+    : car.category === "suv" ? ["V1", "V2"]
+    : car.category === "sedan" ? ["E1", "E2"] : ["K2", "K3"],
+    locale,
+  );
+  const equipment = detail?.equipment?.length ? [{
+    question: locale === "ru" ? `Какие опции подтверждены у ${vehicleName}?` : `Which features are confirmed on this ${vehicleName}?`,
+    answer: detail.equipment.map((item) => item[locale]).join(", "),
+  }] : [];
+  const physical = detail?.bodyStyle || detail?.seats ? [{
+    question: locale === "ru" ? "Какой кузов и сколько мест у этого экземпляра?" : "What body style and seat count does this vehicle have?",
+    answer: [
+      detail.bodyStyle?.[locale],
+      detail.seats ? `${detail.seats} ${locale === "ru" ? "мест" : "seats"}` : undefined,
+    ].filter(Boolean).join(" · "),
+  }] : [];
+  const variants = master && group.variants.length > 1
+    ? getLocalizedModelGroup(group, locale).questions.slice(1) : [];
   const excess = car.terms.insurance?.excessThb;
-  const groupQuestions = master && group.variants.length > 1
-    ? getLocalizedModelGroup(group, locale).questions
-    : [];
-
-  if (locale === "ru") {
-    return [
-      ...groupQuestions,
-      {
-        question: `На странице реальные фотографии ${vehicleName}?`,
-        answer: `Да. В галерее показаны реальные фотографии конкретной машины из каталога Sunny Rentals, а не изображение абстрактного класса.`,
-      },
-      {
-        question: `Какой депозит у ${vehicleName}?`,
-        answer: `Депозит составляет ${car.deposit.toLocaleString("ru-RU")} ฿ и показывается отдельно от стоимости аренды.`,
-      },
-      car.terms.insurance
-        ? {
-            question: `Какая страховка действует для ${vehicleName}?`,
-            answer: `Страховка класса 1 действует при ДТП с участием двух сторон. Франшиза — ${excess?.toLocaleString("ru-RU")} ฿. Царапины и парковочные повреждения без второй стороны в покрытие не входят.`,
-          }
-        : {
-            question: `Есть ли страховка у ${vehicleName}?`,
-            answer: `Нет. Байки Sunny Rentals передаются без страховки. Условия ответственности нужно учитывать до подтверждения бронирования.`,
-          },
-      {
-        question: `Сколько стоит доставка ${vehicleName}?`,
-        answer: `Доставка в аэропорт Пхукета бесплатна. Доставка по городу, к отелю или вилле стоит 500 ฿.`,
-      },
-      ...(groupQuestions.length ? [] : [{
-        question: `Как рассчитывается аренда ${vehicleName}?`,
-        answer: `Ставка зависит от сезона и срока аренды: 1–6, 7–14, 15–29 или 30+ дней. Полная сетка цен показана выше.`,
-      }]),
-    ].slice(0, 5);
-  }
-
-  return [
-    ...groupQuestions,
-    {
-      question: `Are these real photos of the ${vehicleName}?`,
-      answer: `Yes. The gallery shows real photos of the specific vehicle in the Sunny Rentals catalogue, not a generic vehicle-class image.`,
-    },
-    {
-      question: `What is the deposit for the ${vehicleName}?`,
-      answer: `The deposit is ${car.deposit.toLocaleString("en-US")} THB and is shown separately from the rental price.`,
-    },
-    car.terms.insurance
-      ? {
-          question: `What insurance applies to the ${vehicleName}?`,
-          answer: `Class 1 insurance applies to accidents with an identified second party. The excess is ${excess?.toLocaleString("en-US")} THB. Scratches and parking damage without a second party are excluded.`,
-        }
-      : {
-          question: `Is the ${vehicleName} insured?`,
-          answer: `No. Sunny Rentals scooters are supplied without insurance. Please consider the liability terms before confirming your booking.`,
-        },
-    {
-      question: `How much is delivery for the ${vehicleName}?`,
-      answer: `Phuket Airport delivery is free. City, hotel or villa delivery costs 500 THB.`,
-    },
-    ...(groupQuestions.length ? [] : [{
-      question: `How is the ${vehicleName} rental price calculated?`,
-      answer: `The daily rate depends on the season and rental term: 1–6, 7–14, 15–29 or 30+ days. The complete rate grid is shown above.`,
-    }]),
-  ].slice(0, 5);
+  const financial = locale === "ru" ? {
+    question: `Какие депозит и франшиза у выбранного ${vehicleName}?`,
+    answer: `Депозит этого экземпляра — ${car.deposit.toLocaleString("ru-RU")} бат, отдельно от аренды.${excess !== undefined ? ` Франшиза по опубликованным условиям — ${excess.toLocaleString("ru-RU")} бат. Депозит и франшиза не ограничивают автоматически ответственность при любом повреждении.` : " Покрытие байка проверяется отдельно по договору."}`,
+  } : {
+    question: `What deposit and excess apply to the selected ${vehicleName}?`,
+    answer: `This vehicle's deposit is ${car.deposit.toLocaleString("en-US")} THB, separate from rental.${excess !== undefined ? ` The published excess is ${excess.toLocaleString("en-US")} THB. Neither amount automatically limits all damage liability.` : " Check scooter cover separately against the agreement."}`,
+  };
+  return [...selection.slice(0, physical.length ? 1 : 2), ...physical, ...equipment, ...variants, financial].slice(0, 5);
 }
 
 export function createVehicleMetadata(
@@ -212,8 +181,7 @@ export function VehicleLanding({
         url: variantUrl,
         priceCurrency: "THB",
         price: variant.fromPrice,
-        availability: "https://schema.org/LimitedAvailability",
-        businessFunction: "http://purl.org/goodrelations/v1#LeaseOut",
+                businessFunction: "http://purl.org/goodrelations/v1#LeaseOut",
         priceSpecification: {
           "@type": "UnitPriceSpecification",
           price: variant.fromPrice,
@@ -356,6 +324,8 @@ export function VehicleLanding({
                 {copy.vehicle.book}
               </a>
               <p className="handoff-note">{copy.vehicle.handoff}</p>
+              <p className="handoff-note">{locale === "ru" ? "Наличие и минимальный срок проверяются до подтверждения брони. Аренда, депозит и услуги — отдельные суммы." : "Availability and minimum term are checked before booking confirmation. Rental, deposit and services are separate amounts."}</p>
+              <ContextLinks locale={locale} paths={["deposit", "insurance", "delivery"]} />
             </div>
           </div>
 
@@ -401,14 +371,26 @@ export function VehicleLanding({
               <p>{copy.vehicle.delivery}</p>
             </div>
             <dl>
-              <div><dt>{copy.vehicle.transmission}</dt><dd>{localizedCar.transmission}</dd></div>
-              <div><dt>{copy.vehicle.engine}</dt><dd>{localizedCar.engine}</dd></div>
-              <div><dt>{copy.vehicle.fuel}</dt><dd>{localizedCar.fuel}</dd></div>
+              {car.verifiedDetails?.bodyStyle ? <div><dt>{locale === "ru" ? "Кузов" : "Body style"}</dt><dd>{car.verifiedDetails.bodyStyle[locale]}</dd></div> : null}
+              {localizedCar.transmission !== "—" ? <div><dt>{copy.vehicle.transmission}</dt><dd>{localizedCar.transmission}</dd></div> : null}
+              {localizedCar.engine !== "—" ? <div><dt>{copy.vehicle.engine}</dt><dd>{localizedCar.engine}</dd></div> : null}
+              {localizedCar.fuel !== "—" ? <div><dt>{copy.vehicle.fuel}</dt><dd>{localizedCar.fuel}</dd></div> : null}
               {localizedCar.seats ? (
                 <div><dt>{copy.vehicle.capacity}</dt><dd>{localizedCar.seats}</dd></div>
               ) : null}
             </dl>
           </section>
+
+          {car.verifiedDetails?.equipment?.length ? <section className="vehicle-details">
+            <h2>{locale === "ru" ? "Подтверждённая комплектация" : "Confirmed equipment"}</h2>
+            <ul>{car.verifiedDetails.equipment.map((item) => <li key={item.en}>{item[locale]}</li>)}</ul>
+          </section> : null}
+          {car.verifiedDetails?.luggage?.photos.length ? <section className="vehicle-details">
+            <div><h2>{locale === "ru" ? "Багажник и конфигурация сидений" : "Luggage space and seat configuration"}</h2>
+            <p>{car.verifiedDetails.luggage.configuration[locale]}</p>
+            {car.verifiedDetails.luggage.note ? <p>{car.verifiedDetails.luggage.note[locale]}</p> : null}</div>
+            <div>{car.verifiedDetails.luggage.photos.map((photo) => <img key={photo} src={photo} loading="lazy" alt={car.verifiedDetails!.luggage!.configuration[locale]} />)}</div>
+          </section> : null}
 
           <section className="vehicle-terms" aria-labelledby="terms-title">
             <div className="section-heading">
@@ -425,13 +407,15 @@ export function VehicleLanding({
                 <h3>{copy.vehicle.deposit}</h3>
                 <strong>{car.deposit.toLocaleString(copy.numberLocale)} ฿</strong>
                 <p>{copy.vehicle.depositNote}</p>
+                {car.category !== "bikes" ? <p>{policyCopy(locale).depositReturn}</p> : null}
+                {car.category !== "bikes" ? <p>{policyCopy(locale).carBooking}</p> : null}
               </article>
               <article>
                 <span>02</span>
                 <h3>{copy.vehicle.insurance}</h3>
                 {insurance ? (
                   <>
-                    <strong>{copy.vehicle.insuranceClass}</strong>
+                    <strong>{locale === "ru" ? "Опубликованные условия Sunny" : "Sunny’s published terms"}</strong>
                     <p>{copy.vehicle.insuranceExcess}: {insurance.excessThb?.toLocaleString(copy.numberLocale)} ฿. {locale === "ru" ? insurance.summary : insurance.summaryEn}</p>
                     <small>{locale === "ru" ? insurance.exclusions[0] : insurance.exclusionsEn[0]}</small>
                   </>
@@ -447,6 +431,7 @@ export function VehicleLanding({
                 <h3>{copy.vehicle.deliveryTitle}</h3>
                 <strong>{copy.vehicle.airport}: {deliveryAirport?.toLocaleString(copy.numberLocale) ?? "0"} ฿</strong>
                 <p>{copy.vehicle.city}: {deliveryCity?.toLocaleString(copy.numberLocale) ?? "500"} ฿</p>
+                <small>{policyCopy(locale).delivery}</small>
               </article>
               <article>
                 <span>04</span>
