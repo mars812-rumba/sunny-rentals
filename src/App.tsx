@@ -21,20 +21,39 @@ import BlogDetailPage from "./pages/blog/BlogDetailPage";
 import React, { Suspense, useEffect } from 'react';
 import { trackLeadEvent } from '@/api/api';
 
-// ✅ Declare Telegram WebApp types
+interface TelegramWebAppUser {
+  id: number;
+  username?: string;
+  first_name?: string;
+}
+
+interface TelegramWebApp {
+  initData: string;
+  initDataUnsafe: {
+    user?: TelegramWebAppUser;
+    start_param?: string;
+  };
+  ready: () => void;
+  close: () => void;
+  expand?: () => void;
+  openLink?: (url: string) => void;
+}
+
 declare global {
   interface Window {
     Telegram?: {
-      WebApp: any;
+      WebApp: TelegramWebApp;
     };
   }
 }
 
 const AdminScheduler = React.lazy(() => import('./pages/AdminScheduler'));
+const PlatformAdminPage = React.lazy(() => import('./pages/PlatformAdminPage'));
 const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
+    if (window.location.pathname.startsWith('/platform-admin')) return;
     const tg = window.Telegram?.WebApp;
     
     if (tg) {
@@ -64,6 +83,14 @@ const App = () => {
           <Routes>
             {/* ✅ Админ панель */}
             <Route path="/admin/app" element={<AdminApp />} />
+            <Route
+              path="/platform-admin"
+              element={
+                <Suspense fallback={<div className="min-h-screen bg-slate-100" aria-busy="true" />}>
+                  <PlatformAdminPage />
+                </Suspense>
+              }
+            />
             
             {/* Основные роуты */}
             <Route path="/" element={<Site />} />
