@@ -128,6 +128,7 @@ const CRMPage: React.FC = () => {
   const [allUsers, setAllUsers] = useState<User[]>([]); // Все пользователи для индикаторов
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [activeStatus, setActiveStatus] = useState('new');
   const [period, setPeriod] = useState('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -339,6 +340,7 @@ const CRMPage: React.FC = () => {
 
   const loadMainData = useCallback(async () => {
     setLoading(true);
+    setLoadError('');
     try {
       // Загружаем всех пользователей для подсчёта непрочитанных во вкладках
       const allUsersRes = await fetch(`/api/crm/users?period=${period}`);
@@ -364,7 +366,7 @@ const CRMPage: React.FC = () => {
       ]);
       const uData = await uRes.json();
       const sData = await sRes.json();
-      if (uData.status === 'ok') {
+      if (uRes.ok && uData.status === 'ok') {
         // Преобразуем dialog в dialog_status для совместимости
         const processedUsers = uData.users.map((user: any) => ({
           ...user,
@@ -373,9 +375,14 @@ const CRMPage: React.FC = () => {
         }));
         setUsers(processedUsers);
         setTimeout(() => refreshAllDialogStatuses(), 1000);
+      } else {
+        throw new Error(uData.message || uData.detail || 'Сервер не вернул список лидов');
       }
       if (sData.status === 'ok') setStats(sData.stats);
-    } catch (e) { console.error("Ошибка загрузки:", e); }
+    } catch (e) {
+      console.error("Ошибка загрузки:", e);
+      setLoadError(e instanceof Error ? e.message : 'Не удалось загрузить список лидов');
+    }
     finally { setLoading(false); }
   }, [activeStatus, period]);
 
@@ -1367,6 +1374,28 @@ const handleUpdateNote = async () => {
     <div className="h-96 flex flex-col items-center justify-center text-slate-300">
        <RefreshCcw className="w-10 h-10 animate-spin mb-4 text-blue-100" />
        <span className="text-xs font-black uppercase tracking-[0.2em]">Синхронизация...</span>
+    </div>
+  ) : loadError ? (
+    <div className="mx-auto flex min-h-72 max-w-lg flex-col items-center justify-center px-6 text-center" role="alert">
+      <div className="grid h-11 w-11 place-items-center rounded-xl bg-red-50 text-red-600">
+        <AlertCircle className="h-5 w-5" />
+      </div>
+      <h2 className="mt-4 text-base font-bold text-slate-900">Лиды временно не загрузились</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-500">{loadError}</p>
+      <Button onClick={() => void loadMainData()} className="mt-5 bg-blue-600 text-white hover:bg-blue-700">
+        <RefreshCcw className="h-4 w-4" /> Повторить загрузку
+      </Button>
+    </div>
+  ) : getFilteredUsers(users).length === 0 ? (
+    <div className="mx-auto flex min-h-72 max-w-lg flex-col items-center justify-center px-6 text-center" role="status">
+      <Users className="h-8 w-8 text-slate-300" />
+      <h2 className="mt-4 text-base font-bold text-slate-900">В этом разделе пока нет лидов</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-500">Выберите другой статус или сбросьте фильтры диалогов и маркеров.</p>
+      {(dialogFilter !== 'all' || markerFilter !== 'all') && (
+        <Button variant="outline" onClick={() => { setDialogFilter('all'); setMarkerFilter('all'); }} className="mt-5">
+          Сбросить фильтры
+        </Button>
+      )}
     </div>
   ) : (
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">

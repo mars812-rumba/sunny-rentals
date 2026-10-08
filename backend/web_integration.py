@@ -40,6 +40,7 @@ from booking_time import normalize_booking_dates, validate_time_value
 from booking_notifications import build_booking_claude_context, select_active_booking
 from customer_bookings import require_bot_token, customer_bookings, cancel_customer_booking, customer_crm_status
 from chat_messages import deduplicate_chat_entries
+from jsonl_tail import read_jsonl_tail
 from customer_outreach_campaign import (
     CAMPAIGN_ID as OUTREACH_CAMPAIGN_ID,
     GREETING as OUTREACH_GREETING,
@@ -2832,13 +2833,9 @@ def get_fast_dialog_map():
     
     def process_file(path, is_chat=False):
         if not path.exists(): return
-        # Читаем только последние 1000 строк (хватит для актуальных статусов)
-        try:
-            cmd = ["tail", "-n", "1000", str(path)]
-            lines = subprocess.check_output(cmd).decode('utf-8').splitlines()
-        except:
-            with open(path, "r", encoding="utf-8") as f:
-                lines = f.readlines()[-1000:]
+        # Незавершённую последнюю UTF-8 запись пропускаем, сохраняя весь
+        # предыдущий валидный хвост диалога.
+        lines = read_jsonl_tail(path, 1000)
 
         for line in lines:
             try:
@@ -2977,8 +2974,7 @@ def get_crm_stats(period: str = Query("all")):
         # Собираем user_id последних сообщений от пользователей
         unread_by_user = {}  # user_id -> {has_unread: bool, status: str}
         try:
-            cmd = ["tail", "-n", "50000", str(CHAT_LOGS_JSONL)]
-            lines = subprocess.check_output(cmd).decode('utf-8').splitlines()
+            lines = read_jsonl_tail(CHAT_LOGS_JSONL, 50000)
             for line in lines:
                 try:
                     ev = json.loads(line.strip())
@@ -5897,43 +5893,41 @@ async def get_user_chats_fast(user_id: str):
         try:
             # Дедупликация ПО filename (одно фото может прийти в нескольких размерах от Telegram)
             seen_filenames = set()
-            with open(CHAT_LOGS_JSONL, 'r', encoding='utf-8') as f:
-                # Читаем хвост файла
-                lines = f.readlines()[-500:]
-                for line in lines:
-                    try:
-                        entry = json.loads(line.strip())
-                        entry_uid = str(entry.get('user_id', ''))
-                        # Debug для первых 10 записей
-                        if len(chats) < 10:
-                            print(f"📤 [DEBUG] Checking entry: entry_uid={entry_uid}, t_id={t_id}, match={entry_uid == t_id}")
-                        if entry_uid != t_id:
-                            continue
-                        
-                        # Дедупликация: пропускаем если уже видели этот filename
-                        # Проверяем media и в top-level и в content.media
-                        top_media = entry.get('media', {})
-                        content = entry.get('content', {})
-                        content_media = content.get('media', {}) if isinstance(content, dict) else {}
-                        
-                        # Берем media из content если есть, иначе из top-level
-                        media = content_media or top_media
-                        filename = media.get('filename') if media else None
-                        
-                        if filename and filename in seen_filenames:
-                            print(f"📊 [DEBUG] Skipping duplicate media: {filename}")
-                            continue
-                        if filename:
-                            seen_filenames.add(filename)
-                        
-                        # Если media в content - переносим в top-level для совместимости
-                        if content_media and not top_media:
-                            entry['media'] = content_media
-                        
-                        if len(chats) < 3:  # Debug logging for first 3 entries
-                            print(f"📊 [DEBUG] Chat entry: has_media={'media' in entry}, filename={filename}")
-                        chats.append(entry)
-                    except: continue
+            for line in read_jsonl_tail(CHAT_LOGS_JSONL, 500):
+                try:
+                    entry = json.loads(line.strip())
+                    entry_uid = str(entry.get('user_id', ''))
+                    # Debug для первых 10 записей
+                    if len(chats) < 10:
+                        print(f"📤 [DEBUG] Checking entry: entry_uid={entry_uid}, t_id={t_id}, match={entry_uid == t_id}")
+                    if entry_uid != t_id:
+                        continue
+
+                    # Дедупликация: пропускаем если уже видели этот filename
+                    # Проверяем media и в top-level и в content.media
+                    top_media = entry.get('media', {})
+                    content = entry.get('content', {})
+                    content_media = content.get('media', {}) if isinstance(content, dict) else {}
+
+                    # Берем media из content если есть, иначе из top-level
+                    media = content_media or top_media
+                    filename = media.get('filename') if media else None
+
+                    if filename and filename in seen_filenames:
+                        print(f"📊 [DEBUG] Skipping duplicate media: {filename}")
+                        continue
+                    if filename:
+                        seen_filenames.add(filename)
+
+                    # Если media в content - переносим в top-level для совместимости
+                    if content_media and not top_media:
+                        entry['media'] = content_media
+
+                    if len(chats) < 3:  # Debug logging for first 3 entries
+                        print(f"📊 [DEBUG] Chat entry: has_media={'media' in entry}, filename={filename}")
+                    chats.append(entry)
+                except (json.JSONDecodeError, TypeError, AttributeError):
+                    continue
         except Exception as e:
             print(f"⚠️ Ошибка чтения файла чатов: {e}")
 
