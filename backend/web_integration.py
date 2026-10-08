@@ -19,6 +19,9 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
+# Production configuration is maintained in the project-level .env. Load it
+# explicitly as well so service working-directory changes cannot hide it.
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 from datetime import date, datetime, timedelta, UTC
 from typing import List, Dict, Any, Optional, Union
@@ -53,6 +56,7 @@ from claude_dialog import (
     parse_claude_output,
     requests_manager_handoff,
 )
+from platform_admin_api import mount_platform_admin_api
 
 # Claude AI imports
 try:
@@ -255,6 +259,10 @@ app.add_middleware(
 )
 
 app.mount("/images_web", StaticFiles(directory=IMAGES), name="images")
+PLATFORM_ADMIN_API_MOUNTED = mount_platform_admin_api(
+    app,
+    Path(__file__).resolve().parent / "data-v2",
+)
 _lock = threading.Lock()
 
 

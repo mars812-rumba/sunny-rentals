@@ -78,6 +78,10 @@ npm run build --prefix "${MARKETING_APP}"
 echo "Combining the exported Next.js site with legacy WebApp routes..."
 cp -a "${RELEASE_DIR}/legacy/." "${RELEASE_DIR}/site/"
 cp -a "${MARKETING_APP}/out/." "${RELEASE_DIR}/site/"
+# The marketing prebuild generates responsive photos after Vite's public copy.
+# Include those new assets in the combined release as well.
+mkdir -p "${RELEASE_DIR}/site/images_web"
+cp -a "${PROJECT_ROOT}/public/images_web/." "${RELEASE_DIR}/site/images_web/"
 
 LEGACY_ROUTES=(
   "app"
@@ -89,6 +93,7 @@ LEGACY_ROUTES=(
   "offer"
   "blog"
   "offers"
+  "platform-admin"
 )
 
 for route in "${LEGACY_ROUTES[@]}"; do
@@ -115,6 +120,8 @@ test -f "${RELEASE_DIR}/site/en/index.html"
 test -f "${RELEASE_DIR}/site/en/cars/index.html"
 test -f "${RELEASE_DIR}/site/en/cars/toyota-yaris/index.html"
 test -f "${RELEASE_DIR}/site/app/index.html"
+test -f "${RELEASE_DIR}/site/admin/app/index.html"
+test -f "${RELEASE_DIR}/site/platform-admin/index.html"
 test -d "${RELEASE_DIR}/site/_next/static"
 
 if [[ -L "${DIST_PATH}" ]]; then
@@ -140,6 +147,10 @@ curl --fail --silent --show-error \
   https://sunny-rentals.online/en/cars/toyota-yaris >/dev/null
 curl --fail --silent --show-error \
   https://sunny-rentals.online/app >/dev/null
+curl --fail --silent --show-error \
+  https://sunny-rentals.online/admin/app/ >/dev/null
+curl --fail --silent --show-error \
+  https://sunny-rentals.online/platform-admin/ >/dev/null
 
 trap - EXIT
 
