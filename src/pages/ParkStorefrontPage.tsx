@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } 
 import { fetchStorefront, Storefront, StorefrontAsset, storefrontMediaUrl } from '@/api/storefront';
 import heroBg from '@/assets/hero_bg.jpg.webp';
 import heroMob from '@/assets/hero_mob.jpg.webp';
+import { ParkTelegramEntry } from '@/components/platform/ParkTelegramEntry';
+import { ParkBookingForm } from '@/components/platform/ParkBookingForm';
 
 const types: Record<string, string> = { car: 'Автомобили', scooter: 'Электросамокаты', motorcycle: 'Мотоциклы / скутеры', bicycle: 'Велосипеды', snowmobile: 'Снегоходы', other: 'Другая техника' };
 const actionClass = 'bg-gradient-to-r from-cyan-600 to-blue-700 text-white hover:from-cyan-700 hover:to-blue-800';
@@ -34,7 +36,7 @@ function StorefrontImage({ tenantId, reference, preview, alt, className }: { ten
     : <div className={`${className} flex flex-col items-center justify-center gap-2 bg-slate-100 text-slate-600`} role="img" aria-label={alt}><ImageIcon aria-hidden="true" /><span className="text-xs">{failed ? 'Фото недоступно' : reference ? 'Загружаем фото…' : 'Фото пока нет'}</span></div>;
 }
 
-function AssetCard({ asset, tenantId, currency, preview }: { asset: StorefrontAsset; tenantId: string; currency: string; preview: string }) {
+function AssetCard({ asset, tenantId, currency, preview, bookingEnabled }: { asset: StorefrontAsset; tenantId: string; currency: string; preview: string; bookingEnabled: boolean }) {
   const [photo, setPhoto] = useState(0);
   const price = (amount: number) => {
     try { return new Intl.NumberFormat('ru-RU', { style: 'currency', currency, maximumFractionDigits: 2 }).format(amount); }
@@ -51,10 +53,11 @@ function AssetCard({ asset, tenantId, currency, preview }: { asset: StorefrontAs
         <DialogTrigger asChild><Button className={`mt-4 w-full rounded-xl ${actionClass}`} aria-label={`Посмотреть ${asset.name}`}>Посмотреть <ArrowRight aria-hidden="true" className="h-4 w-4" /></Button></DialogTrigger>
         <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto rounded-xl p-4 sm:p-6">
           <DialogTitle className="break-words pr-8 leading-snug">{asset.name}</DialogTitle>
-          <DialogDescription>Фотографии и базовая цена парка. Бронирование через эту витрину пока не подключено.</DialogDescription>
+          <DialogDescription>Фотографии и базовая цена парка. Для заявки откройте витрину через бота этого парка.</DialogDescription>
           <StorefrontImage key={asset.photos[photo]} tenantId={tenantId} reference={asset.photos[photo]} preview={preview} alt={`${asset.name}, фото ${photo + 1}`} className="aspect-[4/3] max-h-[50dvh] w-full rounded-lg object-contain" />
           {asset.photos.length > 1 && <div className="flex items-center justify-between gap-2"><Button variant="outline" aria-label="Предыдущее фото" onClick={() => setPhoto((value) => (value - 1 + asset.photos.length) % asset.photos.length)}><ArrowLeft aria-hidden="true" /></Button><p role="status" className="text-sm tabular-nums">Фото {photo + 1} из {asset.photos.length}</p><Button variant="outline" aria-label="Следующее фото" onClick={() => setPhoto((value) => (value + 1) % asset.photos.length)}><ArrowRight aria-hidden="true" /></Button></div>}
           <p className="font-semibold tabular-nums">{asset.daily_rate ? `${price(asset.daily_rate)} / сутки` : 'Цена по запросу'}{asset.deposit !== null ? ` · депозит ${price(asset.deposit)}` : ''}</p>
+          {bookingEnabled && !preview && <ParkBookingForm key={asset.id} tenantId={tenantId} assetId={asset.id} />}
         </DialogContent>
       </Dialog>
     </CardContent>
@@ -95,14 +98,15 @@ function ParkStorefront({ tenantId }: { tenantId: string }) {
     </header>
     <div className="mx-auto max-w-6xl px-4 pb-10 sm:px-6 lg:px-8">
       {data?.preview && <p role="status" className="mt-4 rounded-xl bg-amber-100 p-3 text-sm text-amber-950">Закрытое превью · здесь видны и неопубликованные машины. Ссылка действует 1 час и не даёт доступа к управлению парком.</p>}
+      {data && !data.preview && <ParkTelegramEntry key={tenantId} tenantId={tenantId} />}
       {loading ? <p role="status" aria-live="polite" className="py-12 text-center text-slate-600">Загружаем транспорт парка…</p> : error ? <div role="alert" className="py-12 text-center"><p className="text-slate-700">{error}</p><Button className={`mt-4 ${actionClass}`} onClick={() => setReload((value) => value + 1)}>Повторить загрузку</Button></div> : data && <>
         <section aria-label="Поиск транспорта" className="relative mt-5 grid gap-4 rounded-xl bg-white p-4 shadow-soft sm:grid-cols-2">
           <div><label htmlFor="park-search" className="mb-2 block text-sm font-medium">Марка или модель</label><div className="relative"><Search aria-hidden="true" className="absolute left-3 top-3 h-4 w-4 text-slate-500" /><Input id="park-search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Найти транспорт" className="pl-9" /></div></div>
           <div><label htmlFor="park-type" className="mb-2 block text-sm font-medium">Тип транспорта</label><select id="park-type" value={type} onChange={(event) => setType(event.target.value)} className="h-10 w-full rounded-md border border-input bg-white px-3 text-sm focus:outline-cyan-700"><option value="all">Весь транспорт</option>{Array.from(new Set(data.assets.map((asset) => asset.asset_type))).map((value) => <option key={value} value={value}>{types[value] || value}</option>)}</select></div>
         </section>
         <section aria-labelledby="park-catalog-title" className="mt-8"><h2 id="park-catalog-title" className="text-xl font-semibold">Транспорт парка</h2><p role="status" className="mb-4 mt-1 text-sm text-slate-600">Показано: {assets.length} из {data.assets.length}</p>
-          {assets.length ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{assets.map((asset) => <AssetCard key={asset.id} asset={asset} tenantId={tenantId} currency={data.tenant.currency} preview={preview} />)}</div> : <div className="rounded-xl bg-white px-5 py-10 text-center"><CarFront aria-hidden="true" className="mx-auto text-slate-500" /><p className="mt-3 font-medium">{data.assets.length ? 'По вашему запросу ничего не найдено' : 'Транспорт пока не опубликован'}</p>{data.assets.length > 0 && <Button variant="outline" className="mt-4" onClick={() => { setSearch(''); setType('all'); }}>Сбросить фильтры</Button>}</div>}
-        </section><p className="mt-8 text-sm text-slate-600">Бронирование и проверка свободных дат пока не подключены.</p>
+          {assets.length ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{assets.map((asset) => <AssetCard key={asset.id} asset={asset} tenantId={tenantId} currency={data.tenant.currency} preview={preview} bookingEnabled={data.booking_enabled} />)}</div> : <div className="rounded-xl bg-white px-5 py-10 text-center"><CarFront aria-hidden="true" className="mx-auto text-slate-500" /><p className="mt-3 font-medium">{data.assets.length ? 'По вашему запросу ничего не найдено' : 'Транспорт пока не опубликован'}</p>{data.assets.length > 0 && <Button variant="outline" className="mt-4" onClick={() => { setSearch(''); setType('all'); }}>Сбросить фильтры</Button>}</div>}
+        </section><p className="mt-8 text-sm text-slate-600">{data.booking_enabled ? 'Откройте карточку транспорта, чтобы проверить даты и отправить заявку через Telegram.' : 'Бронирование на этой витрине ещё не включено.'}</p>
       </>}
     </div>
   </main>;

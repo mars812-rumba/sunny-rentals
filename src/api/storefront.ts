@@ -12,7 +12,7 @@ export interface Storefront {
   tenant: { id: string; slug: string; name: string; currency: string; logo: string | null };
   assets: StorefrontAsset[];
   preview: boolean;
-  booking_enabled: false;
+  booking_enabled: boolean;
 }
 
 export function storefrontMediaUrl(tenantId: string, reference: string) {

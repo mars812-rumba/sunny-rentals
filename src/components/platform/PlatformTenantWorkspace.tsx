@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PlatformParkTelegramPanel } from './PlatformParkTelegramPanel';
+import { ParkBookingCalendar } from './ParkBookingCalendar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import {
   AssetType, PlatformAsset, PlatformAssetInput, PlatformTenant, archivePlatformAsset,
@@ -177,6 +179,9 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
         {previewError && <p role="alert" className="w-full text-sm text-rose-800">{previewError}</p>}
         <p className="w-full text-sm text-slate-600">Превью показывает черновики и действует 1 час. Для публичной витрины включите «Показывать на витрине» в редакторе техники и опубликуйте парк.</p>
       </section>
+
+      <PlatformParkTelegramPanel key={tenant.tenant_id} tenant={tenant} />
+      <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin />
 
       <section className="mt-7 flex flex-wrap items-center gap-5 rounded-2xl bg-white p-5" aria-labelledby="branding-title">
         {tenant.branding?.logo ? <PrivateImage tenantId={tenant.tenant_id} reference={tenant.branding.logo} alt={`Логотип ${tenant.name}`} className="h-20 w-20 rounded-xl object-contain" /> : <div className="grid h-20 w-20 place-items-center rounded-xl bg-slate-100"><ImageIcon className="text-slate-500" aria-hidden="true" /></div>}

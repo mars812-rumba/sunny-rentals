@@ -258,5 +258,5 @@ def mount_platform_admin_api(
             browser_session_ttl_seconds=browser_ttl_seconds,
         )
     )
-    app.include_router(create_storefront_router(storage_root, auth))
+    app.include_router(create_storefront_router(storage_root, auth, booking_enabled=values.get('PLATFORM_PARTNERS_BOT_ENABLED', 'false').strip().lower() == 'true'))
     return True

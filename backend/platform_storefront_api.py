@@ -109,7 +109,7 @@ class StorefrontReader:
                             "photos": self.photos(a)} for a in self.assets]}
 
 
-def create_storefront_router(root: Path, auth: PlatformAdminAuth):
+def create_storefront_router(root: Path, auth: PlatformAdminAuth, booking_enabled: bool = False):
     router = APIRouter(prefix="/api/storefront", tags=["storefront"])
     previews = StorefrontPreview(auth)
 
@@ -126,6 +126,7 @@ def create_storefront_router(root: Path, auth: PlatformAdminAuth):
         from fastapi.responses import JSONResponse
         from fastapi.encoders import jsonable_encoder
         result = reader(tenant_id, x_storefront_preview).catalog(bool(x_storefront_preview))
+        result['booking_enabled'] = booking_enabled and not result['preview']
         return JSONResponse(jsonable_encoder(result), headers={"Cache-Control": "no-store", "X-Robots-Tag": "noindex"})
 
     @router.get("/{tenant_id}/media/{reference:path}")
