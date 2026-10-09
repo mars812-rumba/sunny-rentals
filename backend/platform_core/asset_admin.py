@@ -16,7 +16,7 @@ from uuid import uuid4
 from pydantic import BaseModel, Field, validator
 
 from .context import TenantContext
-from .models import AssetType, RentalAsset, utc_now
+from .models import AssetStatus, AssetType, RentalAsset, utc_now
 from .provisioning import PlatformContext, TenantNotFoundError, TenantProvisioner
 from .repositories import JsonCollectionRepository, JsonlEventRepository
 
@@ -35,6 +35,7 @@ class AssetInput(BaseModel):
     color: str = Field(default="", max_length=80)
     daily_rate: float = Field(default=0, ge=0, le=100000000)
     deposit: float = Field(default=0, ge=0, le=100000000)
+    public: Optional[bool] = None
 
     @validator("name")
     def meaningful_name(cls, value):
@@ -97,6 +98,10 @@ class TenantAssetAdmin:
             asset.specs = {**asset.specs, "brand": data.brand, "model": data.model, "year": data.year, "color": data.color}
             asset.pricing = {**asset.pricing, "daily_rate": data.daily_rate, "currency": self.tenant.currency}
             asset.deposit_policy = {**asset.deposit_policy, "amount": data.deposit, "currency": self.tenant.currency}
+            if data.public is not None:
+                asset.public = data.public
+                if data.public and asset.status == AssetStatus.DRAFT:
+                    asset.status = AssetStatus.AVAILABLE
             asset.updated_at = utc_now()
             self._commit_asset(asset, "asset_updated" if asset_id else "asset_created")
             return asset

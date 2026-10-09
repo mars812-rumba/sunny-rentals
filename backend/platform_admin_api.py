@@ -10,6 +10,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, constr
 from platform_core.asset_admin import AssetInput, MAX_IMAGE_BYTES, TenantAssetAdmin
+from platform_storefront_api import StorefrontPreview, create_storefront_router
 
 from platform_core import (
     BrowserHandoffError,
@@ -155,6 +156,15 @@ def create_platform_admin_router(
             raise HTTPException(status_code=409, detail=str(error))
         return {"tenant": tenant, "trial_started": True}
 
+    @router.post("/tenants/{tenant_id}/storefront-preview")
+    def storefront_preview(tenant_id: str, context: PlatformContext = Depends(require_admin)):
+        try:
+            tenant = provisioner.get_tenant(context, tenant_id)
+        except (TenantNotFoundError, ValueError):
+            raise HTTPException(404, "Tenant not found")
+        previews = StorefrontPreview(auth)
+        return {"token": previews.issue(tenant.tenant_id, context.actor_id), "expires_in": previews.TTL}
+
     def asset_service(tenant_id: str, context: PlatformContext) -> TenantAssetAdmin:
         try:
             return TenantAssetAdmin(storage_root, context, tenant_id)
@@ -248,4 +258,5 @@ def mount_platform_admin_api(
             browser_session_ttl_seconds=browser_ttl_seconds,
         )
     )
+    app.include_router(create_storefront_router(storage_root, auth))
     return True

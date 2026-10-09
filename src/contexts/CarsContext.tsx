@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -27,10 +28,12 @@ interface CarsContextType {
 const CarsContext = createContext<CarsContextType | undefined>(undefined);
 
 export function CarsProvider({ children }: { children: React.ReactNode }) {
+  const isStorefront = useLocation().pathname.startsWith('/p/');
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
 
  const fetchCars = async () => {
+  if (window.location.pathname.startsWith('/p/')) { setLoading(false); return; }
   try {
     setLoading(true);
     const cacheBuster = new Date().getTime();
@@ -51,10 +54,11 @@ export function CarsProvider({ children }: { children: React.ReactNode }) {
     await fetchCars(); // ← ГАРАНТИРОВАННО ОБНОВЛЯЕТ
   };
 
-  // Загружаем при старте
+  // Reload when leaving a tenant route through SPA navigation. Tenant pages
+  // themselves must not fetch the global Sunny catalog.
   useEffect(() => {
     fetchCars();
-  }, []);
+  }, [isStorefront]);
 
   return (
     <CarsContext.Provider value={{ cars, loading, refetchCars }}>

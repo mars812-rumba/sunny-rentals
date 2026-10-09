@@ -168,6 +168,7 @@ export interface PlatformAsset {
   tenant_id: string;
   name: string;
   asset_type: AssetType;
+  public: boolean;
   photos: { main?: string; gallery?: string[] };
   specs: { brand?: string; model?: string; year?: number; color?: string };
   pricing: { daily_rate?: number; currency?: string };
@@ -183,10 +184,15 @@ export interface PlatformAssetInput {
   color: string;
   daily_rate: number;
   deposit: number;
+  public?: boolean;
 }
 
 function tenantPath(tenantId: string) {
   return `/tenants/${encodeURIComponent(tenantId)}`;
+}
+
+export async function createStorefrontPreview(tenantId: string): Promise<{ token: string; expires_in: number }> {
+  return platformFetch(`${tenantPath(tenantId)}/storefront-preview`, { method: 'POST' });
 }
 
 export async function getPlatformTenant(tenantId: string): Promise<PlatformTenant> {

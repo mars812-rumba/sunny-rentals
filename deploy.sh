@@ -94,12 +94,25 @@ LEGACY_ROUTES=(
   "blog"
   "offers"
   "platform-admin"
+  "p"
 )
 
 for route in "${LEGACY_ROUTES[@]}"; do
   mkdir -p "${RELEASE_DIR}/site/${route}"
   cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/${route}/index.html"
 done
+
+# Existing parks also get static entry points when nginx still uses the generic
+# fallback. New parks after release require the checked-in /p/ nginx location.
+if [[ -d "${PROJECT_ROOT}/backend/data-v2/tenants" ]]; then
+  while IFS= read -r tenant_dir; do
+    tenant_id="$(basename "${tenant_dir}")"
+    if [[ "${tenant_id}" =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]]; then
+      mkdir -p "${RELEASE_DIR}/site/p/${tenant_id}"
+      cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/p/${tenant_id}/index.html"
+    fi
+  done < <(find "${PROJECT_ROOT}/backend/data-v2/tenants" -mindepth 1 -maxdepth 1 -type d)
+fi
 
 while IFS= read -r content_file; do
   slug="$(basename "${content_file}" .json)"
@@ -122,6 +135,7 @@ test -f "${RELEASE_DIR}/site/en/cars/toyota-yaris/index.html"
 test -f "${RELEASE_DIR}/site/app/index.html"
 test -f "${RELEASE_DIR}/site/admin/app/index.html"
 test -f "${RELEASE_DIR}/site/platform-admin/index.html"
+test -f "${RELEASE_DIR}/site/p/index.html"
 test -d "${RELEASE_DIR}/site/_next/static"
 
 if [[ -L "${DIST_PATH}" ]]; then

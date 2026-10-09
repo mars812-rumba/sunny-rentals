@@ -20,6 +20,7 @@ import OfferDetailPage from "./pages/offers/OfferDetailPage";
 import BlogDetailPage from "./pages/blog/BlogDetailPage";
 import React, { Suspense, useEffect } from 'react';
 import { trackLeadEvent } from '@/api/api';
+import { CarsProvider } from '@/contexts/CarsContext';
 
 interface TelegramWebAppUser {
   id: number;
@@ -49,11 +50,12 @@ declare global {
 
 const AdminScheduler = React.lazy(() => import('./pages/AdminScheduler'));
 const PlatformAdminPage = React.lazy(() => import('./pages/PlatformAdminPage'));
+const ParkStorefrontPage = React.lazy(() => import('./pages/ParkStorefrontPage'));
 const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    if (window.location.pathname.startsWith('/platform-admin')) return;
+    if (window.location.pathname.startsWith('/platform-admin') || window.location.pathname.startsWith('/p/')) return;
     const tg = window.Telegram?.WebApp;
     
     if (tg) {
@@ -79,6 +81,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <CarsProvider>
           {/*<LanguageSwitcher />*/}
           <Routes>
             {/* ✅ Админ панель */}
@@ -95,6 +98,7 @@ const App = () => {
             {/* Основные роуты */}
             <Route path="/" element={<Site />} />
             <Route path="/app" element={<Index />} />
+            <Route path="/p/:tenantId" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем витрину…</p>}><ParkStorefrontPage /></Suspense>} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/offer" element={<OfferPage />} />
             <Route path="/admin/offer" element={<OfferAdminPage />} />
@@ -122,6 +126,7 @@ const App = () => {
             
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </CarsProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

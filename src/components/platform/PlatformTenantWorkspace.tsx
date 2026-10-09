@@ -9,13 +9,14 @@ import {
   AssetType, PlatformAsset, PlatformAssetInput, PlatformTenant, archivePlatformAsset,
   listPlatformAssets, loadPlatformMedia, savePlatformAsset,
   uploadPlatformLogo, uploadPlatformPhoto,
+  createStorefrontPreview,
 } from "@/api/platform-admin";
 
 const TYPES: Record<AssetType, string> = {
   car: "Автомобиль", scooter: "Электросамокат", motorcycle: "Мотоцикл / скутер",
   bicycle: "Велосипед", snowmobile: "Снегоход", other: "Другая техника",
 };
-const blank = (type: AssetType): PlatformAssetInput => ({ name: "", asset_type: type, brand: "", model: "", year: null, color: "", daily_rate: 0, deposit: 0 });
+const blank = (type: AssetType): PlatformAssetInput => ({ name: "", asset_type: type, brand: "", model: "", year: null, color: "", daily_rate: 0, deposit: 0, public: false });
 const message = (error: unknown) => error instanceof Error ? error.message : "Не удалось сохранить. Повторите попытку.";
 const primaryButton = "bg-[#0d1b2a] text-white hover:bg-[#17324a]";
 
@@ -61,6 +62,17 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
   const [archiveTarget, setArchiveTarget] = useState<PlatformAsset | null>(null);
   const [archiveError, setArchiveError] = useState("");
   const [uploadProgress, setUploadProgress] = useState("");
+  const [previewBusy, setPreviewBusy] = useState(false);
+  const [previewError, setPreviewError] = useState("");
+  const [previewUrl, setPreviewUrl] = useState("");
+  const preview = async () => {
+    setPreviewBusy(true); setPreviewError(""); setPreviewUrl("");
+    try {
+      const result = await createStorefrontPreview(tenant.tenant_id);
+      setPreviewUrl(`/p/${encodeURIComponent(tenant.tenant_id)}#preview=${encodeURIComponent(result.token)}`);
+    } catch (failure) { setPreviewError(message(failure)); }
+    finally { setPreviewBusy(false); }
+  };
 
   useEffect(() => {
     let active = true;
@@ -85,6 +97,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
     setForm(asset === "new" ? blank(tenant.primary_asset_type) : {
       name: asset.name, asset_type: asset.asset_type, brand: asset.specs.brand || "", model: asset.specs.model || "",
       year: asset.specs.year || null, color: asset.specs.color || "", daily_rate: asset.pricing.daily_rate || 0, deposit: asset.deposit_policy.amount || 0,
+      public: asset.public,
     });
     if (editingId === (asset === "new" ? "new" : asset.id)) nameInput.current?.focus();
   };
@@ -157,6 +170,14 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
         <span className="rounded-full bg-slate-200 px-3 py-1 text-sm">{tenant.status === "draft" ? "Черновик · триал ещё не начался" : "Парк опубликован"}</span>
       </header>
 
+      <section className="mt-5 flex flex-wrap items-center gap-3" aria-label="Витрина парка">
+        <Button variant="outline" disabled={previewBusy || busy} onClick={() => void preview()}>{previewBusy ? "Готовим превью…" : "Подготовить превью витрины"}</Button>
+        {previewUrl && <a className="rounded-md px-3 py-2 text-sm font-medium text-blue-700 underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={previewUrl} target="_blank" rel="noopener noreferrer">Открыть закрытое превью</a>}
+        {(tenant.status === "trial" || tenant.status === "active") && <a className="rounded-md px-3 py-2 text-sm font-medium text-blue-700 underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={`/p/${encodeURIComponent(tenant.tenant_id)}`} target="_blank" rel="noopener noreferrer">Публичная витрина</a>}
+        {previewError && <p role="alert" className="w-full text-sm text-rose-800">{previewError}</p>}
+        <p className="w-full text-sm text-slate-600">Превью показывает черновики и действует 1 час. Для публичной витрины включите «Показывать на витрине» в редакторе техники и опубликуйте парк.</p>
+      </section>
+
       <section className="mt-7 flex flex-wrap items-center gap-5 rounded-2xl bg-white p-5" aria-labelledby="branding-title">
         {tenant.branding?.logo ? <PrivateImage tenantId={tenant.tenant_id} reference={tenant.branding.logo} alt={`Логотип ${tenant.name}`} className="h-20 w-20 rounded-xl object-contain" /> : <div className="grid h-20 w-20 place-items-center rounded-xl bg-slate-100"><ImageIcon className="text-slate-500" aria-hidden="true" /></div>}
         <div className="min-w-0 flex-1"><h2 id="branding-title" className="font-semibold">Логотип проката</h2><p className="mt-1 text-sm leading-6 text-slate-600">JPEG, PNG или WebP до 8 МБ. Внутри парка сохраняются оригинал и версия для витрины.</p></div>
@@ -188,6 +209,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
               {([ ["brand", "Марка"], ["model", "Модель"], ["color", "Цвет"] ] as const).map(([field, label]) => <div key={field}><Label htmlFor={`asset-${field}`}>{label}</Label><Input id={`asset-${field}`} maxLength={80} value={form[field]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} className="mt-2" /></div>)}
               <div><Label htmlFor="asset-rate">Цена за день, {tenant.currency}</Label><Input id="asset-rate" type="number" required min={0} max={100000000} step="0.01" value={form.daily_rate} onChange={(e) => setForm({ ...form, daily_rate: Number(e.target.value) })} className="mt-2" /></div>
               <div><Label htmlFor="asset-deposit">Депозит, {tenant.currency}</Label><Input id="asset-deposit" type="number" required min={0} max={100000000} step="0.01" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: Number(e.target.value) })} className="mt-2" /></div>
+              <div className="sm:col-span-2"><label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={Boolean(form.public)} onChange={(event) => setForm({ ...form, public: event.target.checked })} className="h-4 w-4 accent-blue-700 focus-visible:outline focus-visible:outline-2" />Показывать на витрине</label><p className="mt-2 text-sm text-slate-600">После публикации парка машина, её цены и фотографии станут доступны по публичной ссылке.</p></div>
             </fieldset>
             <p className="mt-4 text-sm text-slate-600">На этом этапе задаётся базовая суточная цена. Сезонные тарифы добавим отдельно.</p>
             <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className={primaryButton}>{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : null} Сохранить технику</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}>Закрыть редактор</Button></div>
