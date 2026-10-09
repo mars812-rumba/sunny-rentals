@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PlatformTenantWorkspace } from "@/components/platform/PlatformTenantWorkspace";
+import { PlatformBotConnection } from "@/components/platform/PlatformBotConnection";
 import {
   AssetType,
   CreateTenantPayload,
@@ -381,6 +382,8 @@ export default function PlatformAdminPage() {
               <Plus aria-hidden="true" /> Подключить прокат
             </Button>
           </div>
+
+          <PlatformBotConnection />
 
           {isTelegramMiniApp && (
             <section className="mt-7 flex flex-col gap-5 rounded-2xl bg-[#0d1b2a] px-5 py-5 text-white shadow-[0_16px_38px_rgba(13,27,42,0.16)] sm:flex-row sm:items-center sm:justify-between sm:px-6" aria-labelledby="browser-mode-title">

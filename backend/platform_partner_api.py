@@ -16,6 +16,7 @@ from platform_core.partner_bot import (
     PartnerDeliveryError, TelegramPartnerTransport,
 )
 from platform_core.telegram_identity import TelegramIdentityError
+from platform_core.partner_webhook import PartnerWebhookManager, WebhookSetupError, WebhookConflict
 from platform_core.park_bookings import ParkBookingService, ParkQuoteRequest, ParkBookingRequest, BookingConflict, ParkStatusRequest, ParkOwnerStatusRequest
 
 
@@ -28,13 +29,14 @@ class PartnerIdentityRequest(BaseModel):
     init_data: constr(min_length=1, max_length=8192)
 
 
-def create_platform_partner_router(service: PartnerBotService, admin_auth: PlatformAdminAuth):
+def create_platform_partner_router(service: PartnerBotService, admin_auth: PlatformAdminAuth, webhook_manager=None):
     def private_response(response: Response):
         response.headers['Cache-Control'] = 'private, no-store'
         response.headers['Referrer-Policy'] = 'no-referrer'
     router = APIRouter(prefix='/api/partners', tags=['park-bot'], dependencies=[Depends(private_response)])
     bearer = HTTPBearer(auto_error=False)
     bookings = ParkBookingService(service)
+    webhooks = webhook_manager or PartnerWebhookManager(service.config)
 
     def require_admin(credentials=Depends(bearer)):
         try:
@@ -43,6 +45,22 @@ def create_platform_partner_router(service: PartnerBotService, admin_auth: Platf
             return admin_auth.verify(credentials.credentials)
         except (PermissionError, ValueError):
             raise HTTPException(401, 'Platform admin authorization required') from None
+
+    def webhook_result(action):
+        try:
+            return action()
+        except WebhookConflict as error:
+            raise HTTPException(409, str(error)) from None
+        except WebhookSetupError as error:
+            raise HTTPException(503, str(error)) from None
+
+    @router.get('/admin/webhook')
+    def webhook_status(context=Depends(require_admin)):
+        return webhook_result(webhooks.status)
+
+    @router.post('/admin/webhook/connect')
+    def webhook_connect(context=Depends(require_admin)):
+        return webhook_result(webhooks.connect)
 
     @router.get('/parks/{tenant_id}/bot-link')
     def bot_link(tenant_id: str):

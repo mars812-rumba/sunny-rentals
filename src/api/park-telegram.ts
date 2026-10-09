@@ -13,6 +13,10 @@ async function request<T>(path: string, options: RequestInit = {}, admin = false
   }
   const response = await fetch(`/api/partners${path}`, { ...options, headers, cache: 'no-store' });
   if (!response.ok) {
+    if (admin && path.startsWith('/admin/webhook')) {
+      if (response.status === 409) throw new Error('У бота уже установлен другой webhook. Автоматическая замена запрещена.');
+      if (response.status === 503) throw new Error('Telegram недоступен или настройки бота не совпадают. Проверьте токен и имя на сервере, затем повторите проверку.');
+    }
     if (response.status === 401 && admin) {
       clearPlatformSession();
       throw new Error('Сессия суперадминистратора истекла. Войдите заново.');
@@ -55,6 +59,23 @@ export async function verifyParkTelegramIdentity(tenantId: string, initData: str
   const data = await request<ParkIdentity>('/identity', { method: 'POST', body: JSON.stringify({ tenant_id: tenantId, init_data: initData }), signal });
   if (data.tenant_id !== tenantId || data.telegram_linked !== true || !['owner', 'customer'].includes(data.role)) throw new Error('Не удалось подтвердить подключение к этому парку.');
   return data;
+}
+
+export interface PlatformWebhookStatus {
+  username: string;
+  state: 'not_set' | 'configured' | 'other';
+  expected_url: string;
+  pending_updates: number;
+  delivery_error: boolean;
+  last_error_at: number | null;
+}
+
+export function fetchPlatformWebhook(signal?: AbortSignal): Promise<PlatformWebhookStatus> {
+  return request('/admin/webhook', { signal }, true);
+}
+
+export function connectPlatformWebhook(signal?: AbortSignal): Promise<PlatformWebhookStatus> {
+  return request('/admin/webhook/connect', { method: 'POST', signal }, true);
 }
 
 export interface ParkQuote {

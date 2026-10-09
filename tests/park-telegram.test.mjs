@@ -15,6 +15,31 @@ afterEach(() => { globalThis.fetch = originalFetch; store.clear(); });
 const response = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 const session = () => store.set('sunny_platform_admin_session', JSON.stringify({ access_token: 'test-admin-session' }));
 
+test('webhook management requires admin and passes only a fixed route, no credentials in body', async () => {
+  globalThis.fetch = async () => { throw new Error('must not send'); };
+  await assert.rejects(api.fetchPlatformWebhook(), /Сессия суперадминистратора/);
+  await assert.rejects(api.connectPlatformWebhook(), /Сессия суперадминистратора/);
+  session();
+  const signal = new AbortController().signal;
+  globalThis.fetch = async (url, options) => {
+    assert.equal(options.headers.get('Authorization'), 'Bearer test-admin-session');
+    assert.equal(options.signal, signal);
+    assert.equal(options.body, undefined);
+    assert.equal(url, options.method === 'POST' ? '/api/partners/admin/webhook/connect' : '/api/partners/admin/webhook');
+    return response({ state: 'configured' });
+  };
+  assert.equal((await api.fetchPlatformWebhook(signal)).state, 'configured');
+  assert.equal((await api.connectPlatformWebhook(signal)).state, 'configured');
+});
+
+test('webhook failures explain conflict and unavailable Telegram without upstream secrets', async () => {
+  session();
+  globalThis.fetch = async () => response({ detail: 'upstream-secret' }, 409);
+  await assert.rejects(api.connectPlatformWebhook(), /другой webhook/);
+  globalThis.fetch = async () => response({ detail: 'upstream-secret' }, 503);
+  await assert.rejects(api.fetchPlatformWebhook(), /Telegram недоступен/);
+});
+
 test('public bot link has no admin authorization or stored credentials', async () => {
   session();
   globalThis.fetch = async (url, options) => {
