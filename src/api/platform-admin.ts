@@ -32,12 +32,13 @@ export interface PlatformTenant {
   updated_at: string;
   published_at?: string | null;
   domains: string[];
+  branding?: { logo?: string };
 }
 
 export interface CreateTenantPayload {
   name: string;
   slug: string;
-  owner_user_id: string;
+  owner_user_id?: string;
   primary_asset_type: AssetType;
   currency: string;
   locale: string;
@@ -60,10 +61,11 @@ async function responseError(response: Response): Promise<PlatformApiError> {
   try {
     const body = await response.json();
     if (typeof body?.detail === "string") message = body.detail;
+    else if (Array.isArray(body?.detail)) message = "Проверьте поля формы: " + body.detail.map((item: { loc?: string[]; msg?: string }) => `${item.loc?.slice(1).join(".") || "поле"}: ${item.msg || "некорректное значение"}`).join("; ");
   } catch {
     // The status-based fallback below remains useful for non-JSON gateway errors.
   }
-  if (response.status === 404) {
+  if (response.status === 404 && message === "Not Found") {
     message = "Контур суперадминки пока выключен на сервере";
   } else if (response.status === 401) {
     message = "Сессия Telegram недействительна или у аккаунта нет доступа";
@@ -128,7 +130,7 @@ async function platformFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${PLATFORM_API_BASE}${path}`, {
     ...init,
     headers: {
-      "Content-Type": "application/json",
+      ...(init?.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
       Authorization: `Bearer ${session.access_token}`,
       ...init?.headers,
     },
@@ -159,4 +161,70 @@ export async function publishPlatformTenant(tenantId: string): Promise<PlatformT
     { method: "POST" },
   );
   return response.tenant;
+}
+
+export interface PlatformAsset {
+  id: string;
+  tenant_id: string;
+  name: string;
+  asset_type: AssetType;
+  photos: { main?: string; gallery?: string[] };
+  specs: { brand?: string; model?: string; year?: number; color?: string };
+  pricing: { daily_rate?: number; currency?: string };
+  deposit_policy: { amount?: number };
+}
+
+export interface PlatformAssetInput {
+  name: string;
+  asset_type: AssetType;
+  brand: string;
+  model: string;
+  year: number | null;
+  color: string;
+  daily_rate: number;
+  deposit: number;
+}
+
+function tenantPath(tenantId: string) {
+  return `/tenants/${encodeURIComponent(tenantId)}`;
+}
+
+export async function getPlatformTenant(tenantId: string): Promise<PlatformTenant> {
+  return (await platformFetch<{ tenant: PlatformTenant }>(tenantPath(tenantId))).tenant;
+}
+
+export async function listPlatformAssets(tenantId: string): Promise<PlatformAsset[]> {
+  return (await platformFetch<{ assets: PlatformAsset[] }>(`${tenantPath(tenantId)}/assets`)).assets;
+}
+
+export async function savePlatformAsset(tenantId: string, data: PlatformAssetInput, assetId?: string): Promise<PlatformAsset> {
+  return (await platformFetch<{ asset: PlatformAsset }>(`${tenantPath(tenantId)}/assets${assetId ? `/${encodeURIComponent(assetId)}` : ""}`, {
+    method: assetId ? "PUT" : "POST", body: JSON.stringify(data),
+  })).asset;
+}
+
+export async function archivePlatformAsset(tenantId: string, assetId: string): Promise<void> {
+  await platformFetch(`${tenantPath(tenantId)}/assets/${encodeURIComponent(assetId)}`, { method: "DELETE" });
+}
+
+export async function uploadPlatformPhoto(tenantId: string, assetId: string, file: File): Promise<PlatformAsset> {
+  const body = new FormData();
+  body.append("file", file);
+  return (await platformFetch<{ asset: PlatformAsset }>(`${tenantPath(tenantId)}/assets/${encodeURIComponent(assetId)}/photos`, { method: "POST", body })).asset;
+}
+
+export async function uploadPlatformLogo(tenantId: string, file: File): Promise<PlatformTenant> {
+  const body = new FormData();
+  body.append("file", file);
+  return (await platformFetch<{ tenant: PlatformTenant }>(`${tenantPath(tenantId)}/logo`, { method: "POST", body })).tenant;
+}
+
+export async function loadPlatformMedia(tenantId: string, reference: string, signal: AbortSignal): Promise<Blob> {
+  const session = getStoredPlatformSession();
+  if (!session?.access_token) throw new PlatformApiError("Сессия истекла", 401);
+  const response = await fetch(`${PLATFORM_API_BASE}${tenantPath(tenantId)}/media/${reference.split("/").map(encodeURIComponent).join("/")}`, {
+    headers: { Authorization: `Bearer ${session.access_token}` }, signal,
+  });
+  if (!response.ok) throw await responseError(response);
+  return response.blob();
 }

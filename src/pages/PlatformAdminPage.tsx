@@ -47,6 +47,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PlatformTenantWorkspace } from "@/components/platform/PlatformTenantWorkspace";
 import {
   AssetType,
   CreateTenantPayload,
@@ -93,7 +94,6 @@ const ASSET_LABELS: Record<AssetType, string> = {
 const initialForm: CreateTenantPayload = {
   name: "",
   slug: "",
-  owner_user_id: "",
   primary_asset_type: "car",
   currency: "THB",
   locale: "ru",
@@ -193,6 +193,7 @@ export default function PlatformAdminPage() {
   const [publishingTenant, setPublishingTenant] = useState<PlatformTenant | null>(null);
   const [isPublishing, setPublishing] = useState(false);
   const [isOpeningBrowser, setOpeningBrowser] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState<PlatformTenant | null>(null);
 
   const loadWorkspace = useCallback(async (sessionActor: PlatformActor) => {
     setActor(sessionActor);
@@ -287,6 +288,7 @@ export default function PlatformAdminPage() {
   const handleCreated = (tenant: PlatformTenant) => {
     setTenants((current) => [tenant, ...current]);
     setCreateOpen(false);
+    setSelectedTenant(tenant);
     toast.success(`${tenant.name} создан как черновик`);
   };
 
@@ -315,6 +317,11 @@ export default function PlatformAdminPage() {
       />
     );
   }
+
+  if (selectedTenant) return <PlatformTenantWorkspace key={selectedTenant.tenant_id} tenant={selectedTenant} onBack={() => setSelectedTenant(null)} onTenantChanged={(updated) => {
+    setSelectedTenant(updated);
+    setTenants((current) => current.map((item) => item.tenant_id === updated.tenant_id ? updated : item));
+  }} />;
 
   return (
     <div className="min-h-screen bg-[#f4f6f8] text-slate-950 selection:bg-cyan-200 selection:text-slate-950">
@@ -421,12 +428,12 @@ export default function PlatformAdminPage() {
               <EmptyState hasSearch={Boolean(search)} onCreate={() => setCreateOpen(true)} />
             ) : (
               <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
-                <div className="hidden grid-cols-[minmax(220px,1.8fr)_1fr_0.8fr_0.8fr_auto] gap-4 border-b border-slate-100 px-5 py-3 text-xs font-medium text-slate-500 md:grid">
+                <div className="hidden grid-cols-[minmax(220px,1.8fr)_1fr_0.8fr_0.8fr_auto] gap-4 border-b border-slate-100 px-5 py-3 text-xs font-medium text-slate-500 xl:grid">
                   <span>Прокат</span><span>Статус</span><span>Транспорт</span><span>Создан</span><span className="text-right">Действие</span>
                 </div>
                 <div className="divide-y divide-slate-100">
                   {filteredTenants.map((tenant) => (
-                    <TenantRow key={tenant.tenant_id} tenant={tenant} onPublish={() => setPublishingTenant(tenant)} />
+                    <TenantRow key={tenant.tenant_id} tenant={tenant} onOpen={() => setSelectedTenant(tenant)} onPublish={() => setPublishingTenant(tenant)} />
                   ))}
                 </div>
               </div>
@@ -467,17 +474,18 @@ function SummaryItem({ label, value, icon, border = false }: { label: string; va
   );
 }
 
-function TenantRow({ tenant, onPublish }: { tenant: PlatformTenant; onPublish: () => void }) {
+function TenantRow({ tenant, onPublish, onOpen }: { tenant: PlatformTenant; onPublish: () => void; onOpen: () => void }) {
   return (
-    <article className="grid gap-4 px-5 py-5 transition-colors hover:bg-slate-50/70 md:grid-cols-[minmax(220px,1.8fr)_1fr_0.8fr_0.8fr_auto] md:items-center">
+    <article className="grid gap-4 px-5 py-5 transition-colors hover:bg-slate-50/70 xl:grid-cols-[minmax(220px,1.8fr)_1fr_0.8fr_0.8fr_auto] xl:items-center">
       <div className="min-w-0">
-        <div className="truncate font-semibold tracking-[-0.01em]">{tenant.name}</div>
+        <button onClick={onOpen} className="max-w-full truncate text-left font-semibold tracking-[-0.01em] text-slate-950 underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-600">{tenant.name}</button>
         <div className="mt-1 truncate text-xs text-slate-500">/{tenant.slug} · {tenant.currency}</div>
       </div>
       <div><StatusBadge status={tenant.status} /></div>
-      <div className="text-sm text-slate-600"><span className="mr-2 text-xs text-slate-400 md:hidden">Тип</span>{ASSET_LABELS[tenant.primary_asset_type]}</div>
-      <div className="text-sm tabular-nums text-slate-600"><span className="mr-2 text-xs text-slate-400 md:hidden">Создан</span>{formatDate(tenant.created_at)}</div>
-      <div className="flex justify-end">
+      <div className="text-sm text-slate-600"><span className="mr-2 text-xs text-slate-400 xl:hidden">Тип</span>{ASSET_LABELS[tenant.primary_asset_type]}</div>
+      <div className="text-sm tabular-nums text-slate-600"><span className="mr-2 text-xs text-slate-400 xl:hidden">Создан</span>{formatDate(tenant.created_at)}</div>
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button variant="outline" size="sm" onClick={onOpen}>Открыть парк</Button>
         {tenant.status === "draft" ? (
           <Button variant="outline" size="sm" onClick={onPublish} className="w-full border-slate-300 bg-white hover:bg-slate-100 sm:w-auto">
             Опубликовать <ArrowRight aria-hidden="true" />
@@ -539,8 +547,8 @@ function CreateTenantSheet({
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setFormError("");
-    if (!form.name.trim() || !form.slug.trim() || !form.owner_user_id.trim()) {
-      setFormError("Заполните название, slug и Telegram ID владельца");
+    if (!form.name.trim() || !form.slug.trim()) {
+      setFormError("Заполните название и slug");
       return;
     }
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(form.slug)) {
@@ -549,7 +557,7 @@ function CreateTenantSheet({
     }
     setSubmitting(true);
     try {
-      onCreated(await createPlatformTenant({ ...form, name: form.name.trim(), slug: form.slug.trim(), owner_user_id: form.owner_user_id.trim() }));
+      onCreated(await createPlatformTenant({ ...form, name: form.name.trim(), slug: form.slug.trim() }));
     } catch (error) {
       setFormError(error instanceof PlatformApiError ? error.message : "Не удалось создать прокат");
     } finally {
@@ -589,12 +597,9 @@ function CreateTenantSheet({
             </div>
 
             <div className="border-t border-slate-100 pt-7">
-              <h3 className="font-semibold">Владелец и расчёты</h3>
-              <p className="mt-1 text-sm text-slate-500">Владелец получит роль только внутри этого проката.</p>
+              <h3 className="font-semibold">Расчёты и регион</h3>
+              <p className="mt-1 text-sm text-slate-500">Парк можно подготовить заранее. Доступ владельцу подключается отдельно.</p>
               <div className="mt-5 space-y-5">
-                <FormField id="owner-id" label="Telegram ID владельца" hint="Числовой ID или доверенный внешний идентификатор.">
-                  <Input id="owner-id" value={form.owner_user_id} onChange={(event) => update("owner_user_id", event.target.value)} placeholder="123456789" inputMode="numeric" className="focus-visible:ring-cyan-500" />
-                </FormField>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <FormField id="currency" label="Валюта">
                     <Select value={form.currency} onValueChange={(value) => update("currency", value)}>

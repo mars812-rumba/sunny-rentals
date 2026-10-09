@@ -4,9 +4,12 @@ import os
 from pathlib import Path
 from typing import Mapping, Optional
 
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, status
+from fastapi import APIRouter, Depends, FastAPI, File, HTTPException, UploadFile, status
+from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, constr
+from platform_core.asset_admin import AssetInput, MAX_IMAGE_BYTES, TenantAssetAdmin
 
 from platform_core import (
     BrowserHandoffError,
@@ -151,6 +154,70 @@ def create_platform_admin_router(
         except ValueError as error:
             raise HTTPException(status_code=409, detail=str(error))
         return {"tenant": tenant, "trial_started": True}
+
+    def asset_service(tenant_id: str, context: PlatformContext) -> TenantAssetAdmin:
+        try:
+            return TenantAssetAdmin(storage_root, context, tenant_id)
+        except (TenantNotFoundError, ValueError):
+            raise HTTPException(status_code=404, detail="Парк не найден")
+
+    def execute_asset(action):
+        try:
+            return action()
+        except TenantNotFoundError as error:
+            raise HTTPException(status_code=404, detail=str(error))
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error))
+        except FileNotFoundError:
+            raise HTTPException(status_code=503, detail="Обработка изображений недоступна на сервере")
+
+    async def image_bytes(file: UploadFile):
+        try:
+            content = await file.read(MAX_IMAGE_BYTES + 1)
+        finally:
+            await file.close()
+        if len(content) > MAX_IMAGE_BYTES:
+            raise HTTPException(status_code=413, detail="Изображение больше 8 МБ")
+        return content
+
+    @router.get("/tenants/{tenant_id}/assets")
+    def list_assets(tenant_id: str, context: PlatformContext = Depends(require_admin)):
+        return {"assets": asset_service(tenant_id, context).list()}
+
+    @router.post("/tenants/{tenant_id}/assets", status_code=201)
+    def create_asset(tenant_id: str, request: AssetInput, context: PlatformContext = Depends(require_admin)):
+        service = asset_service(tenant_id, context)
+        return {"asset": execute_asset(lambda: service.save(request))}
+
+    @router.put("/tenants/{tenant_id}/assets/{asset_id}")
+    def update_asset(tenant_id: str, asset_id: str, request: AssetInput, context: PlatformContext = Depends(require_admin)):
+        service = asset_service(tenant_id, context)
+        return {"asset": execute_asset(lambda: service.save(request, asset_id))}
+
+    @router.delete("/tenants/{tenant_id}/assets/{asset_id}")
+    def archive_asset(tenant_id: str, asset_id: str, context: PlatformContext = Depends(require_admin)):
+        service = asset_service(tenant_id, context)
+        execute_asset(lambda: service.archive(asset_id))
+        return {"archived": True}
+
+    @router.post("/tenants/{tenant_id}/assets/{asset_id}/photos")
+    async def upload_asset_photo(tenant_id: str, asset_id: str, file: UploadFile = File(...), context: PlatformContext = Depends(require_admin)):
+        service = await run_in_threadpool(asset_service, tenant_id, context)
+        content = await image_bytes(file)
+        # Decode in the threadpool, not on the async request loop.
+        return {"asset": await run_in_threadpool(execute_asset, lambda: service.upload_photo(asset_id, content))}
+
+    @router.post("/tenants/{tenant_id}/logo")
+    async def upload_tenant_logo(tenant_id: str, file: UploadFile = File(...), context: PlatformContext = Depends(require_admin)):
+        service = await run_in_threadpool(asset_service, tenant_id, context)
+        content = await image_bytes(file)
+        return {"tenant": await run_in_threadpool(execute_asset, lambda: service.upload_logo(content))}
+
+    @router.get("/tenants/{tenant_id}/media/{reference:path}")
+    def get_media(tenant_id: str, reference: str, context: PlatformContext = Depends(require_admin)):
+        service = asset_service(tenant_id, context)
+        path = execute_asset(lambda: service.media_path(reference))
+        return FileResponse(path, media_type="image/webp", headers={"Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"})
 
     return router
 
