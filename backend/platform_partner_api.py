@@ -8,6 +8,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.security import HTTPBearer
 from pydantic import BaseModel, constr
+from platform_core.pydantic_compat import pattern_string
 
 from platform_core.admin_auth import PlatformAdminAuth
 from platform_core.partner_bot import (
@@ -19,7 +20,7 @@ from platform_core.park_bookings import ParkBookingService, ParkQuoteRequest, Pa
 
 
 class InvitationRequest(BaseModel):
-    expected_user_id: constr(regex=r'^[1-9][0-9]{0,19}$') = None
+    expected_user_id: pattern_string(r'^[1-9][0-9]{0,19}$') = None
 
 
 class PartnerIdentityRequest(BaseModel):

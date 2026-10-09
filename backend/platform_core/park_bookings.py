@@ -7,6 +7,7 @@ import json
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import BaseModel, constr
+from .pydantic_compat import pattern_string
 from .context import TenantContext
 from .models import AssetStatus, Booking, BookingStatus, Customer, RentalAsset
 from .partner_bot import PartnerBotError
@@ -20,7 +21,7 @@ class BookingConflict(ValueError):
 class ParkQuoteRequest(BaseModel):
     tenant_id: constr(min_length=1, max_length=63)
     init_data: constr(min_length=1, max_length=8192)
-    asset_id: constr(regex=r'^[a-f0-9]{32}$')
+    asset_id: pattern_string(r'^[a-f0-9]{32}$')
     start_date: date
     end_date: date
 
@@ -29,13 +30,13 @@ class ParkQuoteRequest(BaseModel):
 
 
 class ParkBookingRequest(ParkQuoteRequest):
-    request_id: constr(regex=r'^[A-Za-z0-9_-]{16,64}$')
-    quote_token: constr(regex=r'^[a-f0-9]{64}$')
+    request_id: pattern_string(r'^[A-Za-z0-9_-]{16,64}$')
+    quote_token: pattern_string(r'^[a-f0-9]{64}$')
 
 
 class ParkStatusRequest(BaseModel):
-    status: constr(regex=r'^(confirmed|cancelled)$')
-    expected_status: constr(regex=r'^(requested|confirmed)$')
+    status: pattern_string(r'^(confirmed|cancelled)$')
+    expected_status: pattern_string(r'^(requested|confirmed)$')
 
     class Config:
         extra = 'forbid'
@@ -44,7 +45,7 @@ class ParkStatusRequest(BaseModel):
 class ParkOwnerStatusRequest(ParkStatusRequest):
     tenant_id: constr(min_length=1, max_length=63)
     init_data: constr(min_length=1, max_length=8192)
-    booking_id: constr(regex=r'^[a-f0-9]{64}$')
+    booking_id: pattern_string(r'^[a-f0-9]{64}$')
 
 
 class ParkBookingService:
