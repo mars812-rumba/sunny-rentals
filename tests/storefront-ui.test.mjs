@@ -56,8 +56,11 @@ test('owner workspace does not render platform management controls', () => {
   assert.match(html, /Техника парка/);
   assert.match(html, /role="tablist"[^>]+aria-label="Управление парком"/);
   assert.equal((html.match(/role="tab"/g) || []).length, 2);
-  assert.match(html, /aria-selected="true"[^>]*>Автопарк/);
-  assert.match(html, /aria-selected="false"[^>]*>Календарь/);
+  assert.match(html, /aria-selected="true"[^>]*>[\s\S]*?Автопарк<\/button>/);
+  assert.match(html, /aria-selected="false"[^>]*>[\s\S]*?Календарь<\/button>/);
+  assert.match(html, /data-\[state=active\]:bg-blue-700/);
+  assert.match(html, /lucide-car-front/);
+  assert.match(html, /lucide-calendar-days/);
   assert.match(html, /role="tabpanel"/);
   assert.doesNotMatch(html, /Загружаем календарь|Добавить бронь \/ блокировку/);
   assert.doesNotMatch(html, /Все прокаты|Подготовить превью|Логотип проката|Webhook|<h1/);
@@ -65,12 +68,14 @@ test('owner workspace does not render platform management controls', () => {
 
 test('owner can open the separate client storefront from the park header', () => {
   const html = renderToStaticMarkup(e(ui.PlatformTenantWorkspace, { owner: true,
-    tenant: { tenant_id: 'park-a', slug: 'park-a', name: 'Park A', status: 'active', currency: 'THB', timezone: 'Asia/Bangkok', primary_asset_type: 'car' },
+    tenant: { tenant_id: 'park-a', slug: 'park-a', name: 'Park A', branding: { logo: 'logo/test.webp' }, status: 'active', currency: 'THB', timezone: 'Asia/Bangkok', primary_asset_type: 'car' },
     onBack: () => {}, onTenantChanged: () => {}, onViewStorefront: () => {},
   }));
-  assert.match(html, /Посмотреть витрину/);
-  assert.ok(html.indexOf('Park A') < html.indexOf('Посмотреть витрину'));
-  assert.ok(html.indexOf('Посмотреть витрину') < html.indexOf('role="tablist"'));
+  assert.match(html, />Витрина<\/button>/);
+  assert.match(html, /aria-label="Логотип Park A"/);
+  assert.ok(html.indexOf('aria-label="Логотип Park A"') < html.indexOf('<h2'));
+  assert.ok(html.indexOf('<h2') < html.indexOf('>Витрина</button>'));
+  assert.ok(html.indexOf('>Витрина</button>') < html.indexOf('role="tablist"'));
   assert.doesNotMatch(html, /Подберите транспорт|Выберите транспорт|Клиентский каталог/);
 });
 

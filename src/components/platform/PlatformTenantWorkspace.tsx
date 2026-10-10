@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { ArrowLeft, CarFront, ImageIcon, Loader2, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { ArrowLeft, CarFront, CalendarDays, CheckCircle2, Eye, EyeOff, ImageIcon, Loader2, Pencil, Plus, RefreshCw, Store, Trash2, WalletCards, Banknote, Save, X, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +25,8 @@ const TYPES: Record<AssetType, string> = {
 };
 const blank = (type: AssetType): PlatformAssetInput => ({ name: "", asset_type: type, brand: "", model: "", year: null, color: "", daily_rate: 0, deposit: 0, public: false });
 const message = (error: unknown) => error instanceof Error ? error.message : "Не удалось сохранить. Повторите попытку.";
-const primaryButton = "bg-[#0d1b2a] text-white hover:bg-[#17324a]";
+const primaryButton = "min-h-11 rounded-lg bg-blue-700 text-white hover:bg-blue-800";
+const workspaceTab = "min-h-11 gap-2 rounded-lg px-4 text-slate-600 data-[state=active]:bg-blue-700 data-[state=active]:text-white data-[state=active]:shadow-none hover:bg-blue-50 focus-visible:ring-blue-700";
 
 function validateImage(file: File) {
   if (!file.size || file.size > 8 * 1024 * 1024) throw new Error(`${file.name}: размер должен быть не больше 8 МБ`);
@@ -177,15 +178,20 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
     finally { setBusy(false); }
   };
 
-  return <div className={`${owner ? 'rounded-xl' : 'min-h-screen'} bg-[#f4f6f8] px-4 py-6 text-slate-950 selection:bg-cyan-200 md:px-8`}>
+  return <div className={`${owner ? 'rounded-xl' : 'min-h-screen'} bg-slate-50 px-4 py-6 text-slate-950 selection:bg-blue-200 md:px-8 [&_button]:min-h-11 [&_input]:min-h-11`}>
     <div className="mx-auto max-w-6xl">
       {!owner && <Button variant="ghost" onClick={onBack} disabled={busy}><ArrowLeft aria-hidden="true" /> Все прокаты</Button>}
-      <header className="mt-5 flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0"><Heading className="break-words text-3xl font-semibold tracking-[-0.03em]">{tenant.name}</Heading><p className="mt-2 break-all text-sm text-slate-600">/{tenant.slug} · {tenant.currency} · {tenant.timezone}</p></div>
-        <span className="rounded-full bg-slate-200 px-3 py-1 text-sm">{tenant.status === "draft" ? "Черновик · триал ещё не начался" : "Парк опубликован"}</span>
+      <header className="flex items-start gap-3 sm:gap-4">
+        {tenant.branding?.logo ? <PrivateImage owner={owner} tenantId={tenant.tenant_id} reference={tenant.branding.logo} alt={`Логотип ${tenant.name}`} className="h-12 w-12 shrink-0 rounded-xl bg-white object-contain p-1 sm:h-14 sm:w-14" /> : <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-700 sm:h-14 sm:w-14"><Store aria-hidden="true" className="h-6 w-6" /></div>}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 sm:gap-4"><Heading className="min-w-0 flex-1 break-words text-xl font-semibold leading-tight tracking-tight sm:text-3xl">{tenant.name}</Heading>
+            {owner && onViewStorefront ? <Button variant="outline" className="shrink-0 gap-2 rounded-lg border-blue-200 bg-white px-3 text-blue-700 hover:bg-blue-50" onClick={onViewStorefront}><Store aria-hidden="true" className="h-4 w-4" />Витрина</Button> : !owner && tenant.status !== 'draft' && <Button asChild variant="outline" className="shrink-0 gap-2 rounded-lg border-blue-200 bg-white px-3 text-blue-700 hover:bg-blue-50"><a href={`/p/${encodeURIComponent(tenant.tenant_id)}`} target="_blank" rel="noopener noreferrer"><Store aria-hidden="true" className="h-4 w-4" />Витрина</a></Button>}
+          </div>
+          <p className="mt-2 flex items-start gap-2 break-all text-xs leading-5 text-slate-600 sm:text-sm"><Globe aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />/{tenant.slug} · {tenant.currency} · {tenant.timezone}</p>
+          <ParkTrialStatus tenant={tenant} />
+          <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700"><CheckCircle2 aria-hidden="true" className={`h-3.5 w-3.5 ${tenant.status === 'draft' ? 'text-slate-500' : 'text-emerald-700'}`} />{tenant.status === "draft" ? "Черновик · триал ещё не начался" : "Парк опубликован"}</p>
+        </div>
       </header>
-      <ParkTrialStatus tenant={tenant} />
-      {owner && onViewStorefront && <Button variant="outline" className="mt-4 min-h-11" onClick={onViewStorefront}>Посмотреть витрину</Button>}
 
       {!owner && <details className="mt-5"><summary className="min-h-11 cursor-pointer rounded-md py-3 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700">Настройки подключения и оформления</summary>
       {!owner && <section className="mt-5 flex flex-wrap items-center gap-3" aria-label="Витрина парка">
@@ -206,9 +212,9 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
       </details>}
 
       <Tabs value={section} onValueChange={(value) => { setSection(value); if (value === 'calendar') { setCalendarVisited(true); setCalendarRevision(current => current + 1); } }} activationMode="manual" className="mt-6 min-w-0">
-        <TabsList aria-label="Управление парком" className="grid h-auto w-full grid-cols-2 p-1 sm:max-w-md">
-          <TabsTrigger value="fleet" className="min-h-11 px-4">Автопарк</TabsTrigger>
-          <TabsTrigger value="calendar" className="min-h-11 px-4">Календарь</TabsTrigger>
+        <TabsList aria-label="Управление парком" className="grid h-auto w-full grid-cols-2 gap-1 rounded-xl bg-slate-200/70 p-1 sm:max-w-md">
+          <TabsTrigger value="fleet" className={workspaceTab}><CarFront aria-hidden="true" className="h-4 w-4" />Автопарк</TabsTrigger>
+          <TabsTrigger value="calendar" className={workspaceTab}><CalendarDays aria-hidden="true" className="h-4 w-4" />Календарь</TabsTrigger>
         </TabsList>
         <TabsContent value="fleet" forceMount hidden={section !== 'fleet'} className="mt-6 data-[state=inactive]:hidden">
       <section aria-labelledby="fleet-title">
@@ -219,9 +225,9 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {assets.map((asset) => <VehicleCardFrame key={asset.id} assetId={asset.id} media={asset.photos.main ? <PrivateImage owner={owner} tenantId={tenant.tenant_id} reference={asset.photos.main} alt={asset.name} className="aspect-[16/10] w-full object-cover" /> : <div className="grid aspect-[16/10] place-items-center bg-slate-100"><CarFront className="text-slate-500" aria-hidden="true" /></div>}>
               <CardContent className="flex flex-1 flex-col gap-4 p-4">
-              <div className="min-w-0 flex-1"><h3 className="break-words font-semibold">{asset.name}</h3><p className="mt-1 text-sm text-slate-600">{TYPES[asset.asset_type]} · {asset.pricing.daily_rate || 0} {tenant.currency}/день</p><p className="mt-1 text-sm text-slate-600">Фото: {asset.photos.gallery?.length || 0} · депозит: {asset.deposit_policy.amount || 0} {tenant.currency}</p></div>
+              <div className="min-w-0 flex-1"><h3 className="break-words text-lg font-semibold leading-snug">{asset.name}</h3><p className="mt-2 flex items-center gap-2 text-sm text-slate-600"><CarFront aria-hidden="true" className="h-4 w-4 shrink-0" />{TYPES[asset.asset_type]}</p><p className="mt-3 flex items-center gap-2 text-base font-semibold tabular-nums text-blue-700"><Banknote aria-hidden="true" className="h-4 w-4 shrink-0" />{asset.pricing.daily_rate || 0} {tenant.currency}/день</p><p className="mt-2 flex items-center gap-2 text-sm tabular-nums text-slate-600"><WalletCards aria-hidden="true" className="h-4 w-4 shrink-0" />Депозит: {asset.deposit_policy.amount || 0} {tenant.currency}</p><p className="mt-2 flex items-center gap-2 text-sm text-slate-600"><ImageIcon aria-hidden="true" className="h-4 w-4 shrink-0" />Фото: {asset.photos.gallery?.length || 0}</p></div>
               <div className="flex gap-2"><Button variant="outline" disabled={busy} aria-label={`Редактировать ${asset.name}`} onClick={() => edit(asset)}><Pencil aria-hidden="true" /> Изменить</Button><Button variant="outline" disabled={busy} aria-label={`В архив: ${asset.name}`} onClick={() => { setArchiveError(""); setArchiveTarget(asset); }}><Trash2 aria-hidden="true" /></Button></div>
-              <p className="text-sm text-slate-600">{asset.public ? 'Показывается клиентам' : 'Скрыто с витрины'}</p>
+              <p className={`flex items-center gap-2 text-sm ${asset.public ? 'text-emerald-700' : 'text-slate-600'}`}>{asset.public ? <Eye aria-hidden="true" className="h-4 w-4 shrink-0" /> : <EyeOff aria-hidden="true" className="h-4 w-4 shrink-0" />}{asset.public ? 'Показывается клиентам' : 'Скрыто с витрины'}</p>
               </CardContent></VehicleCardFrame>)}
           </div>
         </>}
@@ -240,7 +246,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
               <div className="sm:col-span-2"><label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={Boolean(form.public)} onChange={(event) => setForm({ ...form, public: event.target.checked })} className="h-4 w-4 accent-blue-700 focus-visible:outline focus-visible:outline-2" />Показывать на витрине</label><p className="mt-2 text-sm text-slate-600">После публикации парка машина, её цены и фотографии станут доступны по публичной ссылке.</p></div>
             </fieldset>
             <p className="mt-4 text-sm text-slate-600">На этом этапе задаётся базовая суточная цена. Сезонные тарифы добавим отдельно.</p>
-            <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className={primaryButton}>{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : null} Сохранить технику</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}>Закрыть редактор</Button></div>
+            <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className={primaryButton}>{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />} Сохранить технику</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}><X aria-hidden="true" />Закрыть редактор</Button></div>
           </form>
           {editing !== "new" && <div className="mt-7 border-t border-slate-200 pt-5">
             <Label htmlFor="asset-photos">Фотографии машины</Label><p id="photo-hint" className="mt-1 text-sm text-slate-600">Первая фотография станет главной. Можно выбрать несколько файлов; до 20 фото, каждое до 8 МБ.</p>

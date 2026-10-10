@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { fetchParkBotLink, ParkIdentity, verifyParkTelegramIdentity } from '@/api/park-telegram';
 import { ParkOwnerFleet } from './ParkOwnerFleet';
@@ -47,7 +48,7 @@ export function ParkTelegramEntry({ tenantId, view = 'owner', onViewChange }: { 
   }, [tenantId, reload, onViewChange]);
 
   if (identity?.role === 'owner') return <section ref={ownerControls} aria-label={view === 'client' ? 'Просмотр клиентской витрины' : 'Кабинет владельца'} className="py-4">
-    {view === 'client' && <Button variant="outline" className="min-h-11" onClick={() => onViewChange?.('owner')}>Вернуться в кабинет</Button>}
+    {view === 'client' && <Button variant="outline" className="min-h-11 gap-2 rounded-lg" onClick={() => onViewChange?.('owner')}><ArrowLeft aria-hidden="true" className="h-4 w-4" />Вернуться в кабинет</Button>}
     <div hidden={view !== 'owner'}>
       <ParkOwnerFleet key={`fleet-${tenantId}`} tenantId={tenantId} onViewStorefront={() => onViewChange?.('client')} />
     </div>

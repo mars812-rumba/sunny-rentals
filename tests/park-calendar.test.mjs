@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import Module from 'node:module';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -9,7 +10,8 @@ import { build } from 'esbuild';
 const bundle = await build({ stdin: { contents: `export * from './src/utils/park-calendar';
  export { SchedulerCalendar } from './src/components/admin/SchedulerCalendar';
  export { MonthCalendarView } from './src/components/admin/MonthCalendarView';
- export { ParkTrialStatus } from './src/components/platform/ParkTrialStatus';`, resolveDir: process.cwd(), loader: 'tsx' },
+ export { ParkTrialStatus } from './src/components/platform/ParkTrialStatus';
+ export { ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';`, resolveDir: process.cwd(), loader: 'tsx' },
  bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic',
  external: ['react', 'react/jsx-runtime', 'react-dom'], define: { 'import.meta.env.VITE_API_URL': '""' } });
 const compiled = new Module(resolve('tests/park-calendar-fixture.cjs'));
@@ -58,11 +60,47 @@ test('shared month has occupied-day and return badges, with named keyboard contr
  assert.match(html, /<button[^>]+aria-label="3 августа 2026, событий: 1"/);
 });
 
-test('trial dates show the park timezone and explicit expiry without a new timer', () => {
+test('trial displays only the expiry date in the park timezone', () => {
  const tenant = { timezone: 'Asia/Bangkok', trial: { status: 'trialing', days: 7, started_at: '2026-10-10T00:00:00Z', ends_at: '2026-10-17T00:00:00Z', expired: false } };
  const html = renderToStaticMarkup(e(ui.ParkTrialStatus, { tenant }));
- assert.match(html, /Триал идёт/);
- assert.match(html, /Asia\/Bangkok/);
- assert.match(html, /07:00/);
+ assert.match(html, /Триал до 17 окт\. 2026/);
+ assert.doesNotMatch(html, /Asia\/Bangkok|07:00|10 окт/);
+ const boundary = { ...tenant, trial: { ...tenant.trial, ends_at: '2026-10-16T20:00:00Z' } };
+ assert.match(renderToStaticMarkup(e(ui.ParkTrialStatus, { tenant: boundary })), /Триал до 17 окт/);
  assert.match(renderToStaticMarkup(e(ui.ParkTrialStatus, { tenant: { ...tenant, trial: { ...tenant.trial, expired: true } } })), /Триал завершён/);
+});
+
+test('month view also contains the Gantt with shared dates and asset filter, without a Gantt switch', () => {
+ const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ const monthPanel = source.match(/<TabsContent value="month"[\s\S]*?<\/TabsContent>/)?.[0];
+ assert.ok(monthPanel);
+ assert.ok(monthPanel.indexOf('<MonthCalendarView') < monthPanel.indexOf('<SchedulerCalendar'));
+ assert.match(monthPanel, /currentDate=\{date\}/);
+ assert.match(monthPanel, /startDate=\{date\}/);
+ assert.match(monthPanel, /cars=\{cars\.filter\(car => !assetId \|\| car\.id === assetId\)\}/);
+ assert.doesNotMatch(source, /TabsTrigger value="gantt"|TabsContent value="gantt"/);
+ assert.match(source, /TabsTrigger value="list"/);
+});
+
+test('manual form has labeled fields, inline validation hooks and date-only inputs', () => {
+ const html = renderToStaticMarkup(e(ui.ParkManualBookingForm, { tenantId: 'park-a', admin: false,
+   assets: [{ id: 'asset-a', name: 'Toyota', pricing: { daily_rate: 800, currency: 'THB' }, deposit_policy: { amount: 5000 } }],
+   initialDay: '2026-08-02', onSaved() {}, onClose() {} }));
+ assert.match(html, /Добавить запись в календарь/);
+ assert.match(html, /Блокировка \/ обслуживание/);
+ assert.match(html, /Имя клиента/);
+ assert.match(html, /Создать подтверждённую бронь/);
+ assert.match(html, /type="date"[^>]+value="2026-08-02"/);
+ assert.match(html, /aria-describedby=/);
+ assert.doesNotMatch(html, /datetime-local|chat_id|Bearer|secret|images_web/);
+});
+
+test('block projects to a distinct calendar label and color without altering stored booking status', () => {
+ const block = { ...booking, entry_type: 'block', source: 'owner_manual', status: 'confirmed', operator_details: { customer_name: '', note: 'Ремонт' } };
+ assert.equal(ui.calendarBooking(block).status, 'blocked');
+ assert.equal(block.status, 'confirmed');
+ const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: [ui.calendarBooking(block)], logisticsData: [ui.calendarLogistics(block)], onDateChange() {}, onBookingClick() {}, onDayClick() {}, showOccupancy: true }));
+ assert.match(html, /aria-label="Блокировка: Toyota"/);
+ assert.match(html, /bg-purple-100/);
+ assert.equal(ui.calendarBooking({ ...block, status: 'cancelled' }).status, 'cancelled');
 });
