@@ -3,17 +3,52 @@ import assert from 'node:assert/strict';
 import { build } from 'esbuild';
 
 // Test the real TS client without adding dependencies or writing bundled files.
-const result = await build({ entryPoints: ['src/api/park-telegram.ts'], bundle: true, write: false, format: 'esm', platform: 'node' });
+const result = await build({ stdin: { contents: `export * from './src/api/park-telegram'; export * from './src/lib/park-calendar-updates';`, resolveDir: process.cwd(), loader: 'ts' }, bundle: true, write: false, format: 'esm', platform: 'node' });
 const api = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}`);
 const originalFetch = globalThis.fetch;
+const originalWindow = globalThis.window;
 const store = new Map();
 globalThis.sessionStorage = globalThis.localStorage = {
   getItem: (key) => store.get(key) || null,
   removeItem: (key) => store.delete(key),
 };
-afterEach(() => { globalThis.fetch = originalFetch; store.clear(); });
+afterEach(() => { globalThis.fetch = originalFetch; globalThis.window = originalWindow; store.clear(); });
 const response = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 const session = () => store.set('sunny_platform_admin_session', JSON.stringify({ access_token: 'test-admin-session' }));
+
+test('manual calendar creation uses owner signature or admin bearer, never both', async () => {
+  const data = { asset_id: 'a'.repeat(32), start_date: '2026-10-11', end_date: '2026-10-14', request_id: 'manual_request_12345', entry_type: 'block', customer_name: '', note: 'Обслуживание' };
+  const booking = { asset_id: data.asset_id, entry_type: 'block', status: 'confirmed', pricing: { start_date: data.start_date, end_date: data.end_date } };
+  globalThis.window = { Telegram: { WebApp: { initData: 'signed-owner' } } };
+  session();
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, '/api/partners/calendar/manual');
+    assert.equal(options.headers.has('Authorization'), false);
+    assert.equal(options.cache, 'no-store');
+    assert.deepEqual(JSON.parse(options.body), { ...data, tenant_id: 'park-a', init_data: 'signed-owner' });
+    return response({ booking });
+  };
+  assert.equal((await api.createParkManualBooking('park-a', data, false)).entry_type, 'block');
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, '/api/partners/parks/park-a/calendar/manual');
+    assert.equal(options.headers.get('Authorization'), 'Bearer test-admin-session');
+    assert.deepEqual(JSON.parse(options.body), data);
+    return response({ booking });
+  };
+  await api.createParkManualBooking('park-a', data, true);
+});
+
+test('manual creation rejects missing identity, stale response and reports validation without secrets', async () => {
+  const data = { asset_id: 'a'.repeat(32), start_date: '2026-10-11', end_date: '2026-10-14', request_id: 'manual_request_12345', entry_type: 'block', customer_name: '', note: 'Ремонт' };
+  globalThis.window = {};
+  globalThis.fetch = async () => { throw new Error('must not send'); };
+  await assert.rejects(api.createParkManualBooking('park-a', data, false), /через бота/);
+  globalThis.window = { Telegram: { WebApp: { initData: 'signed' } } };
+  globalThis.fetch = async () => response({ booking: { asset_id: 'b'.repeat(32), entry_type: 'block' } });
+  await assert.rejects(api.createParkManualBooking('park-a', data, false), /Обновите календарь/);
+  globalThis.fetch = async () => response({ detail: 'secret-do-not-leak' }, 422);
+  await assert.rejects(api.createParkManualBooking('park-a', data, false), /причина без цены/);
+});
 
 test('availability is public, dates-only and checks the park in the response', async () => {
   session();
@@ -92,9 +127,9 @@ test('expired admin session clears local session', async () => {
   assert.equal(store.size, 0);
 });
 
-test('disabled bot and invalid identity have actionable errors', async () => {
+test('unavailable park API and invalid identity have actionable errors', async () => {
   globalThis.fetch = async () => response({}, 404);
-  await assert.rejects(api.fetchParkBotLink('park-a'), /ещё не включён/);
+  await assert.rejects(api.fetchParkBotLink('park-a'), /API парка недоступен.*404/);
   globalThis.fetch = async () => response({}, 403);
   await assert.rejects(api.verifyParkTelegramIdentity('park-a', 'signed'), /заново откройте/);
 });
@@ -171,4 +206,33 @@ test('admin calendar is scoped and authenticated; conflict explains recovery', a
   assert.deepEqual(await api.fetchParkCalendar('park-a', true), []);
   globalThis.fetch = async () => response({}, 409);
   await assert.rejects(api.quoteParkBooking({}), /Обновите расчёт/);
+});
+
+test('storefront success invalidates only its park calendar; failures do not invalidate and unsubscribe works', async () => {
+  let own = 0, other = 0;
+  const stopOwn = api.subscribeParkCalendar('park-a', () => own++);
+  const stopOther = api.subscribeParkCalendar('park-b', () => other++);
+  try {
+    globalThis.fetch = async () => response({ booking: { id: 'test-booking' } });
+    await api.submitParkBooking({ tenant_id: 'park-a' }, 'quote', 'request');
+    assert.equal(own, 1); assert.equal(other, 0);
+    globalThis.fetch = async () => response({}, 409);
+    await assert.rejects(api.submitParkBooking({ tenant_id: 'park-a' }, 'quote', 'request'));
+    assert.equal(own, 1);
+    stopOwn(); api.invalidateParkCalendar('park-a'); assert.equal(own, 1);
+    api.invalidateParkCalendar('park-b'); assert.equal(other, 1);
+  } finally { stopOwn(); stopOther(); }
+});
+
+test('manual route 404 names backend/API rather than bot state or customer fields, for owner and admin', async () => {
+  globalThis.window = { Telegram: { WebApp: { initData: 'signed-owner' } } };
+  session();
+  globalThis.fetch = async () => response({ detail: 'private-server-secret' }, 404);
+  for (const admin of [false, true]) {
+    await assert.rejects(api.createParkManualBooking('park-a', {}, admin), error => {
+      assert.match(error.message, /маршрут.*404.*backend/);
+      assert.doesNotMatch(error.message, /Бот ещё не включён|private-server-secret/);
+      return true;
+    });
+  }
 });

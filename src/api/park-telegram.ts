@@ -1,4 +1,5 @@
 import { clearPlatformSession, getStoredPlatformSession } from './platform-admin';
+import { invalidateParkCalendar } from '@/lib/park-calendar-updates';
 
 export interface ParkInvitation { invitation_id: string; url: string; expires_in: number }
 export interface ParkIdentity { tenant_id: string; user_id: string; telegram_linked: boolean; role: 'owner' | 'customer' }
@@ -21,11 +22,13 @@ async function request<T>(path: string, options: RequestInit = {}, admin = false
       clearPlatformSession();
       throw new Error('Сессия суперадминистратора истекла. Войдите заново.');
     }
-    if (response.status === 404) throw new Error('Бот ещё не включён на сервере или парк недоступен.');
+    if (response.status === 404 && path.endsWith('/calendar/manual')) throw new Error('Сервер не нашёл маршрут создания ручной брони (404). Администратору нужно проверить версию backend и настройку API. Изменение имени клиента или переподключение бота не исправит эту ошибку.');
+    if (response.status === 404) throw new Error('API парка недоступен (404). Проверьте ссылку парка и обратитесь к администратору.');
     if (response.status === 403) throw new Error('Откройте этот парк по ссылке в новом боте. Если Telegram уже подключён — закройте и заново откройте мини-приложение.');
     if (response.status === 409) throw new Error('Даты уже заняты, цена или статус изменились. Обновите расчёт или календарь.');
+    if (response.status === 422 && path.endsWith('/calendar/manual')) throw new Error('Проверьте поля: возврат позже получения, период до 365 суток, начало не старше года. Для аренды нужны имя и положительная ставка; для блокировки — причина без цены.');
     if (response.status === 422) throw new Error('Проверьте даты: получение не в прошлом, возврат позже получения, период не больше 365 суток. Для техники должна быть задана цена.');
-    throw new Error('Не удалось связаться с ботом. Проверьте соединение и повторите попытку.');
+    throw new Error('Не удалось выполнить запрос к серверу парка. Проверьте соединение, затем обновите календарь перед повторной попыткой.');
   }
   return response.json() as Promise<T>;
 }
@@ -106,11 +109,33 @@ export interface ParkBooking {
   id: string; asset_id: string; status: string; start_at: string; end_at: string; currency: string;
   pricing: { asset_name: string; start_date: string; end_date: string; days: number; daily_rate: string; total_rental: string; timezone: string };
   deposit: { amount: string };
+  entry_type?: 'rental' | 'block';
+  source?: string;
+  operator_details?: { customer_name: string; note: string };
+}
+
+export interface ParkManualInput {
+  asset_id: string; start_date: string; end_date: string; request_id: string;
+  entry_type: 'rental' | 'block'; customer_name: string; note: string;
+  daily_rate?: string; deposit?: string;
+}
+export async function createParkManualBooking(tenantId: string, data: ParkManualInput, admin: boolean, signal?: AbortSignal): Promise<ParkBooking> {
+  const initData = admin ? '' : window.Telegram?.WebApp?.initData;
+  if (!admin && !initData) throw new Error('Откройте кабинет владельца заново через бота парка.');
+  const result = await request<{ booking: ParkBooking }>(admin ? `/parks/${encodeURIComponent(tenantId)}/calendar/manual` : '/calendar/manual', {
+    method: 'POST', signal, body: JSON.stringify(admin ? data : { ...data, tenant_id: tenantId, init_data: initData }),
+  }, admin);
+  if (result.booking?.asset_id !== data.asset_id || result.booking.entry_type !== data.entry_type
+      || result.booking.pricing?.start_date !== data.start_date || result.booking.pricing?.end_date !== data.end_date
+      || result.booking.status !== 'confirmed') throw new Error('Данные записи изменились. Обновите календарь перед повторной попыткой.');
+  return result.booking;
 }
 export interface ParkPeriod { tenant_id: string; init_data: string; asset_id: string; start_date: string; end_date: string }
 export const quoteParkBooking = (period: ParkPeriod, signal?: AbortSignal) => request<ParkQuote>('/bookings/quote', { method: 'POST', body: JSON.stringify(period), signal });
 export async function submitParkBooking(period: ParkPeriod, quoteToken: string, requestId: string, signal?: AbortSignal): Promise<ParkBooking> {
-  return (await request<{ booking: ParkBooking }>('/bookings', { method: 'POST', body: JSON.stringify({ ...period, quote_token: quoteToken, request_id: requestId }), signal })).booking;
+  const booking = (await request<{ booking: ParkBooking }>('/bookings', { method: 'POST', body: JSON.stringify({ ...period, quote_token: quoteToken, request_id: requestId }), signal })).booking;
+  invalidateParkCalendar(period.tenant_id);
+  return booking;
 }
 export async function fetchParkCalendar(tenantId: string, admin: boolean, signal?: AbortSignal): Promise<ParkBooking[]> {
   const options = admin ? { signal } : { signal, method: 'POST', body: JSON.stringify({ tenant_id: tenantId, init_data: window.Telegram?.WebApp?.initData || '' }) };

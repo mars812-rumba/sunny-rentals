@@ -204,7 +204,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
       </section>}
       </details>}
 
-      <Tabs value={section} onValueChange={(value) => { setSection(value); if (value === 'calendar') setCalendarVisited(true); }} activationMode="manual" className="mt-6 min-w-0">
+      <Tabs value={section} onValueChange={(value) => { setSection(value); if (value === 'calendar') { setCalendarVisited(true); setCalendarRevision(current => current + 1); } }} activationMode="manual" className="mt-6 min-w-0">
         <TabsList aria-label="Управление парком" className="grid h-auto w-full grid-cols-2 p-1 sm:max-w-md">
           <TabsTrigger value="fleet" className="min-h-11 px-4">Автопарк</TabsTrigger>
           <TabsTrigger value="calendar" className="min-h-11 px-4">Календарь</TabsTrigger>

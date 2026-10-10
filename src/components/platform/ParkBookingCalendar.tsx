@@ -13,6 +13,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { bookingsOnDay, calendarBooking, calendarCars, calendarLogistics } from '@/utils/park-calendar';
 import { ParkManualBookingForm } from './ParkManualBookingForm';
+import { subscribeParkCalendar } from '@/lib/park-calendar-updates';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждено', cancelled: 'Отменено', in_progress: 'В аренде', completed: 'Завершено' };
 
@@ -33,6 +34,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [reload, setReload] = useState(0);
+  useEffect(() => subscribeParkCalendar(tenantId, () => setReload(value => value + 1)), [tenantId]);
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true); setError(''); setSelection(null);
