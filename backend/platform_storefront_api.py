@@ -99,7 +99,7 @@ class StorefrontReader:
             return value if isinstance(value, (int, float)) and not isinstance(value, bool) and 0 <= value <= 100000000 else None
 
         return {"tenant": {"id": self.tenant.tenant_id, "slug": self.tenant.slug,
-                           "name": self.tenant.name, "currency": self.tenant.currency,
+                           "name": self.tenant.name, "currency": self.tenant.currency, "timezone": self.tenant.timezone,
                            "logo": self.logo()},
                 "preview": preview, "booking_enabled": False,
                 "assets": [{"id": a.id, "name": a.name, "asset_type": a.asset_type,

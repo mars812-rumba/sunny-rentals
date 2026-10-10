@@ -17,7 +17,7 @@ from platform_core.partner_bot import (
 )
 from platform_core.telegram_identity import TelegramIdentityError
 from platform_core.partner_webhook import PartnerWebhookManager, WebhookSetupError, WebhookConflict
-from platform_core.park_bookings import ParkBookingService, ParkQuoteRequest, ParkBookingRequest, BookingConflict, ParkStatusRequest, ParkOwnerStatusRequest
+from platform_core.park_bookings import ParkBookingService, ParkQuoteRequest, ParkBookingRequest, BookingConflict, ParkStatusRequest, ParkOwnerStatusRequest, ParkAvailabilityRequest
 
 
 class InvitationRequest(BaseModel):
@@ -78,6 +78,15 @@ def create_platform_partner_router(service: PartnerBotService, admin_auth: Platf
             raise HTTPException(409, str(error)) from None
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
+
+    @router.post('/parks/{tenant_id}/availability')
+    def availability(tenant_id: str, request: ParkAvailabilityRequest):
+        try:
+            return bookings.availability(tenant_id, request)
+        except PartnerBotError:
+            raise HTTPException(404, 'Park unavailable') from None
+        except ValueError:
+            raise HTTPException(422, 'Choose valid dates for this park') from None
 
     @router.post('/bookings/quote')
     def quote(request: ParkQuoteRequest):

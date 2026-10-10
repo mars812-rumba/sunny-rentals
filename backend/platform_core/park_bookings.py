@@ -48,6 +48,14 @@ class ParkOwnerStatusRequest(ParkStatusRequest):
     booking_id: pattern_string(r'^[a-f0-9]{64}$')
 
 
+class ParkAvailabilityRequest(BaseModel):
+    start_date: date
+    end_date: date
+
+    class Config:
+        extra = 'forbid'
+
+
 class ParkBookingService:
     BLOCKING = {BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS}
 
@@ -78,8 +86,7 @@ class ParkBookingService:
             repo.context.require_record_tenant(record.tenant_id)
         return records
 
-    def prepare(self, request, context):
-        tenant = self.partners.tenant(self.partners.provisioner._load_state(), context.tenant_id, public=True)
+    def period_bounds(self, tenant, request):
         try:
             zone = ZoneInfo(tenant.timezone)
         except ZoneInfoNotFoundError:
@@ -88,6 +95,13 @@ class ParkBookingService:
         days = (request.end_date - request.start_date).days
         if request.start_date < today or not 1 <= days <= 365:
             raise ValueError('Choose future dates, from 1 to 365 days')
+        start = datetime.combine(request.start_date, time.min, zone).astimezone(timezone.utc)
+        end = datetime.combine(request.end_date, time.min, zone).astimezone(timezone.utc)
+        return days, start, end
+
+    def prepare(self, request, context):
+        tenant = self.partners.tenant(self.partners.provisioner._load_state(), context.tenant_id, public=True)
+        days, start, end = self.period_bounds(tenant, request)
         asset = self.repo(context, 'assets.json', RentalAsset).get(request.asset_id)
         if asset is None or not asset.public or asset.status != AssetStatus.AVAILABLE:
             raise BookingConflict('Vehicle is unavailable')
@@ -95,8 +109,6 @@ class ParkBookingService:
         if rate <= 0:
             raise ValueError('Price is not configured')
         deposit = self.money(asset.deposit_policy.get('amount', 0))
-        start = datetime.combine(request.start_date, time.min, zone).astimezone(timezone.utc)
-        end = datetime.combine(request.end_date, time.min, zone).astimezone(timezone.utc)
         quote = {'asset_id': asset.id, 'asset_name': asset.name, 'start_date': request.start_date.isoformat(),
                  'end_date': request.end_date.isoformat(), 'days': days, 'daily_rate': str(rate),
                  'total_rental': str(rate * days), 'deposit': str(deposit), 'currency': tenant.currency,
@@ -104,6 +116,28 @@ class ParkBookingService:
         # This is a change detector, not authentication. Identity is verified separately.
         quote['quote_token'] = hashlib.sha256(json.dumps(quote, sort_keys=True).encode()).hexdigest()
         return quote, start, end
+
+    def availability(self, tenant_id, request):
+        # Public read projection: never expose bookings, contacts or preview assets.
+        with self.partners.provisioner._locked():
+            tenant = self.partners.tenant(self.partners.provisioner._load_state(), tenant_id, public=True)
+            context = TenantContext(tenant_id=tenant.tenant_id)
+            days, start, end = self.period_bounds(tenant, request)
+            records = self.repo(context, 'bookings.json', Booking).list()
+            available = []
+            for asset in self.repo(context, 'assets.json', RentalAsset).list():
+                if not asset.public or asset.status != AssetStatus.AVAILABLE:
+                    continue
+                try:
+                    if self.money(asset.pricing.get('daily_rate')) <= 0:
+                        continue
+                    self.check_overlap(records, asset.id, start, end)
+                except (ValueError, BookingConflict):
+                    continue
+                available.append(asset.id)
+            return {'tenant_id': tenant.tenant_id, 'start_date': request.start_date.isoformat(),
+                    'end_date': request.end_date.isoformat(), 'days': days,
+                    'available_asset_ids': available}
 
     def check_overlap(self, records, asset_id, start, end):
         for booking in records:

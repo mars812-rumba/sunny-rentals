@@ -9,7 +9,7 @@ export interface StorefrontAsset {
 }
 
 export interface Storefront {
-  tenant: { id: string; slug: string; name: string; currency: string; logo: string | null };
+  tenant: { id: string; slug: string; name: string; currency: string; timezone: string; logo: string | null };
   assets: StorefrontAsset[];
   preview: boolean;
   booking_enabled: boolean;

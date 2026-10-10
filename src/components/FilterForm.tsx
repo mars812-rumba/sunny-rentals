@@ -3,11 +3,11 @@ import { MapPin, CalendarDays, Clock3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Drawer, DrawerContent, DrawerTrigger, DrawerFooter } from '@/components/ui/drawer';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { RentalDateCalendar as CalendarContent } from '@/components/RentalDateCalendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from "@/components/ui/checkbox";
-import { format, startOfDay, isValid } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import type { DateRange } from 'react-day-picker';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -36,26 +36,6 @@ interface FilterFormProps {
     returnTime?: string;
   };
 }
-
-const CalendarContent = ({ dateRange, setDateRange, onApply, onCancel, isMobile, t }) => (
-  <>
-    <div className="flex justify-center">
-      <CalendarComponent
-        mode="range"
-        selected={dateRange}
-        onSelect={setDateRange}
-        disabled={(date) => date < startOfDay(new Date())}
-        initialFocus
-        numberOfMonths={isMobile ? 1 : 2}
-        fromMonth={new Date()}
-      />
-    </div>
-    <DrawerFooter className="pt-2 flex flex-col sm:flex-row sm:justify-center gap-2">
-      <Button variant="outline" onClick={onCancel}>{t('cancel')}</Button>
-      <Button onClick={onApply} disabled={!dateRange?.from || !dateRange?.to}>{t('select_dates')}</Button>
-    </DrawerFooter>
-  </>
-);
 
 const FilterForm = ({ 
   onFiltersChange, 

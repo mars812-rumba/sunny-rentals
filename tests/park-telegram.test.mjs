@@ -15,6 +15,21 @@ afterEach(() => { globalThis.fetch = originalFetch; store.clear(); });
 const response = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 const session = () => store.set('sunny_platform_admin_session', JSON.stringify({ access_token: 'test-admin-session' }));
 
+test('availability is public, dates-only and checks the park in the response', async () => {
+  session();
+  const signal = new AbortController().signal;
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, '/api/partners/parks/park-a/availability');
+    assert.equal(options.headers.has('Authorization'), false);
+    assert.equal(options.signal, signal);
+    assert.deepEqual(JSON.parse(options.body), { start_date: '2026-10-11', end_date: '2026-10-14' });
+    return response({ tenant_id: 'park-a', start_date: '2026-10-11', end_date: '2026-10-14', days: 3, available_asset_ids: [] });
+  };
+  assert.deepEqual((await api.fetchParkAvailability('park-a', '2026-10-11', '2026-10-14', signal)).available_asset_ids, []);
+  globalThis.fetch = async () => response({ tenant_id: 'park-b', start_date: '2026-10-11', end_date: '2026-10-14', days: 3, available_asset_ids: [] });
+  await assert.rejects(api.fetchParkAvailability('park-a', '2026-10-11', '2026-10-14'));
+});
+
 test('webhook management requires admin and passes only a fixed route, no credentials in body', async () => {
   globalThis.fetch = async () => { throw new Error('must not send'); };
   await assert.rejects(api.fetchPlatformWebhook(), /Сессия суперадминистратора/);

@@ -78,6 +78,25 @@ export function connectPlatformWebhook(signal?: AbortSignal): Promise<PlatformWe
   return request('/admin/webhook/connect', { method: 'POST', signal }, true);
 }
 
+export interface ParkAvailability {
+  tenant_id: string;
+  start_date: string;
+  end_date: string;
+  days: number;
+  available_asset_ids: string[];
+}
+
+export async function fetchParkAvailability(tenantId: string, start: string, end: string, signal?: AbortSignal): Promise<ParkAvailability> {
+  const result = await request<ParkAvailability>(`/parks/${encodeURIComponent(tenantId)}/availability`, {
+    method: 'POST', body: JSON.stringify({ start_date: start, end_date: end }), signal,
+  });
+  if (result.tenant_id !== tenantId || result.start_date !== start || result.end_date !== end
+      || !Array.isArray(result.available_asset_ids) || !Number.isInteger(result.days) || result.days < 1) {
+    throw new Error('Не удалось проверить наличие для этого парка. Повторите поиск.');
+  }
+  return result;
+}
+
 export interface ParkQuote {
   asset_id: string; asset_name: string; start_date: string; end_date: string;
   days: number; daily_rate: string; total_rental: string; deposit: string;
@@ -89,9 +108,9 @@ export interface ParkBooking {
   deposit: { amount: string };
 }
 export interface ParkPeriod { tenant_id: string; init_data: string; asset_id: string; start_date: string; end_date: string }
-export const quoteParkBooking = (period: ParkPeriod) => request<ParkQuote>('/bookings/quote', { method: 'POST', body: JSON.stringify(period) });
-export async function submitParkBooking(period: ParkPeriod, quoteToken: string, requestId: string): Promise<ParkBooking> {
-  return (await request<{ booking: ParkBooking }>('/bookings', { method: 'POST', body: JSON.stringify({ ...period, quote_token: quoteToken, request_id: requestId }) })).booking;
+export const quoteParkBooking = (period: ParkPeriod, signal?: AbortSignal) => request<ParkQuote>('/bookings/quote', { method: 'POST', body: JSON.stringify(period), signal });
+export async function submitParkBooking(period: ParkPeriod, quoteToken: string, requestId: string, signal?: AbortSignal): Promise<ParkBooking> {
+  return (await request<{ booking: ParkBooking }>('/bookings', { method: 'POST', body: JSON.stringify({ ...period, quote_token: quoteToken, request_id: requestId }), signal })).booking;
 }
 export async function fetchParkCalendar(tenantId: string, admin: boolean, signal?: AbortSignal): Promise<ParkBooking[]> {
   const options = admin ? { signal } : { signal, method: 'POST', body: JSON.stringify({ tenant_id: tenantId, init_data: window.Telegram?.WebApp?.initData || '' }) };

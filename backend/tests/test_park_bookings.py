@@ -107,6 +107,37 @@ class ParkBookingTests(unittest.TestCase):
         self.client.post('/api/partners/bookings', json=self.booking_payload())
         self.assertEqual(self.client.post('/api/partners/bookings/quote', json=self.payload(start_date='2026-10-14', end_date='2026-10-16')).status_code, 200)
 
+    def availability(self, **fields):
+        return self.client.post('/api/partners/parks/park-a/availability', json={
+            'start_date': '2026-10-11', 'end_date': '2026-10-14', **fields})
+
+    def test_public_availability_is_scoped_and_contains_no_client_data(self):
+        TenantAssetAdmin(self.root, self.admin, 'park-b').save(AssetInput(name='Foreign', daily_rate=900, public=True))
+        TenantAssetAdmin(self.root, self.admin, 'park-a').save(AssetInput(name='Hidden', daily_rate=900, public=False))
+        TenantAssetAdmin(self.root, self.admin, 'park-a').save(AssetInput(name='No price', daily_rate=0, public=True))
+        result = self.availability()
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(result.json(), {'tenant_id': 'park-a', 'start_date': '2026-10-11',
+            'end_date': '2026-10-14', 'days': 3, 'available_asset_ids': [self.asset.id]})
+
+    def test_availability_hold_adjacent_dates_and_cancel_release(self):
+        booking = self.client.post('/api/partners/bookings', json=self.booking_payload()).json()['booking']
+        self.assertEqual(self.availability().json()['available_asset_ids'], [])
+        self.assertEqual(self.availability(start_date='2026-10-14', end_date='2026-10-16').json()['available_asset_ids'], [self.asset.id])
+        headers = {'Authorization': 'Bearer ' + self.auth.issue_for_verified_actor('1')}
+        result = self.client.request('PATCH', f"/api/partners/parks/park-a/bookings/{booking['id']}/status", headers=headers,
+            json={'status': 'cancelled', 'expected_status': 'requested'})
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(self.availability().json()['available_asset_ids'], [self.asset.id])
+
+    def test_availability_rejects_invalid_dates_and_untrusted_fields(self):
+        for fields in ({'start_date': '2020-01-01'}, {'end_date': '2026-10-11'},
+                       {'end_date': '2028-01-01'}, {'role': 'owner'}, {'chat_id': '42'}):
+            self.assertEqual(self.availability(**fields).status_code, 422)
+        missing = self.client.post('/api/partners/parks/missing/availability', json={
+            'start_date': '2026-10-11', 'end_date': '2026-10-14'})
+        self.assertEqual(missing.status_code, 404)
+
     def test_hidden_and_foreign_assets_are_unavailable(self):
         foreign = TenantAssetAdmin(self.root, self.admin, 'park-b').save(AssetInput(name='Foreign', daily_rate=900, public=True))
         self.assertEqual(self.client.post('/api/partners/bookings/quote', json=self.payload(asset_id=foreign.id)).status_code, 409)
