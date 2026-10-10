@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { format, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import type { DateRange } from 'react-day-picker';
-import { CalendarDays, Search } from 'lucide-react';
+import { CalendarDays, Search, ArrowRight, CarFront, Bike, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -40,11 +41,11 @@ export function ParkRentalFilters({ period, onPeriodChange, search, onSearchChan
         if (value) { setRange(period ? { from: parseISO(period.start), to: parseISO(period.end) } : undefined); setError(''); }
         setOpen(value);
       }}>
-        <DialogTrigger asChild><Button variant="outline" className="min-h-12 w-full justify-start whitespace-normal rounded-xl text-left"><CalendarDays aria-hidden="true" className="mr-2 shrink-0" />{period ? `${dateLabel(period.start)} — ${dateLabel(period.end)} · ${rentalDays(period)} суток` : 'Выберите получение и возврат'}</Button></DialogTrigger>
+        <DialogTrigger asChild><Button variant="outline" className="min-h-16 w-full justify-between gap-2 whitespace-normal rounded-xl px-3 py-3 text-left" aria-label={period ? `Изменить даты: ${dateLabel(period.start)} — ${dateLabel(period.end)}` : 'Выбрать даты получения и возврата'}><CalendarDays aria-hidden="true" className="h-5 w-5 shrink-0 text-blue-700" /><span className="flex-1"><span className="block text-xs font-normal text-slate-600">Получение</span><span className="block">{period ? dateLabel(period.start) : 'Выберите дату'}</span></span><ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-500" /><span className="flex-1"><span className="block text-xs font-normal text-slate-600">Возврат</span><span className="block">{period ? dateLabel(period.end) : 'Выберите дату'}</span></span></Button></DialogTrigger>
         <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-xl p-4 sm:p-6">
           <DialogTitle>Даты аренды</DialogTitle>
           <DialogDescription>Часовой пояс: {timezone}. День возврата не оплачивается. Период — от 1 до 365 суток.</DialogDescription>
-          <RentalDateCalendar dateRange={range} setDateRange={(value) => { setRange(value); setError(''); }} onApply={apply} onCancel={() => setOpen(false)} isMobile={mobile} minimumDate={minimumDate} allowSameDay={false} t={(key) => key === 'cancel' ? 'Отмена' : 'Показать транспорт'} />
+          <RentalDateCalendar dateRange={range} setDateRange={(value) => { setRange(value); setError(''); }} onApply={apply} onCancel={() => setOpen(false)} isMobile={mobile} minimumDate={minimumDate} allowSameDay={false} locale={ru} t={(key) => key === 'cancel' ? 'Отмена' : 'Показать транспорт'} />
           {error && <p role="alert" className="text-sm text-rose-800">{error}</p>}
         </DialogContent>
       </Dialog>{period && <Button type="button" variant="ghost" className="mt-1 text-sm" onClick={() => onPeriodChange(null)}>Смотреть без дат</Button>}</div>}
@@ -52,7 +53,7 @@ export function ParkRentalFilters({ period, onPeriodChange, search, onSearchChan
     </div>
     {datesEnabled && !minimumDate && <p role="alert" className="mt-3 text-sm text-rose-800">Парк ещё не настроил часовой пояс. Поиск по датам временно недоступен.</p>}
     <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Тип транспорта">
-      {['all', ...types].map((value) => <Button key={value} type="button" variant={type === value ? 'default' : 'outline'} aria-pressed={type === value} className="min-h-11 rounded-xl" onClick={() => onTypeChange(value)}>{value === 'all' ? 'Весь транспорт' : parkAssetTypes[value] || 'Другой транспорт'}</Button>)}
+      {['all', ...types].map((value) => { const Icon = value === 'all' ? LayoutGrid : value === 'car' ? CarFront : Bike; return <Button key={value} type="button" variant={type === value ? 'default' : 'outline'} aria-pressed={type === value} className="min-h-12 rounded-xl" onClick={() => onTypeChange(value)}><Icon aria-hidden="true" className="mr-2 h-4 w-4" />{value === 'all' ? 'Весь транспорт' : parkAssetTypes[value] || 'Другой транспорт'}</Button>; })}
     </div>
     {datesEnabled && <p className="mt-3 text-sm leading-6 text-slate-600">Выберите даты, чтобы увидеть доступные варианты. В этом парке пока действует базовая цена за сутки; время и доставка отдельно не настроены.</p>}
   </section>;

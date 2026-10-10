@@ -56,12 +56,12 @@ export function ParkBookingForm({ tenantId, assetId, initialPeriod, onCreated }:
   return <form onSubmit={calculate} aria-busy={busy} className="space-y-4 border-t pt-4">
     <h3 className="text-lg font-semibold">{quote ? 'Подтвердите заявку' : 'Проверка дат и цены'}</h3>
     {!connected && <div><p className="text-sm leading-6 text-slate-600">Чтобы отправить заявку, откройте витрину из сообщения бота парка. Каталог и наличие доступны без входа.</p>{link && <Button asChild variant="outline" className="mt-3"><a href={link} target="_blank" rel="noopener noreferrer">Открыть бота парка</a></Button>}</div>}
-    <fieldset disabled={busy || !connected} className="grid gap-3 sm:grid-cols-2">
+    {!quote && <fieldset disabled={busy || !connected} className="grid gap-3 sm:grid-cols-2">
       <div><label htmlFor={`${id}-start`} className="block text-sm font-medium">Получение</label><Input id={`${id}-start`} type="date" required value={start} onChange={(event) => change(event.target.value, 'start')} className="mt-2 text-base" aria-describedby={`${id}-hint`} /></div>
       <div><label htmlFor={`${id}-end`} className="block text-sm font-medium">Возврат</label><Input id={`${id}-end`} type="date" required min={start || undefined} value={end} onChange={(event) => change(event.target.value, 'end')} className="mt-2 text-base" aria-describedby={`${id}-hint`} /></div>
-    </fieldset>
+    </fieldset>}
     <p id={`${id}-hint`} className="text-sm leading-6 text-slate-600">Полные сутки, без времени и доставки. День возврата не оплачивается. Депозит указан отдельно от аренды.</p>
-    <Button type="submit" variant="outline" disabled={busy || !connected}>{busy ? 'Проверяем…' : 'Проверить даты и цену'}</Button>
+    {!quote ? <Button type="submit" variant="outline" disabled={busy || !connected}>{busy ? 'Проверяем…' : 'Проверить даты и цену'}</Button> : <Button type="button" variant="ghost" disabled={busy} onClick={() => { setQuote(null); setError(''); }}>Изменить даты</Button>}
     {quote && <div className="space-y-3" role="status"><p className="font-medium">{quote.asset_name}</p><p>{dateLabel(quote.start_date)} — {dateLabel(quote.end_date)}</p><dl className="space-y-2 tabular-nums"><div className="flex flex-wrap justify-between gap-2"><dt>{rentalMoney(quote.daily_rate, quote.currency)} × {quote.days} суток</dt><dd className="font-semibold">{rentalMoney(quote.total_rental, quote.currency)}</dd></div><div className="flex flex-wrap justify-between gap-2"><dt>Возвратный депозит отдельно</dt><dd>{rentalMoney(quote.deposit, quote.currency)}</dd></div></dl><p className="text-sm leading-6 text-slate-600">Часовой пояс: {quote.timezone}. Наличие и цена повторно проверяются при отправке. Заявку должен подтвердить парк.</p><Button type="button" className="min-h-12 w-full rounded-xl" disabled={busy} onClick={() => void submit()}>{busy ? 'Отправляем…' : 'Отправить заявку'}</Button></div>}
     {error && <p role="alert" className="text-sm text-rose-800">{error}</p>}
   </form>;

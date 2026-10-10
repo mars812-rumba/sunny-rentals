@@ -1,7 +1,8 @@
 import { webpImagePath } from "../../shared/webp-image";
 import React, { useState, useEffect, useMemo } from 'react';
-import { Star, Fuel, Settings, Users, ArrowRight, Zap, Loader2 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Star, Fuel, Settings, Users, ArrowRight, Zap, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CardContent } from '@/components/ui/card';
+import { VehicleCardFrame } from '@/components/VehicleCardFrame';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -18,7 +19,7 @@ interface CarCardProps {
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-const ImageCarousel = ({ photos, carName, t, carId }: { photos: string[], carName: string, t: (key: string) => string, carId: string }) => {
+export const ImageCarousel = ({ photos, carName, t, carId, renderPhoto }: { photos: string[], carName: string, t: (key: string) => string, carId: string; renderPhoto?: (photo: string, index: number) => React.ReactNode }) => {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   
   // Генерируем timestamp ОДИН РАЗ при монтировании компонента
@@ -67,7 +68,7 @@ const ImageCarousel = ({ photos, carName, t, carId }: { photos: string[], carNam
             
             return (
               <div className="embla__slide" key={index}>
-                <img
+                {renderPhoto ? renderPhoto(photo, index) : <img
                   src={imageUrl}
                   alt={`${carName} photo ${index + 1}`}
                   className="embla__slide__img"
@@ -78,7 +79,7 @@ const ImageCarousel = ({ photos, carName, t, carId }: { photos: string[], carNam
                       target.src = `${API_URL}/images_web/${webpImagePath(photo)}`;
                     }
                   }}
-                />
+                />}
               </div>
             );
           })}
@@ -107,6 +108,11 @@ const ImageCarousel = ({ photos, carName, t, carId }: { photos: string[], carNam
           ))}
         </div>
       )}
+      {photos.length > 1 && <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1 rounded-lg bg-white p-1 text-slate-950 shadow-sm">
+        <Button type="button" variant="ghost" size="sm" aria-label={`Предыдущее фото: ${carName}`} onClick={() => emblaApi?.scrollPrev()} className="h-9 px-2"><ChevronLeft aria-hidden="true" className="h-4 w-4" /></Button>
+        <span className="text-xs tabular-nums" aria-live="polite">{selectedIndex + 1} / {photos.length}</span>
+        <Button type="button" variant="ghost" size="sm" aria-label={`Следующее фото: ${carName}`} onClick={() => emblaApi?.scrollNext()} className="h-9 px-2"><ChevronRight aria-hidden="true" className="h-4 w-4" /></Button>
+      </div>}
     </div>
   );
 };
@@ -180,8 +186,8 @@ const CarCard = ({ car, rentalDays, onBooking, isSubmitting }: CarCardProps) => 
   }, []);
 
   return (
-    <Card data-car-id={car.id} className="overflow-hidden shadow-soft hover:shadow-medium transition-all duration-300 flex flex-col transform hover:scale-[1.02] hover:border-primary">
-      <div className="relative h-48">
+    <VehicleCardFrame assetId={car.id} media={
+      <div className="relative aspect-[16/10] overflow-hidden">
         <ImageCarousel photos={imageGallery} carName={car.name} t={t} carId={car.id} />
         
         <div className="absolute top-3 left-3 flex items-center gap-2 z-10 transform-gpu">
@@ -194,7 +200,7 @@ const CarCard = ({ car, rentalDays, onBooking, isSubmitting }: CarCardProps) => 
             {t('verified')}
           </div>
         </div>
-      </div>
+      </div>}>
 
       <CardContent className="p-4 flex-grow flex flex-col">
         <div className="space-y-3 flex-grow flex flex-col">
@@ -294,7 +300,7 @@ const CarCard = ({ car, rentalDays, onBooking, isSubmitting }: CarCardProps) => 
 </Button>
         </div>
       </CardContent>
-    </Card>
+    </VehicleCardFrame>
   );
 };
 
