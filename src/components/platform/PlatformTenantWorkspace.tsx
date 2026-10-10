@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlatformParkTelegramPanel } from './PlatformParkTelegramPanel';
 import { ParkBookingCalendar } from './ParkBookingCalendar';
+import { ParkTrialStatus } from './ParkTrialStatus';
 import { fetchOwnerFleet, saveOwnerAsset, uploadOwnerPhoto, archiveOwnerAsset, loadOwnerMedia } from '@/api/park-owner-fleet';
 import { VehicleCardFrame } from '@/components/VehicleCardFrame';
 import { CardContent } from '@/components/ui/card';
@@ -175,6 +176,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
         <div className="min-w-0"><Heading className="break-words text-3xl font-semibold tracking-[-0.03em]">{tenant.name}</Heading><p className="mt-2 break-all text-sm text-slate-600">/{tenant.slug} · {tenant.currency} · {tenant.timezone}</p></div>
         <span className="rounded-full bg-slate-200 px-3 py-1 text-sm">{tenant.status === "draft" ? "Черновик · триал ещё не начался" : "Парк опубликован"}</span>
       </header>
+      <ParkTrialStatus tenant={tenant} />
 
       {!owner && <section className="mt-5 flex flex-wrap items-center gap-3" aria-label="Витрина парка">
         <Button variant="outline" disabled={previewBusy || busy} onClick={() => void preview()}>{previewBusy ? "Готовим превью…" : "Подготовить превью витрины"}</Button>

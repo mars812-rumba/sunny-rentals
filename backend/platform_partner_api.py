@@ -122,7 +122,7 @@ def create_platform_partner_router(service: PartnerBotService, admin_auth: Platf
 
     @router.post('/fleet/list')
     def owner_fleet(request: PartnerIdentityRequest):
-        return owner_asset_call(request, lambda assets: {'tenant': assets.tenant, 'assets': assets.list()})
+        return owner_asset_call(request, lambda assets: {'tenant': assets.tenant_overview(), 'assets': assets.list()})
 
     @router.post('/fleet/save')
     def owner_save_asset(request: OwnerAssetRequest):

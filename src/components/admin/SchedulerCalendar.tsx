@@ -26,6 +26,8 @@ interface SchedulerCalendarProps {
   selectedClass?: string;
   carOwnersMap?: Record<string, string>;
   isCompactMode?: boolean; // 🆕 Компактный режим
+  readOnly?: boolean;
+  exclusiveEnd?: boolean;
 }
 
 const DAY_WIDTH = 24;
@@ -51,6 +53,8 @@ export function SchedulerCalendar({
   onCreateBooking,
   carOwnersMap = {},
   isCompactMode = false, // 🆕 Дефолтное значение
+  readOnly = false,
+  exclusiveEnd = false,
 }: SchedulerCalendarProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
@@ -62,7 +66,8 @@ export function SchedulerCalendar({
   const DOUBLE_TAP_DELAY = 300;
 
   // 🆕 Динамическая высота
-  const CAR_ROW_HEIGHT = getRowHeight(isCompactMode);
+  const CAR_ROW_HEIGHT = readOnly ? 48 : getRowHeight(isCompactMode);
+  const sidebarWidth = readOnly ? 120 : SIDEBAR_WIDTH;
 
   const {
     dates,
@@ -75,10 +80,11 @@ export function SchedulerCalendar({
     handleCellTouchMove,
     handleCellTouchEnd,
     isInSelection
-  } = useCalendarGrid(startDate, bookings, onCreateBooking);
+  } = useCalendarGrid(startDate, bookings, onCreateBooking, exclusiveEnd);
 
   useEffect(() => {
     if (scrollRef.current) {
+      if (readOnly) { scrollRef.current.scrollLeft = 7 * DAY_WIDTH; return; }
       const today = new Date();
       const todayIndex = dates.findIndex(date => isSameDay(date, today));
       
@@ -87,11 +93,12 @@ export function SchedulerCalendar({
         scrollRef.current.scrollLeft = scrollPosition;
       }
     }
-  }, [dates]);
+  }, [dates, readOnly]);
 
   const handleBookingClick = (booking: Booking, e: React.MouseEvent) => {
     e.stopPropagation();
     
+    if (readOnly) { onBookingClick(booking); return; }
     const now = Date.now();
     if (lastBookingTap && lastBookingTap.bookingId === booking.booking_id 
         && (now - lastBookingTap.timestamp) < DOUBLE_TAP_DELAY) {
@@ -134,17 +141,20 @@ export function SchedulerCalendar({
     <div
       ref={scrollRef}
       className="overflow-x-auto overflow-y-auto"
-      style={{ height: 'calc(100vh - 60px)' }}
+      style={{ height: readOnly ? 'min(65vh, 520px)' : 'calc(100vh - 60px)' }}
+      tabIndex={readOnly ? 0 : undefined}
+      role={readOnly ? 'region' : undefined}
+      aria-label={readOnly ? 'Гант занятости, прокрутка по датам' : undefined}
       onMouseUp={() => handleCellTouchEnd()}
       onMouseLeave={() => handleCellTouchEnd()}
     >
-      <div style={{ width: totalWidth + SIDEBAR_WIDTH }}>
+      <div style={{ width: totalWidth + sidebarWidth }}>
         {/* Header dates */}
         <div className="sticky top-0 z-20 flex bg-white border-b border-gray-300 shadow-md">
           {/* Sidebar header */}
           <div
             className="sticky left-0 z-30 flex-shrink-0 border-r border-gray-300 px-1 flex items-center justify-center bg-white shadow-sm"
-            style={{ width: SIDEBAR_WIDTH, height: HEADER_HEIGHT }}
+            style={{ width: sidebarWidth, height: HEADER_HEIGHT }}
           >
             <span className="text-[9px] font-bold text-gray-600">Авто</span>
           </div>
@@ -209,13 +219,13 @@ export function SchedulerCalendar({
                   "sticky left-0 z-10 flex-shrink-0 flex items-center px-1 border-r border-gray-300 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition-all",
                   isCompactMode ? "flex-row gap-1 py-0.5" : "flex-col justify-center py-0.5"
                 )}
-                style={{ width: SIDEBAR_WIDTH }}
-                onClick={() => {
+                style={{ width: sidebarWidth }}
+                onClick={readOnly ? undefined : () => {
                   setSelectedCarInfo({ car, owner: ownerBadge || null });
                 }}
               >
                 {/* 🆕 Фото - показываем только если НЕ компактный режим */}
-                {!isCompactMode && (
+                {!readOnly && !isCompactMode && (
                   <div className="relative w-full aspect-video rounded overflow-hidden bg-gray-200">
                     <div
                       className="w-full h-full"
@@ -233,11 +243,11 @@ export function SchedulerCalendar({
                   "w-full text-center",
                   isCompactMode ? "mt-0" : "mt-0.5"
                 )}>
-                  <div className={cn(
+                  <div title={car.name} className={cn(
                     "font-bold text-gray-900 leading-none truncate",
-                    isCompactMode ? "text-[6px]" : "text-[7px]"
+                    readOnly ? "text-xs leading-4" : isCompactMode ? "text-[6px]" : "text-[7px]"
                   )}>
-                    {car.brand} {car.model}
+                    {readOnly ? car.name : `${car.brand} ${car.model}`}
                   </div>
                 </div>
               </div>
@@ -274,11 +284,11 @@ export function SchedulerCalendar({
                               ? monthBg
                               : undefined,
                         }}
-                        onMouseDown={(e) => handleCellTouchStart(car.id, i, e)}
+                        onMouseDown={readOnly ? undefined : (e) => handleCellTouchStart(car.id, i, e)}
                         onMouseUp={handleCellTouchEnd}
                         onMouseEnter={() => { handleCellTouchMove(i); setHoveredCell({ carId: car.id, dayIndex: i }); }}
                         onMouseLeave={() => setHoveredCell(null)}
-                        onTouchStart={(e) => handleCellTouchStart(car.id, i, e)}
+                        onTouchStart={readOnly ? undefined : (e) => handleCellTouchStart(car.id, i, e)}
                         onTouchEnd={handleCellTouchEnd}
                       />
                     );
@@ -303,8 +313,12 @@ export function SchedulerCalendar({
                     return (
                       <div
   key={booking.booking_id}
+  role={readOnly ? 'button' : undefined}
+  tabIndex={readOnly ? 0 : undefined}
+  aria-label={readOnly ? `${booking.form_data.car.name}: ${booking.form_data.dates.start} — ${booking.form_data.dates.end}, ${booking.status === 'pre_booking' ? 'Ожидает подтверждения' : 'Занято'}` : undefined}
+  onKeyDown={readOnly ? (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onBookingClick(booking); } } : undefined}
   className={cn(
-    "absolute top-[6px] bottom-[6px] pointer-events-auto cursor-pointer transition-all",
+    "absolute top-[6px] bottom-[6px] pointer-events-auto cursor-pointer transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700",
     hoveredBooking === booking.booking_id && "ring-1 ring-blue-400 z-10"
   )}
   style={{
@@ -334,7 +348,7 @@ export function SchedulerCalendar({
                         <div className="px-0.5 pl-[8px] pr-[2px] h-full flex flex-col justify-center overflow-hidden leading-tight">
                           <div className={cn(
                             "font-semibold text-white-800 whitespace-nowrap overflow-hidden text-ellipsis",
-                            isCompactMode ? "text-[6px]" : "text-[7px]"
+                            readOnly ? "text-xs" : isCompactMode ? "text-[6px]" : "text-[7px]"
                           )}>
                             {badgeData.line1}
                           </div>

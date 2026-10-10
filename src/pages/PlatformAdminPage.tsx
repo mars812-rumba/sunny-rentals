@@ -484,7 +484,7 @@ function TenantRow({ tenant, onPublish, onOpen }: { tenant: PlatformTenant; onPu
         <button onClick={onOpen} className="max-w-full truncate text-left font-semibold tracking-[-0.01em] text-slate-950 underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-600">{tenant.name}</button>
         <div className="mt-1 truncate text-xs text-slate-500">/{tenant.slug} · {tenant.currency}</div>
       </div>
-      <div><StatusBadge status={tenant.status} /></div>
+      <div><StatusBadge status={tenant.status} />{tenant.trial?.status === 'trialing' && tenant.trial.ends_at && <p className="mt-2 text-xs text-slate-600">{tenant.trial.expired ? 'Триал завершён' : 'Триал до'} {formatDate(tenant.trial.ends_at)}</p>}</div>
       <div className="text-sm text-slate-600"><span className="mr-2 text-xs text-slate-400 xl:hidden">Тип</span>{ASSET_LABELS[tenant.primary_asset_type]}</div>
       <div className="text-sm tabular-nums text-slate-600"><span className="mr-2 text-xs text-slate-400 xl:hidden">Создан</span>{formatDate(tenant.created_at)}</div>
       <div className="flex flex-wrap justify-end gap-2">

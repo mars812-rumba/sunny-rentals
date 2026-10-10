@@ -123,12 +123,15 @@ def create_platform_admin_router(
 
     @router.get("/tenants")
     def list_tenants(context: PlatformContext = Depends(require_admin)):
-        return {"tenants": provisioner.list_tenants(context)}
+        return {"tenants": provisioner.tenant_overviews(context)}
 
     @router.get("/tenants/{tenant_id}")
     def get_tenant(tenant_id: str, context: PlatformContext = Depends(require_admin)):
         try:
-            return {"tenant": provisioner.get_tenant(context, tenant_id)}
+            tenant = next((item for item in provisioner.tenant_overviews(context) if item['tenant_id'] == tenant_id), None)
+            if tenant is None:
+                raise TenantNotFoundError('Tenant not found')
+            return {"tenant": tenant}
         except (TenantNotFoundError, ValueError):
             raise HTTPException(status_code=404, detail="Tenant not found")
 
@@ -154,7 +157,8 @@ def create_platform_admin_router(
             raise HTTPException(status_code=404, detail=str(error))
         except ValueError as error:
             raise HTTPException(status_code=409, detail=str(error))
-        return {"tenant": tenant, "trial_started": True}
+        overview = next(item for item in provisioner.tenant_overviews(context) if item['tenant_id'] == tenant_id)
+        return {"tenant": overview, "trial_started": True}
 
     @router.post("/tenants/{tenant_id}/storefront-preview")
     def storefront_preview(tenant_id: str, context: PlatformContext = Depends(require_admin)):

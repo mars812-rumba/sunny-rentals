@@ -1,9 +1,12 @@
 import json
 import unittest
+from datetime import timedelta
 import test_platform_partner_bot as fixtures
 import test_platform_asset_admin as image_fixtures
 from platform_core.asset_admin import AssetInput, TenantAssetAdmin
 from platform_core.partner_bot import PartnerBotError
+from platform_core.provisioning import trial_summary, PlatformContext
+from platform_core.context import TenantAccessError
 
 
 class OwnerFleetTests(unittest.TestCase):
@@ -103,3 +106,23 @@ class OwnerFleetTests(unittest.TestCase):
         self.assertEqual(result.status_code, 404)
         with self.assertRaises(PermissionError):
             TenantAssetAdmin.for_owner(self.service, 'park-a', self.token()).upload_logo(self.png)
+
+    def test_trial_visible_to_owner_and_admin_without_reset_or_other_park_data(self):
+        path = self.service.provisioner.state_path
+        before = path.read_bytes()
+        listing = self.client.post('/api/partners/fleet/list', json=self.signed()).json()
+        trial = listing['tenant']['trial']
+        self.assertEqual(trial['days'], 7)
+        self.assertEqual(trial['status'], 'trialing')
+        self.assertIsNotNone(trial['started_at'])
+        self.assertIsNotNone(trial['ends_at'])
+        self.assertNotIn('memberships', listing['tenant'])
+        overviews = self.service.provisioner.tenant_overviews(self.admin)
+        self.assertEqual(len(overviews), 2)
+        self.assertEqual(next(item for item in overviews if item['tenant_id'] == 'park-a')['trial']['days'], 7)
+        with self.assertRaises(TenantAccessError):
+            self.service.provisioner.tenant_overviews(PlatformContext(actor_id='42', roles=frozenset({'owner'})))
+        subscription = next(item for item in self.state().subscriptions if item.tenant_id == 'park-a')
+        self.assertFalse(trial_summary(self.state(), 'park-a', subscription.trial_ends_at - timedelta(seconds=1))['expired'])
+        self.assertTrue(trial_summary(self.state(), 'park-a', subscription.trial_ends_at)['expired'])
+        self.assertEqual(path.read_bytes(), before)

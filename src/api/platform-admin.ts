@@ -33,6 +33,7 @@ export interface PlatformTenant {
   published_at?: string | null;
   domains: string[];
   branding?: { logo?: string };
+  trial?: { status: string; days: number; started_at: string | null; ends_at: string | null; expired: boolean } | null;
 }
 
 export interface CreateTenantPayload {

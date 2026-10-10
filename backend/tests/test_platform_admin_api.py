@@ -212,13 +212,17 @@ class PlatformAdminApiTests(unittest.TestCase):
         detail = self.route("GET", "/api/platform/tenants/{tenant_id}").endpoint(
             "second-rental", context
         )
-        self.assertEqual(detail["tenant"].tenant_id, "second-rental")
+        self.assertEqual(detail["tenant"]["tenant_id"], "second-rental")
+        self.assertEqual(detail["tenant"]["trial"]["status"], "draft")
+        self.assertIsNone(detail["tenant"]["trial"]["started_at"])
 
         published = self.route(
             "POST", "/api/platform/tenants/{tenant_id}/publish"
         ).endpoint("second-rental", context)
         self.assertTrue(published["trial_started"])
-        self.assertEqual(published["tenant"].status.value, "trial")
+        self.assertEqual(published["tenant"]["status"], "trial")
+        self.assertEqual(published["tenant"]["trial"]["days"], 7)
+        self.assertIsNotNone(published["tenant"]["trial"]["ends_at"])
 
     def test_duplicate_slug_returns_conflict(self):
         token = self.auth.issue_for_verified_actor("admin-1")

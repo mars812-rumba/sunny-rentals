@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { DayDetailsModal } from './DayDetailsModal'; 
 
 interface DayEvent {
-  type: 'pickup' | 'return';
+  type: 'pickup' | 'return' | 'rental';
   time: string;
   carName: string;
   clientName: string;
@@ -27,6 +27,7 @@ interface MonthCalendarViewProps {
   onBookingClick: (booking: Booking) => void;
   onDayClick?: (date: Date, events: DayEvent[]) => void;
   onCreateBooking?: (dateRange: { start: Date; end: Date }) => void;
+  showOccupancy?: boolean;
 }
 
 const getMonthLetters = (date: Date) => {
@@ -39,12 +40,14 @@ const MonthGrid = memo(({
   date, 
   eventsByDay, 
   onDayClick,
-  onBadgeClick
+  onBadgeClick,
+  showOccupancy = false
 }: { 
   date: Date, 
   eventsByDay: Map<string, DayEvent[]>,
-  onDayClick: (date: Date, events: DayEvent[]) => void,
-  onBadgeClick: (event: DayEvent, e: React.MouseEvent) => void
+  onDayClick: (date: Date, events: DayEvent[], overflow?: boolean) => void,
+  onBadgeClick: (event: DayEvent, e: React.MouseEvent) => void,
+  showOccupancy?: boolean
 }) => {
   const days = useMemo(() => {
     const monthStart = startOfMonth(date);
@@ -90,18 +93,18 @@ const MonthGrid = memo(({
                 <div
                   key={dayKey}
                   className={cn(
-                    "min-h-[100px] p-0.5 transition-colors cursor-pointer group bg-transparent",
+                    "min-h-[100px] p-0.5 transition-colors cursor-pointer group bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700",
                     !isCurrentMonth ? "opacity-60" : "hover:bg-blue-60/50"
                   )}
                   onClick={() => onDayClick(day, events, false)}
                 >
                   <div className="flex justify-between items-start mb-1">
-                    <span className={cn(
+                    {showOccupancy ? <button type="button" className={cn('min-h-11 w-full rounded-sm text-left px-1 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700', dayIsToday && 'bg-blue-600 text-white')} aria-label={`${format(day, 'd MMMM yyyy', { locale: ru })}, событий: ${events.length}`} onClick={event => { event.stopPropagation(); onDayClick(day, events); }}>{format(day, 'd')}</button> : <span className={cn(
                       "text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full transition-colors",
                       dayIsToday ? "bg-blue-600 text-white shadow-md" : isCurrentMonth ? "text-slate-500" : "text-gray-300"
                     )}>
                       {format(day, 'd')}
-                    </span>
+                    </span>}
                   </div>
                   
                   <div className="space-y-0.5 overflow-hidden font-sans">
@@ -112,38 +115,40 @@ const MonthGrid = memo(({
                         ? "bg-slate-200 text-slate-600"
                         : ev.type === 'pickup' 
                           ? "bg-green-400 text-green-900"
-                          : "bg-yellow-400 text-yellow-900";
+                          : ev.type === 'rental' ? "bg-blue-100 text-blue-900" : "bg-yellow-400 text-yellow-900";
                       
                       return (
-                        <div 
+                        <button type="button"
                           key={idx}
                           className={cn(
-                            "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
+                            showOccupancy ? "w-full min-h-11 overflow-hidden px-1 text-[10px] font-medium rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
                             bgClass
                           )}
+                          aria-label={`${ev.type === 'pickup' ? 'Выдача' : ev.type === 'return' ? 'Возврат' : 'Занято'}: ${ev.carName}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             onBadgeClick(ev, e);
                           }}
+                          title={`${ev.type === 'pickup' ? 'Выдача' : ev.type === 'return' ? 'Возврат' : 'Занято'}: ${ev.carName}`}
                         >
-                          <span className="truncate tracking-tight">
+                          <span className="block truncate tracking-tight">
                             {ev.carName}
                           </span>
-                        </div>
+                        </button>
                       );
                     })}
                     
                     {events.length > 4 && (
-                      <div 
-                        className="text-[7px] text-blue-500 font-bold pl-1 cursor-pointer hover:text-blue-700" 
+                      <button type="button"
+                        className={showOccupancy ? "min-h-11 w-full text-xs font-semibold text-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "text-[7px] text-blue-500 font-bold pl-1 cursor-pointer hover:text-blue-700"}
                         onClick={(e) => { 
                           e.stopPropagation(); 
                           // Открыть popup только с теми бейджами которые не влезли
-                          onDayClick && onDayClick(new Date(dayKey), events.slice(4), true);
+                          onDayClick(day, events.slice(4), true);
                         }}
                       >
                         + ещё {events.length - 4}
-                      </div>
+                      </button>
                     )}
                   </div>
                 </div>
@@ -164,6 +169,7 @@ export function MonthCalendarView({
   onBookingClick,
   onDayClick,
   onCreateBooking,
+  showOccupancy = false,
 }: MonthCalendarViewProps) {
   
   const [selectedDayData, setSelectedDayData] = useState<{
@@ -214,10 +220,18 @@ export function MonthCalendarView({
         if (!map.has(rKey)) map.set(rKey, []);
         map.get(rKey)!.push({ ...baseEvent, type: 'return', time: format(rDate, 'HH:mm') });
       }
+      if (showOccupancy && pDate && rDate && !isNaN(pDate.getTime()) && !isNaN(rDate.getTime())) {
+        // Return day is not occupied; retain a separate return event on that day.
+        for (let day = addDays(pDate, 1), count = 0; day < rDate && count < 365; day = addDays(day, 1), count++) {
+          const key = format(day, 'yyyy-MM-dd');
+          if (!map.has(key)) map.set(key, []);
+          map.get(key)!.push({ ...baseEvent, type: 'rental', time: '' });
+        }
+      }
     });
 
     return map;
-  }, [logisticsData, bookings]);
+  }, [logisticsData, bookings, showOccupancy]);
 
   const handleInnerDayClick = useCallback((date: Date, events: DayEvent[], isOverflowClick = false) => {
     // Click on empty space - create booking immediately (только если не overflow click)
@@ -280,13 +294,13 @@ export function MonthCalendarView({
 
       <div className="overflow-hidden flex-1 cursor-grab active:cursor-grabbing w-full" ref={emblaRef}>
         <div className="flex h-full">
-          <MonthGrid date={addMonths(currentDate, -1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} />
-          <MonthGrid date={currentDate} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} />
-          <MonthGrid date={addMonths(currentDate, 1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} />
+          <MonthGrid date={addMonths(currentDate, -1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} />
+          <MonthGrid date={currentDate} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} />
+          <MonthGrid date={addMonths(currentDate, 1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} />
         </div>
       </div>
 
-      <DayDetailsModal 
+      {!showOccupancy && <DayDetailsModal
         isOpen={selectedDayData.isOpen}
         onClose={() => setSelectedDayData(prev => ({ ...prev, isOpen: false }))}
         date={selectedDayData.date}
@@ -295,7 +309,7 @@ export function MonthCalendarView({
           onBookingClick(booking);
           setSelectedDayData(prev => ({ ...prev, isOpen: false }));
         }}
-      />
+      />}
     </div>
   );
 }

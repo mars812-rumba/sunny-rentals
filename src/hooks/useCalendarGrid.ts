@@ -4,7 +4,7 @@ import { Booking } from '@/api/api';
 
 const TOTAL_DAYS = 97; // 7 дней назад + 90 дней вперёд (3 месяца)
 
-export const useCalendarGrid = (startDate: Date, bookings: Booking[], onCreateBooking: (carId: string, dateRange: { start: Date; end: Date }) => void) => {
+export const useCalendarGrid = (startDate: Date, bookings: Booking[], onCreateBooking: (carId: string, dateRange: { start: Date; end: Date }) => void, exclusiveEnd = false) => {
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionCarId, setSelectionCarId] = useState<string | null>(null);
   const [selectionStart, setSelectionStart] = useState<number | null>(null);
@@ -32,8 +32,8 @@ export const useCalendarGrid = (startDate: Date, bookings: Booking[], onCreateBo
 
   const getBookingPosition = (booking: Booking, dayWidth: number) => {
     const bookingStart = startOfDay(new Date(booking.form_data.dates.start));
-    const bookingEnd = startOfDay(new Date(booking.form_data.dates.end));
-    const viewStart = actualStartDate;
+    const bookingEnd = addDays(startOfDay(new Date(booking.form_data.dates.end)), exclusiveEnd ? -1 : 0);
+    const viewStart = startOfDay(actualStartDate);
     const viewEnd = addDays(actualStartDate, TOTAL_DAYS - 1);
 
     if (bookingEnd < viewStart || bookingStart > viewEnd) return null;

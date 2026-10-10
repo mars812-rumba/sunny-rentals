@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, validator
 
 from .context import TenantContext
 from .models import AssetStatus, AssetType, RentalAsset, utc_now
-from .provisioning import PlatformContext, TenantNotFoundError, TenantProvisioner
+from .provisioning import PlatformContext, TenantNotFoundError, TenantProvisioner, trial_summary, _jsonable
 from .repositories import JsonCollectionRepository, JsonlEventRepository
 
 
@@ -87,6 +87,15 @@ class TenantAssetAdmin:
     def _event(self, kind: str, **fields):
         self.audit.append({"schema_version": 1, "type": kind, "actor_id": self.admin.actor_id,
                            "timestamp": utc_now().isoformat(), **fields})
+
+    def tenant_overview(self):
+        with self.provisioner._locked():
+            self._authorize()
+            state = self.provisioner._load_state()
+            tenant = next((item for item in state.tenants if item.tenant_id == self.context.tenant_id), None)
+            if tenant is None:
+                raise TenantNotFoundError('Tenant not found')
+            return {**_jsonable(tenant), 'trial': trial_summary(state, self.context.tenant_id)}
 
     def list(self):
         with self.provisioner._locked():

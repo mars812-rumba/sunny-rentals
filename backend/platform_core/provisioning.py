@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, validator
 from .context import TenantAccessError, validate_tenant_id
 from .context import TenantContext
 from .repositories import JsonlEventRepository
+from .partner_contracts import PartnerBotState
 from .models import (
     AssetType,
     Membership,
@@ -29,6 +30,18 @@ from .models import (
 
 
 _THREAD_LOCK = threading.RLock()
+
+
+def trial_summary(state, tenant_id: str, at: Optional[datetime] = None):
+    """Read-only projection: never extend or restart a persisted trial."""
+    subscription = next((item for item in state.subscriptions if item.tenant_id == tenant_id), None)
+    if subscription is None:
+        return None
+    moment = at or _utc_now()
+    return {"status": subscription.status.value, "days": subscription.trial_days,
+            "started_at": subscription.trial_started_at, "ends_at": subscription.trial_ends_at,
+            "expired": bool(subscription.status == SubscriptionStatus.TRIALING
+                            and subscription.trial_ends_at and moment >= subscription.trial_ends_at)}
 
 
 def _utc_now() -> datetime:
@@ -106,6 +119,7 @@ class ControlPlaneState(BaseModel):
     tenants: List[Tenant] = Field(default_factory=list)
     memberships: List[Membership] = Field(default_factory=list)
     subscriptions: List[Subscription] = Field(default_factory=list)
+    partner_bot: PartnerBotState = Field(default_factory=PartnerBotState)
 
 
 class TenantAlreadyExistsError(ValueError):
@@ -198,6 +212,12 @@ class TenantProvisioner:
         context.require_platform_admin()
         with self._locked():
             return list(self._load_state().tenants)
+
+    def tenant_overviews(self, context: PlatformContext):
+        context.require_platform_admin()
+        with self._locked():
+            state = self._load_state()
+            return [{**_jsonable(tenant), "trial": trial_summary(state, tenant.tenant_id)} for tenant in state.tenants]
 
     def get_tenant(self, context: PlatformContext, tenant_id: str) -> Tenant:
         context.require_platform_admin()
