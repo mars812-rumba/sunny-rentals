@@ -63,6 +63,17 @@ test('owner workspace does not render platform management controls', () => {
   assert.doesNotMatch(html, /Все прокаты|Подготовить превью|Логотип проката|Webhook|<h1/);
 });
 
+test('owner can open the separate client storefront from the park header', () => {
+  const html = renderToStaticMarkup(e(ui.PlatformTenantWorkspace, { owner: true,
+    tenant: { tenant_id: 'park-a', slug: 'park-a', name: 'Park A', status: 'active', currency: 'THB', timezone: 'Asia/Bangkok', primary_asset_type: 'car' },
+    onBack: () => {}, onTenantChanged: () => {}, onViewStorefront: () => {},
+  }));
+  assert.match(html, /Посмотреть витрину/);
+  assert.ok(html.indexOf('Park A') < html.indexOf('Посмотреть витрину'));
+  assert.ok(html.indexOf('Посмотреть витрину') < html.indexOf('role="tablist"'));
+  assert.doesNotMatch(html, /Подберите транспорт|Выберите транспорт|Клиентский каталог/);
+});
+
 test('superadmin uses the same two working tabs with separate collapsed park setup', () => {
   const html = renderToStaticMarkup(e(ui.PlatformTenantWorkspace, {
     tenant: { tenant_id: 'park-a', slug: 'park-a', name: 'Очень длинное название проката для проверки переноса', status: 'draft', currency: 'THB', timezone: 'Asia/Bangkok', primary_asset_type: 'car' },

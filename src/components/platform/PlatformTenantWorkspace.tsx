@@ -51,8 +51,8 @@ function PrivateImage({ tenantId, reference, alt, className, owner = false }: { 
   return url ? <img src={url} alt={alt} className={className} /> : <div className={`${className} grid place-items-center bg-slate-100 text-xs text-slate-600`} role="img" aria-label={alt}>{failed ? "Фото недоступно" : <Loader2 className="animate-spin" aria-hidden="true" />}</div>;
 }
 
-export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner = false }: {
-  tenant: PlatformTenant; onBack: () => void; onTenantChanged: (tenant: PlatformTenant) => void; owner?: boolean;
+export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner = false, onViewStorefront }: {
+  tenant: PlatformTenant; onBack: () => void; onTenantChanged: (tenant: PlatformTenant) => void; owner?: boolean; onViewStorefront?: () => void;
 }) {
   const [assets, setAssets] = useState<PlatformAsset[]>([]);
   const [section, setSection] = useState('fleet');
@@ -185,6 +185,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
         <span className="rounded-full bg-slate-200 px-3 py-1 text-sm">{tenant.status === "draft" ? "Черновик · триал ещё не начался" : "Парк опубликован"}</span>
       </header>
       <ParkTrialStatus tenant={tenant} />
+      {owner && onViewStorefront && <Button variant="outline" className="mt-4 min-h-11" onClick={onViewStorefront}>Посмотреть витрину</Button>}
 
       {!owner && <details className="mt-5"><summary className="min-h-11 cursor-pointer rounded-md py-3 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700">Настройки подключения и оформления</summary>
       {!owner && <section className="mt-5 flex flex-wrap items-center gap-3" aria-label="Витрина парка">

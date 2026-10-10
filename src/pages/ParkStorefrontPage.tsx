@@ -9,7 +9,7 @@ import { ImageCarousel } from '@/components/CarCard';
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { fetchStorefront, Storefront, StorefrontAsset, storefrontMediaUrl } from '@/api/storefront';
 import HeroBanner from '@/components/HeroBanner';
-import { ParkTelegramEntry } from '@/components/platform/ParkTelegramEntry';
+import { ParkTelegramEntry, type ParkView } from '@/components/platform/ParkTelegramEntry';
 import { ParkBookingForm } from '@/components/platform/ParkBookingForm';
 import { ParkRentalFilters } from '@/components/platform/ParkRentalFilters';
 import { fetchParkAvailability, ParkAvailability } from '@/api/park-telegram';
@@ -72,6 +72,7 @@ function AssetCard({ asset, tenantId, currency, preview, bookingEnabled, period,
 
 function ParkStorefront({ tenantId }: { tenantId: string }) {
   const [preview] = useState(() => new URLSearchParams(window.location.hash.slice(1)).get('preview') || '');
+  const [view, setView] = useState<ParkView>(() => !preview && window.Telegram?.WebApp?.initData ? 'checking' : 'client');
   const [data, setData] = useState<Storefront | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -115,12 +116,12 @@ function ParkStorefront({ tenantId }: { tenantId: string }) {
   const rates = data?.assets.map((asset) => asset.daily_rate).filter((rate): rate is number => rate !== null && rate > 0) || [];
   return <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 text-slate-950 selection:bg-cyan-200">
     <Helmet><html lang="ru" /><title>{name} — транспорт в аренду</title><meta name="robots" content="noindex, nofollow" /><meta name="referrer" content="no-referrer" /><meta name="description" content={`Каталог транспорта ${name}: фотографии и цены проката.`} /><link rel="canonical" href={`${window.location.origin}/p/${encodeURIComponent(tenantId)}`} /><meta property="og:type" content="website" /><meta property="og:title" content={`${name} — транспорт в аренду`} /><meta property="og:description" content={`Каталог транспорта ${name}: фотографии и цены проката.`} /><meta property="og:url" content={`${window.location.origin}/p/${encodeURIComponent(tenantId)}`} /><meta name="twitter:card" content="summary" /></Helmet>
-    <header><HeroBanner park={{ name, minimumPrice: data && rates.length ? rentalMoney(Math.min(...rates), data.tenant.currency) : null, logo: data?.tenant.logo ? <StorefrontImage tenantId={tenantId} reference={data.tenant.logo} preview={preview} alt={`Логотип ${name}`} className="mx-auto mb-2 h-10 w-10 rounded-lg bg-white object-contain p-1" /> : undefined }} /></header>
+    {data && !data.preview && <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"><ParkTelegramEntry key={tenantId} tenantId={tenantId} view={view} onViewChange={setView} /></div>}
+    {view === 'client' && <header><HeroBanner park={{ name, minimumPrice: data && rates.length ? rentalMoney(Math.min(...rates), data.tenant.currency) : null, logo: data?.tenant.logo ? <StorefrontImage tenantId={tenantId} reference={data.tenant.logo} preview={preview} alt={`Логотип ${name}`} className="mx-auto mb-2 h-10 w-10 rounded-lg bg-white object-contain p-1" /> : undefined }} /></header>}
     <div className="mx-auto max-w-6xl px-4 pb-10 sm:px-6 lg:px-8">
       {data?.preview && <p role="status" className="mt-4 rounded-xl bg-amber-100 p-3 text-sm text-amber-950">Закрытое превью · здесь видны и неопубликованные машины. Ссылка действует 24 часа и не даёт доступа к управлению парком.</p>}
-      {loading ? <p role="status" aria-live="polite" className="py-12 text-center text-slate-600">Загружаем транспорт парка…</p> : error ? <div role="alert" className="py-12 text-center"><p className="text-slate-700">{error}</p><Button className={`mt-4 ${actionClass}`} onClick={() => setReload((value) => value + 1)}>Повторить загрузку</Button></div> : data && <>
+      {loading ? <p role="status" aria-live="polite" className="py-12 text-center text-slate-600">Загружаем транспорт парка…</p> : error ? <div role="alert" className="py-12 text-center"><p className="text-slate-700">{error}</p><Button className={`mt-4 ${actionClass}`} onClick={() => setReload((value) => value + 1)}>Повторить загрузку</Button></div> : data && view === 'client' && <>
         <ParkRentalFilters period={period} onPeriodChange={setPeriod} search={search} onSearchChange={setSearch} type={type} onTypeChange={setType} types={Array.from(new Set(data.assets.map((asset) => asset.asset_type)))} timezone={data.tenant.timezone} datesEnabled={data.booking_enabled && !data.preview} />
-        {!data.preview && <ParkTelegramEntry key={tenantId} tenantId={tenantId} />}
         <section aria-labelledby="park-catalog-title" className="mt-8"><h2 id="park-catalog-title" className="text-xl font-semibold">{period ? 'Доступно на ваши даты' : 'Выберите транспорт'}</h2><p role="status" className="mb-4 mt-1 text-sm text-slate-600">{checking ? 'Проверяем наличие…' : `Найдено: ${assets.length}`}{period && !checking ? ` · ${rentalDays(period)} суток` : ''}</p>
           {checking ? <p role="status" className="py-8 text-slate-600">Проверяем свободные машины на выбранные даты…</p> : availabilityError ? <div role="alert" className="py-6"><p>{availabilityError}</p><Button variant="outline" className="mt-3" onClick={() => setAvailabilityReload((value) => value + 1)}>Повторить поиск</Button></div> : assets.length ? <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">{assets.map((asset) => <AssetCard key={asset.id} asset={asset} tenantId={tenantId} currency={data.tenant.currency} preview={preview} bookingEnabled={data.booking_enabled} period={period} onBooked={() => setAvailabilityReload((value) => value + 1)} />)}</div> : <div className="rounded-xl bg-white px-5 py-10 text-center"><CarFront aria-hidden="true" className="mx-auto text-slate-500" /><p className="mt-3 font-medium">{data.assets.length ? period ? 'На эти даты подходящий транспорт не найден' : 'По вашему запросу ничего не найдено' : 'Транспорт пока не опубликован'}</p>{data.assets.length > 0 && <Button variant="outline" className="mt-4" onClick={() => { setSearch(''); setType('all'); setPeriod(null); }}>Сбросить фильтры</Button>}</div>}
         </section><p className="mt-8 text-sm text-slate-600">{data.booking_enabled ? 'Откройте карточку транспорта, чтобы проверить даты и отправить заявку через Telegram.' : 'Бронирование на этой витрине ещё не включено.'}</p>
