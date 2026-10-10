@@ -81,6 +81,8 @@ class TelegramPartnerTransport:
 
 
 class PartnerBotService:
+    INVITATION_TTL = 24 * 60 * 60
+
     def __init__(self, root: Path, config: PartnerBotConfig, transport, clock: Callable = time.time):
         self.provisioner = TenantProvisioner(root)
         self.config = config
@@ -121,11 +123,11 @@ class PartnerBotService:
             self._prune(state)
             state.partner_bot.invitations[digest] = PartnerInvitation(
                 bot_id=self.config.bot_id, tenant_id=tenant_id,
-                expires_at=int(self.clock()) + 3600, created_by=context.actor_id,
+                expires_at=int(self.clock()) + self.INVITATION_TTL, created_by=context.actor_id,
                 expected_user_id=expected_user_id,
             )
             self.provisioner._save_state(state)
-        return {'invitation_id': digest, 'url': f'https://t.me/{self.config.username}?start={code}', 'expires_in': 3600}
+        return {'invitation_id': digest, 'url': f'https://t.me/{self.config.username}?start={code}', 'expires_in': self.INVITATION_TTL}
 
     def revoke_invite(self, context, tenant_id, invitation_id):
         context.require_platform_admin()
@@ -151,10 +153,19 @@ class PartnerBotService:
 
     def _prune(self, state):
         now = int(self.clock())
-        state.partner_bot.invitations = {k: v for k, v in state.partner_bot.invitations.items() if v.expires_at > now}
+        # A consumed invite is only a shortcut for its existing, active owner.
+        # Retain it after activation expiry; it can never issue rights again.
+        state.partner_bot.invitations = {k: v for k, v in state.partner_bot.invitations.items()
+            if v.expires_at > now or (v.bot_id == self.config.bot_id and v.used_by is not None
+                and self._active_owner(state, v.tenant_id, v.used_by))}
         state.partner_bot.replies = {k: v for k, v in state.partner_bot.replies.items() if not v.sent or v.created_at > now - 172800}
         if len(state.partner_bot.replies) >= 10000 or len(state.partner_bot.invitations) >= 1000:
             raise PartnerDeliveryError('Onboarding backlog limit reached')
+
+    def _active_owner(self, state, tenant_id, user_id):
+        return any(m.tenant_id == tenant_id and m.user_id == self.actor_id(user_id)
+            and m.active and m.archived_at is None and m.role == MembershipRole.OWNER
+            for m in state.memberships)
 
     def resolve_identity(self, tenant_id, init_data, require_owner=False):
         user = self.verifier.verify(init_data)
@@ -193,9 +204,15 @@ class PartnerBotService:
         if not parameter or len(parameter) > 64:
             return payload
         owner_invite = None
+        returning_owner = False
         if parameter.startswith('i_'):
             owner_invite = state.partner_bot.invitations.get(hashlib.sha256(parameter.encode()).hexdigest())
-            if (owner_invite is None or owner_invite.bot_id != self.config.bot_id or owner_invite.used_by is not None or owner_invite.expires_at <= int(self.clock()) or owner_invite.expected_user_id not in (None, user_id)):
+            if owner_invite is not None and owner_invite.used_by == user_id:
+                returning_owner = self._active_owner(state, owner_invite.tenant_id, user_id)
+            if (owner_invite is None or owner_invite.bot_id != self.config.bot_id
+                    or owner_invite.expected_user_id not in (None, user_id)
+                    or (owner_invite.used_by is not None and not returning_owner)
+                    or (owner_invite.used_by is None and owner_invite.expires_at <= int(self.clock()))):
                 payload['text'] = 'Приглашение недействительно, истекло или уже использовано. Запросите новое у администратора.'
                 return payload
             tenant_id = owner_invite.tenant_id
@@ -208,7 +225,7 @@ class PartnerBotService:
         except (PartnerBotError, ValueError):
             payload['text'] = 'Парк сейчас недоступен. Уточните ссылку у проката.'
             return payload
-        if owner_invite is not None:
+        if owner_invite is not None and not returning_owner:
             owner_invite.used_by = user_id
             actor = self.actor_id(user_id)
             member = next((m for m in state.memberships if m.tenant_id == tenant_id and m.user_id == actor and m.role == MembershipRole.OWNER), None)
