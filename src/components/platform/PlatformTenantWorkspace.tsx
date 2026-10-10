@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { PlatformParkTelegramPanel } from './PlatformParkTelegramPanel';
 import { ParkBookingCalendar } from './ParkBookingCalendar';
 import { ParkTrialStatus } from './ParkTrialStatus';
@@ -54,6 +55,9 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
   tenant: PlatformTenant; onBack: () => void; onTenantChanged: (tenant: PlatformTenant) => void; owner?: boolean;
 }) {
   const [assets, setAssets] = useState<PlatformAsset[]>([]);
+  const [section, setSection] = useState('fleet');
+  const [calendarVisited, setCalendarVisited] = useState(false);
+  const [calendarRevision, setCalendarRevision] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const [error, setError] = useState("");
@@ -94,8 +98,11 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
     return () => { active = false; };
   }, [tenant.tenant_id, reload, owner]);
 
-  const replaceAsset = (asset: PlatformAsset) => setAssets((current) => current.some((item) => item.id === asset.id)
-    ? current.map((item) => item.id === asset.id ? asset : item) : [...current, asset]);
+  const replaceAsset = (asset: PlatformAsset) => {
+    setAssets((current) => current.some((item) => item.id === asset.id)
+      ? current.map((item) => item.id === asset.id ? asset : item) : [...current, asset]);
+    setCalendarRevision((value) => value + 1);
+  };
 
   const edit = (asset: PlatformAsset | "new") => {
     setEditing(asset);
@@ -162,6 +169,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
     try {
       await (owner ? archiveOwnerAsset : archivePlatformAsset)(tenant.tenant_id, archiveTarget.id);
       setAssets((current) => current.filter((item) => item.id !== archiveTarget.id));
+      setCalendarRevision((value) => value + 1);
       if (editing !== "new" && editing?.id === archiveTarget.id) setEditing(null);
       setArchiveTarget(null);
       toast.success("Техника перенесена в архив");
@@ -178,6 +186,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
       </header>
       <ParkTrialStatus tenant={tenant} />
 
+      {!owner && <details className="mt-5"><summary className="min-h-11 cursor-pointer rounded-md py-3 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700">Настройки подключения и оформления</summary>
       {!owner && <section className="mt-5 flex flex-wrap items-center gap-3" aria-label="Витрина парка">
         <Button variant="outline" disabled={previewBusy || busy} onClick={() => void preview()}>{previewBusy ? "Готовим превью…" : "Подготовить превью витрины"}</Button>
         {previewUrl && <a className="rounded-md px-3 py-2 text-sm font-medium text-blue-700 underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={previewUrl} target="_blank" rel="noopener noreferrer">Открыть закрытое превью</a>}
@@ -186,16 +195,22 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
         <p className="w-full text-sm text-slate-600">Превью показывает черновики и действует 1 час. Для публичной витрины включите «Показывать на витрине» в редакторе техники и опубликуйте парк.</p>
       </section>}
 
-      {!owner && <><PlatformParkTelegramPanel key={tenant.tenant_id} tenant={tenant} />
-      <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin /></>}
+      {!owner && <PlatformParkTelegramPanel key={tenant.tenant_id} tenant={tenant} />}
 
       {!owner && <section className="mt-7 flex flex-wrap items-center gap-5 rounded-2xl bg-white p-5" aria-labelledby="branding-title">
         {tenant.branding?.logo ? <PrivateImage tenantId={tenant.tenant_id} reference={tenant.branding.logo} alt={`Логотип ${tenant.name}`} className="h-20 w-20 rounded-xl object-contain" /> : <div className="grid h-20 w-20 place-items-center rounded-xl bg-slate-100"><ImageIcon className="text-slate-500" aria-hidden="true" /></div>}
         <div className="min-w-0 flex-1"><h2 id="branding-title" className="font-semibold">Логотип проката</h2><p className="mt-1 text-sm leading-6 text-slate-600">JPEG, PNG или WebP до 8 МБ. Внутри парка сохраняются оригинал и версия для витрины.</p></div>
         <div><Label htmlFor="tenant-logo" className="mb-2 block">{tenant.branding?.logo ? "Заменить логотип" : "Загрузить логотип"}</Label><Input id="tenant-logo" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy || loading || loadFailed} className="max-w-64" onChange={(event) => { const file = event.target.files?.[0]; event.target.value = ""; void logo(file); }} /></div>
       </section>}
+      </details>}
 
-      <section className="mt-8" aria-labelledby="fleet-title">
+      <Tabs value={section} onValueChange={(value) => { setSection(value); if (value === 'calendar') setCalendarVisited(true); }} activationMode="manual" className="mt-6 min-w-0">
+        <TabsList aria-label="Управление парком" className="grid h-auto w-full grid-cols-2 p-1 sm:max-w-md">
+          <TabsTrigger value="fleet" className="min-h-11 px-4">Автопарк</TabsTrigger>
+          <TabsTrigger value="calendar" className="min-h-11 px-4">Календарь</TabsTrigger>
+        </TabsList>
+        <TabsContent value="fleet" forceMount hidden={section !== 'fleet'} className="mt-6 data-[state=inactive]:hidden">
+      <section aria-labelledby="fleet-title">
         <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 id="fleet-title" className="text-xl font-semibold">Техника парка</h2><p className="mt-1 text-sm text-slate-600">{loading || loadFailed ? "Количество уточняется" : `${assets.length} единиц`} · для первого демо подготовьте 5</p></div><Button className={primaryButton} onClick={() => edit("new")} disabled={busy || loading || loadFailed}><Plus aria-hidden="true" /> Добавить технику</Button></div>
         {error && <div role="alert" className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-rose-50 p-4 text-sm text-rose-800"><span>{error}</span><Button variant="outline" disabled={busy} onClick={() => setReload((value) => value + 1)}><RefreshCw aria-hidden="true" /> Обновить данные</Button></div>}
         {loading ? <p role="status" className="py-8 text-slate-600">Загружаем данные парка…</p> : loadFailed ? null : <>
@@ -234,6 +249,11 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
           </div>}
         </section>}
       </section>
+        </TabsContent>
+        {calendarVisited && <TabsContent value="calendar" forceMount hidden={section !== 'calendar'} className="mt-6 min-w-0 data-[state=inactive]:hidden">
+          <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} fleetRevision={calendarRevision} />
+        </TabsContent>}
+      </Tabs>
     </div>
     <AlertDialog open={Boolean(archiveTarget)} onOpenChange={(open) => { if (!open && !busy) setArchiveTarget(null); }}>
       <AlertDialogContent><AlertDialogHeader><AlertDialogTitle className="break-words">Перенести {archiveTarget?.name} в архив?</AlertDialogTitle><AlertDialogDescription>Техника исчезнет из активного списка. Её данные и фотографии сохранятся.</AlertDialogDescription></AlertDialogHeader>{archiveError && <p role="alert" className="text-sm text-rose-800">{archiveError}</p>}<AlertDialogFooter><AlertDialogCancel disabled={busy}>Отмена</AlertDialogCancel><AlertDialogAction className={primaryButton} disabled={busy} onClick={(event) => { event.preventDefault(); void archive(); }}>{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}{busy ? "Переносим…" : "В архив"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>

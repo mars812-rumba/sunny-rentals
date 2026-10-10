@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { addMonths, format, startOfMonth } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -12,10 +12,11 @@ import { SchedulerCalendar } from '@/components/admin/SchedulerCalendar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { bookingsOnDay, calendarBooking, calendarCars, calendarLogistics } from '@/utils/park-calendar';
+import { ParkManualBookingForm } from './ParkManualBookingForm';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждено', cancelled: 'Отменено', in_progress: 'В аренде', completed: 'Завершено' };
 
-export function ParkBookingCalendar({ tenantId, admin = false }: { tenantId: string; admin?: boolean }) {
+export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0 }: { tenantId: string; admin?: boolean; fleetRevision?: number }) {
   const id = useId();
   const [bookings, setBookings] = useState<ParkBooking[]>([]);
   const [assets, setAssets] = useState<PlatformAsset[]>([]);
@@ -23,6 +24,11 @@ export function ParkBookingCalendar({ tenantId, admin = false }: { tenantId: str
   const [assetId, setAssetId] = useState('');
   const [view, setView] = useState('month');
   const [selection, setSelection] = useState<{ bookingId?: string; day?: string } | null>(null);
+  const [draft, setDraft] = useState<{ day?: string; assetId?: string } | null>(null);
+  const [success, setSuccess] = useState('');
+  const createButton = useRef<HTMLButtonElement>(null);
+  const wasDraft = useRef(false);
+  useEffect(() => { if (wasDraft.current && !draft) createButton.current?.focus(); wasDraft.current = !!draft; }, [draft]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -35,9 +41,9 @@ export function ParkBookingCalendar({ tenantId, admin = false }: { tenantId: str
       .catch((failure) => { if (!controller.signal.aborted) { setBookings([]); setError(failure instanceof Error ? failure.message : 'Не удалось загрузить календарь.'); } })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [tenantId, admin, reload]);
+  }, [tenantId, admin, reload, fleetRevision]);
   const action = async (booking: ParkBooking, status: 'confirmed' | 'cancelled') => {
-    if (status === 'cancelled' && !window.confirm(`Отменить заявку на ${booking.pricing.asset_name}? Период освободится для других клиентов.`)) return;
+    if (status === 'cancelled' && !window.confirm(`${booking.entry_type === 'block' ? 'Снять блокировку' : 'Отменить бронь'} на ${booking.pricing.asset_name}? Период освободится для других клиентов.`)) return;
     setBusy(true); setError('');
     try { await changeParkBookingStatus(tenantId, booking, status, admin); setReload((value) => value + 1); }
     catch (failure) { setError(failure instanceof Error ? failure.message : 'Не удалось изменить статус.'); }
@@ -52,11 +58,16 @@ export function ParkBookingCalendar({ tenantId, admin = false }: { tenantId: str
     .sort((a, b) => a.start_at.localeCompare(b.start_at));
   const selected = selection?.bookingId ? filtered.filter(item => item.id === selection.bookingId) : selection?.day ? bookingsOnDay(filtered, selection.day) : [];
   const details = (items: ParkBooking[]) => <ul className="mt-4 divide-y divide-slate-200">{items.map((booking) => <li key={booking.id} className="py-4">
-    <h3 className="break-words font-semibold">{booking.pricing.asset_name || booking.asset_id}</h3><p className="mt-1">{booking.pricing.start_date} — {booking.pricing.end_date} · {statuses[booking.status] || booking.status}</p><p className="mt-1 text-sm">Аренда: {booking.pricing.total_rental} {booking.currency} · депозит: {booking.deposit.amount} {booking.currency}</p><p className="mt-1 break-all text-xs text-slate-600">Номер: {booking.id}</p>
-    {['requested', 'confirmed'].includes(booking.status) && <div className="mt-3 flex flex-wrap gap-3">{booking.status === 'requested' && <Button variant="outline" disabled={busy || loading} onClick={() => void action(booking, 'confirmed')}>Подтвердить заявку</Button>}<Button variant="outline" disabled={busy || loading} onClick={() => void action(booking, 'cancelled')}>Отменить заявку</Button></div>}
+    <h3 className="break-words font-semibold">{booking.pricing.asset_name || booking.asset_id}</h3><p className="mt-1">{booking.pricing.start_date} — {booking.pricing.end_date} · {statuses[booking.status] || booking.status}</p>
+    <p className="mt-1 text-sm font-medium">{booking.entry_type === 'block' ? 'Блокировка занятости' : booking.source?.endsWith('_manual') ? 'Ручная аренда' : 'Заявка из Telegram'}</p>
+    {booking.entry_type !== 'block' && <p className="mt-1 text-sm">Аренда: {booking.pricing.total_rental} {booking.currency} · депозит: {booking.deposit.amount} {booking.currency}</p>}
+    {booking.operator_details?.customer_name && <p className="mt-2 break-words text-sm">Клиент: {booking.operator_details.customer_name}</p>}
+    {booking.operator_details?.note && <p className="mt-2 whitespace-pre-wrap break-words text-sm">{booking.operator_details.note}</p>}
+    <p className="mt-1 break-all text-xs text-slate-600">Номер: {booking.id}</p>
+    {['requested', 'confirmed'].includes(booking.status) && <div className="mt-3 flex flex-wrap gap-3">{booking.status === 'requested' && <Button variant="outline" disabled={busy || loading || !!draft} onClick={() => void action(booking, 'confirmed')}>Подтвердить заявку</Button>}<Button variant="outline" disabled={busy || loading || !!draft} onClick={() => void action(booking, 'cancelled')}>{booking.entry_type === 'block' ? 'Снять блокировку' : 'Отменить бронь'}</Button></div>}
   </li>)}</ul>;
   return <section aria-labelledby={`${id}-title`} aria-busy={loading || busy} className="mt-7 border-t border-slate-200 pt-5">
-    <div className="flex flex-wrap items-center justify-between gap-3"><h2 id={`${id}-title`} className="text-xl font-semibold">Календарь заявок парка</h2><Button variant="outline" disabled={loading || busy} onClick={() => setReload((value) => value + 1)}>Обновить календарь</Button></div>
+    <div className="flex flex-wrap items-center justify-between gap-3"><h2 id={`${id}-title`} className="text-xl font-semibold">Календарь заявок парка</h2><div className="flex flex-wrap gap-3"><Button ref={createButton} disabled={loading || busy || !!draft || !assets.length || !!error} onClick={() => { setSuccess(''); setDraft({ assetId }); }}>Добавить бронь / блокировку</Button><Button variant="outline" disabled={loading || busy || !!draft} onClick={() => setReload((value) => value + 1)}>Обновить календарь</Button></div></div>
     <p className="mt-2 text-sm text-slate-600">Заявки из бота и витрины — в одном календаре. Ожидающие заявки также занимают период. День возврата свободен для следующей аренды.</p>
     <div className="mt-4 flex flex-wrap items-end gap-3">
       <div><label htmlFor={`${id}-month`} className="block text-sm font-medium">Месяц</label><Input id={`${id}-month`} type="month" value={month} onChange={(event) => { if (/^\d{4}-\d{2}$/.test(event.target.value)) setMonth(event.target.value); }} className="mt-2 max-w-xs text-base" /></div>
@@ -66,12 +77,18 @@ export function ParkBookingCalendar({ tenantId, admin = false }: { tenantId: str
       <div className="min-w-0 max-w-full"><label htmlFor={`${id}-asset`} className="block text-sm font-medium">Техника</label><select id={`${id}-asset`} className="mt-2 h-11 max-w-full rounded-md border border-slate-300 bg-white px-3 text-base" value={assetId} onChange={event => setAssetId(event.target.value)}><option value="">Весь парк</option>{cars.map(car => <option key={car.id} value={car.id}>{car.name}</option>)}</select></div>
     </div>
     {error && <p role="alert" className="mt-3 text-sm text-rose-800">{error}</p>}
+    {!loading && !assets.length && !error && <p className="mt-3 text-sm text-slate-600">Чтобы создать запись, сначала добавьте машину в автопарк.</p>}
+    {success && <p role="status" className="mt-3 text-sm text-emerald-800">{success}</p>}
+    {draft && <ParkManualBookingForm tenantId={tenantId} assets={assets} admin={admin} initialDay={draft.day} initialAssetId={draft.assetId} onClose={() => setDraft(null)} onSaved={booking => {
+      setBookings(items => [...items.filter(item => item.id !== booking.id), booking]); setMonth(booking.pricing.start_date.slice(0, 7)); setAssetId(booking.asset_id); setDraft(null);
+      setSuccess(booking.entry_type === 'block' ? 'Даты закрыты. Блокировка видна во всех видах календаря.' : 'Подтверждённая бронь создана и видна во всех видах календаря.');
+    }} />}
     {loading ? <p role="status" className="mt-4">Загружаем заявки…</p> : !error && <Tabs value={view} onValueChange={setView} className="mt-5">
       <TabsList aria-label="Вид календаря"><TabsTrigger value="list">Список</TabsTrigger><TabsTrigger value="month">Месяц</TabsTrigger><TabsTrigger value="gantt">Гант</TabsTrigger></TabsList>
       <TabsContent value="list">{visible.length ? details(visible) : <p role="status" className="py-5">На выбранный месяц заявок нет.</p>}</TabsContent>
-      <TabsContent value="month"><p className="my-3 text-sm text-slate-600">{format(date, 'LLLL yyyy', { locale: ru })} · зелёный — выдача, жёлтый — возврат, синий — занято, серый — ожидает подтверждения. Нажмите день или заявку.</p><MonthCalendarView currentDate={date} bookings={active.map(calendarBooking)} logisticsData={active.map(calendarLogistics)} onDateChange={value => setMonth(format(value, 'yyyy-MM'))} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onDayClick={value => setSelection({ day: format(value, 'yyyy-MM-dd') })} showOccupancy /></TabsContent>
+      <TabsContent value="month"><p className="my-3 text-sm text-slate-600">{format(date, 'LLLL yyyy', { locale: ru })} · зелёный — выдача, жёлтый — возврат, синий — занято, серый — ожидает подтверждения, фиолетовый — блокировка. Нажмите день или заявку.</p><MonthCalendarView currentDate={date} bookings={active.map(calendarBooking)} logisticsData={active.map(calendarLogistics)} onDateChange={value => setMonth(format(value, 'yyyy-MM'))} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onDayClick={value => setSelection({ day: format(value, 'yyyy-MM-dd') })} showOccupancy /></TabsContent>
       <TabsContent value="gantt"><p className="my-3 text-sm text-slate-600">Полоса показывает занятость машины. Прокрутите даты вправо; нажмите полосу для деталей. Создание брони выделением пока не включено.</p><SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly exclusiveEnd /></TabsContent>
     </Tabs>}
-    <Dialog open={!!selection} onOpenChange={open => { if (!open) setSelection(null); }}><DialogContent className="max-h-[85vh] overflow-y-auto"><DialogHeader><DialogTitle>{selection?.day ? `События ${selection.day}` : 'Заявка парка'}</DialogTitle><DialogDescription>Время и даты относятся к часовому поясу парка. Сообщения клиентам пока не отправляются автоматически.</DialogDescription></DialogHeader>{selected.length ? details(selected) : <p>На этот день событий нет.</p>}{error && <p role="alert" className="text-sm text-rose-800">{error}</p>}</DialogContent></Dialog>
+    <Dialog open={!!selection} onOpenChange={open => { if (!open) setSelection(null); }}><DialogContent onCloseAutoFocus={event => { if (draft) event.preventDefault(); }} className="max-h-[85vh] overflow-y-auto"><DialogHeader><DialogTitle>{selection?.day ? `События ${selection.day}` : 'Заявка парка'}</DialogTitle><DialogDescription>Время и даты относятся к часовому поясу парка. Сообщения клиентам пока не отправляются автоматически.</DialogDescription></DialogHeader>{selected.length ? details(selected) : <p>На этот день событий нет.</p>}{selection?.day && <Button disabled={!!draft || loading || busy || !assets.length} onClick={() => { setDraft({ day: selection.day, assetId }); setSelection(null); setSuccess(''); }}>Добавить запись на этот день</Button>}{error && <p role="alert" className="text-sm text-rose-800">{error}</p>}</DialogContent></Dialog>
   </section>;
 }

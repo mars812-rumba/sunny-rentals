@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { fetchParkBotLink, ParkIdentity, verifyParkTelegramIdentity } from '@/api/park-telegram';
-import { ParkBookingCalendar } from './ParkBookingCalendar';
 import { ParkOwnerFleet } from './ParkOwnerFleet';
 
 export function ParkTelegramEntry({ tenantId }: { tenantId: string }) {
@@ -32,8 +31,8 @@ export function ParkTelegramEntry({ tenantId }: { tenantId: string }) {
   }, [tenantId, reload]);
 
   return <section aria-labelledby="park-telegram-entry" aria-busy={loading} className="mt-5 px-1 py-2">
-    <h2 id="park-telegram-entry" className="font-semibold">{identity ? 'Telegram подключён к этому парку' : 'Открыть парк в Telegram'}</h2>
-    <p className="mt-2 text-sm leading-6 text-slate-600">{identity ? identity.role === 'owner' ? 'Ваш доступ владельца подтверждён сервером. Ниже — заявки этого парка.' : 'Ваш аккаунт подтверждён сервером. Откройте карточку транспорта, чтобы отправить заявку. Диалоги с менеджером пока не подключены.' : 'Запустите бота, затем нажмите «Открыть витрину» в его сообщении. Каталог можно смотреть и без Telegram.'}</p>
+    <h2 id="park-telegram-entry" className="font-semibold">{identity?.role === 'owner' ? 'Кабинет владельца' : identity ? 'Telegram подключён к этому парку' : 'Открыть парк в Telegram'}</h2>
+    <p className="mt-2 text-sm leading-6 text-slate-600">{identity ? identity.role === 'owner' ? 'Управляйте транспортом и занятостью своего парка. Клиентский каталог — ниже кабинета.' : 'Ваш аккаунт подтверждён сервером. Откройте карточку транспорта, чтобы отправить заявку. Диалоги с менеджером пока не подключены.' : 'Запустите бота, затем нажмите «Открыть витрину» в его сообщении. Каталог можно смотреть и без Telegram.'}</p>
     {loading && <p role="status" className="mt-3 text-sm text-slate-600">Проверяем подключение…</p>}
     {!loading && link && !identity && <Button asChild variant="outline" className="mt-3"><a href={link} target="_blank" rel="noopener noreferrer" onClick={(event) => {
       const telegram = window.Telegram?.WebApp;
@@ -42,6 +41,6 @@ export function ParkTelegramEntry({ tenantId }: { tenantId: string }) {
       }
     }}>Открыть бота парка</a></Button>}
     {error && <div className="mt-3"><p role="alert" className="text-sm text-rose-800">{error}</p><Button variant="outline" className="mt-3" onClick={() => setReload((value) => value + 1)}>Повторить проверку</Button></div>}
-    {identity?.role === 'owner' && <><details className="mt-3 rounded-xl bg-white p-4"><summary className="cursor-pointer font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700">Автопарк владельца</summary><ParkOwnerFleet key={`fleet-${tenantId}`} tenantId={tenantId} /></details><details className="mt-3 rounded-xl bg-white p-4"><summary className="cursor-pointer font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700">Календарь владельца</summary><ParkBookingCalendar key={tenantId} tenantId={tenantId} /></details></>}
+    {identity?.role === 'owner' && <div className="mt-4"><ParkOwnerFleet key={`fleet-${tenantId}`} tenantId={tenantId} /></div>}
   </section>;
 }

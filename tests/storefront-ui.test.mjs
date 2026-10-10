@@ -54,5 +54,25 @@ test('owner workspace does not render platform management controls', () => {
     onBack: () => {}, onTenantChanged: () => {},
   }));
   assert.match(html, /Техника парка/);
+  assert.match(html, /role="tablist"[^>]+aria-label="Управление парком"/);
+  assert.equal((html.match(/role="tab"/g) || []).length, 2);
+  assert.match(html, /aria-selected="true"[^>]*>Автопарк/);
+  assert.match(html, /aria-selected="false"[^>]*>Календарь/);
+  assert.match(html, /role="tabpanel"/);
+  assert.doesNotMatch(html, /Загружаем календарь|Добавить бронь \/ блокировку/);
   assert.doesNotMatch(html, /Все прокаты|Подготовить превью|Логотип проката|Webhook|<h1/);
+});
+
+test('superadmin uses the same two working tabs with separate collapsed park setup', () => {
+  const html = renderToStaticMarkup(e(ui.PlatformTenantWorkspace, {
+    tenant: { tenant_id: 'park-a', slug: 'park-a', name: 'Очень длинное название проката для проверки переноса', status: 'draft', currency: 'THB', timezone: 'Asia/Bangkok', primary_asset_type: 'car' },
+    onBack() {}, onTenantChanged() {},
+  }));
+  assert.equal((html.match(/role="tab"/g) || []).length, 2);
+  assert.match(html, /Настройки подключения и оформления<\/summary>/);
+  assert.match(html, /<details class="mt-5">/);
+  assert.match(html, /Подготовить превью витрины/);
+  assert.match(html, /Логотип проката/);
+  assert.match(html, /Все прокаты/);
+  assert.doesNotMatch(html, /Загружаем календарь|Общая информация/);
 });
