@@ -5,7 +5,9 @@ import json
 import os
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, UploadFile, File, Form
+from fastapi.responses import FileResponse
+from starlette.concurrency import run_in_threadpool
 from fastapi.security import HTTPBearer
 from pydantic import BaseModel, constr
 from platform_core.pydantic_compat import pattern_string
@@ -16,6 +18,8 @@ from platform_core.partner_bot import (
     PartnerDeliveryError, TelegramPartnerTransport,
 )
 from platform_core.telegram_identity import TelegramIdentityError
+from platform_core.asset_admin import AssetInput, TenantAssetAdmin, MAX_IMAGE_BYTES
+from platform_core.provisioning import TenantNotFoundError
 from platform_core.partner_webhook import PartnerWebhookManager, WebhookSetupError, WebhookConflict
 from platform_core.park_bookings import ParkBookingService, ParkQuoteRequest, ParkBookingRequest, BookingConflict, ParkStatusRequest, ParkOwnerStatusRequest, ParkAvailabilityRequest
 
@@ -27,6 +31,22 @@ class InvitationRequest(BaseModel):
 class PartnerIdentityRequest(BaseModel):
     tenant_id: constr(min_length=1, max_length=63)
     init_data: constr(min_length=1, max_length=8192)
+
+    class Config:
+        extra = 'forbid'
+
+
+class OwnerAssetRequest(PartnerIdentityRequest):
+    asset_id: pattern_string(r'^[a-f0-9]{32}$') = None
+    data: AssetInput
+
+
+class OwnerAssetTarget(PartnerIdentityRequest):
+    asset_id: pattern_string(r'^[a-f0-9]{32}$')
+
+
+class OwnerMediaRequest(PartnerIdentityRequest):
+    reference: constr(min_length=1, max_length=200)
 
 
 def create_platform_partner_router(service: PartnerBotService, admin_auth: PlatformAdminAuth, webhook_manager=None):
@@ -87,6 +107,52 @@ def create_platform_partner_router(service: PartnerBotService, admin_auth: Platf
             raise HTTPException(404, 'Park unavailable') from None
         except ValueError:
             raise HTTPException(422, 'Choose valid dates for this park') from None
+
+    def owner_asset_call(request, action):
+        try:
+            return action(TenantAssetAdmin.for_owner(service, request.tenant_id, request.init_data))
+        except (PartnerBotError, TelegramIdentityError, PermissionError):
+            raise HTTPException(403, 'Park owner authorization required') from None
+        except TenantNotFoundError:
+            raise HTTPException(404, 'Vehicle or media not found') from None
+        except ValueError:
+            raise HTTPException(422, 'Check vehicle fields or image') from None
+        except FileNotFoundError:
+            raise HTTPException(503, 'Image processing unavailable') from None
+
+    @router.post('/fleet/list')
+    def owner_fleet(request: PartnerIdentityRequest):
+        return owner_asset_call(request, lambda assets: {'tenant': assets.tenant, 'assets': assets.list()})
+
+    @router.post('/fleet/save')
+    def owner_save_asset(request: OwnerAssetRequest):
+        return owner_asset_call(request, lambda assets: {'asset': assets.save(request.data, request.asset_id)})
+
+    @router.post('/fleet/archive')
+    def owner_archive_asset(request: OwnerAssetTarget):
+        def archive(assets):
+            assets.archive(request.asset_id)
+            return {'archived': True}
+        return owner_asset_call(request, archive)
+
+    @router.post('/fleet/media')
+    def owner_media(request: OwnerMediaRequest):
+        return owner_asset_call(request, lambda assets: FileResponse(assets.media_path(request.reference),
+            media_type='image/webp', headers={'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff'}))
+
+    @router.post('/fleet/photo')
+    async def owner_photo(tenant_id: str = Form(..., max_length=63), init_data: str = Form(..., max_length=8192),
+                          asset_id: str = Form(..., max_length=32), file: UploadFile = File(...)):
+        request = PartnerIdentityRequest(tenant_id=tenant_id, init_data=init_data)
+        try:
+            owner_asset_call(request, lambda assets: True)
+            content = await file.read(MAX_IMAGE_BYTES + 1)
+        finally:
+            await file.close()
+        if len(content) > MAX_IMAGE_BYTES:
+            raise HTTPException(413, 'Image exceeds 8 MB')
+        return await run_in_threadpool(owner_asset_call, request,
+            lambda assets: {'asset': assets.upload_photo(asset_id, content)})
 
     @router.post('/bookings/quote')
     def quote(request: ParkQuoteRequest):

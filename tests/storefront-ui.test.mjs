@@ -10,8 +10,10 @@ const bundle = await build({
   stdin: { contents: `export { ImageCarousel } from './src/components/CarCard';
     export { default as HeroBanner } from './src/components/HeroBanner';
     export { VehicleCardFrame } from './src/components/VehicleCardFrame';
+    export { PlatformTenantWorkspace } from './src/components/platform/PlatformTenantWorkspace';
     export { LanguageProvider } from './src/contexts/LanguageContext';`, resolveDir: process.cwd(), loader: 'tsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs',
+  jsx: 'automatic',
   external: ['react', 'react/jsx-runtime', 'react-dom'],
   define: { 'import.meta.env.VITE_API_URL': '""' }, loader: { '.webp': 'dataurl' },
 });
@@ -44,4 +46,13 @@ test('legacy Sunny hero retains its original default copy', () => {
   const html = renderToStaticMarkup(e(ui.LanguageProvider, null, e(ui.HeroBanner)));
   assert.match(html, /Sunny Rentals/);
   assert.match(html, /Аренда на Пхукете/);
+});
+
+test('owner workspace does not render platform management controls', () => {
+  const html = renderToStaticMarkup(e(ui.PlatformTenantWorkspace, { owner: true,
+    tenant: { tenant_id: 'park-a', slug: 'park-a', name: 'Park A', status: 'active', currency: 'THB', timezone: 'Asia/Bangkok', primary_asset_type: 'car' },
+    onBack: () => {}, onTenantChanged: () => {},
+  }));
+  assert.match(html, /Техника парка/);
+  assert.doesNotMatch(html, /Все прокаты|Подготовить превью|Логотип проката|Webhook|<h1/);
 });

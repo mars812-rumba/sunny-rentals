@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { fetchParkBotLink, ParkIdentity, verifyParkTelegramIdentity } from '@/api/park-telegram';
 import { ParkBookingCalendar } from './ParkBookingCalendar';
+import { ParkOwnerFleet } from './ParkOwnerFleet';
 
 export function ParkTelegramEntry({ tenantId }: { tenantId: string }) {
   const [link, setLink] = useState('');
@@ -41,6 +42,6 @@ export function ParkTelegramEntry({ tenantId }: { tenantId: string }) {
       }
     }}>Открыть бота парка</a></Button>}
     {error && <div className="mt-3"><p role="alert" className="text-sm text-rose-800">{error}</p><Button variant="outline" className="mt-3" onClick={() => setReload((value) => value + 1)}>Повторить проверку</Button></div>}
-    {identity?.role === 'owner' && <details className="mt-3 rounded-xl bg-white p-4"><summary className="cursor-pointer font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700">Календарь владельца</summary><ParkBookingCalendar key={tenantId} tenantId={tenantId} /></details>}
+    {identity?.role === 'owner' && <><details className="mt-3 rounded-xl bg-white p-4"><summary className="cursor-pointer font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700">Автопарк владельца</summary><ParkOwnerFleet key={`fleet-${tenantId}`} tenantId={tenantId} /></details><details className="mt-3 rounded-xl bg-white p-4"><summary className="cursor-pointer font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700">Календарь владельца</summary><ParkBookingCalendar key={tenantId} tenantId={tenantId} /></details></>}
   </section>;
 }

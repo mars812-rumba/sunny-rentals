@@ -55,6 +55,29 @@ class TenantAssetAdmin:
         self.tenant = self.provisioner.get_tenant(context, tenant_id)
         self.admin = context
         self.context = TenantContext.for_actor(self.tenant.tenant_id, context.actor_id, {"platform_admin"})
+        self._owner_auth = None
+        self._init_storage(root)
+
+    @classmethod
+    def for_owner(cls, partners, tenant_id: str, init_data: str):
+        """Reuse asset operations without granting a tenant owner platform privileges."""
+        instance = cls.__new__(cls)
+        _, context = partners.resolve_identity(tenant_id, init_data, require_owner=True)
+        instance.provisioner = partners.provisioner
+        instance.tenant = partners.tenant(partners.provisioner._load_state(), context.tenant_id)
+        instance.admin = instance.context = context
+        instance._owner_auth = lambda: partners.resolve_identity(tenant_id, init_data, require_owner=True)
+        instance._init_storage(partners.provisioner.root)
+        return instance
+
+    def _authorize(self):
+        if self._owner_auth is not None:
+            _, context = self._owner_auth()
+            context.require_record_tenant(self.context.tenant_id)
+            if context.actor_id != self.context.actor_id:
+                raise PermissionError('Owner identity changed')
+
+    def _init_storage(self, root):
         self.assets = JsonCollectionRepository(root, self.context, "assets.json", RentalAsset)
         self.audit = JsonlEventRepository(root, self.context, "audit.jsonl")
         self.media_dir = self.assets.storage.tenant_dir / "media"
@@ -66,7 +89,9 @@ class TenantAssetAdmin:
                            "timestamp": utc_now().isoformat(), **fields})
 
     def list(self):
-        return self.assets.list()
+        with self.provisioner._locked():
+            self._authorize()
+            return self.assets.list()
 
     def _asset(self, asset_id: str):
         if not re.fullmatch(r"[a-f0-9]{32}", asset_id):
@@ -92,6 +117,7 @@ class TenantAssetAdmin:
 
     def save(self, data: AssetInput, asset_id: Optional[str] = None):
         with self.provisioner._locked():
+            self._authorize()
             asset = self._asset(asset_id) if asset_id else RentalAsset(tenant_id=self.context.tenant_id, name=data.name)
             asset.name = data.name
             asset.asset_type = data.asset_type
@@ -108,12 +134,14 @@ class TenantAssetAdmin:
 
     def archive(self, asset_id: str):
         with self.provisioner._locked():
+            self._authorize()
             asset = self._asset(asset_id)
             asset.archived_at = asset.updated_at = utc_now()
             asset.public = False
             self._commit_asset(asset, "asset_archived")
 
     def media_path(self, reference: str):
+        self._authorize()
         if not MEDIA_PATTERN.fullmatch(reference):
             raise TenantNotFoundError("Изображение не найдено")
         path = self.media_dir / reference
@@ -171,6 +199,7 @@ class TenantAssetAdmin:
 
     def upload_photo(self, asset_id: str, content: bytes):
         with self.provisioner._locked():
+            self._authorize()
             asset = self._asset(asset_id)
             gallery = list(asset.photos.get("gallery", []))
             if len(gallery) >= MAX_PHOTOS:
@@ -188,6 +217,8 @@ class TenantAssetAdmin:
             return asset
 
     def upload_logo(self, content: bytes):
+        if self._owner_auth is not None:
+            raise PermissionError('Logo management requires platform admin')
         reference, paths = self._encode(content, "logo")
         try:
             tenant = self.provisioner.set_logo(self.admin, self.context.tenant_id, reference)

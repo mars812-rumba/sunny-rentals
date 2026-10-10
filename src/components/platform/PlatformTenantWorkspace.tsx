@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlatformParkTelegramPanel } from './PlatformParkTelegramPanel';
 import { ParkBookingCalendar } from './ParkBookingCalendar';
+import { fetchOwnerFleet, saveOwnerAsset, uploadOwnerPhoto, archiveOwnerAsset, loadOwnerMedia } from '@/api/park-owner-fleet';
+import { VehicleCardFrame } from '@/components/VehicleCardFrame';
+import { CardContent } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import {
   AssetType, PlatformAsset, PlatformAssetInput, PlatformTenant, archivePlatformAsset,
@@ -27,7 +30,7 @@ function validateImage(file: File) {
   if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) throw new Error(`${file.name}: выберите JPEG, PNG или WebP`);
 }
 
-function PrivateImage({ tenantId, reference, alt, className }: { tenantId: string; reference: string; alt: string; className: string }) {
+function PrivateImage({ tenantId, reference, alt, className, owner = false }: { tenantId: string; reference: string; alt: string; className: string; owner?: boolean }) {
   const [url, setUrl] = useState("");
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -35,19 +38,19 @@ function PrivateImage({ tenantId, reference, alt, className }: { tenantId: strin
     let objectUrl = "";
     setUrl("");
     setFailed(false);
-    loadPlatformMedia(tenantId, reference, controller.signal).then((blob) => {
+    (owner ? loadOwnerMedia : loadPlatformMedia)(tenantId, reference, controller.signal).then((blob) => {
       if (!controller.signal.aborted) {
         objectUrl = URL.createObjectURL(blob);
         setUrl(objectUrl);
       }
     }).catch(() => { if (!controller.signal.aborted) setFailed(true); });
     return () => { controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl); };
-  }, [tenantId, reference]);
+  }, [tenantId, reference, owner]);
   return url ? <img src={url} alt={alt} className={className} /> : <div className={`${className} grid place-items-center bg-slate-100 text-xs text-slate-600`} role="img" aria-label={alt}>{failed ? "Фото недоступно" : <Loader2 className="animate-spin" aria-hidden="true" />}</div>;
 }
 
-export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
-  tenant: PlatformTenant; onBack: () => void; onTenantChanged: (tenant: PlatformTenant) => void;
+export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner = false }: {
+  tenant: PlatformTenant; onBack: () => void; onTenantChanged: (tenant: PlatformTenant) => void; owner?: boolean;
 }) {
   const [assets, setAssets] = useState<PlatformAsset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +66,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
   const [form, setForm] = useState<PlatformAssetInput>(blank(tenant.primary_asset_type));
   const [archiveTarget, setArchiveTarget] = useState<PlatformAsset | null>(null);
   const [archiveError, setArchiveError] = useState("");
+  const Heading = owner ? 'h2' : 'h1';
   const [uploadProgress, setUploadProgress] = useState("");
   const [previewBusy, setPreviewBusy] = useState(false);
   const [previewError, setPreviewError] = useState("");
@@ -82,12 +86,12 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
     setLoadFailed(false);
     setError("");
     setEditorError("");
-    listPlatformAssets(tenant.tenant_id).then((items) => {
+    (owner ? fetchOwnerFleet(tenant.tenant_id).then((result) => result.assets) : listPlatformAssets(tenant.tenant_id)).then((items) => {
       if (active) setAssets(items);
     }).catch((failure) => { if (active) { setError(message(failure)); setLoadFailed(true); } })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [tenant.tenant_id, reload]);
+  }, [tenant.tenant_id, reload, owner]);
 
   const replaceAsset = (asset: PlatformAsset) => setAssets((current) => current.some((item) => item.id === asset.id)
     ? current.map((item) => item.id === asset.id ? asset : item) : [...current, asset]);
@@ -110,7 +114,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
     setBusy(true);
     setEditorError("");
     try {
-      const asset = await savePlatformAsset(tenant.tenant_id, form, editing === "new" ? undefined : editing.id);
+      const asset = await (owner ? saveOwnerAsset : savePlatformAsset)(tenant.tenant_id, form, editing === "new" ? undefined : editing.id);
       replaceAsset(asset);
       setEditing(asset);
       toast.success("Техника сохранена. Можно добавить фотографии.");
@@ -128,7 +132,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
       files.forEach(validateImage);
       for (const [index, file] of files.entries()) {
         setUploadProgress(`Загружаем фото ${index + 1} из ${files.length}`);
-        const updated = await uploadPlatformPhoto(tenant.tenant_id, asset.id, file);
+        const updated = await (owner ? uploadOwnerPhoto : uploadPlatformPhoto)(tenant.tenant_id, asset.id, file);
         replaceAsset(updated);
         setEditing(updated);
         completed++;
@@ -155,7 +159,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
     setBusy(true);
     setArchiveError("");
     try {
-      await archivePlatformAsset(tenant.tenant_id, archiveTarget.id);
+      await (owner ? archiveOwnerAsset : archivePlatformAsset)(tenant.tenant_id, archiveTarget.id);
       setAssets((current) => current.filter((item) => item.id !== archiveTarget.id));
       if (editing !== "new" && editing?.id === archiveTarget.id) setEditing(null);
       setArchiveTarget(null);
@@ -164,42 +168,43 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
     finally { setBusy(false); }
   };
 
-  return <main className="min-h-screen bg-[#f4f6f8] px-4 py-6 text-slate-950 selection:bg-cyan-200 md:px-8">
+  return <div className={`${owner ? 'rounded-xl' : 'min-h-screen'} bg-[#f4f6f8] px-4 py-6 text-slate-950 selection:bg-cyan-200 md:px-8`}>
     <div className="mx-auto max-w-6xl">
-      <Button variant="ghost" onClick={onBack} disabled={busy}><ArrowLeft aria-hidden="true" /> Все прокаты</Button>
+      {!owner && <Button variant="ghost" onClick={onBack} disabled={busy}><ArrowLeft aria-hidden="true" /> Все прокаты</Button>}
       <header className="mt-5 flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0"><h1 className="break-words text-3xl font-semibold tracking-[-0.03em]">{tenant.name}</h1><p className="mt-2 break-all text-sm text-slate-600">/{tenant.slug} · {tenant.currency} · {tenant.timezone}</p></div>
+        <div className="min-w-0"><Heading className="break-words text-3xl font-semibold tracking-[-0.03em]">{tenant.name}</Heading><p className="mt-2 break-all text-sm text-slate-600">/{tenant.slug} · {tenant.currency} · {tenant.timezone}</p></div>
         <span className="rounded-full bg-slate-200 px-3 py-1 text-sm">{tenant.status === "draft" ? "Черновик · триал ещё не начался" : "Парк опубликован"}</span>
       </header>
 
-      <section className="mt-5 flex flex-wrap items-center gap-3" aria-label="Витрина парка">
+      {!owner && <section className="mt-5 flex flex-wrap items-center gap-3" aria-label="Витрина парка">
         <Button variant="outline" disabled={previewBusy || busy} onClick={() => void preview()}>{previewBusy ? "Готовим превью…" : "Подготовить превью витрины"}</Button>
         {previewUrl && <a className="rounded-md px-3 py-2 text-sm font-medium text-blue-700 underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={previewUrl} target="_blank" rel="noopener noreferrer">Открыть закрытое превью</a>}
         {(tenant.status === "trial" || tenant.status === "active") && <a className="rounded-md px-3 py-2 text-sm font-medium text-blue-700 underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={`/p/${encodeURIComponent(tenant.tenant_id)}`} target="_blank" rel="noopener noreferrer">Публичная витрина</a>}
         {previewError && <p role="alert" className="w-full text-sm text-rose-800">{previewError}</p>}
         <p className="w-full text-sm text-slate-600">Превью показывает черновики и действует 1 час. Для публичной витрины включите «Показывать на витрине» в редакторе техники и опубликуйте парк.</p>
-      </section>
+      </section>}
 
-      <PlatformParkTelegramPanel key={tenant.tenant_id} tenant={tenant} />
-      <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin />
+      {!owner && <><PlatformParkTelegramPanel key={tenant.tenant_id} tenant={tenant} />
+      <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin /></>}
 
-      <section className="mt-7 flex flex-wrap items-center gap-5 rounded-2xl bg-white p-5" aria-labelledby="branding-title">
+      {!owner && <section className="mt-7 flex flex-wrap items-center gap-5 rounded-2xl bg-white p-5" aria-labelledby="branding-title">
         {tenant.branding?.logo ? <PrivateImage tenantId={tenant.tenant_id} reference={tenant.branding.logo} alt={`Логотип ${tenant.name}`} className="h-20 w-20 rounded-xl object-contain" /> : <div className="grid h-20 w-20 place-items-center rounded-xl bg-slate-100"><ImageIcon className="text-slate-500" aria-hidden="true" /></div>}
         <div className="min-w-0 flex-1"><h2 id="branding-title" className="font-semibold">Логотип проката</h2><p className="mt-1 text-sm leading-6 text-slate-600">JPEG, PNG или WebP до 8 МБ. Внутри парка сохраняются оригинал и версия для витрины.</p></div>
         <div><Label htmlFor="tenant-logo" className="mb-2 block">{tenant.branding?.logo ? "Заменить логотип" : "Загрузить логотип"}</Label><Input id="tenant-logo" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy || loading || loadFailed} className="max-w-64" onChange={(event) => { const file = event.target.files?.[0]; event.target.value = ""; void logo(file); }} /></div>
-      </section>
+      </section>}
 
       <section className="mt-8" aria-labelledby="fleet-title">
         <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 id="fleet-title" className="text-xl font-semibold">Техника парка</h2><p className="mt-1 text-sm text-slate-600">{loading || loadFailed ? "Количество уточняется" : `${assets.length} единиц`} · для первого демо подготовьте 5</p></div><Button className={primaryButton} onClick={() => edit("new")} disabled={busy || loading || loadFailed}><Plus aria-hidden="true" /> Добавить технику</Button></div>
         {error && <div role="alert" className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-rose-50 p-4 text-sm text-rose-800"><span>{error}</span><Button variant="outline" disabled={busy} onClick={() => setReload((value) => value + 1)}><RefreshCw aria-hidden="true" /> Обновить данные</Button></div>}
         {loading ? <p role="status" className="py-8 text-slate-600">Загружаем данные парка…</p> : loadFailed ? null : <>
           {assets.length === 0 && !editing && <div className="mt-4 rounded-2xl bg-white p-8 text-center"><CarFront className="mx-auto text-slate-500" aria-hidden="true" /><p className="mt-3 font-medium">Добавьте первую машину</p><p className="mt-2 text-sm text-slate-600">Название, характеристики, суточная цена и фотографии.</p></div>}
-          <div className="mt-4 divide-y divide-slate-200 rounded-2xl bg-white">
-            {assets.map((asset) => <article key={asset.id} className="flex flex-wrap items-center gap-4 p-4">
-              {asset.photos.main ? <PrivateImage tenantId={tenant.tenant_id} reference={asset.photos.main} alt={asset.name} className="h-20 w-28 rounded-xl object-cover" /> : <div className="grid h-20 w-28 place-items-center rounded-xl bg-slate-100"><CarFront className="text-slate-500" aria-hidden="true" /></div>}
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {assets.map((asset) => <VehicleCardFrame key={asset.id} assetId={asset.id} media={asset.photos.main ? <PrivateImage owner={owner} tenantId={tenant.tenant_id} reference={asset.photos.main} alt={asset.name} className="aspect-[16/10] w-full object-cover" /> : <div className="grid aspect-[16/10] place-items-center bg-slate-100"><CarFront className="text-slate-500" aria-hidden="true" /></div>}>
+              <CardContent className="flex flex-1 flex-col gap-4 p-4">
               <div className="min-w-0 flex-1"><h3 className="break-words font-semibold">{asset.name}</h3><p className="mt-1 text-sm text-slate-600">{TYPES[asset.asset_type]} · {asset.pricing.daily_rate || 0} {tenant.currency}/день</p><p className="mt-1 text-sm text-slate-600">Фото: {asset.photos.gallery?.length || 0} · депозит: {asset.deposit_policy.amount || 0} {tenant.currency}</p></div>
               <div className="flex gap-2"><Button variant="outline" disabled={busy} aria-label={`Редактировать ${asset.name}`} onClick={() => edit(asset)}><Pencil aria-hidden="true" /> Изменить</Button><Button variant="outline" disabled={busy} aria-label={`В архив: ${asset.name}`} onClick={() => { setArchiveError(""); setArchiveTarget(asset); }}><Trash2 aria-hidden="true" /></Button></div>
-            </article>)}
+              <p className="text-sm text-slate-600">{asset.public ? 'Показывается клиентам' : 'Скрыто с витрины'}</p>
+              </CardContent></VehicleCardFrame>)}
           </div>
         </>}
 
@@ -223,7 +228,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
             <Label htmlFor="asset-photos">Фотографии машины</Label><p id="photo-hint" className="mt-1 text-sm text-slate-600">Первая фотография станет главной. Можно выбрать несколько файлов; до 20 фото, каждое до 8 МБ.</p>
             <Input id="asset-photos" aria-describedby="photo-hint" type="file" multiple accept="image/jpeg,image/png,image/webp" disabled={busy} className="mt-3" onChange={(event) => { const files = Array.from(event.target.files || []); event.target.value = ""; void photos(editing, files); }} />
             <p role="status" aria-live="polite" className="mt-2 text-sm text-slate-600">{uploadProgress}</p>
-            <div className="mt-3 flex flex-wrap gap-3">{editing.photos.gallery?.map((reference, index) => <PrivateImage key={reference} tenantId={tenant.tenant_id} reference={reference} alt={`${editing.name}, фото ${index + 1}`} className="h-24 w-32 rounded-xl object-cover" />)}</div>
+            <div className="mt-3 flex flex-wrap gap-3">{editing.photos.gallery?.map((reference, index) => <PrivateImage key={reference} owner={owner} tenantId={tenant.tenant_id} reference={reference} alt={`${editing.name}, фото ${index + 1}`} className="h-24 w-32 rounded-xl object-cover" />)}</div>
           </div>}
         </section>}
       </section>
@@ -231,5 +236,5 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged }: {
     <AlertDialog open={Boolean(archiveTarget)} onOpenChange={(open) => { if (!open && !busy) setArchiveTarget(null); }}>
       <AlertDialogContent><AlertDialogHeader><AlertDialogTitle className="break-words">Перенести {archiveTarget?.name} в архив?</AlertDialogTitle><AlertDialogDescription>Техника исчезнет из активного списка. Её данные и фотографии сохранятся.</AlertDialogDescription></AlertDialogHeader>{archiveError && <p role="alert" className="text-sm text-rose-800">{archiveError}</p>}<AlertDialogFooter><AlertDialogCancel disabled={busy}>Отмена</AlertDialogCancel><AlertDialogAction className={primaryButton} disabled={busy} onClick={(event) => { event.preventDefault(); void archive(); }}>{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}{busy ? "Переносим…" : "В архив"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
     </AlertDialog>
-  </main>;
+  </div>;
 }
