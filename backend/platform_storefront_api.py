@@ -18,7 +18,7 @@ from platform_core.repositories import TenantStorage
 
 
 class StorefrontPreview:
-    TTL = 3600
+    TTL = 24 * 60 * 60
 
     def __init__(self, auth: PlatformAdminAuth):
         self.auth = auth

@@ -192,7 +192,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
         {previewUrl && <a className="rounded-md px-3 py-2 text-sm font-medium text-blue-700 underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={previewUrl} target="_blank" rel="noopener noreferrer">Открыть закрытое превью</a>}
         {(tenant.status === "trial" || tenant.status === "active") && <a className="rounded-md px-3 py-2 text-sm font-medium text-blue-700 underline underline-offset-4 focus-visible:outline focus-visible:outline-2" href={`/p/${encodeURIComponent(tenant.tenant_id)}`} target="_blank" rel="noopener noreferrer">Публичная витрина</a>}
         {previewError && <p role="alert" className="w-full text-sm text-rose-800">{previewError}</p>}
-        <p className="w-full text-sm text-slate-600">Превью показывает черновики и действует 1 час. Для публичной витрины включите «Показывать на витрине» в редакторе техники и опубликуйте парк.</p>
+        <p className="w-full text-sm text-slate-600">Превью показывает черновики и действует 24 часа. Для публичной витрины включите «Показывать на витрине» в редакторе техники и опубликуйте парк.</p>
       </section>}
 
       {!owner && <PlatformParkTelegramPanel key={tenant.tenant_id} tenant={tenant} />}

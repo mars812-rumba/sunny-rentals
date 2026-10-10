@@ -91,6 +91,10 @@ class StorefrontTests(unittest.TestCase):
         token = self.token()
         self.assertEqual(self.client.get(self.url, headers={'X-Storefront-Preview': token + 'x'}).status_code, 401)
         self.now += 3600
+        self.assertEqual(self.client.get(self.url, headers={'X-Storefront-Preview': token}).status_code, 200)
+        self.now += 24 * 3600 - 3600 - 1
+        self.assertEqual(self.client.get(self.url, headers={'X-Storefront-Preview': token}).status_code, 200)
+        self.now += 1
         self.assertEqual(self.client.get(self.url, headers={'X-Storefront-Preview': token}).status_code, 401)
         token = self.token()
         self.auth.allowed_actor_ids = frozenset({'someone-else'})
@@ -101,7 +105,7 @@ class StorefrontTests(unittest.TestCase):
         self.assertEqual(self.client.post(url).status_code, 401)
         response = self.client.post(url, headers={'Authorization': f"Bearer {self.auth.issue_for_verified_actor('admin')}"})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['expires_in'], 3600)
+        self.assertEqual(response.json()['expires_in'], 86400)
         self.assertEqual(self.client.get(self.url, headers={'X-Storefront-Preview': response.json()['token']}).status_code, 200)
 
     def test_media_only_serves_referenced_processed_images(self):
