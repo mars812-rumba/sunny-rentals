@@ -107,6 +107,7 @@ test('request item displays private contacts with safe links and actionable stat
  assert.match(html, /href="tel:\+66123456789"/);
  assert.match(html, /Telegram ID: 42/);
  assert.match(html, /Подтвердить/);
+ assert.match(html, /bg-amber-50 text-amber-900[^>]*>Ожидает подтверждения/);
  assert.match(html, /Отменить/);
  const missing = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking } }));
  assert.match(missing, /Контакт для прямой связи не указан/);
@@ -114,9 +115,11 @@ test('request item displays private contacts with safe links and actionable stat
  const unsafe = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, customer: { username: 'evil?start=secret', phone: 'javascript:alert(1)' } } }));
  assert.doesNotMatch(unsafe, /href="(?:https:\/\/t.me|tel:|javascript:)/);
  const confirmed = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, status: 'confirmed' } }));
+ assert.match(confirmed, /bg-emerald-100 text-emerald-900[^>]*>Подтверждена/);
  assert.doesNotMatch(confirmed, />Подтвердить<\/button>/);
  assert.match(confirmed, />Отменить<\/button>/);
  const cancelled = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, status: 'cancelled' } }));
+ assert.match(cancelled, /bg-red-100 text-red-900[^>]*>Отменена/);
  assert.doesNotMatch(cancelled, />Отменить<\/button>|>Подтвердить<\/button>/);
 });
 

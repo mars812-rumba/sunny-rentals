@@ -4,8 +4,14 @@ import { changeParkBookingStatus, fetchParkCalendar, type ParkBooking } from '@/
 import { subscribeParkCalendar } from '@/lib/park-calendar-updates';
 import { dateLabel, rentalMoney } from '@/lib/park-rental';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждена', cancelled: 'Отменена', in_progress: 'В аренде', completed: 'Завершена' };
+const statusColors: Record<string, string> = {
+  requested: 'bg-amber-50 text-amber-900',
+  confirmed: 'bg-emerald-100 text-emerald-900',
+  cancelled: 'bg-red-100 text-red-900',
+};
 
 export function ParkRequestItem({ booking, busy, onAction }: { booking: ParkBooking; busy: boolean; onAction: (booking: ParkBooking, status: 'confirmed' | 'cancelled') => void }) {
   const [copyMessage, setCopyMessage] = useState('');
@@ -17,7 +23,7 @@ export function ParkRequestItem({ booking, busy, onAction }: { booking: ParkBook
   const phoneUrl = /^\+?[\d ()-]{5,30}$/.test(phone) ? `tel:${phone.replace(/[ ()-]/g, '')}` : '';
   const name = booking.operator_details?.customer_name || booking.customer?.name || 'Имя не указано';
   return <li className="min-w-0 rounded-xl border border-slate-300 bg-white p-4 sm:p-5">
-    <div className="flex flex-wrap items-start justify-between gap-2"><h3 className="break-words text-lg font-semibold">{booking.pricing.asset_name || 'Транспорт парка'}</h3><span className={`rounded-full px-3 py-1 text-xs font-medium ${booking.status === 'requested' ? 'bg-amber-50 text-amber-900' : 'bg-slate-100 text-slate-700'}`}>{statuses[booking.status] || booking.status}</span></div>
+    <div className="flex flex-wrap items-start justify-between gap-2"><h3 className="break-words text-lg font-semibold">{booking.pricing.asset_name || 'Транспорт парка'}</h3><span className={cn('rounded-full px-3 py-1 text-xs font-medium', statusColors[booking.status] || 'bg-slate-100 text-slate-700')}>{statuses[booking.status] || booking.status}</span></div>
     <p className="mt-2 flex items-start gap-2 text-sm text-slate-700"><CalendarDays aria-hidden="true" className="h-4 w-4 shrink-0" />{dateLabel(booking.pricing.start_date)} — {dateLabel(booking.pricing.end_date)} · {booking.pricing.days} суток</p>
     <p className="mt-2 flex flex-wrap items-center gap-2 text-sm tabular-nums text-slate-700"><Banknote aria-hidden="true" className="h-4 w-4" />Аренда: {rentalMoney(booking.pricing.total_rental, booking.currency)} · депозит отдельно: {rentalMoney(booking.deposit.amount, booking.currency)}</p>
     <div className="mt-4 space-y-2"><p className="flex items-start gap-2 break-words font-medium"><UserRound aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-600" />{name}</p>
