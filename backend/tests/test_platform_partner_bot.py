@@ -100,7 +100,7 @@ class PartnerBotTests(unittest.TestCase):
         self.assertEqual(self.identity('park-b').status_code, 403)
         self.assertEqual(self.identity(bot_token='123:other-bot').status_code, 403)
         self.assertEqual(self.identity(uid=43).status_code, 403)
-        self.assertEqual(self.transport.sent[0]['reply_markup']['inline_keyboard'][0][0]['web_app']['url'], 'https://example.com/p/park-a')
+        self.assertEqual(self.transport.sent[0]['reply_markup']['inline_keyboard'][0][0]['web_app']['url'], 'https://example.com/p/park-a?v=2')
 
     def test_invite_is_protected_and_once(self):
         url = '/api/partners/parks/park-a/owner-invitations'
@@ -133,16 +133,16 @@ class PartnerBotTests(unittest.TestCase):
         self.service.handle_update(self.update(self.invite()))
         rows = self.transport.sent[-1]['reply_markup']['inline_keyboard']
         self.assertEqual(rows[0][0]['web_app']['url'], 'https://example.com/p/park-a/owner')
-        self.assertEqual(rows[1][0]['web_app']['url'], 'https://example.com/p/park-a')
+        self.assertEqual(rows[1][0]['web_app']['url'], 'https://example.com/p/park-a?v=2')
         self.service.handle_update(self.update('ppark-a', update_id=101))
         rows = self.transport.sent[-1]['reply_markup']['inline_keyboard']
         self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0][0]['web_app']['url'], 'https://example.com/p/park-a')
+        self.assertEqual(rows[0][0]['web_app']['url'], 'https://example.com/p/park-a?v=2')
         self.assertEqual(self.identity().json()['role'], 'owner')
         self.service.handle_update(self.update('ppark-a', uid=43, update_id=102))
         rows = self.transport.sent[-1]['reply_markup']['inline_keyboard']
         self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0][0]['web_app']['url'], 'https://example.com/p/park-a')
+        self.assertEqual(rows[0][0]['web_app']['url'], 'https://example.com/p/park-a?v=2')
         self.assertEqual(self.identity(uid=43).json()['role'], 'customer')
 
     def test_invitation_lasts_a_day_and_expires_exactly_at_boundary(self):

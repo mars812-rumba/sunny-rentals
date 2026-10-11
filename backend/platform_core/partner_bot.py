@@ -82,6 +82,9 @@ class TelegramPartnerTransport:
 
 class PartnerBotService:
     INVITATION_TTL = 24 * 60 * 60
+    # New Web App URL after separating the public screen from owner auto-entry.
+    # This is a cache revision, not a role, credential or invitation token.
+    STOREFRONT_ENTRY_VERSION = 2
 
     def __init__(self, root: Path, config: PartnerBotConfig, transport, clock: Callable = time.time):
         self.provisioner = TenantProvisioner(root)
@@ -241,7 +244,7 @@ class PartnerBotService:
         )
         state.partner_bot.identities[self.identity_key(tenant_id, user_id)] = identity
         payload['text'] = (f'Доступ владельца к парку «{tenant.name}» подключён. Откройте кабинет для управления автопарком и календарём.' if owner_invite else f'Добро пожаловать в «{tenant.name}»! Посмотрите доступный транспорт на витрине.')
-        storefront_button = {'text': 'Открыть витрину', 'web_app': {'url': f'{self.config.public_origin}/p/{tenant_id}'}}
+        storefront_button = {'text': 'Открыть витрину', 'web_app': {'url': f'{self.config.public_origin}/p/{tenant_id}?v={self.STOREFRONT_ENTRY_VERSION}'}}
         owner_button = {'text': 'Кабинет владельца', 'web_app': {'url': f'{self.config.public_origin}/p/{tenant_id}/owner'}}
         buttons = [owner_button, storefront_button] if owner_invite else [storefront_button]
         payload['reply_markup'] = {'inline_keyboard': [[button] for button in buttons]}
