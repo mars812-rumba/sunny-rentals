@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useEffect, memo, useState, useRef } from 'react';
 import { 
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, 
-  addDays, addMonths, isSameMonth, isToday 
+  addDays, addMonths, isSameMonth, isToday, isWeekend
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -28,6 +28,7 @@ interface MonthCalendarViewProps {
   onDayClick?: (date: Date, events: DayEvent[]) => void;
   onCreateBooking?: (dateRange: { start: Date; end: Date }) => void;
   showOccupancy?: boolean;
+  hideConfirmedOccupancy?: boolean;
 }
 
 const getMonthLetters = (date: Date) => {
@@ -41,13 +42,15 @@ const MonthGrid = memo(({
   eventsByDay, 
   onDayClick,
   onBadgeClick,
-  showOccupancy = false
+  showOccupancy = false,
+  hideConfirmedOccupancy = false
 }: { 
   date: Date, 
   eventsByDay: Map<string, DayEvent[]>,
   onDayClick: (date: Date, events: DayEvent[], overflow?: boolean) => void,
   onBadgeClick: (event: DayEvent, e: React.MouseEvent) => void,
   showOccupancy?: boolean
+  hideConfirmedOccupancy?: boolean
 }) => {
   const days = useMemo(() => {
     const monthStart = startOfMonth(date);
@@ -86,14 +89,20 @@ const MonthGrid = memo(({
             {week.map((day) => {
               const dayKey = format(day, 'yyyy-MM-dd');
               const events = eventsByDay.get(dayKey) || [];
+              // Hide only visual occupancy badges; day details still receive all events.
+              const visibleEvents = hideConfirmedOccupancy
+                ? events.filter(event => event.type !== 'rental' || event.booking.status !== 'confirmed')
+                : events;
               const isCurrentMonth = isSameMonth(day, date);
               const dayIsToday = isToday(day);
 
               return (
                 <div
                   key={dayKey}
+                  data-calendar-day={dayKey}
                   className={cn(
                     "min-h-[100px] p-0.5 transition-colors cursor-pointer group bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700",
+                    showOccupancy && isWeekend(day) && "bg-slate-100",
                     !isCurrentMonth ? "opacity-60" : "hover:bg-blue-60/50"
                   )}
                   onClick={() => onDayClick(day, events, false)}
@@ -108,10 +117,12 @@ const MonthGrid = memo(({
                   </div>
                   
                   <div className="space-y-0.5 overflow-hidden font-sans">
-                    {events.slice(0, 4).map((ev, idx) => {
+                    {visibleEvents.slice(0, 4).map((ev, idx) => {
                       // Цвет в зависимости от статуса брони
                       const isPreBooking = ev.booking?.status === 'pre_booking';
-                      const bgClass = isPreBooking
+                      const bgClass = showOccupancy && ev.type === 'rental'
+                        ? ev.booking?.status === 'blocked' ? 'bg-purple-500/5 text-purple-950' : isPreBooking ? 'bg-slate-500/5 text-slate-700' : 'bg-blue-500/5 text-blue-950'
+                        : ev.booking?.status === 'blocked' ? 'bg-purple-100 text-purple-900' : isPreBooking
                         ? "bg-slate-200 text-slate-600"
                         : ev.type === 'pickup' 
                           ? "bg-green-400 text-green-900"
@@ -119,12 +130,13 @@ const MonthGrid = memo(({
                       
                       return (
                         <button type="button"
+                          data-compact-event={showOccupancy ? true : undefined}
                           key={idx}
                           className={cn(
-                            showOccupancy ? "w-full min-h-11 overflow-hidden px-1 text-[10px] font-medium rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
+                            showOccupancy ? "w-full min-h-7 overflow-hidden px-1 py-1 text-[10px] leading-4 font-medium rounded-sm hover:ring-1 hover:ring-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
                             bgClass
                           )}
-                          aria-label={`${ev.type === 'pickup' ? 'Выдача' : ev.type === 'return' ? 'Возврат' : 'Занято'}: ${ev.carName}`}
+                          aria-label={`${ev.booking?.status === 'blocked' ? 'Блокировка' : ev.type === 'pickup' ? 'Выдача' : ev.type === 'return' ? 'Возврат' : 'Занято'}: ${ev.carName}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             onBadgeClick(ev, e);
@@ -132,22 +144,22 @@ const MonthGrid = memo(({
                           title={`${ev.type === 'pickup' ? 'Выдача' : ev.type === 'return' ? 'Возврат' : 'Занято'}: ${ev.carName}`}
                         >
                           <span className="block truncate tracking-tight">
-                            {ev.carName}
+                            {ev.booking?.status === 'blocked' ? `Блок · ${ev.carName}` : ev.carName}
                           </span>
                         </button>
                       );
                     })}
                     
-                    {events.length > 4 && (
+                    {visibleEvents.length > 4 && (
                       <button type="button"
                         className={showOccupancy ? "min-h-11 w-full text-xs font-semibold text-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "text-[7px] text-blue-500 font-bold pl-1 cursor-pointer hover:text-blue-700"}
                         onClick={(e) => { 
                           e.stopPropagation(); 
                           // Открыть popup только с теми бейджами которые не влезли
-                          onDayClick(day, events.slice(4), true);
+                          onDayClick(day, visibleEvents.slice(4), true);
                         }}
                       >
-                        + ещё {events.length - 4}
+                        + ещё {visibleEvents.length - 4}
                       </button>
                     )}
                   </div>
@@ -170,6 +182,7 @@ export function MonthCalendarView({
   onDayClick,
   onCreateBooking,
   showOccupancy = false,
+  hideConfirmedOccupancy = false,
 }: MonthCalendarViewProps) {
   
   const [selectedDayData, setSelectedDayData] = useState<{
@@ -294,9 +307,9 @@ export function MonthCalendarView({
 
       <div className="overflow-hidden flex-1 cursor-grab active:cursor-grabbing w-full" ref={emblaRef}>
         <div className="flex h-full">
-          <MonthGrid date={addMonths(currentDate, -1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} />
-          <MonthGrid date={currentDate} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} />
-          <MonthGrid date={addMonths(currentDate, 1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} />
+          <MonthGrid date={addMonths(currentDate, -1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} hideConfirmedOccupancy={hideConfirmedOccupancy} />
+          <MonthGrid date={currentDate} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} hideConfirmedOccupancy={hideConfirmedOccupancy} />
+          <MonthGrid date={addMonths(currentDate, 1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} hideConfirmedOccupancy={hideConfirmedOccupancy} />
         </div>
       </div>
 

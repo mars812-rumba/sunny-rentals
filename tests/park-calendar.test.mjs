@@ -158,12 +158,48 @@ test('shared month has occupied-day and return badges, with named keyboard contr
  assert.doesNotMatch(html, /class="[^"]*opacity-[^\"]*"[^>]*aria-label="Занято/);
 });
 
+test('park month shades Saturday and Sunday, including adjacent-month days, without shading weekdays', () => {
+ const props = { currentDate: new Date('2026-10-01T00:00:00'), bookings: [], logisticsData: [], onDateChange() {}, onBookingClick() {} };
+ const html = renderToStaticMarkup(e(ui.MonthCalendarView, { ...props, showOccupancy: true }));
+ const cells = [...html.matchAll(/data-calendar-day="([^"]+)" class="([^"]+)"/g)];
+ assert.ok(cells.length > 0);
+ for (const [, day, classes] of cells) {
+  const weekday = new Date(`${day}T00:00:00`).getDay();
+  assert.equal(classes.split(' ').includes('bg-slate-100'), weekday === 0 || weekday === 6, day);
+ }
+ assert.ok(cells.some(([ , day, classes]) => day === '2026-11-01' && classes.includes('bg-slate-100')));
+ const legacy = renderToStaticMarkup(e(ui.MonthCalendarView, props));
+ assert.doesNotMatch(legacy, /data-calendar-day="[^"]+" class="[^"]*bg-slate-100/);
+});
+
 test('confirmed occupancy is quiet but pickup and return retain their distinct colors', () => {
  const confirmed = { ...booking, status: 'confirmed' };
  const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: [ui.calendarBooking(confirmed)], logisticsData: [ui.calendarLogistics(confirmed)], onDateChange() {}, onBookingClick() {}, showOccupancy: true }));
  assert.match(html, /bg-blue-500\/5 text-blue-950/);
  assert.match(html, /bg-green-400 text-green-900/);
  assert.match(html, /bg-yellow-400 text-yellow-900/);
+});
+
+test('park month hides confirmed middle-day badges but retains handovers, prebookings, blocks and day details', () => {
+ const confirmed = { ...booking, status: 'confirmed' };
+ const props = { currentDate: new Date('2026-08-01T00:00:00'), onDateChange() {}, onBookingClick() {}, showOccupancy: true, hideConfirmedOccupancy: true };
+ const html = renderToStaticMarkup(e(ui.MonthCalendarView, { ...props, bookings: [ui.calendarBooking(confirmed)], logisticsData: [ui.calendarLogistics(confirmed)] }));
+ assert.match(html, /aria-label="Выдача: Toyota"/);
+ assert.match(html, /aria-label="Возврат: Toyota"/);
+ assert.doesNotMatch(html, /aria-label="Занято: Toyota"/);
+ assert.match(html, /aria-label="3 августа 2026, событий: 1"/);
+ assert.equal(ui.bookingsOnDay([confirmed], '2026-08-03')[0].id, confirmed.id);
+ const items = [booking, { ...booking, id: 'block-a', entry_type: 'block', status: 'confirmed', pricing: { ...booking.pricing, asset_name: 'Blocked car' } }];
+ const retained = renderToStaticMarkup(e(ui.MonthCalendarView, { ...props, bookings: items.map(ui.calendarBooking), logisticsData: items.map(ui.calendarLogistics) }));
+ assert.match(retained, /aria-label="Занято: Toyota"/);
+ assert.match(retained, /aria-label="Блокировка: Blocked car"/);
+ assert.match(retained, /bg-slate-500\/5 text-slate-700/);
+ assert.match(retained, /bg-purple-500\/5 text-purple-950/);
+ const many = Array.from({ length: 6 }, (_, index) => ({ ...confirmed, id: `confirmed-${index}` }));
+ const overflow = renderToStaticMarkup(e(ui.MonthCalendarView, { ...props, bookings: many.map(ui.calendarBooking), logisticsData: many.map(ui.calendarLogistics) }));
+ const middleCell = overflow.match(/data-calendar-day="2026-08-03"[\s\S]*?(?=data-calendar-day="2026-08-04")/)[0];
+ assert.doesNotMatch(middleCell, /data-compact-event|\+ ещё/);
+ assert.match(middleCell, /событий: 6/);
 });
 
 test('client quote has semantic icons and clearly separates rent from refundable deposit', () => {
