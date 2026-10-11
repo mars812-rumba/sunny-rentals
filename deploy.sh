@@ -108,8 +108,10 @@ if [[ -d "${PROJECT_ROOT}/backend/data-v2/tenants" ]]; then
   while IFS= read -r tenant_dir; do
     tenant_id="$(basename "${tenant_dir}")"
     if [[ "${tenant_id}" =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]]; then
-      mkdir -p "${RELEASE_DIR}/site/p/${tenant_id}"
-      cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/p/${tenant_id}/index.html"
+      for park_suffix in "" "/owner"; do
+        mkdir -p "${RELEASE_DIR}/site/p/${tenant_id}${park_suffix}"
+        cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/p/${tenant_id}${park_suffix}/index.html"
+      done
     fi
   done < <(find "${PROJECT_ROOT}/backend/data-v2/tenants" -mindepth 1 -maxdepth 1 -type d)
 fi
