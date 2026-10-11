@@ -244,8 +244,6 @@ class PartnerBotService:
         storefront_button = {'text': 'Открыть витрину', 'web_app': {'url': f'{self.config.public_origin}/p/{tenant_id}'}}
         owner_button = {'text': 'Кабинет владельца', 'web_app': {'url': f'{self.config.public_origin}/p/{tenant_id}/owner'}}
         buttons = [owner_button, storefront_button] if owner_invite else [storefront_button]
-        if owner_invite is None and self._active_owner(state, tenant_id, user_id):
-            buttons.append(owner_button)
         payload['reply_markup'] = {'inline_keyboard': [[button] for button in buttons]}
         if tenant.status == TenantStatus.DRAFT:
             # Drafts require a superadmin preview; no invalid public link.

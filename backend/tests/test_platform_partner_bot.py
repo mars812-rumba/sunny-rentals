@@ -136,8 +136,8 @@ class PartnerBotTests(unittest.TestCase):
         self.assertEqual(rows[1][0]['web_app']['url'], 'https://example.com/p/park-a')
         self.service.handle_update(self.update('ppark-a', update_id=101))
         rows = self.transport.sent[-1]['reply_markup']['inline_keyboard']
+        self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0][0]['web_app']['url'], 'https://example.com/p/park-a')
-        self.assertEqual(rows[1][0]['web_app']['url'], 'https://example.com/p/park-a/owner')
         self.assertEqual(self.identity().json()['role'], 'owner')
         self.service.handle_update(self.update('ppark-a', uid=43, update_id=102))
         rows = self.transport.sent[-1]['reply_markup']['inline_keyboard']
