@@ -27,6 +27,7 @@ async function request<T>(path: string, options: RequestInit = {}, admin = false
     if (response.status === 403) throw new Error('Откройте этот парк по ссылке в новом боте. Если Telegram уже подключён — закройте и заново откройте мини-приложение.');
     if (response.status === 409) throw new Error('Даты уже заняты, цена или статус изменились. Обновите расчёт или календарь.');
     if (response.status === 422 && path.endsWith('/calendar/manual')) throw new Error('Проверьте поля: возврат позже получения, период до 365 суток, начало не старше года. Для аренды нужны имя и положительная ставка; для блокировки — причина без цены.');
+    if (response.status === 422 && path === '/bookings') throw new Error('Проверьте даты и контакт. Без Telegram username нужен WhatsApp, MAX или телефон: номер с кодом страны, например +66…');
     if (response.status === 422) throw new Error('Проверьте даты: получение не в прошлом, возврат позже получения, период не больше 365 суток. Для техники должна быть задана цена.');
     throw new Error('Не удалось выполнить запрос к серверу парка. Проверьте соединение, затем обновите календарь перед повторной попыткой.');
   }
@@ -104,20 +105,25 @@ export interface ParkQuote {
   asset_id: string; asset_name: string; start_date: string; end_date: string;
   days: number; daily_rate: string; total_rental: string; deposit: string;
   currency: string; timezone: string; quote_token: string;
+  requires_contact?: boolean;
 }
+export interface ParkContact { channel: 'whatsapp' | 'max' | 'phone'; value: string; consent?: true }
 export interface ParkBooking {
+  booking_number?: string;
   id: string; asset_id: string; status: string; start_at: string; end_at: string; currency: string;
   pricing: { asset_name: string; start_date: string; end_date: string; days: number; daily_rate: string; total_rental: string; timezone: string };
   deposit: { amount: string };
   entry_type?: 'rental' | 'block';
   source?: string;
   operator_details?: { customer_name: string; note: string };
+  customer?: { name: string | null; username: string | null; phone: string | null; telegram_user_id: string | null; contact?: ParkContact };
 }
 
 export interface ParkManualInput {
   asset_id: string; start_date: string; end_date: string; request_id: string;
   entry_type: 'rental' | 'block'; customer_name: string; note: string;
   daily_rate?: string; deposit?: string;
+  booking_status?: 'confirmed' | 'requested';
 }
 export async function createParkManualBooking(tenantId: string, data: ParkManualInput, admin: boolean, signal?: AbortSignal): Promise<ParkBooking> {
   const initData = admin ? '' : window.Telegram?.WebApp?.initData;
@@ -127,13 +133,13 @@ export async function createParkManualBooking(tenantId: string, data: ParkManual
   }, admin);
   if (result.booking?.asset_id !== data.asset_id || result.booking.entry_type !== data.entry_type
       || result.booking.pricing?.start_date !== data.start_date || result.booking.pricing?.end_date !== data.end_date
-      || result.booking.status !== 'confirmed') throw new Error('Данные записи изменились. Обновите календарь перед повторной попыткой.');
+      || result.booking.status !== (data.booking_status || 'confirmed')) throw new Error('Данные записи изменились. Обновите календарь перед повторной попыткой.');
   return result.booking;
 }
 export interface ParkPeriod { tenant_id: string; init_data: string; asset_id: string; start_date: string; end_date: string }
 export const quoteParkBooking = (period: ParkPeriod, signal?: AbortSignal) => request<ParkQuote>('/bookings/quote', { method: 'POST', body: JSON.stringify(period), signal });
-export async function submitParkBooking(period: ParkPeriod, quoteToken: string, requestId: string, signal?: AbortSignal): Promise<ParkBooking> {
-  const booking = (await request<{ booking: ParkBooking }>('/bookings', { method: 'POST', body: JSON.stringify({ ...period, quote_token: quoteToken, request_id: requestId }), signal })).booking;
+export async function submitParkBooking(period: ParkPeriod, quoteToken: string, requestId: string, signal?: AbortSignal, contact?: ParkContact): Promise<ParkBooking> {
+  const booking = (await request<{ booking: ParkBooking }>('/bookings', { method: 'POST', body: JSON.stringify({ ...period, quote_token: quoteToken, request_id: requestId, ...(contact ? { contact } : {}) }), signal })).booking;
   invalidateParkCalendar(period.tenant_id);
   return booking;
 }
@@ -146,4 +152,5 @@ export async function changeParkBookingStatus(tenantId: string, booking: ParkBoo
   await request(admin ? `/parks/${encodeURIComponent(tenantId)}/bookings/${encodeURIComponent(booking.id)}/status` : '/bookings/status', {
     method: admin ? 'PATCH' : 'POST', body: JSON.stringify(admin ? action : { ...action, tenant_id: tenantId, booking_id: booking.id, init_data: window.Telegram?.WebApp?.initData || '' }),
   }, admin);
+  invalidateParkCalendar(tenantId);
 }

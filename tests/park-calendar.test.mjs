@@ -26,6 +26,14 @@ const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', sta
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
 
+test('Gantt uses thumbnail references for new and previously uploaded photos', () => {
+ const main = `assets/${'a'.repeat(32)}/${'b'.repeat(32)}.webp`;
+ const thumbnail = main.replace(/\/([^/]+)$/, '/thumb/$1');
+ assert.equal(ui.calendarThumbnail({ photos: { main, thumbnail } }), thumbnail);
+ assert.equal(ui.calendarThumbnail({ photos: { main } }), thumbnail);
+ assert.equal(ui.calendarThumbnail({ photos: {} }), undefined);
+});
+
 test('fallback contact form labels all channels and requires a number and consent', () => {
  for (const channel of ['whatsapp', 'max', 'phone']) {
   const html = renderToStaticMarkup(e(ui.ParkContactFields, { id: 'client', contact: { channel, value: '' }, busy: false, onChange() {} }));
@@ -103,6 +111,7 @@ test('request item displays private contacts with safe links and actionable stat
  const html = renderToStaticMarkup(e(ui.ParkRequestItem, props));
  assert.match(html, /Иван/);
  assert.match(html, /@ivan_test/);
+ assert.doesNotMatch(html, /a{64}/);
  assert.match(html, /href="https:\/\/t.me\/ivan_test"/);
  assert.match(html, /href="tel:\+66123456789"/);
  assert.match(html, /Telegram ID: 42/);
@@ -121,6 +130,21 @@ test('request item displays private contacts with safe links and actionable stat
  const cancelled = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, status: 'cancelled' } }));
  assert.match(cancelled, /bg-red-100 text-red-900[^>]*>Отменена/);
  assert.doesNotMatch(cancelled, />Отменить<\/button>|>Подтвердить<\/button>/);
+});
+
+test('opened request has readable amounts, private contacts and a single-line copyable ID', () => {
+ const html = renderToStaticMarkup(e(ui.ParkRequestItem, { booking: { ...booking, id: 'a'.repeat(64), booking_number: '100001', customer: { name: 'Иван', username: 'ivan_test' } }, detailed: true, busy: false, onAction() {} }));
+ assert.match(html, /lucide-car-front/);
+ assert.match(html, /lucide-calendar-days/);
+ assert.match(html, /<dl/);
+ assert.match(html, /Депозит отдельно/);
+ assert.match(html, /1(?:\s|&#x27;|&#160;|&nbsp;)+600/);
+ assert.match(html, /type="text"[^>]*readonly=""[^>]*value="100001"/);
+ assert.match(html, /aria-label="Скопировать номер заявки"/);
+ assert.match(html, /@ivan_test/);
+ assert.doesNotMatch(html, /a{64}/);
+ assert.match(html, /bg-amber-50 text-amber-900/);
+ assert.doesNotMatch(html, /2026-08-02 — 2026-08-04/);
 });
 
 test('shared month has occupied-day and return badges, with named keyboard controls', () => {

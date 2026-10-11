@@ -30,13 +30,15 @@ class ParkBookingTests(unittest.TestCase):
         payload = self.payload(**fields)
         quote = self.client.post('/api/partners/bookings/quote', json=payload)
         self.assertEqual(quote.status_code, 200, quote.text)
-        return {**payload, 'quote_token': quote.json()['quote_token'], 'request_id': 'request_test_12345'}
+        return {**payload, 'quote_token': quote.json()['quote_token'], 'request_id': 'request_test_12345',
+                'contact': {'channel': 'whatsapp', 'value': '+66123456789', 'consent': True}}
 
     def test_quote_and_booking_use_server_price_customer_and_timezone(self):
         payload = self.booking_payload()
         result = self.client.post('/api/partners/bookings', json=payload)
         self.assertEqual(result.status_code, 201, result.text)
         booking = result.json()['booking']
+        self.assertEqual(booking['booking_number'], '100001')
         self.assertEqual(booking['pricing']['total_rental'], '2400.00')
         self.assertEqual(booking['deposit']['amount'], '5000.00')
         self.assertEqual(booking['start_at'], '2026-10-10T17:00:00+00:00')
@@ -44,12 +46,85 @@ class ParkBookingTests(unittest.TestCase):
         self.assertEqual(len(json.loads((self.root / 'tenants/park-a/customers.json').read_text())['items']), 1)
         self.assertEqual(json.loads((self.root / 'tenants/park-b/bookings.json').read_text())['items'], [])
 
+    def test_contacts_are_joined_only_into_private_scoped_operator_calendar(self):
+        update = self.update('ppark-a', update_id=101)
+        update['message']['from']['username'] = 'client_name'
+        self.service.handle_update(update)
+        payload = self.booking_payload(init_data=self.token(username='client_name'))
+        payload.pop('contact')
+        created = self.client.post('/api/partners/bookings', json=payload).json()['booking']
+        self.assertNotIn('customer', created)
+        owner_request = {'tenant_id': 'park-a', 'init_data': self.token()}
+        self.assertEqual(self.client.post('/api/partners/calendar', json=owner_request).status_code, 403)
+        self.service.handle_update(self.update(self.invite(), update_id=102))
+        private = self.client.post('/api/partners/calendar', json=owner_request).json()['bookings'][0]
+        self.assertEqual(private['customer'], {'name': 'Test', 'username': 'client_name', 'phone': None, 'telegram_user_id': '42'})
+        self.assertNotIn('metadata', private['customer'])
+        self.assertNotIn('chat_id', private['customer'])
+        self.assertEqual(self.client.post('/api/partners/calendar', json={**owner_request, 'tenant_id': 'park-b'}).status_code, 403)
+        headers = {'Authorization': 'Bearer ' + self.auth.issue_for_verified_actor('1')}
+        self.assertEqual(self.client.get('/api/partners/parks/park-a/calendar', headers=headers).json()['bookings'][0]['customer'], private['customer'])
+        self.assertEqual(self.client.get('/api/partners/parks/park-b/calendar', headers=headers).json()['bookings'], [])
+        available = self.client.post('/api/partners/parks/park-a/availability', json={'start_date': '2026-10-11', 'end_date': '2026-10-14'})
+        self.assertNotIn('client_name', available.text)
+        self.assertNotIn('customer', available.text)
+
     def test_idempotent_retry_and_parallel_conflict(self):
         payload = self.booking_payload()
         first = self.client.post('/api/partners/bookings', json=payload)
         self.assertEqual(self.client.post('/api/partners/bookings', json=payload).json(), first.json())
         another = {**payload, 'request_id': 'another_test_12345'}
         self.assertEqual(self.client.post('/api/partners/bookings', json=another).status_code, 409)
+
+    def test_client_and_manual_bookings_share_number_sequence(self):
+        from platform_core.park_bookings import ParkManualRequest
+        first = self.client.post('/api/partners/bookings', json=self.booking_payload()).json()['booking']
+        second = self.booking_service.create_manual('park-a', ParkManualRequest(
+            asset_id=self.asset.id, start_date='2026-10-14', end_date='2026-10-17',
+            request_id='mixed_number_12345', entry_type='rental', customer_name='Иван'), admin=self.admin)
+        self.assertEqual(first['booking_number'], '100001')
+        self.assertEqual(second['booking_number'], '100002')
+
+    def test_missing_username_requires_valid_consented_contact_without_writes(self):
+        update = self.update('ppark-a', update_id=105)
+        update['message']['from']['username'] = 'stale_username'
+        self.service.handle_update(update)
+        self.assertTrue(self.client.post('/api/partners/bookings/quote', json=self.payload()).json()['requires_contact'])
+        payload = self.booking_payload()
+        before = (self.root / 'tenants/park-a/bookings.json').read_bytes()
+        for contact in (None, {'channel': 'email', 'value': '+66123456789', 'consent': True},
+                        {'channel': 'phone', 'value': '123', 'consent': True},
+                        {'channel': 'max', 'value': 'https://example.com', 'consent': True},
+                        {'channel': 'whatsapp', 'value': '+66123456789', 'consent': False},
+                        {'channel': 'phone', 'value': '+66123456789'}):
+            with self.subTest(contact=contact):
+                self.assertEqual(self.client.post('/api/partners/bookings', json={**payload, 'contact': contact}).status_code, 422)
+                self.assertEqual((self.root / 'tenants/park-a/bookings.json').read_bytes(), before)
+        self.assertEqual(json.loads((self.root / 'tenants/park-a/customers.json').read_text())['items'], [])
+
+    def test_each_contact_channel_is_private_normalized_and_idempotent(self):
+        headers = {'Authorization': 'Bearer ' + self.auth.issue_for_verified_actor('1')}
+        for index, channel in enumerate(('whatsapp', 'max', 'phone')):
+            payload = self.booking_payload(start_date=f'2026-10-{11 + index:02d}', end_date=f'2026-10-{12 + index:02d}')
+            payload.update(request_id=f'contact_request_{index:02d}', contact={'channel': channel, 'value': '+66 (123) 456-789', 'consent': True})
+            response = self.client.post('/api/partners/bookings', json=payload)
+            self.assertEqual(response.status_code, 201, response.text)
+            self.assertNotIn('contact', response.text)
+            self.assertNotIn('66123456789', response.text)
+            self.assertEqual(self.client.post('/api/partners/bookings', json=payload).json(), response.json())
+            self.assertEqual(self.client.post('/api/partners/bookings', json={**payload, 'contact': {**payload['contact'], 'value': '+66123456788'}}).status_code, 409)
+        items = self.client.get('/api/partners/parks/park-a/calendar', headers=headers).json()['bookings']
+        self.assertEqual([item['customer']['contact'] for item in items],
+            [{'channel': channel, 'value': '+66123456789'} for channel in ('whatsapp', 'max', 'phone')])
+        self.assertTrue(all(item['customer']['username'] is None for item in items))
+
+    def test_verified_username_does_not_require_contact(self):
+        signed = self.token(username='verified_client')
+        quote = self.client.post('/api/partners/bookings/quote', json=self.payload(init_data=signed)).json()
+        self.assertFalse(quote['requires_contact'])
+        payload = self.booking_payload(init_data=signed)
+        payload.pop('contact')
+        self.assertEqual(self.client.post('/api/partners/bookings', json=payload).status_code, 201)
 
     def test_concurrent_requests_only_one_hold(self):
         payload = self.booking_payload()

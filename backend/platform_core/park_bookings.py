@@ -1,12 +1,14 @@
 """First tenant booking slice: daily quotes, requested holds and private agenda."""
 
-from datetime import date, datetime, time, timezone
+from datetime import date, datetime, time, timezone, timedelta
+from typing import Literal, Optional
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import hashlib
 import json
+import re
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, validator
 from .pydantic_compat import pattern_string
 from .context import TenantContext
 from .models import AssetStatus, Booking, BookingStatus, Customer, RentalAsset
@@ -29,9 +31,26 @@ class ParkQuoteRequest(BaseModel):
         extra = 'forbid'
 
 
+class ParkContact(BaseModel):
+    channel: Literal['whatsapp', 'max', 'phone']
+    value: constr(strip_whitespace=True, min_length=1, max_length=32)
+    consent: Literal[True]
+
+    @validator('value')
+    def international_number(cls, value):
+        number = re.sub(r'[ ()-]', '', value)
+        if not re.fullmatch(r'\+[1-9][0-9]{6,14}', number):
+            raise ValueError('Enter a phone number with country code')
+        return number
+
+    class Config:
+        extra = 'forbid'
+
+
 class ParkBookingRequest(ParkQuoteRequest):
     request_id: pattern_string(r'^[A-Za-z0-9_-]{16,64}$')
     quote_token: pattern_string(r'^[a-f0-9]{64}$')
+    contact: Optional[ParkContact] = None
 
 
 class ParkStatusRequest(BaseModel):
@@ -54,6 +73,27 @@ class ParkAvailabilityRequest(BaseModel):
 
     class Config:
         extra = 'forbid'
+
+
+class ParkManualRequest(BaseModel):
+    asset_id: pattern_string(r'^[a-f0-9]{32}$')
+    start_date: date
+    end_date: date
+    request_id: pattern_string(r'^[A-Za-z0-9_-]{16,64}$')
+    entry_type: Literal['rental', 'block'] = 'rental'
+    booking_status: Literal['confirmed', 'requested'] = 'confirmed'
+    customer_name: constr(strip_whitespace=True, max_length=160) = ''
+    note: constr(strip_whitespace=True, max_length=1000) = ''
+    daily_rate: Optional[constr(strip_whitespace=True, min_length=1, max_length=24)] = None
+    deposit: Optional[constr(strip_whitespace=True, min_length=1, max_length=24)] = None
+
+    class Config:
+        extra = 'forbid'
+
+
+class ParkOwnerManualRequest(ParkManualRequest):
+    tenant_id: constr(min_length=1, max_length=63)
+    init_data: constr(min_length=1, max_length=8192)
 
 
 class ParkBookingService:
@@ -81,20 +121,46 @@ class ParkBookingService:
 
     @staticmethod
     def records(repo):
-        records = [repo.model_type.parse_obj(item) for item in repo._read_document()['items']]
+        # Caller holds the collection lock. Reserve numbers for legacy/archived
+        # entries too, so status changes and retries never recycle a number.
+        document = repo._read_document()
+        records = [repo.model_type.parse_obj(item) for item in document['items']]
         for record in records:
             repo.context.require_record_tenant(record.tenant_id)
+        numbers = [record.booking_number for record in records if record.booking_number]
+        if len(numbers) != len(set(numbers)):
+            raise BookingConflict('Duplicate booking numbers. Calendar needs repair')
+        next_number = max([100000] + [int(number) for number in numbers]) + 1
+        changed = False
+        for record, item in zip(records, document['items']):
+            if record.booking_number is None:
+                if next_number > 999999:
+                    raise BookingConflict('Six-digit booking numbers are exhausted')
+                record.booking_number = str(next_number)
+                item['booking_number'] = record.booking_number
+                next_number += 1
+                changed = True
+        if changed:
+            repo._write_document(document)
         return records
 
-    def period_bounds(self, tenant, request):
+    @staticmethod
+    def next_booking_number(records):
+        value = max([100000] + [int(item.booking_number) for item in records if item.booking_number]) + 1
+        if value > 999999:
+            raise BookingConflict('Six-digit booking numbers are exhausted')
+        return str(value)
+
+    def period_bounds(self, tenant, request, manual=False):
         try:
             zone = ZoneInfo(tenant.timezone)
         except ZoneInfoNotFoundError:
             raise ValueError('Park timezone is not configured') from None
         today = datetime.fromtimestamp(self.partners.clock(), zone).date()
         days = (request.end_date - request.start_date).days
-        if request.start_date < today or not 1 <= days <= 365:
-            raise ValueError('Choose future dates, from 1 to 365 days')
+        earliest = today - timedelta(days=365) if manual else today
+        if request.start_date < earliest or not 1 <= days <= 365:
+            raise ValueError('Choose 1 to 365 days, starting no earlier than a year ago' if manual else 'Choose future dates, from 1 to 365 days')
         start = datetime.combine(request.start_date, time.min, zone).astimezone(timezone.utc)
         end = datetime.combine(request.end_date, time.min, zone).astimezone(timezone.utc)
         return days, start, end
@@ -152,14 +218,75 @@ class ParkBookingService:
             _, context = self.partners.resolve_identity(request.tenant_id, request.init_data)
             quote, start, end = self.prepare(request, context)
             self.check_overlap(self.repo(context, 'bookings.json', Booking).list(), request.asset_id, start, end)
+            quote['requires_contact'] = not bool(self.partners.verifier.verify(request.init_data).get('username'))
             return quote
 
     @staticmethod
     def dto(booking):
-        return {'id': booking.id, 'asset_id': booking.asset_id, 'status': booking.status,
+        return {'id': booking.id, 'booking_number': booking.booking_number, 'asset_id': booking.asset_id, 'status': booking.status,
                 'start_at': booking.start_at, 'end_at': booking.end_at,
                 'pricing': {k: booking.pricing.get(k) for k in ('asset_name', 'start_date', 'end_date', 'days', 'daily_rate', 'total_rental', 'timezone')},
-                'deposit': {'amount': booking.deposit.get('amount')}, 'currency': booking.currency}
+                'deposit': {'amount': booking.deposit.get('amount')}, 'currency': booking.currency,
+                'entry_type': booking.entry_type, 'source': booking.source,
+                'operator_details': {k: booking.operator_details.get(k, '') for k in ('customer_name', 'note')}}
+
+    def operator_context(self, tenant_id, init_data=None, admin=None):
+        if admin is not None:
+            admin.require_platform_admin()
+            self.partners.tenant(self.partners.provisioner._load_state(), tenant_id)
+            return TenantContext(tenant_id=tenant_id, actor_id=admin.actor_id, roles=frozenset({'platform_admin'}))
+        _, context = self.partners.resolve_identity(tenant_id, init_data, require_owner=True)
+        return context
+
+    def create_manual(self, tenant_id, request, init_data=None, admin=None):
+        # Same lock and booking collection as Telegram requests: no race or second calendar.
+        with self.partners.provisioner._locked():
+            context = self.operator_context(tenant_id, init_data, admin)
+            tenant = self.partners.tenant(self.partners.provisioner._load_state(), context.tenant_id)
+            repo = self.repo(context, 'bookings.json', Booking)
+            key = hashlib.sha256(f'calendar:{context.actor_id}:{request.request_id}'.encode()).hexdigest()
+            payload = json.loads(request.json(exclude={'request_id', 'init_data', 'tenant_id'}))
+            # Preserve fingerprints of confirmed entries created before this field existed.
+            if request.booking_status == 'confirmed':
+                payload.pop('booking_status', None)
+            fingerprint = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+            with repo.storage.exclusive(repo.path):
+                records = self.records(repo)
+                previous = next((item for item in records if item.id == key), None)
+                if previous:
+                    if previous.legacy.get('request_fingerprint') != fingerprint:
+                        raise BookingConflict('Request ID already used for another calendar entry')
+                    return self.dto(previous)
+                days, start, end = self.period_bounds(tenant, request, manual=True)
+                asset = self.repo(context, 'assets.json', RentalAsset).get(request.asset_id)
+                if asset is None or asset.archived_at is not None or asset.status == AssetStatus.ARCHIVED:
+                    raise BookingConflict('Vehicle is unavailable')
+                self.check_overlap(records, asset.id, start, end)
+                if request.entry_type == 'block':
+                    if request.booking_status != 'confirmed' or not request.note or request.customer_name or request.daily_rate is not None or request.deposit is not None:
+                        raise ValueError('A block needs a reason and must not contain rental prices or a customer')
+                    rate = deposit = Decimal('0.00')
+                else:
+                    if not request.customer_name:
+                        raise ValueError('Customer name is required for a manual rental')
+                    rate = self.money(request.daily_rate if request.daily_rate is not None else asset.pricing.get('daily_rate'))
+                    deposit = self.money(request.deposit if request.deposit is not None else asset.deposit_policy.get('amount', 0))
+                    if rate <= 0:
+                        raise ValueError('Rental rate must be positive')
+                timestamp = datetime.fromtimestamp(self.partners.clock(), timezone.utc)
+                booking = Booking(id=key, booking_number=self.next_booking_number(records), tenant_id=context.tenant_id, asset_id=asset.id,
+                    customer_id=None, status=BookingStatus(request.booking_status), start_at=start, end_at=end,
+                    currency=tenant.currency, entry_type=request.entry_type,
+                    source='platform_manual' if admin is not None else 'owner_manual',
+                    operator_details={'customer_name': request.customer_name, 'note': request.note, 'created_by': context.actor_id},
+                    pricing={'asset_name': asset.name, 'start_date': request.start_date.isoformat(), 'end_date': request.end_date.isoformat(),
+                             'days': days, 'daily_rate': str(rate), 'total_rental': str(rate * days), 'timezone': tenant.timezone},
+                    deposit={'amount': str(deposit)}, legacy={'request_fingerprint': fingerprint},
+                    created_at=timestamp, updated_at=timestamp)
+                document = repo._read_document()
+                document['items'].append(json.loads(booking.json()))
+                repo._write_document(document)
+                return self.dto(booking)
 
     def create(self, request):
         with self.partners.provisioner._locked():
@@ -167,6 +294,8 @@ class ParkBookingService:
             repo = self.repo(context, 'bookings.json', Booking)
             key = hashlib.sha256(f'{context.actor_id}:{request.request_id}'.encode()).hexdigest()
             fingerprint = f'{request.asset_id}:{request.start_date}:{request.end_date}:{request.quote_token}'
+            if request.contact is not None:
+                fingerprint += ':' + json.dumps(request.contact.dict(), sort_keys=True)
             with repo.storage.exclusive(repo.path):
                 records = self.records(repo)
                 previous = next((b for b in records if b.id == key), None)
@@ -174,6 +303,9 @@ class ParkBookingService:
                     if previous.legacy.get('request_fingerprint') != fingerprint:
                         raise BookingConflict('Request ID already used for another booking')
                     return self.dto(previous)
+                user = self.partners.verifier.verify(request.init_data)
+                if not user.get('username') and request.contact is None:
+                    raise ValueError('Contact is required without Telegram username')
                 quote, start, end = self.prepare(request, context)
                 if quote['quote_token'] != request.quote_token:
                     raise BookingConflict('Price changed. Request a new quote')
@@ -182,14 +314,17 @@ class ParkBookingService:
                 customer_id = hashlib.sha256(context.actor_id.encode()).hexdigest()
                 customer = customers.get(customer_id) or Customer(id=customer_id, tenant_id=context.tenant_id, external_id=context.actor_id)
                 customer.name = identity.first_name
-                customer.username = identity.username
+                customer.username = user.get('username') or None
                 customer.source = 'telegram_partner'
                 customer.metadata = {**customer.metadata, 'bot_id': identity.bot_id, 'chat_id': identity.chat_id}
                 customers.upsert(customer)
-                booking = Booking(id=key, tenant_id=context.tenant_id, asset_id=request.asset_id, customer_id=customer_id,
+                booking = Booking(id=key, booking_number=self.next_booking_number(records), tenant_id=context.tenant_id, asset_id=request.asset_id, customer_id=customer_id,
                     start_at=start, end_at=end, currency=quote['currency'], source='telegram_partner',
                     pricing={k: quote[k] for k in ('asset_name', 'start_date', 'end_date', 'days', 'daily_rate', 'total_rental', 'timezone')},
                     deposit={'amount': quote['deposit']}, legacy={'request_fingerprint': fingerprint})
+                if request.contact is not None:
+                    booking.operator_details.update(contact_channel=request.contact.channel, contact_value=request.contact.value,
+                        contact_consent_at=datetime.fromtimestamp(self.partners.clock(), timezone.utc).isoformat())
                 document = repo._read_document()
                 document['items'].append(json.loads(booking.json()))
                 repo._write_document(document)
@@ -197,22 +332,34 @@ class ParkBookingService:
 
     def calendar(self, tenant_id, init_data=None, admin=None):
         with self.partners.provisioner._locked():
-            if admin is not None:
-                admin.require_platform_admin()
-                self.partners.tenant(self.partners.provisioner._load_state(), tenant_id)
-                context = TenantContext(tenant_id=tenant_id, actor_id=admin.actor_id, roles=frozenset({'platform_admin'}))
-            else:
-                _, context = self.partners.resolve_identity(tenant_id, init_data, require_owner=True)
-            return [self.dto(b) for b in self.repo(context, 'bookings.json', Booking).list()]
+            context = self.operator_context(tenant_id, init_data, admin)
+            customers = {customer.id: customer for customer in self.repo(context, 'customers.json', Customer).list()}
+            result = []
+            repo = self.repo(context, 'bookings.json', Booking)
+            with repo.storage.exclusive(repo.path):
+                records = self.records(repo)
+            for booking in records:
+                if booking.archived_at is not None:
+                    continue
+                item = self.dto(booking)
+                customer = customers.get(booking.customer_id)
+                if customer is not None:
+                    # Contact data belongs only to this private operator projection.
+                    # Never expose metadata/chat_id or join another tenant's records.
+                    prefix = f'telegram:{self.partners.config.bot_id}:'
+                    external = customer.external_id or ''
+                    telegram_id = external[len(prefix):] if external.startswith(prefix) else ''
+                    item['customer'] = {'name': customer.name, 'username': customer.username,
+                        'phone': customer.phone, 'telegram_user_id': telegram_id if telegram_id.isdigit() else None}
+                    if booking.operator_details.get('contact_value'):
+                        item['customer']['contact'] = {'channel': booking.operator_details.get('contact_channel'),
+                            'value': booking.operator_details['contact_value']}
+                result.append(item)
+            return result
 
     def change_status(self, tenant_id, booking_id, request, init_data=None, admin=None):
         with self.partners.provisioner._locked():
-            if admin is not None:
-                admin.require_platform_admin()
-                self.partners.tenant(self.partners.provisioner._load_state(), tenant_id)
-                context = TenantContext(tenant_id=tenant_id, actor_id=admin.actor_id, roles=frozenset({'platform_admin'}))
-            else:
-                _, context = self.partners.resolve_identity(tenant_id, init_data, require_owner=True)
+            context = self.operator_context(tenant_id, init_data, admin)
             repo = self.repo(context, 'bookings.json', Booking)
             with repo.storage.exclusive(repo.path):
                 records = self.records(repo)

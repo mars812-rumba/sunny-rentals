@@ -1,10 +1,11 @@
 import { useEffect, useId, useMemo, useState } from 'react';
-import { Banknote, CalendarDays, Check, ClipboardList, Copy, MessageCircle, Phone, RefreshCw, UserRound, X } from 'lucide-react';
+import { Banknote, CalendarDays, CarFront, Check, ClipboardList, Copy, MessageCircle, Phone, RefreshCw, UserRound, WalletCards, X } from 'lucide-react';
 import { changeParkBookingStatus, fetchParkCalendar, type ParkBooking } from '@/api/park-telegram';
 import { subscribeParkCalendar } from '@/lib/park-calendar-updates';
 import { dateLabel, rentalMoney } from '@/lib/park-rental';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждена', cancelled: 'Отменена', in_progress: 'В аренде', completed: 'Завершена' };
 const statusColors: Record<string, string> = {
@@ -13,8 +14,11 @@ const statusColors: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-900',
 };
 
-export function ParkRequestItem({ booking, busy, onAction }: { booking: ParkBooking; busy: boolean; onAction: (booking: ParkBooking, status: 'confirmed' | 'cancelled') => void }) {
+export function ParkRequestItem({ booking, busy, onAction, detailed = false }: { booking: ParkBooking; busy: boolean; detailed?: boolean; onAction: (booking: ParkBooking, status: 'confirmed' | 'cancelled') => void }) {
   const [copyMessage, setCopyMessage] = useState('');
+  const [referenceMessage, setReferenceMessage] = useState('');
+  const id = useId();
+  const bookingNumber = booking.booking_number || booking.id;
   const contact = booking.customer?.contact;
   const contactLabel = contact?.channel === 'whatsapp' ? 'WhatsApp' : contact?.channel === 'max' ? 'MAX' : 'Телефон';
   const username = booking.customer?.username?.replace(/^@/, '') || '';
@@ -22,10 +26,11 @@ export function ParkRequestItem({ booking, busy, onAction }: { booking: ParkBook
   const phone = booking.customer?.phone || '';
   const phoneUrl = /^\+?[\d ()-]{5,30}$/.test(phone) ? `tel:${phone.replace(/[ ()-]/g, '')}` : '';
   const name = booking.operator_details?.customer_name || booking.customer?.name || 'Имя не указано';
-  return <li className="min-w-0 rounded-xl border border-slate-300 bg-white p-4 sm:p-5">
-    <div className="flex flex-wrap items-start justify-between gap-2"><h3 className="break-words text-lg font-semibold">{booking.pricing.asset_name || 'Транспорт парка'}</h3><span className={cn('rounded-full px-3 py-1 text-xs font-medium', statusColors[booking.status] || 'bg-slate-100 text-slate-700')}>{statuses[booking.status] || booking.status}</span></div>
+  return <li className={cn('min-w-0', detailed ? 'py-2' : 'rounded-xl border border-slate-300 bg-white p-4 sm:p-5')}>
+    <div className="flex flex-wrap items-start justify-between gap-2"><h3 className="flex items-start gap-2 break-words text-lg font-semibold">{detailed && <CarFront aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-blue-700" />}{booking.pricing.asset_name || 'Транспорт парка'}</h3><span className={cn('rounded-full px-3 py-1 text-xs font-medium', statusColors[booking.status] || 'bg-slate-100 text-slate-700')}>{statuses[booking.status] || booking.status}</span></div>
+    {!detailed && booking.booking_number && <p className="mt-2 text-xs tabular-nums text-slate-600">Заявка № {booking.booking_number}</p>}
     <p className="mt-2 flex items-start gap-2 text-sm text-slate-700"><CalendarDays aria-hidden="true" className="h-4 w-4 shrink-0" />{dateLabel(booking.pricing.start_date)} — {dateLabel(booking.pricing.end_date)} · {booking.pricing.days} суток</p>
-    <p className="mt-2 flex flex-wrap items-center gap-2 text-sm tabular-nums text-slate-700"><Banknote aria-hidden="true" className="h-4 w-4" />Аренда: {rentalMoney(booking.pricing.total_rental, booking.currency)} · депозит отдельно: {rentalMoney(booking.deposit.amount, booking.currency)}</p>
+    {detailed ? <dl className="mt-4 grid gap-4 rounded-xl bg-slate-50 p-4 sm:grid-cols-2"><div><dt className="flex items-center gap-2 text-sm text-slate-600"><Banknote aria-hidden="true" className="size-4" />Аренда</dt><dd className="mt-2 break-words text-xl font-semibold tabular-nums text-blue-700">{rentalMoney(booking.pricing.total_rental, booking.currency)}</dd></div><div><dt className="flex items-center gap-2 text-sm text-slate-600"><WalletCards aria-hidden="true" className="size-4" />Депозит отдельно</dt><dd className="mt-2 break-words text-xl font-semibold tabular-nums">{rentalMoney(booking.deposit.amount, booking.currency)}</dd></div></dl> : <p className="mt-2 flex flex-wrap items-center gap-2 text-sm tabular-nums text-slate-700"><Banknote aria-hidden="true" className="h-4 w-4" />Аренда: {rentalMoney(booking.pricing.total_rental, booking.currency)} · депозит отдельно: {rentalMoney(booking.deposit.amount, booking.currency)}</p>}
     <div className="mt-4 space-y-2"><p className="flex items-start gap-2 break-words font-medium"><UserRound aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-600" />{name}</p>
       {username && <p className="break-all text-sm text-slate-700">@{username}</p>}
       {booking.customer?.telegram_user_id && <p className="text-xs tabular-nums text-slate-600">Telegram ID: {booking.customer.telegram_user_id}</p>}
@@ -36,6 +41,7 @@ export function ParkRequestItem({ booking, busy, onAction }: { booking: ParkBook
     </div>
     {booking.operator_details?.note && <p className="mt-3 whitespace-pre-wrap break-words text-sm text-slate-600">{booking.operator_details.note}</p>}
     <p className="mt-3 text-xs text-slate-600">{booking.source?.endsWith('_manual') ? 'Ручная запись' : 'Заявка через Telegram'} · {booking.pricing.timezone}</p>
+    {detailed && <div className="mt-4"><label htmlFor={`${id}-reference`} className="text-sm font-medium">Номер заявки</label><div className="mt-2 flex min-w-0 gap-2"><Input type="text" id={`${id}-reference`} readOnly value={bookingNumber} className="min-h-11 min-w-0 flex-1 text-sm" onFocus={event => event.target.select()} /><Button variant="outline" className="min-h-11 shrink-0" aria-label="Скопировать номер заявки" onClick={async () => { try { await navigator.clipboard.writeText(bookingNumber); setReferenceMessage('Номер скопирован.'); } catch { setReferenceMessage('Выделите и скопируйте номер вручную.'); } }}><Copy aria-hidden="true" className="size-4" /></Button></div>{referenceMessage && <p role="status" className="mt-2 text-sm text-slate-600">{referenceMessage}</p>}</div>}
     {['requested', 'confirmed'].includes(booking.status) && <div className="mt-4 flex flex-wrap gap-2">{booking.status === 'requested' && <Button className="min-h-11 gap-2 bg-blue-700 text-white hover:bg-blue-800" disabled={busy} onClick={() => onAction(booking, 'confirmed')}><Check aria-hidden="true" className="h-4 w-4" />Подтвердить</Button>}<Button variant="outline" className="min-h-11 gap-2" disabled={busy} onClick={() => onAction(booking, 'cancelled')}><X aria-hidden="true" className="h-4 w-4" />Отменить</Button></div>}
   </li>;
 }
