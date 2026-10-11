@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { ArrowLeft, CarFront, CalendarDays, CheckCircle2, Eye, EyeOff, ImageIcon, Loader2, Pencil, Plus, RefreshCw, Store, Trash2, WalletCards, Banknote, Save, X, Globe } from "lucide-react";
+import { ArrowLeft, CarFront, CalendarDays, CheckCircle2, ClipboardList, Eye, EyeOff, ImageIcon, Loader2, Pencil, Plus, RefreshCw, Store, Trash2, WalletCards, Banknote, Save, X, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { PlatformParkTelegramPanel } from './PlatformParkTelegramPanel';
 import { ParkBookingCalendar } from './ParkBookingCalendar';
+import { ParkRequestsPanel } from './ParkRequestsPanel';
 import { ParkTrialStatus } from './ParkTrialStatus';
 import { fetchOwnerFleet, saveOwnerAsset, uploadOwnerPhoto, archiveOwnerAsset, loadOwnerMedia } from '@/api/park-owner-fleet';
 import { VehicleCardFrame } from '@/components/VehicleCardFrame';
@@ -26,7 +27,7 @@ const TYPES: Record<AssetType, string> = {
 const blank = (type: AssetType): PlatformAssetInput => ({ name: "", asset_type: type, brand: "", model: "", year: null, color: "", daily_rate: 0, deposit: 0, public: false });
 const message = (error: unknown) => error instanceof Error ? error.message : "Не удалось сохранить. Повторите попытку.";
 const primaryButton = "min-h-11 rounded-lg bg-blue-700 text-white hover:bg-blue-800";
-const workspaceTab = "min-h-11 gap-2 rounded-lg px-4 text-slate-600 data-[state=active]:bg-blue-700 data-[state=active]:text-white data-[state=active]:shadow-none hover:bg-blue-50 focus-visible:ring-blue-700";
+const workspaceTab = "min-h-11 flex-col gap-1 rounded-lg px-2 py-2 text-xs text-slate-600 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm data-[state=active]:bg-blue-700 data-[state=active]:text-white data-[state=active]:shadow-none hover:bg-blue-50 focus-visible:ring-blue-700";
 
 function validateImage(file: File) {
   if (!file.size || file.size > 8 * 1024 * 1024) throw new Error(`${file.name}: размер должен быть не больше 8 МБ`);
@@ -56,8 +57,9 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
   tenant: PlatformTenant; onBack: () => void; onTenantChanged: (tenant: PlatformTenant) => void; owner?: boolean; onViewStorefront?: () => void;
 }) {
   const [assets, setAssets] = useState<PlatformAsset[]>([]);
-  const [section, setSection] = useState('fleet');
+  const [section, setSection] = useState('requests');
   const [calendarVisited, setCalendarVisited] = useState(false);
+  const [requestsVisited, setRequestsVisited] = useState(true);
   const [calendarRevision, setCalendarRevision] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -178,7 +180,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
     finally { setBusy(false); }
   };
 
-  return <div className={`${owner ? 'rounded-xl' : 'min-h-screen'} bg-slate-50 px-4 py-6 text-slate-950 selection:bg-blue-200 md:px-8 [&_button]:min-h-11 [&_input]:min-h-11`}>
+  return <div className={`${owner ? 'rounded-xl' : 'min-h-screen'} bg-slate-50 px-4 py-6 text-slate-950 selection:bg-blue-200 md:px-8 [&_button:not([data-compact-event])]:min-h-11 [&_input]:min-h-11`}>
     <div className="mx-auto max-w-6xl">
       {!owner && <Button variant="ghost" onClick={onBack} disabled={busy}><ArrowLeft aria-hidden="true" /> Все прокаты</Button>}
       <header className="flex items-start gap-3 sm:gap-4">
@@ -211,10 +213,11 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
       </section>}
       </details>}
 
-      <Tabs value={section} onValueChange={(value) => { setSection(value); if (value === 'calendar') { setCalendarVisited(true); setCalendarRevision(current => current + 1); } }} activationMode="manual" className="mt-6 min-w-0">
-        <TabsList aria-label="Управление парком" className="grid h-auto w-full grid-cols-2 gap-1 rounded-xl bg-slate-200/70 p-1 sm:max-w-md">
-          <TabsTrigger value="fleet" className={workspaceTab}><CarFront aria-hidden="true" className="h-4 w-4" />Автопарк</TabsTrigger>
+      <Tabs value={section} onValueChange={(value) => { setSection(value); if (value === 'calendar') setCalendarVisited(true); if (value === 'requests') setRequestsVisited(true); if (value === 'calendar' || value === 'requests') setCalendarRevision(current => current + 1); }} activationMode="manual" className="mt-6 min-w-0">
+        <TabsList aria-label="Управление парком" className="mx-auto grid h-auto w-full max-w-xl grid-cols-3 gap-1 rounded-xl bg-slate-200/70 p-1">
+          <TabsTrigger value="requests" className={workspaceTab}><ClipboardList aria-hidden="true" className="h-4 w-4" />Заявки</TabsTrigger>
           <TabsTrigger value="calendar" className={workspaceTab}><CalendarDays aria-hidden="true" className="h-4 w-4" />Календарь</TabsTrigger>
+          <TabsTrigger value="fleet" className={workspaceTab}><CarFront aria-hidden="true" className="h-4 w-4" />Автопарк</TabsTrigger>
         </TabsList>
         <TabsContent value="fleet" forceMount hidden={section !== 'fleet'} className="mt-6 data-[state=inactive]:hidden">
       <section aria-labelledby="fleet-title">
@@ -259,6 +262,9 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
         </TabsContent>
         {calendarVisited && <TabsContent value="calendar" forceMount hidden={section !== 'calendar'} className="mt-6 min-w-0 data-[state=inactive]:hidden">
           <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} fleetRevision={calendarRevision} />
+        </TabsContent>}
+        {requestsVisited && <TabsContent value="requests" forceMount hidden={section !== 'requests'} className="mt-6 min-w-0 data-[state=inactive]:hidden">
+          <ParkRequestsPanel key={`requests-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} revision={calendarRevision} />
         </TabsContent>}
       </Tabs>
     </div>

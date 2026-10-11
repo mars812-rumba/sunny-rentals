@@ -11,7 +11,9 @@ const bundle = await build({ stdin: { contents: `export * from './src/utils/park
  export { SchedulerCalendar } from './src/components/admin/SchedulerCalendar';
  export { MonthCalendarView } from './src/components/admin/MonthCalendarView';
  export { ParkTrialStatus } from './src/components/platform/ParkTrialStatus';
- export { ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';`, resolveDir: process.cwd(), loader: 'tsx' },
+ export { ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';
+ export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
+ export { ParkRequestItem } from './src/components/platform/ParkRequestsPanel';`, resolveDir: process.cwd(), loader: 'tsx' },
  bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic',
  external: ['react', 'react/jsx-runtime', 'react-dom'], define: { 'import.meta.env.VITE_API_URL': '""' } });
 const compiled = new Module(resolve('tests/park-calendar-fixture.cjs'));
@@ -22,6 +24,27 @@ const ui = compiled.exports;
 const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', start_at: '2026-08-01T17:00:00Z', end_at: '2026-08-03T17:00:00Z', currency: 'THB',
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
+
+test('fallback contact form labels all channels and requires a number and consent', () => {
+ for (const channel of ['whatsapp', 'max', 'phone']) {
+  const html = renderToStaticMarkup(e(ui.ParkContactFields, { id: 'client', contact: { channel, value: '' }, busy: false, onChange() {} }));
+  assert.match(html, /WhatsApp/); assert.match(html, /MAX/); assert.match(html, /Телефон/);
+  assert.match(html, /for="client-contact"/);
+  assert.match(html, /type="tel"[^>]*required=""/);
+  assert.match(html, /type="checkbox" required=""/);
+  assert.match(html, /Разрешаю передать этот контакт парку/);
+  assert.match(html, /aria-describedby="client-contact-hint client-contact-format"/);
+ }
+ const html = renderToStaticMarkup(e(ui.ParkRequestItem, { booking: { ...booking, customer: { name: 'Test', username: null, contact: { channel: 'max', value: '+66123456789' } } }, busy: false, onAction() {} }));
+ assert.match(html, /MAX: \+66123456789/);
+ assert.match(html, /Скопировать контакт/);
+ assert.match(html, /<li class="min-w-0 rounded-xl border border-slate-300 bg-white p-4 sm:p-5"/);
+ assert.doesNotMatch(html, /Контакт для прямой связи не указан/);
+ const invalid = renderToStaticMarkup(e(ui.ParkContactFields, { id: 'client', contact: { channel: 'phone', value: '+1' }, error: 'Укажите номер с кодом страны.', busy: false, onChange() {} }));
+ assert.match(invalid, /aria-invalid="true"/);
+ assert.match(invalid, /aria-describedby="client-contact-hint client-contact-format client-contact-error"/);
+ assert.match(invalid, /id="client-contact-error" role="alert"/);
+});
 
 test('adapter uses park civil dates, retains ID and does not invent customer contacts or photos', () => {
  const item = ui.calendarBooking(booking);
@@ -50,6 +73,30 @@ test('shared Gantt excludes return day for parks, keeps legacy inclusive range b
  assert.doesNotMatch(html, /images_web|park-b/);
  const legacy = renderToStaticMarkup(e(ui.SchedulerCalendar, props));
  assert.match(legacy, /width:66px/);
+ assert.match(html, /height:96px;max-height:min\(65vh, 520px\)/);
+ assert.match(legacy, /height:calc\(100vh - 60px\)/);
+});
+
+test('request item displays private contacts with safe links and actionable statuses', () => {
+ const props = { booking: { ...booking, customer: { name: 'Иван', username: 'ivan_test', phone: '+66 123-456-789', telegram_user_id: '42' } }, busy: false, onAction() {} };
+ const html = renderToStaticMarkup(e(ui.ParkRequestItem, props));
+ assert.match(html, /Иван/);
+ assert.match(html, /@ivan_test/);
+ assert.match(html, /href="https:\/\/t.me\/ivan_test"/);
+ assert.match(html, /href="tel:\+66123456789"/);
+ assert.match(html, /Telegram ID: 42/);
+ assert.match(html, /Подтвердить/);
+ assert.match(html, /Отменить/);
+ const missing = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking } }));
+ assert.match(missing, /Контакт для прямой связи не указан/);
+ assert.doesNotMatch(missing, /href="(?:https:\/\/t.me|tel:)/);
+ const unsafe = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, customer: { username: 'evil?start=secret', phone: 'javascript:alert(1)' } } }));
+ assert.doesNotMatch(unsafe, /href="(?:https:\/\/t.me|tel:|javascript:)/);
+ const confirmed = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, status: 'confirmed' } }));
+ assert.doesNotMatch(confirmed, />Подтвердить<\/button>/);
+ assert.match(confirmed, />Отменить<\/button>/);
+ const cancelled = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, status: 'cancelled' } }));
+ assert.doesNotMatch(cancelled, />Отменить<\/button>|>Подтвердить<\/button>/);
 });
 
 test('shared month has occupied-day and return badges, with named keyboard controls', () => {
@@ -58,6 +105,27 @@ test('shared month has occupied-day and return badges, with named keyboard contr
  assert.match(html, /aria-label="Занято: Toyota"/);
  assert.match(html, /aria-label="Возврат: Toyota"/);
  assert.match(html, /<button[^>]+aria-label="3 августа 2026, событий: 1"/);
+ assert.match(html, /min-h-7/);
+ assert.match(html, /bg-slate-500\/5 text-slate-700/);
+ assert.doesNotMatch(html, /class="[^"]*opacity-[^\"]*"[^>]*aria-label="Занято/);
+});
+
+test('confirmed occupancy is quiet but pickup and return retain their distinct colors', () => {
+ const confirmed = { ...booking, status: 'confirmed' };
+ const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: [ui.calendarBooking(confirmed)], logisticsData: [ui.calendarLogistics(confirmed)], onDateChange() {}, onBookingClick() {}, showOccupancy: true }));
+ assert.match(html, /bg-blue-500\/5 text-blue-950/);
+ assert.match(html, /bg-green-400 text-green-900/);
+ assert.match(html, /bg-yellow-400 text-yellow-900/);
+});
+
+test('client quote has semantic icons and clearly separates rent from refundable deposit', () => {
+ const html = renderToStaticMarkup(e(ui.ParkQuoteSummary, { quote: { asset_name: 'MG 5', start_date: '2026-10-11', end_date: '2026-10-23', days: 12,
+   daily_rate: '900', total_rental: '10800', deposit: '5000', currency: 'THB', timezone: 'Asia/Bangkok' } }));
+ for (const icon of ['car-front', 'calendar-days', 'banknote', 'wallet-cards', 'clock-3', 'info']) assert.match(html, new RegExp(`lucide-${icon}`));
+ assert.match(html, /Возвратный депозит отдельно/);
+ assert.match(html, /12 суток/);
+ assert.match(html, /<dl/);
+ assert.doesNotMatch(html, /Передачи|Бензин|5 мест|Bearer|quote_token/);
 });
 
 test('trial displays only the expiry date in the park timezone', () => {
@@ -74,7 +142,7 @@ test('month view also contains the Gantt with shared dates and asset filter, wit
  const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
  const monthPanel = source.match(/<TabsContent value="month"[\s\S]*?<\/TabsContent>/)?.[0];
  assert.ok(monthPanel);
- assert.ok(monthPanel.indexOf('<MonthCalendarView') < monthPanel.indexOf('<SchedulerCalendar'));
+ assert.ok(monthPanel.indexOf('<SchedulerCalendar') < monthPanel.indexOf('<MonthCalendarView'));
  assert.match(monthPanel, /currentDate=\{date\}/);
  assert.match(monthPanel, /startDate=\{date\}/);
  assert.match(monthPanel, /cars=\{cars\.filter\(car => !assetId \|\| car\.id === assetId\)\}/);
@@ -90,6 +158,8 @@ test('manual form has labeled fields, inline validation hooks and date-only inpu
  assert.match(html, /Блокировка \/ обслуживание/);
  assert.match(html, /Имя клиента/);
  assert.match(html, /Создать подтверждённую бронь/);
+ assert.match(html, /Предбронь — ожидает подтверждения/);
+ assert.match(html, /Статус брони/);
  assert.match(html, /type="date"[^>]+value="2026-08-02"/);
  assert.match(html, /aria-describedby=/);
  assert.doesNotMatch(html, /datetime-local|chat_id|Bearer|secret|images_web/);

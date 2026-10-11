@@ -65,12 +65,20 @@ test('owner workspace does not render platform management controls', () => {
   }));
   assert.match(html, /Техника парка/);
   assert.match(html, /role="tablist"[^>]+aria-label="Управление парком"/);
-  assert.equal((html.match(/role="tab"/g) || []).length, 2);
-  assert.match(html, /aria-selected="true"[^>]*>[\s\S]*?Автопарк<\/button>/);
+  assert.equal((html.match(/role="tab"/g) || []).length, 3);
+  assert.match(html, /aria-selected="false"[^>]*>[\s\S]*?Автопарк<\/button>/);
   assert.match(html, /aria-selected="false"[^>]*>[\s\S]*?Календарь<\/button>/);
   assert.match(html, /data-\[state=active\]:bg-blue-700/);
   assert.match(html, /lucide-car-front/);
   assert.match(html, /lucide-calendar-days/);
+  assert.match(html, /lucide-clipboard-list/);
+  assert.match(html, /aria-selected="true"[^>]*>[\s\S]*?Заявки<\/button>/);
+  const tablist = html.match(/role="tablist"[\s\S]*?<\/div>/)[0];
+  assert.ok(tablist.indexOf('Заявки') < tablist.indexOf('Календарь'));
+  assert.ok(tablist.indexOf('Календарь') < tablist.indexOf('Автопарк'));
+  assert.match(tablist, /mx-auto/);
+  assert.match(tablist, /max-w-xl/);
+  assert.match(html, /Загружаем заявки/);
   assert.match(html, /role="tabpanel"/);
   assert.doesNotMatch(html, /Загружаем календарь|Добавить бронь \/ блокировку/);
   assert.doesNotMatch(html, /Все прокаты|Подготовить превью|Логотип проката|Webhook|<h1/);
@@ -89,12 +97,16 @@ test('owner can open the separate client storefront from the park header', () =>
   assert.doesNotMatch(html, /Подберите транспорт|Выберите транспорт|Клиентский каталог/);
 });
 
-test('superadmin uses the same two working tabs with separate collapsed park setup', () => {
+test('superadmin uses the same three working tabs with separate collapsed park setup', () => {
   const html = renderToStaticMarkup(e(ui.PlatformTenantWorkspace, {
     tenant: { tenant_id: 'park-a', slug: 'park-a', name: 'Очень длинное название проката для проверки переноса', status: 'draft', currency: 'THB', timezone: 'Asia/Bangkok', primary_asset_type: 'car' },
     onBack() {}, onTenantChanged() {},
   }));
-  assert.equal((html.match(/role="tab"/g) || []).length, 2);
+  assert.equal((html.match(/role="tab"/g) || []).length, 3);
+  const tablist = html.match(/role="tablist"[\s\S]*?<\/div>/)[0];
+  assert.ok(tablist.indexOf('Заявки') < tablist.indexOf('Календарь'));
+  assert.ok(tablist.indexOf('Календарь') < tablist.indexOf('Автопарк'));
+  assert.match(html, /aria-selected="true"[^>]*>[\s\S]*?Заявки<\/button>/);
   assert.match(html, /Настройки подключения и оформления<\/summary>/);
   assert.match(html, /<details class="mt-5">/);
   assert.match(html, /Подготовить превью витрины/);
