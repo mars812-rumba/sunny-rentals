@@ -19,9 +19,10 @@ from platform_core.partner_bot import (
 )
 from platform_core.telegram_identity import TelegramIdentityError
 from platform_core.asset_admin import AssetInput, TenantAssetAdmin, MAX_IMAGE_BYTES
+from platform_core.vehicle_details import VehicleDetailsInput
 from platform_core.provisioning import TenantNotFoundError
 from platform_core.partner_webhook import PartnerWebhookManager, WebhookSetupError, WebhookConflict
-from platform_core.park_bookings import ParkBookingService, ParkQuoteRequest, ParkBookingRequest, BookingConflict, ParkStatusRequest, ParkOwnerStatusRequest, ParkAvailabilityRequest
+from platform_core.park_bookings import ParkBookingService, ParkQuoteRequest, ParkBookingRequest, BookingConflict, ParkStatusRequest, ParkOwnerStatusRequest, ParkAvailabilityRequest, ParkManualRequest, ParkOwnerManualRequest
 
 
 class InvitationRequest(BaseModel):
@@ -43,6 +44,10 @@ class OwnerAssetRequest(PartnerIdentityRequest):
 
 class OwnerAssetTarget(PartnerIdentityRequest):
     asset_id: pattern_string(r'^[a-f0-9]{32}$')
+
+
+class OwnerAssetDetailsRequest(OwnerAssetTarget):
+    data: VehicleDetailsInput
 
 
 class OwnerMediaRequest(PartnerIdentityRequest):
@@ -135,6 +140,10 @@ def create_platform_partner_router(service: PartnerBotService, admin_auth: Platf
             return {'archived': True}
         return owner_asset_call(request, archive)
 
+    @router.post('/fleet/details')
+    def owner_asset_details(request: OwnerAssetDetailsRequest):
+        return owner_asset_call(request, lambda assets: {'asset': assets.save_details(request.asset_id, request.data)})
+
     @router.post('/fleet/media')
     def owner_media(request: OwnerMediaRequest):
         return owner_asset_call(request, lambda assets: FileResponse(assets.media_path(request.reference),
@@ -165,6 +174,14 @@ def create_platform_partner_router(service: PartnerBotService, admin_auth: Platf
     @router.post('/calendar')
     def owner_calendar(request: PartnerIdentityRequest):
         return {'bookings': booking_result(lambda: bookings.calendar(request.tenant_id, request.init_data))}
+
+    @router.post('/calendar/manual', status_code=201)
+    def owner_manual_booking(request: ParkOwnerManualRequest):
+        return {'booking': booking_result(lambda: bookings.create_manual(request.tenant_id, request, init_data=request.init_data))}
+
+    @router.post('/parks/{tenant_id}/calendar/manual', status_code=201)
+    def admin_manual_booking(tenant_id: str, request: ParkManualRequest, context=Depends(require_admin)):
+        return {'booking': booking_result(lambda: bookings.create_manual(tenant_id, request, admin=context))}
 
     @router.get('/parks/{tenant_id}/calendar')
     def admin_calendar(tenant_id: str, context=Depends(require_admin)):

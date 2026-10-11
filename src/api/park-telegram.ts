@@ -106,12 +106,14 @@ export interface ParkQuote {
   days: number; daily_rate: string; total_rental: string; deposit: string;
   currency: string; timezone: string; quote_token: string;
   requires_contact?: boolean;
+  tariff_breakdown?: TariffBreakdown[];
 }
+export interface TariffBreakdown { season: 'low_season' | 'high_season'; days: number; daily_rate: string; subtotal: string }
 export interface ParkContact { channel: 'whatsapp' | 'max' | 'phone'; value: string; consent?: true }
 export interface ParkBooking {
   booking_number?: string;
   id: string; asset_id: string; status: string; start_at: string; end_at: string; currency: string;
-  pricing: { asset_name: string; start_date: string; end_date: string; days: number; daily_rate: string; total_rental: string; timezone: string };
+  pricing: { asset_name: string; start_date: string; end_date: string; days: number; daily_rate: string; total_rental: string; timezone: string; tariff_breakdown?: TariffBreakdown[] };
   deposit: { amount: string };
   entry_type?: 'rental' | 'block';
   source?: string;

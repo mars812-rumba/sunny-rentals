@@ -139,6 +139,7 @@ class Subscription(TenantRecord):
 
 
 class RentalAsset(TenantRecord):
+    description: str = Field(default='', max_length=5000)
     asset_type: AssetType = AssetType.CAR
     name: str = Field(min_length=1)
     internal_number: Optional[str] = None

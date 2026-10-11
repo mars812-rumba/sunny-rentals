@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { ArrowLeft, CarFront, CalendarDays, CheckCircle2, ClipboardList, Eye, EyeOff, ImageIcon, Loader2, Pencil, Plus, RefreshCw, Store, Trash2, WalletCards, Banknote, Save, X, Globe } from "lucide-react";
+import { ArrowLeft, CarFront, CalendarDays, CheckCircle2, ClipboardList, Eye, EyeOff, FileText, ImageIcon, Loader2, Pencil, Plus, RefreshCw, Store, Trash2, WalletCards, Banknote, Save, Wrench, X, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { PlatformParkTelegramPanel } from './PlatformParkTelegramPanel';
 import { ParkBookingCalendar } from './ParkBookingCalendar';
 import { ParkRequestsPanel } from './ParkRequestsPanel';
 import { ParkTrialStatus } from './ParkTrialStatus';
+import { VehicleDetailsEditor, VehicleSpecSummary } from './VehicleDetailsEditor';
 import { fetchOwnerFleet, saveOwnerAsset, uploadOwnerPhoto, archiveOwnerAsset, loadOwnerMedia } from '@/api/park-owner-fleet';
 import { VehicleCardFrame } from '@/components/VehicleCardFrame';
 import { CardContent } from '@/components/ui/card';
@@ -25,6 +26,7 @@ const TYPES: Record<AssetType, string> = {
   bicycle: "Велосипед", snowmobile: "Снегоход", other: "Другая техника",
 };
 const blank = (type: AssetType): PlatformAssetInput => ({ name: "", asset_type: type, brand: "", model: "", year: null, color: "", daily_rate: 0, deposit: 0, public: false });
+const minimumRate = (asset: PlatformAsset) => asset.pricing.tariff_grid ? Math.min(...Object.values(asset.pricing.tariff_grid.low_season), ...Object.values(asset.pricing.tariff_grid.high_season)) : asset.pricing.daily_rate || 0;
 const message = (error: unknown) => error instanceof Error ? error.message : "Не удалось сохранить. Повторите попытку.";
 const primaryButton = "min-h-11 rounded-lg bg-blue-700 text-white hover:bg-blue-800";
 const workspaceTab = "min-h-11 flex-col gap-1 rounded-lg px-2 py-2 text-xs text-slate-600 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm data-[state=active]:bg-blue-700 data-[state=active]:text-white data-[state=active]:shadow-none hover:bg-blue-50 focus-visible:ring-blue-700";
@@ -67,6 +69,8 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
   const [reload, setReload] = useState(0);
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState<PlatformAsset | "new" | null>(null);
+  const [detailEditor, setDetailEditor] = useState<{ asset: PlatformAsset; section: 'pricing' | 'specs' | 'description' } | null>(null);
+  const detailTrigger = useRef<HTMLButtonElement>(null);
   const [editorError, setEditorError] = useState("");
   const nameInput = useRef<HTMLInputElement>(null);
   const editingId = editing === "new" ? "new" : editing?.id;
@@ -228,8 +232,11 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {assets.map((asset) => <VehicleCardFrame key={asset.id} assetId={asset.id} media={asset.photos.main ? <PrivateImage owner={owner} tenantId={tenant.tenant_id} reference={asset.photos.main} alt={asset.name} className="aspect-[16/10] w-full object-cover" /> : <div className="grid aspect-[16/10] place-items-center bg-slate-100"><CarFront className="text-slate-500" aria-hidden="true" /></div>}>
               <CardContent className="flex flex-1 flex-col gap-4 p-4">
-              <div className="min-w-0 flex-1"><h3 className="break-words text-lg font-semibold leading-snug">{asset.name}</h3><p className="mt-2 flex items-center gap-2 text-sm text-slate-600"><CarFront aria-hidden="true" className="h-4 w-4 shrink-0" />{TYPES[asset.asset_type]}</p><p className="mt-3 flex items-center gap-2 text-base font-semibold tabular-nums text-blue-700"><Banknote aria-hidden="true" className="h-4 w-4 shrink-0" />{asset.pricing.daily_rate || 0} {tenant.currency}/день</p><p className="mt-2 flex items-center gap-2 text-sm tabular-nums text-slate-600"><WalletCards aria-hidden="true" className="h-4 w-4 shrink-0" />Депозит: {asset.deposit_policy.amount || 0} {tenant.currency}</p><p className="mt-2 flex items-center gap-2 text-sm text-slate-600"><ImageIcon aria-hidden="true" className="h-4 w-4 shrink-0" />Фото: {asset.photos.gallery?.length || 0}</p></div>
+              <div className="min-w-0 flex-1"><h3 className="break-words text-lg font-semibold leading-snug">{asset.name}</h3><p className="mt-2 flex items-center gap-2 text-sm text-slate-600"><CarFront aria-hidden="true" className="h-4 w-4 shrink-0" />{TYPES[asset.asset_type]}</p><p className="mt-3 flex items-center gap-2 text-base font-semibold tabular-nums text-blue-700"><Banknote aria-hidden="true" className="h-4 w-4 shrink-0" />{asset.pricing.tariff_grid ? 'от ' : ''}{minimumRate(asset).toLocaleString('ru-RU')} {tenant.currency}/день</p><p className="mt-2 flex items-center gap-2 text-sm tabular-nums text-slate-600"><WalletCards aria-hidden="true" className="h-4 w-4 shrink-0" />Депозит: {asset.deposit_policy.amount || 0} {tenant.currency}</p><p className="mt-2 flex items-center gap-2 text-sm text-slate-600"><ImageIcon aria-hidden="true" className="h-4 w-4 shrink-0" />Фото: {asset.photos.gallery?.length || 0}</p></div>
               <div className="flex gap-2"><Button variant="outline" disabled={busy} aria-label={`Редактировать ${asset.name}`} onClick={() => edit(asset)}><Pencil aria-hidden="true" /> Изменить</Button><Button variant="outline" disabled={busy} aria-label={`В архив: ${asset.name}`} onClick={() => { setArchiveError(""); setArchiveTarget(asset); }}><Trash2 aria-hidden="true" /></Button></div>
+              <VehicleSpecSummary specs={asset.specs} />
+              {asset.pricing.tariff_grid && <p className="text-sm text-slate-600">Сезонная сетка · 4 диапазона аренды</p>}
+              <div className="flex flex-wrap gap-2">{([['pricing', 'Цены', WalletCards], ['specs', 'Характеристики', Wrench], ['description', 'Описание', FileText]] as const).map(([section, label, Icon]) => <Button key={section} variant="outline" className="min-h-11 gap-2 text-sm" disabled={busy} aria-label={`${label}: ${asset.name}`} onClick={event => { detailTrigger.current = event.currentTarget; setDetailEditor({ asset, section }); }}><Icon aria-hidden="true" className="size-4" />{label}</Button>)}</div>
               <p className={`flex items-center gap-2 text-sm ${asset.public ? 'text-emerald-700' : 'text-slate-600'}`}>{asset.public ? <Eye aria-hidden="true" className="h-4 w-4 shrink-0" /> : <EyeOff aria-hidden="true" className="h-4 w-4 shrink-0" />}{asset.public ? 'Показывается клиентам' : 'Скрыто с витрины'}</p>
               </CardContent></VehicleCardFrame>)}
           </div>
@@ -244,11 +251,11 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
               <div><Label htmlFor="asset-kind">Тип транспорта</Label><select id="asset-kind" className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm focus:outline-cyan-600" value={form.asset_type} onChange={(e) => setForm({ ...form, asset_type: e.target.value as AssetType })}>{Object.entries(TYPES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
               <div><Label htmlFor="asset-year">Год выпуска</Label><Input id="asset-year" type="number" min={1950} max={2100} value={form.year ?? ""} onChange={(e) => setForm({ ...form, year: e.target.value ? Number(e.target.value) : null })} className="mt-2" /></div>
               {([ ["brand", "Марка"], ["model", "Модель"], ["color", "Цвет"] ] as const).map(([field, label]) => <div key={field}><Label htmlFor={`asset-${field}`}>{label}</Label><Input id={`asset-${field}`} maxLength={80} value={form[field]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} className="mt-2" /></div>)}
-              <div><Label htmlFor="asset-rate">Цена за день, {tenant.currency}</Label><Input id="asset-rate" type="number" required min={0} max={100000000} step="0.01" value={form.daily_rate} onChange={(e) => setForm({ ...form, daily_rate: Number(e.target.value) })} className="mt-2" /></div>
+              <div><Label htmlFor="asset-rate">Базовая цена без сетки, {tenant.currency}</Label><Input id="asset-rate" type="number" required min={0} max={100000000} step="0.01" value={form.daily_rate} onChange={(e) => setForm({ ...form, daily_rate: Number(e.target.value) })} className="mt-2" /></div>
               <div><Label htmlFor="asset-deposit">Депозит, {tenant.currency}</Label><Input id="asset-deposit" type="number" required min={0} max={100000000} step="0.01" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: Number(e.target.value) })} className="mt-2" /></div>
               <div className="sm:col-span-2"><label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={Boolean(form.public)} onChange={(event) => setForm({ ...form, public: event.target.checked })} className="h-4 w-4 accent-blue-700 focus-visible:outline focus-visible:outline-2" />Показывать на витрине</label><p className="mt-2 text-sm text-slate-600">После публикации парка машина, её цены и фотографии станут доступны по публичной ссылке.</p></div>
             </fieldset>
-            <p className="mt-4 text-sm text-slate-600">На этом этапе задаётся базовая суточная цена. Сезонные тарифы добавим отдельно.</p>
+            <p className="mt-4 text-sm text-slate-600">Здесь задаётся базовая цена без сетки. После сохранения сезонные тарифы, характеристики и описание можно настроить кнопками в карточке автомобиля.</p>
             <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className={primaryButton}>{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />} Сохранить технику</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}><X aria-hidden="true" />Закрыть редактор</Button></div>
           </form>
           {editing !== "new" && <div className="mt-7 border-t border-slate-200 pt-5">
@@ -271,5 +278,6 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
     <AlertDialog open={Boolean(archiveTarget)} onOpenChange={(open) => { if (!open && !busy) setArchiveTarget(null); }}>
       <AlertDialogContent><AlertDialogHeader><AlertDialogTitle className="break-words">Перенести {archiveTarget?.name} в архив?</AlertDialogTitle><AlertDialogDescription>Техника исчезнет из активного списка. Её данные и фотографии сохранятся.</AlertDialogDescription></AlertDialogHeader>{archiveError && <p role="alert" className="text-sm text-rose-800">{archiveError}</p>}<AlertDialogFooter><AlertDialogCancel disabled={busy}>Отмена</AlertDialogCancel><AlertDialogAction className={primaryButton} disabled={busy} onClick={(event) => { event.preventDefault(); void archive(); }}>{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}{busy ? "Переносим…" : "В архив"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
     </AlertDialog>
+    {detailEditor && <VehicleDetailsEditor key={`${detailEditor.asset.id}:${detailEditor.section}`} asset={detailEditor.asset} section={detailEditor.section} currency={tenant.currency} owner={owner} onRestoreFocus={() => detailTrigger.current?.focus()} onClose={() => setDetailEditor(null)} onSaved={asset => { replaceAsset(asset); if (editing !== 'new' && editing?.id === asset.id) { setEditing(asset); if (detailEditor.section === 'pricing') setForm(current => ({ ...current, deposit: asset.deposit_policy.amount ?? 0 })); } toast.success('Данные автомобиля сохранены.'); }} />}
   </div>;
 }

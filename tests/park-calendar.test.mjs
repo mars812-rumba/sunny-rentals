@@ -213,6 +213,17 @@ test('manual form has labeled fields, inline validation hooks and date-only inpu
  assert.doesNotMatch(html, /datetime-local|chat_id|Bearer|secret|images_web/);
 });
 
+test('manual grid choice appears once and disables only the manual rate', () => {
+ const rates = { price_1_6: 800, price_7_14: 700, price_15_29: 600, price_30: 500 };
+ const html = renderToStaticMarkup(e(ui.ParkManualBookingForm, { tenantId: 'park-a', admin: false,
+   assets: [{ id: 'asset-a', name: 'Toyota', pricing: { daily_rate: 800, currency: 'THB', tariff_grid: { low_season: rates, high_season: rates, high_start: '11-01', high_end: '03-31' } }, deposit_policy: { amount: 5000 } }],
+   onSaved() {}, onClose() {} }));
+ assert.equal((html.match(/Рассчитать аренду по сезонной сетке автомобиля/g) || []).length, 1);
+ assert.match(html, /type="checkbox"[^>]*checked=""/);
+ assert.match(html, /id="[^"]+-rate" disabled=""/);
+ assert.doesNotMatch(html, /id="[^"]+-deposit" disabled=""/);
+});
+
 test('block projects to a distinct calendar label and color without altering stored booking status', () => {
  const block = { ...booking, entry_type: 'block', source: 'owner_manual', status: 'confirmed', operator_details: { customer_name: '', note: 'Ремонт' } };
  assert.equal(ui.calendarBooking(block).status, 'blocked');

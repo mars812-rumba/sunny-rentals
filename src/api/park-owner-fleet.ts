@@ -1,4 +1,4 @@
-import type { PlatformAsset, PlatformAssetInput, PlatformTenant } from './platform-admin';
+import type { PlatformAsset, PlatformAssetInput, PlatformTenant, VehicleDetailsInput } from './platform-admin';
 function identity(tenantId: string) {
   const initData = window.Telegram?.WebApp?.initData;
   if (!initData) throw new Error('Откройте кабинет из сообщения бота парка.');
@@ -26,6 +26,11 @@ export async function saveOwnerAsset(tenantId: string, data: PlatformAssetInput,
   return result.asset;
 }
 export async function archiveOwnerAsset(tenantId: string, assetId: string): Promise<void> { await ownerFetch('archive', { ...identity(tenantId), asset_id: assetId }); }
+export async function saveOwnerAssetDetails(tenantId: string, assetId: string, data: VehicleDetailsInput): Promise<PlatformAsset> {
+  const result = await (await ownerFetch('details', { ...identity(tenantId), asset_id: assetId, data })).json();
+  if (result.asset?.tenant_id !== tenantId || result.asset.id !== assetId) throw new Error('Получены неверные данные машины.');
+  return result.asset;
+}
 export async function uploadOwnerPhoto(tenantId: string, assetId: string, file: File): Promise<PlatformAsset> {
   const signed = identity(tenantId); const body = new FormData();
   body.set('tenant_id', signed.tenant_id); body.set('init_data', signed.init_data); body.set('asset_id', assetId); body.set('file', file);

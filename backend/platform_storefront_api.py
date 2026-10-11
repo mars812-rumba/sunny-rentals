@@ -15,6 +15,7 @@ from platform_core.context import TenantContext, validate_tenant_id
 from platform_core.models import AssetStatus, RentalAsset, TenantStatus
 from platform_core.provisioning import TenantProvisioner
 from platform_core.repositories import TenantStorage
+from platform_core.vehicle_details import PUBLIC_SPEC_KEYS, TariffGrid
 
 
 class StorefrontPreview:
@@ -98,13 +99,22 @@ class StorefrontReader:
         def number(value):
             return value if isinstance(value, (int, float)) and not isinstance(value, bool) and 0 <= value <= 100000000 else None
 
+        def grid(asset):
+            value = asset.pricing.get('tariff_grid')
+            return json.loads(TariffGrid.parse_obj(value).json()) if value else None
+
+        def minimum(asset):
+            value = grid(asset)
+            return min(*value['low_season'].values(), *value['high_season'].values()) if value else number(asset.pricing.get('daily_rate'))
+
         return {"tenant": {"id": self.tenant.tenant_id, "slug": self.tenant.slug,
                            "name": self.tenant.name, "currency": self.tenant.currency, "timezone": self.tenant.timezone,
                            "logo": self.logo()},
                 "preview": preview, "booking_enabled": False,
                 "assets": [{"id": a.id, "name": a.name, "asset_type": a.asset_type,
-                            "specs": {k: v for k, v in a.specs.items() if k in {"brand", "model", "year", "color"} and isinstance(v, (str, int))},
-                            "daily_rate": number(a.pricing.get("daily_rate")),
+                            "specs": {k: v for k, v in a.specs.items() if k in PUBLIC_SPEC_KEYS and (isinstance(v, (str, int, bool)) or k == 'features' and isinstance(v, list) and all(isinstance(x, str) for x in v))},
+                            "description": a.description, "tariff_grid": grid(a),
+                            "daily_rate": minimum(a),
                             "deposit": number(a.deposit_policy.get("amount")),
                             "photos": self.photos(a)} for a in self.assets]}
 

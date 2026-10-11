@@ -4,14 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { fetchParkBotLink, ParkBooking, ParkContact, ParkQuote, quoteParkBooking, submitParkBooking } from '@/api/park-telegram';
 import { dateLabel, ParkRentalPeriod, rentalMoney } from '@/lib/park-rental';
+import { ParkTariffBreakdown } from './ParkTariffBreakdown';
 
 export function ParkQuoteSummary({ quote }: { quote: ParkQuote }) {
   return <div className="space-y-4" role="status">
     <div className="space-y-2"><p className="flex items-start gap-2 break-words font-semibold"><CarFront aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-blue-700" />{quote.asset_name}</p><p className="flex items-start gap-2 text-sm text-slate-700"><CalendarDays aria-hidden="true" className="h-4 w-4 shrink-0" />{dateLabel(quote.start_date)} — {dateLabel(quote.end_date)} · {quote.days} суток</p></div>
     <dl className="space-y-3 rounded-xl bg-slate-50 p-4 tabular-nums">
-      <div className="flex flex-wrap items-start justify-between gap-2"><dt className="flex items-start gap-2 text-sm text-slate-600"><Banknote aria-hidden="true" className="h-4 w-4 shrink-0" /><span>Аренда<br />{rentalMoney(quote.daily_rate, quote.currency)} × {quote.days} суток</span></dt><dd className="text-xl font-semibold text-blue-700">{rentalMoney(quote.total_rental, quote.currency)}</dd></div>
+      <div className="flex flex-wrap items-start justify-between gap-2"><dt className="flex items-start gap-2 text-sm text-slate-600"><Banknote aria-hidden="true" className="h-4 w-4 shrink-0" /><span>Аренда<br />{quote.tariff_breakdown?.length ? 'По сезонной сетке' : `${rentalMoney(quote.daily_rate, quote.currency)} × ${quote.days} суток`}</span></dt><dd className="text-xl font-semibold text-blue-700">{rentalMoney(quote.total_rental, quote.currency)}</dd></div>
       <div className="flex flex-wrap items-start justify-between gap-2 border-t border-slate-200 pt-3"><dt className="flex items-start gap-2 text-sm text-slate-600"><WalletCards aria-hidden="true" className="h-4 w-4 shrink-0" />Возвратный депозит отдельно</dt><dd className="font-medium">{rentalMoney(quote.deposit, quote.currency)}</dd></div>
     </dl>
+    <ParkTariffBreakdown items={quote.tariff_breakdown} currency={quote.currency} />
     <p className="flex items-center gap-2 break-all text-xs text-slate-600"><Clock3 aria-hidden="true" className="h-4 w-4 shrink-0" />Часовой пояс: {quote.timezone}</p>
     <p className="flex items-start gap-2 text-sm leading-6 text-slate-600"><Info aria-hidden="true" className="mt-1 h-4 w-4 shrink-0" />Наличие и цена повторно проверяются при отправке. Заявку должен подтвердить парк.</p>
   </div>;

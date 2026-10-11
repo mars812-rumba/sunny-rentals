@@ -14,6 +14,7 @@ from .context import TenantContext
 from .models import AssetStatus, Booking, BookingStatus, Customer, RentalAsset
 from .partner_bot import PartnerBotError
 from .repositories import JsonCollectionRepository
+from .vehicle_details import calculate_rental
 
 
 class BookingConflict(ValueError):
@@ -171,13 +172,11 @@ class ParkBookingService:
         asset = self.repo(context, 'assets.json', RentalAsset).get(request.asset_id)
         if asset is None or not asset.public or asset.status != AssetStatus.AVAILABLE:
             raise BookingConflict('Vehicle is unavailable')
-        rate = self.money(asset.pricing.get('daily_rate'))
-        if rate <= 0:
-            raise ValueError('Price is not configured')
+        rental = calculate_rental(asset.pricing, request.start_date, days)
         deposit = self.money(asset.deposit_policy.get('amount', 0))
         quote = {'asset_id': asset.id, 'asset_name': asset.name, 'start_date': request.start_date.isoformat(),
-                 'end_date': request.end_date.isoformat(), 'days': days, 'daily_rate': str(rate),
-                 'total_rental': str(rate * days), 'deposit': str(deposit), 'currency': tenant.currency,
+                 'end_date': request.end_date.isoformat(), 'days': days, **rental,
+                 'deposit': str(deposit), 'currency': tenant.currency,
                  'timezone': tenant.timezone}
         # This is a change detector, not authentication. Identity is verified separately.
         quote['quote_token'] = hashlib.sha256(json.dumps(quote, sort_keys=True).encode()).hexdigest()
@@ -195,8 +194,7 @@ class ParkBookingService:
                 if not asset.public or asset.status != AssetStatus.AVAILABLE:
                     continue
                 try:
-                    if self.money(asset.pricing.get('daily_rate')) <= 0:
-                        continue
+                    calculate_rental(asset.pricing, request.start_date, days)
                     self.check_overlap(records, asset.id, start, end)
                 except (ValueError, BookingConflict):
                     continue
@@ -225,7 +223,7 @@ class ParkBookingService:
     def dto(booking):
         return {'id': booking.id, 'booking_number': booking.booking_number, 'asset_id': booking.asset_id, 'status': booking.status,
                 'start_at': booking.start_at, 'end_at': booking.end_at,
-                'pricing': {k: booking.pricing.get(k) for k in ('asset_name', 'start_date', 'end_date', 'days', 'daily_rate', 'total_rental', 'timezone')},
+                'pricing': {k: booking.pricing.get(k) for k in ('asset_name', 'start_date', 'end_date', 'days', 'daily_rate', 'total_rental', 'timezone', 'tariff_breakdown') if k in booking.pricing},
                 'deposit': {'amount': booking.deposit.get('amount')}, 'currency': booking.currency,
                 'entry_type': booking.entry_type, 'source': booking.source,
                 'operator_details': {k: booking.operator_details.get(k, '') for k in ('customer_name', 'note')}}
@@ -266,13 +264,18 @@ class ParkBookingService:
                     if request.booking_status != 'confirmed' or not request.note or request.customer_name or request.daily_rate is not None or request.deposit is not None:
                         raise ValueError('A block needs a reason and must not contain rental prices or a customer')
                     rate = deposit = Decimal('0.00')
+                    rental = {'daily_rate': str(rate), 'total_rental': str(rate * days)}
                 else:
                     if not request.customer_name:
                         raise ValueError('Customer name is required for a manual rental')
-                    rate = self.money(request.daily_rate if request.daily_rate is not None else asset.pricing.get('daily_rate'))
+                    if request.daily_rate is None:
+                        rental = calculate_rental(asset.pricing, request.start_date, days)
+                    else:
+                        rate = self.money(request.daily_rate)
+                        if rate <= 0:
+                            raise ValueError('Rental rate must be positive')
+                        rental = {'daily_rate': str(rate), 'total_rental': str(rate * days)}
                     deposit = self.money(request.deposit if request.deposit is not None else asset.deposit_policy.get('amount', 0))
-                    if rate <= 0:
-                        raise ValueError('Rental rate must be positive')
                 timestamp = datetime.fromtimestamp(self.partners.clock(), timezone.utc)
                 booking = Booking(id=key, booking_number=self.next_booking_number(records), tenant_id=context.tenant_id, asset_id=asset.id,
                     customer_id=None, status=BookingStatus(request.booking_status), start_at=start, end_at=end,
@@ -280,7 +283,7 @@ class ParkBookingService:
                     source='platform_manual' if admin is not None else 'owner_manual',
                     operator_details={'customer_name': request.customer_name, 'note': request.note, 'created_by': context.actor_id},
                     pricing={'asset_name': asset.name, 'start_date': request.start_date.isoformat(), 'end_date': request.end_date.isoformat(),
-                             'days': days, 'daily_rate': str(rate), 'total_rental': str(rate * days), 'timezone': tenant.timezone},
+                             'days': days, **rental, 'timezone': tenant.timezone},
                     deposit={'amount': str(deposit)}, legacy={'request_fingerprint': fingerprint},
                     created_at=timestamp, updated_at=timestamp)
                 document = repo._read_document()
@@ -320,7 +323,7 @@ class ParkBookingService:
                 customers.upsert(customer)
                 booking = Booking(id=key, booking_number=self.next_booking_number(records), tenant_id=context.tenant_id, asset_id=request.asset_id, customer_id=customer_id,
                     start_at=start, end_at=end, currency=quote['currency'], source='telegram_partner',
-                    pricing={k: quote[k] for k in ('asset_name', 'start_date', 'end_date', 'days', 'daily_rate', 'total_rental', 'timezone')},
+                    pricing={k: quote[k] for k in ('asset_name', 'start_date', 'end_date', 'days', 'daily_rate', 'total_rental', 'timezone', 'tariff_breakdown') if k in quote},
                     deposit={'amount': quote['deposit']}, legacy={'request_fingerprint': fingerprint})
                 if request.contact is not None:
                     booking.operator_details.update(contact_channel=request.contact.channel, contact_value=request.contact.value,

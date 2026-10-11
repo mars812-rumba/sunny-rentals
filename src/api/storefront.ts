@@ -1,8 +1,11 @@
+import type { TariffGrid, VehicleSpecs } from './platform-admin';
 export interface StorefrontAsset {
   id: string;
   name: string;
   asset_type: string;
-  specs: { brand?: string; model?: string; year?: number; color?: string };
+  specs: VehicleSpecs & { brand?: string; model?: string; year?: number; color?: string };
+  description?: string;
+  tariff_grid?: TariffGrid | null;
   daily_rate: number | null;
   deposit: number | null;
   photos: string[];

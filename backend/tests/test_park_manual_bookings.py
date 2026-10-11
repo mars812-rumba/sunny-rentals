@@ -72,6 +72,19 @@ class ManualCalendarTests(unittest.TestCase):
             results = list(pool.map(create, range(4)))
         self.assertEqual({item['booking_number'] for item in results}, {'100001', '100002', '100003', '100004'})
 
+    def test_manual_rental_uses_grid_unless_operator_supplies_a_rate(self):
+        from platform_core.vehicle_details import VehicleDetailsInput
+        from test_vehicle_details import grid
+        self.assets.save_details(self.asset.id, VehicleDetailsInput(section='pricing', pricing=grid()))
+        result = self.create(start_date='2026-10-30', end_date='2026-11-06')
+        self.assertEqual(result.status_code, 201, result.text)
+        self.assertEqual(result.json()['booking']['pricing']['total_rental'], '5900.00')
+        self.assertEqual(len(result.json()['booking']['pricing']['tariff_breakdown']), 2)
+        result = self.create(request_id='custom_rate_12345', start_date='2026-11-06', end_date='2026-11-13', daily_rate='750')
+        self.assertEqual(result.status_code, 201, result.text)
+        self.assertEqual(result.json()['booking']['pricing']['total_rental'], '5250.00')
+        self.assertNotIn('tariff_breakdown', result.json()['booking']['pricing'])
+
     def test_manual_rental_is_confirmed_scoped_and_not_a_fake_telegram_customer(self):
         result = self.create()
         self.assertEqual(result.status_code, 201, result.text)

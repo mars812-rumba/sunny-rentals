@@ -19,11 +19,12 @@ from .context import TenantContext
 from .models import AssetStatus, AssetType, RentalAsset, utc_now
 from .provisioning import PlatformContext, TenantNotFoundError, TenantProvisioner, trial_summary, _jsonable
 from .repositories import JsonCollectionRepository, JsonlEventRepository
+from .vehicle_details import VehicleDetailsInput
 
 
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
 MAX_PHOTOS = 20
-MEDIA_PATTERN = re.compile(r"^(?:logo|assets/[a-f0-9]{32})/[a-f0-9]{32}\.webp$")
+MEDIA_PATTERN = re.compile(r"^(?:logo|assets/[a-f0-9]{32}(?:/thumb)?)/[a-f0-9]{32}\.webp$")
 
 
 class AssetInput(BaseModel):
@@ -149,14 +150,58 @@ class TenantAssetAdmin:
             asset.public = False
             self._commit_asset(asset, "asset_archived")
 
+    def save_details(self, asset_id: str, data: VehicleDetailsInput):
+        # Patch only the chosen section: never overwrite photos, visibility,
+        # basic fields, private metadata or another editor's unrelated changes.
+        with self.provisioner._locked():
+            self._authorize()
+            asset = self._asset(asset_id)
+            if data.section == 'pricing':
+                asset.pricing = {**asset.pricing, 'tariff_grid': json.loads(data.pricing.json()) if data.pricing else None}
+                if data.deposit is not None:
+                    asset.deposit_policy = {**asset.deposit_policy, 'amount': data.deposit, 'currency': self.tenant.currency}
+            elif data.section == 'specs':
+                asset.specs = {**asset.specs, **json.loads(data.specs.json())}
+            else:
+                asset.description = data.description.strip()
+            asset.updated_at = utc_now()
+            self._commit_asset(asset, 'asset_details_updated', section=data.section)
+            return asset
+
     def media_path(self, reference: str):
         self._authorize()
         if not MEDIA_PATTERN.fullmatch(reference):
             raise TenantNotFoundError("Изображение не найдено")
         path = self.media_dir / reference
-        if not path.resolve().is_relative_to(self.media_dir.resolve()) or not path.is_file():
+        if not path.resolve().is_relative_to(self.media_dir.resolve()):
+            raise TenantNotFoundError("Изображение не найдено")
+        if '/thumb/' in reference and not path.is_file():
+            # Compatibility for existing uploads: create the derivative once,
+            # only behind the same tenant authorization as the full image.
+            with self.provisioner._locked():
+                source = self.media_dir / reference.replace('/thumb/', '/')
+                if not source.resolve().is_relative_to(self.media_dir.resolve()) or not source.is_file():
+                    raise TenantNotFoundError("Изображение не найдено")
+                if not path.is_file():
+                    path.parent.mkdir(exist_ok=True)
+                    with tempfile.TemporaryDirectory(prefix='.thumb-', dir=path.parent) as temporary:
+                        output = Path(temporary) / 'thumb.webp'
+                        self._encode_thumbnail(source, output)
+                        os.replace(output, path)
+        if not path.is_file():
             raise TenantNotFoundError("Изображение не найдено")
         return path
+
+    @staticmethod
+    def _encode_thumbnail(source, output):
+        try:
+            subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-threads', '1', '-i', str(source),
+                '-frames:v', '1', '-map_metadata', '-1', '-vf',
+                "scale=w='min(160,iw)':h='min(96,ih)':force_original_aspect_ratio=decrease",
+                '-c:v', 'libwebp', '-quality', '65', '-threads', '1', str(output)],
+                capture_output=True, timeout=20, check=True)
+        except subprocess.SubprocessError as error:
+            raise ValueError('Не удалось создать миниатюру изображения') from error
 
     def _encode(self, content: bytes, folder: str):
         if not content or len(content) > MAX_IMAGE_BYTES:
@@ -177,6 +222,9 @@ class TenantAssetAdmin:
         preview = target / f"{file_id}.webp"
         original = target / "original" / f"{file_id}.{extension}"
         original.parent.mkdir(exist_ok=True)
+        thumbnail = target / 'thumb' / f'{file_id}.webp' if folder.startswith('assets/') else None
+        if thumbnail is not None and not thumbnail.resolve().is_relative_to(self.media_dir.resolve()):
+            raise ValueError('Недопустимый путь миниатюры')
         try:
             with tempfile.TemporaryDirectory(prefix=".upload-", dir=target) as temporary:
                 source = Path(temporary) / f"source.{extension}"
@@ -196,15 +244,24 @@ class TenantAssetAdmin:
                                capture_output=True, timeout=20, check=True)
                 os.replace(source, original)
                 os.replace(output, preview)
+                if thumbnail is not None:
+                    thumbnail.parent.mkdir(exist_ok=True)
+                    small = Path(temporary) / 'thumb.webp'
+                    self._encode_thumbnail(preview, small)
+                    os.replace(small, thumbnail)
         except (subprocess.SubprocessError, KeyError, IndexError, json.JSONDecodeError) as error:
             original.unlink(missing_ok=True)
             preview.unlink(missing_ok=True)
+            if thumbnail is not None:
+                thumbnail.unlink(missing_ok=True)
             raise ValueError("Не удалось прочитать изображение. Загрузите другой JPEG, PNG или WebP") from error
         except Exception:
             original.unlink(missing_ok=True)
             preview.unlink(missing_ok=True)
+            if thumbnail is not None:
+                thumbnail.unlink(missing_ok=True)
             raise
-        return f"{folder}/{file_id}.webp", (preview, original)
+        return f"{folder}/{file_id}.webp", (preview, original, thumbnail) if thumbnail is not None else (preview, original)
 
     def upload_photo(self, asset_id: str, content: bytes):
         with self.provisioner._locked():
@@ -217,6 +274,8 @@ class TenantAssetAdmin:
             try:
                 gallery.append(reference)
                 asset.photos = {**asset.photos, "main": asset.photos.get("main") or reference, "gallery": gallery}
+                main = asset.photos['main']
+                asset.photos['thumbnail'] = str(Path(main).parent / 'thumb' / Path(main).name)
                 asset.updated_at = utc_now()
                 self._commit_asset(asset, "asset_photo_uploaded", reference=reference)
             except Exception:

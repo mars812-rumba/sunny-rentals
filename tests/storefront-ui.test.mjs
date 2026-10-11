@@ -11,6 +11,7 @@ const bundle = await build({
     export { default as HeroBanner } from './src/components/HeroBanner';
     export { VehicleCardFrame } from './src/components/VehicleCardFrame';
     export { PlatformTenantWorkspace } from './src/components/platform/PlatformTenantWorkspace';
+    export { VehicleSpecSummary, VehicleTariffTable } from './src/components/platform/VehicleDetailsEditor';
     export { resolveParkEntryView } from './src/lib/park-entry';
     export { LanguageProvider } from './src/contexts/LanguageContext';`, resolveDir: process.cwd(), loader: 'tsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs',
@@ -24,6 +25,20 @@ compiled.paths = Module._nodeModulePaths(process.cwd());
 compiled._compile(bundle.outputFiles[0].text, compiled.filename);
 const ui = compiled.exports;
 const e = React.createElement;
+
+test('public vehicle specs keep icon labels and escape custom text', () => {
+ const html = renderToStaticMarkup(e(ui.VehicleSpecSummary, { specs: { fuel: 'Гибрид', transmission: 'CVT', seats: 5, doors: 4, mileage: 12000, air_conditioning: false, features: ['<script>alert(1)</script>'] }, detailed: true }));
+ assert.match(html, /lucide-fuel/); assert.match(html, /lucide-settings-2/);
+ assert.match(html, /5 мест/); assert.match(html, /Двери: 4/); assert.match(html, /Кондиционер: нет/);
+ assert.match(html, /&lt;script&gt;/); assert.doesNotMatch(html, /<script>/);
+});
+
+test('seasonal tariff table names all four periods and both seasons', () => {
+ const rates = { price_1_6: 800, price_7_14: 700, price_15_29: 600, price_30: 500 };
+ const html = renderToStaticMarkup(e(ui.VehicleTariffTable, { grid: { low_season: rates, high_season: rates, high_start: '11-01', high_end: '03-31' }, currency: 'THB' }));
+ for (const label of ['1–6 дней', '7–14 дней', '15–29 дней', '30+ дней', 'Низкий сезон', 'Высокий сезон']) assert.ok(html.includes(label));
+ assert.match(html, /<caption class="sr-only">/); assert.match(html, /scope="row"/);
+});
 
 test('public entry stays a storefront for every role, owner entry requires a verified owner', () => {
   for (const role of [undefined, 'customer', 'owner']) {

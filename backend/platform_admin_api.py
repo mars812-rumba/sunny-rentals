@@ -10,6 +10,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, constr
 from platform_core.asset_admin import AssetInput, MAX_IMAGE_BYTES, TenantAssetAdmin
+from platform_core.vehicle_details import VehicleDetailsInput
 from platform_storefront_api import StorefrontPreview, create_storefront_router
 
 from platform_core import (
@@ -213,6 +214,11 @@ def create_platform_admin_router(
         service = asset_service(tenant_id, context)
         execute_asset(lambda: service.archive(asset_id))
         return {"archived": True}
+
+    @router.put('/tenants/{tenant_id}/assets/{asset_id}/details')
+    def update_asset_details(tenant_id: str, asset_id: str, request: VehicleDetailsInput, context: PlatformContext = Depends(require_admin)):
+        service = asset_service(tenant_id, context)
+        return {'asset': execute_asset(lambda: service.save_details(asset_id, request))}
 
     @router.post("/tenants/{tenant_id}/assets/{asset_id}/photos")
     async def upload_asset_photo(tenant_id: str, asset_id: str, file: UploadFile = File(...), context: PlatformContext = Depends(require_admin)):

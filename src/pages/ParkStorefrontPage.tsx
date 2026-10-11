@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, ArrowRight, CarFront, ImageIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Banknote, CalendarDays, CarFront, FileText, ImageIcon, Palette, WalletCards } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
 import { VehicleCardFrame } from '@/components/VehicleCardFrame';
@@ -12,6 +12,7 @@ import HeroBanner from '@/components/HeroBanner';
 import { ParkTelegramEntry } from '@/components/platform/ParkTelegramEntry';
 import type { ParkView } from '@/lib/park-entry';
 import { ParkBookingForm } from '@/components/platform/ParkBookingForm';
+import { VehicleSpecSummary, VehicleTariffTable } from '@/components/platform/VehicleDetailsEditor';
 import { ParkRentalFilters } from '@/components/platform/ParkRentalFilters';
 import { fetchParkAvailability, ParkAvailability } from '@/api/park-telegram';
 import { ParkRentalPeriod, rentalDays, rentalMoney } from '@/lib/park-rental';
@@ -54,8 +55,10 @@ function AssetCard({ asset, tenantId, currency, preview, bookingEnabled, period,
     <CardContent className="flex flex-1 flex-col p-4">
       <h3 className="break-words text-lg font-semibold leading-tight">{asset.name}</h3>
       <p className="mt-1 text-sm text-slate-600">{[asset.specs.brand, asset.specs.model, asset.specs.year, asset.specs.color].filter(Boolean).join(' · ')}</p>
-      <p className="mt-3 text-xs text-slate-600">{types[asset.asset_type] || 'Транспорт'}</p>
-      <div className="mt-auto pt-5"><p className="break-words text-2xl font-bold tabular-nums text-blue-700">{asset.daily_rate ? price(asset.daily_rate * (days || 1)) : 'Цена по запросу'}</p>{Boolean(asset.daily_rate) && <p className="text-sm text-slate-600">{days ? `${price(asset.daily_rate)} / сутки · за ${days} суток` : 'за сутки'}</p>}{days > 0 && <p className="mt-1 text-xs text-slate-600">Ориентир; точный расчёт подтвердит сервер</p>}<p className="mt-2 text-sm text-slate-600">{asset.deposit !== null ? `Депозит отдельно: ${price(asset.deposit)}` : 'Депозит уточняется'}</p></div>
+      <p className="mt-3 flex items-center gap-2 text-sm text-slate-600"><CarFront aria-hidden="true" className="h-4 w-4 shrink-0" />{types[asset.asset_type] || 'Транспорт'}</p>
+      <VehicleSpecSummary specs={asset.specs} />
+      {asset.description && <details className="mt-3 text-sm"><summary className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md font-medium text-blue-700 focus-visible:outline focus-visible:outline-2"><FileText aria-hidden="true" className="size-4" />Описание</summary><p className="mt-2 whitespace-pre-wrap break-words leading-6 text-slate-700">{asset.description}</p></details>}
+      <div className="mt-auto pt-5"><p className="break-words text-2xl font-bold tabular-nums text-blue-700">{asset.daily_rate ? asset.tariff_grid ? `от ${price(asset.daily_rate)}` : price(asset.daily_rate * (days || 1)) : 'Цена по запросу'}</p>{Boolean(asset.daily_rate) && <p className="text-sm text-slate-600">{asset.tariff_grid ? 'за сутки · точный расчёт после выбора дат' : days ? `${price(asset.daily_rate)} / сутки · за ${days} суток` : 'за сутки'}</p>}{days > 0 && <p className="mt-1 text-xs text-slate-600">Ориентир; точный расчёт подтвердит сервер</p>}<p className="mt-2 text-sm text-slate-600">{asset.deposit !== null ? `Депозит отдельно: ${price(asset.deposit)}` : 'Депозит уточняется'}</p></div>
       <Dialog onOpenChange={(open) => { if (open) { setPhoto(0); setCreated(false); } else if (created) onBooked(); }}>
         <DialogTrigger asChild><Button className={`mt-4 min-h-12 w-full rounded-xl ${actionClass}`} aria-label={`${period && bookingEnabled ? 'Выбрать' : 'Посмотреть'} ${asset.name}`}>{period && bookingEnabled ? 'Выбрать транспорт' : 'Посмотреть'} <ArrowRight aria-hidden="true" className="h-4 w-4" /></Button></DialogTrigger>
         <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto rounded-xl p-4 sm:p-6">
@@ -63,7 +66,18 @@ function AssetCard({ asset, tenantId, currency, preview, bookingEnabled, period,
           <DialogDescription>{period ? 'Проверьте автомобиль и условия на выбранные даты.' : 'Посмотрите фотографии и выберите даты для расчёта аренды.'}</DialogDescription>
           <StorefrontImage key={asset.photos[photo]} tenantId={tenantId} reference={asset.photos[photo]} preview={preview} alt={`${asset.name}, фото ${photo + 1}`} className="aspect-[4/3] max-h-[50dvh] w-full rounded-lg object-contain" />
           {asset.photos.length > 1 && <div className="flex items-center justify-between gap-2"><Button variant="outline" aria-label="Предыдущее фото" onClick={() => setPhoto((value) => (value - 1 + asset.photos.length) % asset.photos.length)}><ArrowLeft aria-hidden="true" /></Button><p role="status" className="text-sm tabular-nums">Фото {photo + 1} из {asset.photos.length}</p><Button variant="outline" aria-label="Следующее фото" onClick={() => setPhoto((value) => (value + 1) % asset.photos.length)}><ArrowRight aria-hidden="true" /></Button></div>}
-          <p className="font-semibold tabular-nums">{asset.daily_rate ? `${price(asset.daily_rate)} / сутки` : 'Цена по запросу'}{asset.deposit !== null ? ` · депозит ${price(asset.deposit)}` : ''}</p>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
+            <li className="inline-flex items-center gap-2"><CarFront aria-hidden="true" className="h-4 w-4 shrink-0" />{types[asset.asset_type] || 'Транспорт'}</li>
+            {asset.specs.year && <li className="inline-flex items-center gap-2"><CalendarDays aria-hidden="true" className="h-4 w-4 shrink-0" />{asset.specs.year} год</li>}
+            {asset.specs.color && <li className="inline-flex items-center gap-2"><Palette aria-hidden="true" className="h-4 w-4 shrink-0" />{asset.specs.color}</li>}
+          </ul>
+          <dl className="grid gap-4 rounded-xl bg-slate-50 p-4 sm:grid-cols-2">
+            <div><dt className="flex items-center gap-2 text-sm text-slate-600"><Banknote aria-hidden="true" className="h-4 w-4" />Аренда за сутки</dt><dd className="mt-1 text-lg font-semibold tabular-nums text-blue-700">{asset.daily_rate ? `${asset.tariff_grid ? 'от ' : ''}${price(asset.daily_rate)}` : 'Цена по запросу'}</dd></div>
+            <div><dt className="flex items-center gap-2 text-sm text-slate-600"><WalletCards aria-hidden="true" className="h-4 w-4" />Возвратный депозит</dt><dd className="mt-1 text-lg font-semibold tabular-nums">{asset.deposit !== null ? price(asset.deposit) : 'Уточняется'}</dd></div>
+          </dl>
+          <VehicleSpecSummary specs={asset.specs} detailed />
+          {asset.description && <section><h4 className="flex items-center gap-2 font-semibold"><FileText aria-hidden="true" className="size-4" />Описание</h4><p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-700">{asset.description}</p></section>}
+          {asset.tariff_grid && <VehicleTariffTable grid={asset.tariff_grid} currency={currency} />}
           {bookingEnabled && !preview && <ParkBookingForm key={`${asset.id}:${period?.start}:${period?.end}`} tenantId={tenantId} assetId={asset.id} initialPeriod={period} onCreated={() => setCreated(true)} />}
         </DialogContent>
       </Dialog>

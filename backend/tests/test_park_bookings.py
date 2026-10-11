@@ -85,6 +85,22 @@ class ParkBookingTests(unittest.TestCase):
         self.assertEqual(first['booking_number'], '100001')
         self.assertEqual(second['booking_number'], '100002')
 
+    def test_tariff_change_rejects_stale_quote_and_keeps_created_booking_snapshot(self):
+        from platform_core.vehicle_details import VehicleDetailsInput
+        from test_vehicle_details import grid
+        old = self.booking_payload()
+        assets = TenantAssetAdmin(self.root, self.admin, 'park-a')
+        assets.save_details(self.asset.id, VehicleDetailsInput(section='pricing', pricing=grid()))
+        self.assertEqual(self.client.post('/api/partners/bookings', json=old).status_code, 409)
+        fresh = self.booking_payload()
+        created = self.client.post('/api/partners/bookings', json=fresh)
+        self.assertEqual(created.status_code, 201, created.text)
+        self.assertEqual(created.json()['booking']['pricing']['total_rental'], '2400.00')
+        changed = grid(); changed['low_season']['price_1_6'] = 1200
+        assets.save_details(self.asset.id, VehicleDetailsInput(section='pricing', pricing=changed))
+        self.assertEqual(self.booking_service.calendar('park-a', admin=self.admin)[0]['pricing']['total_rental'], '2400.00')
+        self.assertEqual(self.client.post('/api/partners/bookings', json=fresh).json(), created.json())
+
     def test_missing_username_requires_valid_consented_contact_without_writes(self):
         update = self.update('ppark-a', update_id=105)
         update['message']['from']['username'] = 'stale_username'
