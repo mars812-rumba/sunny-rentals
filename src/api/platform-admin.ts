@@ -173,17 +173,18 @@ export interface PlatformAsset {
   photos: { main?: string; thumbnail?: string; gallery?: string[] };
   description?: string;
   specs: VehicleSpecs & { brand?: string; model?: string; year?: number; color?: string };
-  pricing: { daily_rate?: number; currency?: string; tariff_grid?: TariffGrid | null };
+  pricing: { daily_rate?: number; currency?: string; tariff_grid?: TariffGrid | null; pricing_mode?: PricingMode };
   deposit_policy: { amount?: number };
 }
 
 export interface SeasonRates { price_1_6: number; price_7_14: number; price_15_29: number; price_30: number }
-export interface TariffGrid { low_season: SeasonRates; high_season: SeasonRates; high_start: string; high_end: string }
+export type PricingMode = 'flat' | 'duration' | 'seasonal';
+export interface TariffGrid { low_season: SeasonRates; high_season: SeasonRates; high_start: string; high_end: string; mode?: 'duration' }
 export interface VehicleSpecs {
   fuel?: string; transmission?: string; power?: string; engine?: string; drive?: string; body_type?: string;
   seats?: number | null; doors?: number | null; mileage?: number | null; air_conditioning?: boolean | null; features?: string[];
 }
-export type VehicleDetailsInput = { section: 'pricing'; pricing: TariffGrid | null; deposit?: number } | { section: 'specs'; specs: VehicleSpecs } | { section: 'description'; description: string };
+export type VehicleDetailsInput = { section: 'pricing'; pricing: TariffGrid | null; deposit?: number; pricing_mode?: PricingMode; daily_rate?: number } | { section: 'specs'; specs: VehicleSpecs } | { section: 'description'; description: string };
 
 export async function savePlatformAssetDetails(tenantId: string, assetId: string, data: VehicleDetailsInput): Promise<PlatformAsset> {
   return (await platformFetch<{ asset: PlatformAsset }>(`${tenantPath(tenantId)}/assets/${encodeURIComponent(assetId)}/details`, { method: 'PUT', body: JSON.stringify(data) })).asset;

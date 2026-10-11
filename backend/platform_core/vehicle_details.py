@@ -61,12 +61,21 @@ class VehicleDetailsInput(StrictDetails):
     section: Literal['pricing', 'specs', 'description']
     pricing: Optional[TariffGrid] = None
     deposit: Optional[float] = Field(default=None, ge=0, le=100000000)
+    pricing_mode: Optional[Literal['flat', 'duration', 'seasonal']] = None
+    daily_rate: Optional[float] = Field(default=None, ge=0.01, le=100000000)
     specs: Optional[VehicleSpecs] = None
     description: Optional[str] = Field(default=None, max_length=5000)
 
     @root_validator(skip_on_failure=True)
     def one_section(cls, values):
         section = values.get('section')
+        mode = values.get('pricing_mode')
+        if section != 'pricing' and (mode is not None or values.get('daily_rate') is not None):
+            raise ValueError('Режим и цена изменяются только в разделе тарифов')
+        if mode in ('duration', 'seasonal') and values.get('pricing') is None:
+            raise ValueError('Заполните тарифы по сроку аренды')
+        if mode == 'flat' and values.get('daily_rate') is None:
+            raise ValueError('Укажите цену за сутки')
         if section != 'pricing' and values.get('deposit') is not None:
             raise ValueError('Депозит изменяется только вместе с тарифами')
         if any(values.get(key) is not None for key in ('pricing', 'specs', 'description') if key != section):
@@ -79,6 +88,18 @@ class VehicleDetailsInput(StrictDetails):
 PUBLIC_SPEC_KEYS = {'brand', 'model', 'year', 'color', *VehicleSpecs.__fields__.keys()}
 
 
+def active_tariff_grid(pricing):
+    """Inactive grids stay private and are not advertised or used for quotes."""
+    if pricing.get('pricing_mode') == 'flat' or not pricing.get('tariff_grid'):
+        return None
+    grid = TariffGrid.parse_obj(pricing['tariff_grid'])
+    import json
+    data = json.loads(grid.json())
+    if pricing.get('pricing_mode') == 'duration':
+        data['mode'] = 'duration'
+    return data
+
+
 def calculate_rental(pricing, start: date, days: int):
     """Tier is chosen by total duration; each rental day uses its own season.
 
@@ -87,7 +108,7 @@ def calculate_rental(pricing, start: date, days: int):
     """
     if not 1 <= days <= 365:
         raise ValueError('Choose 1 to 365 days')
-    grid_data = pricing.get('tariff_grid')
+    grid_data = None if pricing.get('pricing_mode') == 'flat' else pricing.get('tariff_grid')
     if not grid_data:
         rate = Decimal(str(pricing.get('daily_rate', 0)))
         if not rate.is_finite() or not 0 < rate <= 100000000:
@@ -96,6 +117,9 @@ def calculate_rental(pricing, start: date, days: int):
         return {'daily_rate': str(rate), 'total_rental': str(rate * days)}
     grid = TariffGrid.parse_obj(grid_data)
     tier = 'price_1_6' if days <= 6 else 'price_7_14' if days <= 14 else 'price_15_29' if days <= 29 else 'price_30'
+    if pricing.get('pricing_mode') == 'duration':
+        rate = Decimal(str(getattr(grid.low_season, tier))).quantize(Decimal('.01'), rounding=ROUND_HALF_UP)
+        return {'daily_rate': str(rate), 'total_rental': str(rate * days)}
     counts = {'low_season': 0, 'high_season': 0}
     for offset in range(days):
         current = (start + timedelta(days=offset)).strftime('%m-%d')

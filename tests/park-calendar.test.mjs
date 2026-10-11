@@ -132,19 +132,24 @@ test('request item displays private contacts with safe links and actionable stat
  assert.doesNotMatch(cancelled, />Отменить<\/button>|>Подтвердить<\/button>/);
 });
 
-test('opened request has readable amounts, private contacts and a single-line copyable ID', () => {
+test('opened request has readable amounts, private contacts and a plain-text copyable number', () => {
  const html = renderToStaticMarkup(e(ui.ParkRequestItem, { booking: { ...booking, id: 'a'.repeat(64), booking_number: '100001', customer: { name: 'Иван', username: 'ivan_test' } }, detailed: true, busy: false, onAction() {} }));
  assert.match(html, /lucide-car-front/);
  assert.match(html, /lucide-calendar-days/);
  assert.match(html, /<dl/);
  assert.match(html, /Депозит отдельно/);
  assert.match(html, /1(?:\s|&#x27;|&#160;|&nbsp;)+600/);
- assert.match(html, /type="text"[^>]*readonly=""[^>]*value="100001"/);
+ assert.match(html, /<span class="min-w-0 select-text break-all text-sm font-medium tabular-nums">100001<\/span>/);
+ assert.doesNotMatch(html, /<input|<label/);
  assert.match(html, /aria-label="Скопировать номер заявки"/);
+ assert.match(html, /size-11 shrink-0 p-0/);
  assert.match(html, /@ivan_test/);
  assert.doesNotMatch(html, /a{64}/);
  assert.match(html, /bg-amber-50 text-amber-900/);
  assert.doesNotMatch(html, /2026-08-02 — 2026-08-04/);
+ const legacy = renderToStaticMarkup(e(ui.ParkRequestItem, { booking: { ...booking, id: 'a'.repeat(64) }, detailed: true, busy: false, onAction() {} }));
+ assert.match(legacy, new RegExp(`tabular-nums">${'a'.repeat(64)}<\\/span>`));
+ assert.doesNotMatch(legacy, /<input/);
 });
 
 test('shared month has occupied-day and return badges, with named keyboard controls', () => {
@@ -165,11 +170,17 @@ test('park month shades Saturday and Sunday, including adjacent-month days, with
  assert.ok(cells.length > 0);
  for (const [, day, classes] of cells) {
   const weekday = new Date(`${day}T00:00:00`).getDay();
-  assert.equal(classes.split(' ').includes('bg-slate-100'), weekday === 0 || weekday === 6, day);
+  assert.equal(classes.split(' ').includes('bg-slate-100/40'), weekday === 0 || weekday === 6, day);
  }
- assert.ok(cells.some(([ , day, classes]) => day === '2026-11-01' && classes.includes('bg-slate-100')));
+ assert.ok(cells.some(([ , day, classes]) => day === '2026-11-01' && classes.includes('bg-slate-100/40')));
+ assert.match(html, /divide-y border-t divide-dotted divide-slate-200\/60 border-dotted/);
+ assert.match(html, /grid-cols-7 divide-x divide-dotted divide-slate-200\/60/);
+ assert.match(html, /text-red-700">Сб<\/div>/);
+ assert.match(html, /text-red-700">Вс<\/div>/);
+ assert.match(html, /pointer-events-none select-none flex flex-col/);
  const legacy = renderToStaticMarkup(e(ui.MonthCalendarView, props));
  assert.doesNotMatch(legacy, /data-calendar-day="[^"]+" class="[^"]*bg-slate-100/);
+ assert.doesNotMatch(legacy, /divide-dotted|text-red-700/);
 });
 
 test('confirmed occupancy is quiet but pickup and return retain their distinct colors', () => {
@@ -254,7 +265,7 @@ test('manual grid choice appears once and disables only the manual rate', () => 
  const html = renderToStaticMarkup(e(ui.ParkManualBookingForm, { tenantId: 'park-a', admin: false,
    assets: [{ id: 'asset-a', name: 'Toyota', pricing: { daily_rate: 800, currency: 'THB', tariff_grid: { low_season: rates, high_season: rates, high_start: '11-01', high_end: '03-31' } }, deposit_policy: { amount: 5000 } }],
    onSaved() {}, onClose() {} }));
- assert.equal((html.match(/Рассчитать аренду по сезонной сетке автомобиля/g) || []).length, 1);
+ assert.equal((html.match(/Рассчитать аренду по тарифам автомобиля/g) || []).length, 1);
  assert.match(html, /type="checkbox"[^>]*checked=""/);
  assert.match(html, /id="[^"]+-rate" disabled=""/);
  assert.doesNotMatch(html, /id="[^"]+-deposit" disabled=""/);

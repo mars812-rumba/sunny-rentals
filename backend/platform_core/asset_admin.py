@@ -157,7 +157,16 @@ class TenantAssetAdmin:
             self._authorize()
             asset = self._asset(asset_id)
             if data.section == 'pricing':
-                asset.pricing = {**asset.pricing, 'tariff_grid': json.loads(data.pricing.json()) if data.pricing else None}
+                if data.pricing_mode is None:
+                    # Compatibility with the original toggle API.
+                    asset.pricing = {**asset.pricing, 'tariff_grid': json.loads(data.pricing.json()) if data.pricing else None,
+                                     'pricing_mode': 'seasonal' if data.pricing else 'flat'}
+                else:
+                    asset.pricing = {**asset.pricing, 'pricing_mode': data.pricing_mode}
+                    if data.pricing is not None:
+                        asset.pricing['tariff_grid'] = json.loads(data.pricing.json())
+                if data.daily_rate is not None:
+                    asset.pricing['daily_rate'] = data.daily_rate
                 if data.deposit is not None:
                     asset.deposit_policy = {**asset.deposit_policy, 'amount': data.deposit, 'currency': self.tenant.currency}
             elif data.section == 'specs':

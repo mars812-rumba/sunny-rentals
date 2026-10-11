@@ -19,6 +19,17 @@ def grid():
 
 
 class RentalTariffTests(unittest.TestCase):
+    def test_explicit_modes_keep_inactive_grid_out_of_calculation(self):
+        for start in (date(2026, 4, 1), date(2026, 11, 1), date(2026, 10, 30)):
+            flat = calculate_rental({'daily_rate': 3000, 'tariff_grid': grid(), 'pricing_mode': 'flat'}, start, 10)
+            self.assertEqual(flat, {'daily_rate': '3000.00', 'total_rental': '30000.00'})
+            duration = calculate_rental({'tariff_grid': grid(), 'pricing_mode': 'duration'}, start, 10)
+            self.assertEqual(duration, {'daily_rate': '700.00', 'total_rental': '7000.00'})
+        for mode in ('duration', 'seasonal'):
+            with self.assertRaises(ValidationError): VehicleDetailsInput(section='pricing', pricing_mode=mode)
+        with self.assertRaises(ValidationError): VehicleDetailsInput(section='pricing', pricing_mode='flat', daily_rate=0)
+        with self.assertRaises(ValidationError): VehicleDetailsInput(section='specs', specs={}, daily_rate=3000)
+
     def test_every_duration_boundary(self):
         for days, expected in [(1, 800), (6, 800), (7, 700), (14, 700), (15, 600), (29, 600), (30, 500), (365, None)]:
             with self.subTest(days=days):
@@ -79,6 +90,26 @@ class VehicleDetailsApiTests(unittest.TestCase):
     def details(self, data, **identity):
         return self.client.post('/api/partners/fleet/details', json={
             'tenant_id': 'park-a', 'init_data': self.token(), 'asset_id': self.asset.id, 'data': data, **identity})
+
+    def test_mode_switch_preserves_grid_and_public_price_matches_active_mode(self):
+        self.assertEqual(self.details({'section': 'pricing', 'pricing_mode': 'seasonal', 'pricing': grid()}).status_code, 200)
+        flat = self.details({'section': 'pricing', 'pricing_mode': 'flat', 'pricing': None, 'daily_rate': 3000})
+        self.assertEqual(flat.status_code, 200, flat.text)
+        self.assertEqual(flat.json()['asset']['pricing']['tariff_grid'], grid())
+        public = self.client.get('/api/storefront/park-a').json()['assets'][0]
+        self.assertEqual(public['daily_rate'], 3000)
+        self.assertIsNone(public['tariff_grid'])
+        duration_grid = grid()
+        duration_grid['high_season'] = {key: 1 for key in duration_grid['high_season']}
+        duration = self.details({'section': 'pricing', 'pricing_mode': 'duration', 'pricing': duration_grid})
+        self.assertEqual(duration.status_code, 200, duration.text)
+        public = self.client.get('/api/storefront/park-a').json()['assets'][0]
+        self.assertEqual(public['daily_rate'], 500)
+        self.assertEqual(public['tariff_grid']['mode'], 'duration')
+        self.assertEqual(duration.json()['asset']['pricing']['daily_rate'], 3000)
+        seasonal = self.details({'section': 'pricing', 'pricing_mode': 'seasonal', 'pricing': duration_grid})
+        self.assertEqual(seasonal.status_code, 200, seasonal.text)
+        self.assertEqual(self.client.get('/api/storefront/park-a').json()['assets'][0]['daily_rate'], 1)
 
     def test_owner_and_admin_patch_only_selected_section_and_public_projection(self):
         result = self.details({'section': 'pricing', 'pricing': grid(), 'deposit': 5000})

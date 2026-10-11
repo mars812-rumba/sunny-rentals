@@ -15,7 +15,7 @@ from platform_core.context import TenantContext, validate_tenant_id
 from platform_core.models import AssetStatus, RentalAsset, TenantStatus
 from platform_core.provisioning import TenantProvisioner
 from platform_core.repositories import TenantStorage
-from platform_core.vehicle_details import PUBLIC_SPEC_KEYS, TariffGrid
+from platform_core.vehicle_details import PUBLIC_SPEC_KEYS, active_tariff_grid
 
 
 class StorefrontPreview:
@@ -100,12 +100,13 @@ class StorefrontReader:
             return value if isinstance(value, (int, float)) and not isinstance(value, bool) and 0 <= value <= 100000000 else None
 
         def grid(asset):
-            value = asset.pricing.get('tariff_grid')
-            return json.loads(TariffGrid.parse_obj(value).json()) if value else None
+            return active_tariff_grid(asset.pricing)
 
         def minimum(asset):
             value = grid(asset)
-            return min(*value['low_season'].values(), *value['high_season'].values()) if value else number(asset.pricing.get('daily_rate'))
+            if not value:
+                return number(asset.pricing.get('daily_rate'))
+            return min(value['low_season'].values()) if value.get('mode') == 'duration' else min(*value['low_season'].values(), *value['high_season'].values())
 
         return {"tenant": {"id": self.tenant.tenant_id, "slug": self.tenant.slug,
                            "name": self.tenant.name, "currency": self.tenant.currency, "timezone": self.tenant.timezone,

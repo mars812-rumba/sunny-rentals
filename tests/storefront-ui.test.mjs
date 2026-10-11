@@ -11,7 +11,8 @@ const bundle = await build({
     export { default as HeroBanner } from './src/components/HeroBanner';
     export { VehicleCardFrame } from './src/components/VehicleCardFrame';
     export { PlatformTenantWorkspace } from './src/components/platform/PlatformTenantWorkspace';
-    export { VehicleSpecSummary, VehicleTariffTable } from './src/components/platform/VehicleDetailsEditor';
+    export { VehicleSpecSummary, VehicleTariffTable, VehiclePricingFields } from './src/components/platform/VehicleDetailsEditor';
+    export { activeVehicleGrid, minimumVehicleRate, vehiclePricingMode } from './src/lib/vehicle-pricing';
     export { resolveParkEntryView } from './src/lib/park-entry';
     export { LanguageProvider } from './src/contexts/LanguageContext';`, resolveDir: process.cwd(), loader: 'tsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs',
@@ -36,8 +37,31 @@ test('public vehicle specs keep icon labels and escape custom text', () => {
 test('seasonal tariff table names all four periods and both seasons', () => {
  const rates = { price_1_6: 800, price_7_14: 700, price_15_29: 600, price_30: 500 };
  const html = renderToStaticMarkup(e(ui.VehicleTariffTable, { grid: { low_season: rates, high_season: rates, high_start: '11-01', high_end: '03-31' }, currency: 'THB' }));
- for (const label of ['1–6 дней', '7–14 дней', '15–29 дней', '30+ дней', 'Низкий сезон', 'Высокий сезон']) assert.ok(html.includes(label));
+ for (const label of ['1–6 дней', '7–14 дней', '15–29 дней', '30 дней и больше', 'Низкий сезон', 'Высокий сезон']) assert.ok(html.includes(label));
  assert.match(html, /<caption class="sr-only">/); assert.match(html, /scope="row"/);
+});
+
+test('pricing editor has three named modes and only active fields are required', () => {
+ const rates = { price_1_6: 3000, price_7_14: 2700, price_15_29: 2500, price_30: 2200 };
+ const props = { id: 'pricing', currency: 'THB', dailyRate: '3000', grid: { low_season: rates, high_season: rates, high_start: '11-01', high_end: '03-31' }, onModeChange() {}, onDailyRateChange() {}, onGridChange() {} };
+ for (const mode of ['flat', 'duration', 'seasonal']) {
+  const html = renderToStaticMarkup(e(ui.VehiclePricingFields, { ...props, mode }));
+  assert.equal((html.match(/type="radio"/g) || []).length, 3);
+  assert.match(html, new RegExp(`type="radio"[^>]*checked=""[^>]*value="${mode}"`));
+  for (const label of ['Одна цена за сутки', 'Цена зависит от срока аренды', 'Сезонная цена и срок аренды', 'При смене режима введённые цены сохраняются']) assert.ok(html.includes(label));
+  assert.equal((html.match(/type="number"/g) || []).length, mode === 'flat' ? 1 : mode === 'duration' ? 4 : 8);
+  assert.equal(html.includes('Начало высокого сезона'), mode === 'seasonal');
+  assert.equal(html.includes('Например, аренда на 10 суток'), mode === 'duration');
+ }
+ const rising = renderToStaticMarkup(e(ui.VehiclePricingFields, { ...props, mode: 'duration', grid: { ...props.grid, low_season: { ...rates, price_7_14: 3200 } } }));
+ assert.match(rising, /role="status"[^>]*>Проверьте тарифы/);
+ const duration = renderToStaticMarkup(e(ui.VehicleTariffTable, { grid: { ...props.grid, mode: 'duration' }, currency: 'THB' }));
+ assert.doesNotMatch(duration, /Высокий сезон|Низкий сезон|11-01/);
+ assert.match(duration, /Цена за сутки в зависимости от срока аренды/);
+ const asset = { pricing: { daily_rate: 3000, pricing_mode: 'flat', tariff_grid: props.grid } };
+ assert.equal(ui.activeVehicleGrid(asset), null);
+ assert.equal(ui.minimumVehicleRate(asset), 3000);
+ assert.equal(ui.minimumVehicleRate({ pricing: { ...asset.pricing, pricing_mode: 'duration', tariff_grid: { ...props.grid, high_season: { ...rates, price_30: 1 } } } }), 2200);
 });
 
 test('public entry stays a storefront for every role, owner entry requires a verified owner', () => {
