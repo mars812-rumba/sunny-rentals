@@ -13,7 +13,8 @@ const bundle = await build({ stdin: { contents: `export * from './src/utils/park
  export { ParkTrialStatus } from './src/components/platform/ParkTrialStatus';
  export { ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
- export { ParkRequestItem } from './src/components/platform/ParkRequestsPanel';`, resolveDir: process.cwd(), loader: 'tsx' },
+ export { ParkRequestItem } from './src/components/platform/ParkRequestsPanel';
+ export { ParkCalendarPhoto } from './src/components/platform/ParkCalendarPhoto';`, resolveDir: process.cwd(), loader: 'tsx' },
  bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic',
  external: ['react', 'react/jsx-runtime', 'react-dom'], define: { 'import.meta.env.VITE_API_URL': '""' } });
 const compiled = new Module(resolve('tests/park-calendar-fixture.cjs'));
@@ -75,6 +76,26 @@ test('shared Gantt excludes return day for parks, keeps legacy inclusive range b
  assert.match(legacy, /width:66px/);
  assert.match(html, /height:96px;max-height:min\(65vh, 520px\)/);
  assert.match(legacy, /height:calc\(100vh - 60px\)/);
+});
+
+test('park Gantt renders a private thumbnail above the truncated name in the sticky column', () => {
+ const name = 'Toyota Yaris с очень длинным названием';
+ const cars = ui.calendarCars([{ id: 'asset-a', name }], [booking]);
+ const props = { cars, bookings: [], startDate: new Date('2026-08-01T00:00:00'), daysToShow: 97, onDateChange() {}, onCreateBooking() {}, onBookingClick() {},
+  renderCarPhoto: car => e('img', { src: 'blob:private-park-photo', alt: '', 'data-asset': car.id }) };
+ const html = renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, readOnly: true }));
+ assert.match(html, /sticky left-0/);
+ assert.match(html, /h-7 w-20 shrink-0 overflow-hidden rounded/);
+ assert.ok(html.indexOf('blob:private-park-photo') < html.indexOf(`title="${name}"`));
+ assert.match(html, /truncate/);
+ assert.match(html, /height:96px/);
+ assert.doesNotMatch(html, /images_web/);
+ const missing = renderToStaticMarkup(e(ui.ParkCalendarPhoto, { tenantId: 'park-a', admin: true }));
+ assert.match(missing, /Фото пока нет/);
+ assert.match(missing, /lucide-car-front/);
+ assert.doesNotMatch(missing, /<img/);
+ const legacy = renderToStaticMarkup(e(ui.SchedulerCalendar, props));
+ assert.doesNotMatch(legacy, /blob:private-park-photo/);
 });
 
 test('request item displays private contacts with safe links and actionable statuses', () => {

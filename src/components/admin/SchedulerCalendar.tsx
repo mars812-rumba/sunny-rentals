@@ -4,6 +4,7 @@ import { format, isSameDay } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Car, Booking } from '@/api/api';
 import { cn } from '@/lib/utils';
+import { CarFront } from 'lucide-react';
 import { useCalendarGrid } from '@/hooks/useCalendarGrid';
 
 // 🎨 Получить URL фото
@@ -28,6 +29,7 @@ interface SchedulerCalendarProps {
   isCompactMode?: boolean; // 🆕 Компактный режим
   readOnly?: boolean;
   exclusiveEnd?: boolean;
+  renderCarPhoto?: (car: Car) => React.ReactNode;
 }
 
 const DAY_WIDTH = 24;
@@ -55,6 +57,7 @@ export function SchedulerCalendar({
   isCompactMode = false, // 🆕 Дефолтное значение
   readOnly = false,
   exclusiveEnd = false,
+  renderCarPhoto,
 }: SchedulerCalendarProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
@@ -121,6 +124,7 @@ export function SchedulerCalendar({
     const pickupTime = fd.dates.pickupTime || format(start, 'HH:mm');
     
     const line1Parts = [];
+    if (booking.status === 'blocked') line1Parts.push('Блокировка');
     line1Parts.push(`${startStr}-${endStr}`);
     line1Parts.push(pickupTime);
     if (fd.locations?.pickupLocation) line1Parts.push(fd.locations.pickupLocation);
@@ -137,11 +141,11 @@ export function SchedulerCalendar({
   };
 
  return (
-  <div className="relative h-full">
+  <div className={readOnly ? 'relative' : 'relative h-full'}>
     <div
       ref={scrollRef}
       className="overflow-x-auto overflow-y-auto"
-      style={{ height: readOnly ? 'min(65vh, 520px)' : 'calc(100vh - 60px)' }}
+      style={{ height: readOnly ? HEADER_HEIGHT + Math.max(cars.length, 1) * CAR_ROW_HEIGHT + 16 : 'calc(100vh - 60px)', maxHeight: readOnly ? 'min(65vh, 520px)' : undefined }}
       tabIndex={readOnly ? 0 : undefined}
       role={readOnly ? 'region' : undefined}
       aria-label={readOnly ? 'Гант занятости, прокрутка по датам' : undefined}
@@ -216,14 +220,18 @@ export function SchedulerCalendar({
               {/* Sidebar */}
               <div
                 className={cn(
-                  "sticky left-0 z-10 flex-shrink-0 flex items-center px-1 border-r border-gray-300 bg-white shadow-sm cursor-pointer hover:bg-gray-50 transition-all",
-                  isCompactMode ? "flex-row gap-1 py-0.5" : "flex-col justify-center py-0.5"
+                  "sticky left-0 z-10 flex-shrink-0 flex items-center px-1 border-r border-gray-300 bg-white shadow-sm",
+                  !readOnly && "cursor-pointer hover:bg-gray-50 transition-all",
+                  readOnly ? "flex-col justify-center" : isCompactMode ? "flex-row gap-1 py-0.5" : "flex-col justify-center py-0.5"
                 )}
                 style={{ width: sidebarWidth }}
                 onClick={readOnly ? undefined : () => {
                   setSelectedCarInfo({ car, owner: ownerBadge || null });
                 }}
               >
+                {readOnly && <div className="h-7 w-20 shrink-0 overflow-hidden rounded bg-slate-100">
+                  {renderCarPhoto ? renderCarPhoto(car) : <div className="grid h-full w-full place-items-center"><CarFront aria-hidden="true" className="h-4 w-4 text-slate-500" /></div>}
+                </div>}
                 {/* 🆕 Фото - показываем только если НЕ компактный режим */}
                 {!readOnly && !isCompactMode && (
                   <div className="relative w-full aspect-video rounded overflow-hidden bg-gray-200">
@@ -304,7 +312,7 @@ export function SchedulerCalendar({
                     const badgeData = formatBookingBadge(booking);
                     // Color coding for new booking status system
                     const bgColor =
-                      booking.status === 'confirmed'
+                      booking.status === 'blocked' ? '#e9d5ff' : booking.status === 'confirmed'
                         ? 'rgba(74, 227, 69, 0.9)'
                         : booking.status === 'rejected'
                           ? 'rgba(239, 68, 68, 0.15)'  // Очень прозрачный красный
@@ -315,7 +323,7 @@ export function SchedulerCalendar({
   key={booking.booking_id}
   role={readOnly ? 'button' : undefined}
   tabIndex={readOnly ? 0 : undefined}
-  aria-label={readOnly ? `${booking.form_data.car.name}: ${booking.form_data.dates.start} — ${booking.form_data.dates.end}, ${booking.status === 'pre_booking' ? 'Ожидает подтверждения' : 'Занято'}` : undefined}
+  aria-label={readOnly ? `${booking.form_data.car.name}: ${booking.form_data.dates.start} — ${booking.form_data.dates.end}, ${booking.status === 'blocked' ? 'Блокировка' : booking.status === 'pre_booking' ? 'Ожидает подтверждения' : 'Занято'}` : undefined}
   onKeyDown={readOnly ? (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onBookingClick(booking); } } : undefined}
   className={cn(
     "absolute top-[6px] bottom-[6px] pointer-events-auto cursor-pointer transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700",

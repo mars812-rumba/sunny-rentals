@@ -13,6 +13,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { bookingsOnDay, calendarBooking, calendarCars, calendarLogistics } from '@/utils/park-calendar';
 import { ParkManualBookingForm } from './ParkManualBookingForm';
+import { ParkCalendarPhoto } from './ParkCalendarPhoto';
 import { subscribeParkCalendar } from '@/lib/park-calendar-updates';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждено', cancelled: 'Отменено', in_progress: 'В аренде', completed: 'Завершено' };
@@ -52,6 +53,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
     finally { setBusy(false); }
   };
   const cars = useMemo(() => calendarCars(assets, bookings), [assets, bookings]);
+  const photos = useMemo(() => new Map(assets.map(asset => [asset.id, asset.photos.main])), [assets]);
   const filtered = useMemo(() => bookings.filter(item => !assetId || item.asset_id === assetId), [bookings, assetId]);
   const active = useMemo(() => filtered.filter(item => item.status !== 'cancelled'), [filtered]);
   const date = useMemo(() => startOfMonth(new Date(`${month}-01T00:00:00`)), [month]);
@@ -68,7 +70,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
     <p className="mt-1 break-all text-xs text-slate-600">Номер: {booking.id}</p>
     {['requested', 'confirmed'].includes(booking.status) && <div className="mt-3 flex flex-wrap gap-3">{booking.status === 'requested' && <Button variant="outline" disabled={busy || loading || !!draft} onClick={() => void action(booking, 'confirmed')}><Check aria-hidden="true" />Подтвердить заявку</Button>}<Button variant="outline" disabled={busy || loading || !!draft} onClick={() => void action(booking, 'cancelled')}><X aria-hidden="true" />{booking.entry_type === 'block' ? 'Снять блокировку' : 'Отменить бронь'}</Button></div>}
   </li>)}</ul>;
-  return <section aria-labelledby={`${id}-title`} aria-busy={loading || busy} className="min-w-0 [&_button]:min-h-11">
+  return <section aria-labelledby={`${id}-title`} aria-busy={loading || busy} className="min-w-0">
     <div className="flex flex-wrap items-center justify-between gap-3"><h2 id={`${id}-title`} className="flex items-center gap-2 text-xl font-semibold"><CalendarDays aria-hidden="true" className="h-5 w-5 text-blue-700" />Календарь заявок парка</h2><div className="flex flex-wrap gap-2"><Button className="gap-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800" ref={createButton} disabled={loading || busy || !!draft || !assets.length || !!error} onClick={() => { setSuccess(''); setDraft({ assetId }); }}><Plus aria-hidden="true" />Добавить бронь / блокировку</Button><Button variant="outline" className="gap-2 rounded-lg bg-white" disabled={loading || busy || !!draft} onClick={() => setReload((value) => value + 1)}><RefreshCw aria-hidden="true" />Обновить</Button></div></div>
     <p className="mt-2 text-sm text-slate-600">Заявки из бота и витрины — в одном календаре. Ожидающие заявки также занимают период. День возврата свободен для следующей аренды.</p>
     <div className="mt-4 flex flex-wrap items-end gap-3">
@@ -83,19 +85,19 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
     {success && <p role="status" className="mt-3 text-sm text-emerald-800">{success}</p>}
     {draft && <ParkManualBookingForm tenantId={tenantId} assets={assets} admin={admin} initialDay={draft.day} initialAssetId={draft.assetId} onClose={() => setDraft(null)} onSaved={booking => {
       setBookings(items => [...items.filter(item => item.id !== booking.id), booking]); setMonth(booking.pricing.start_date.slice(0, 7)); setAssetId(booking.asset_id); setDraft(null);
-      setSuccess(booking.entry_type === 'block' ? 'Даты закрыты. Блокировка видна во всех видах календаря.' : 'Подтверждённая бронь создана и видна во всех видах календаря.');
+      setSuccess(booking.entry_type === 'block' ? 'Даты закрыты. Блокировка видна во всех видах календаря.' : booking.status === 'requested' ? 'Предбронь создана. Даты заняты до подтверждения или отмены.' : 'Подтверждённая бронь создана и видна во всех видах календаря.');
     }} />}
     {loading ? <p role="status" className="mt-4">Загружаем заявки…</p> : !error && <Tabs value={view} onValueChange={setView} className="mt-5">
       <TabsList aria-label="Вид календаря" className="h-auto gap-1 rounded-xl bg-slate-200/70 p-1"><TabsTrigger value="month" className="min-h-11 gap-2 rounded-lg data-[state=active]:bg-blue-700 data-[state=active]:text-white data-[state=active]:shadow-none"><CalendarDays aria-hidden="true" className="h-4 w-4" />Календарь</TabsTrigger><TabsTrigger value="list" className="min-h-11 gap-2 rounded-lg data-[state=active]:bg-blue-700 data-[state=active]:text-white data-[state=active]:shadow-none"><List aria-hidden="true" className="h-4 w-4" />Список</TabsTrigger></TabsList>
       <TabsContent value="list">{visible.length ? details(visible) : <p role="status" className="py-5">На выбранный месяц заявок нет.</p>}</TabsContent>
       <TabsContent value="month" className="mt-5 min-w-0">
+        <section aria-labelledby={`${id}-gantt-title`} className="mb-5 min-w-0">
+          <h3 id={`${id}-gantt-title`} className="flex items-center gap-2 text-lg font-semibold"><ChartGantt aria-hidden="true" className="h-5 w-5 text-blue-700" />Занятость по автомобилям</h3><p className="mb-4 mt-2 text-sm leading-6 text-slate-600">Диаграмма Ганта: прокрутите даты вправо, нажмите полосу для деталей. Месяц и фильтр техники общие с календарём ниже.</p>
+          <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly exclusiveEnd renderCarPhoto={car => <ParkCalendarPhoto key={`${tenantId}:${car.id}:${photos.get(car.id) || ''}`} tenantId={tenantId} reference={photos.get(car.id)} admin={admin} />} />
+        </section>
         <p className="mb-3 text-sm leading-6 text-slate-600">{format(date, 'LLLL yyyy', { locale: ru })} · Нажмите день или заявку.</p>
         <div className="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-700">{[['bg-green-500', 'Выдача'], ['bg-yellow-400', 'Возврат'], ['bg-blue-500', 'Занято'], ['bg-slate-400', 'Ожидает подтверждения'], ['bg-purple-500', 'Блокировка']].map(([color, label]) => <span key={label} className="inline-flex items-center gap-2"><span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${color}`} />{label}</span>)}</div>
         <MonthCalendarView currentDate={date} bookings={active.map(calendarBooking)} logisticsData={active.map(calendarLogistics)} onDateChange={value => setMonth(format(value, 'yyyy-MM'))} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onDayClick={value => setSelection({ day: format(value, 'yyyy-MM-dd') })} showOccupancy />
-        <section aria-labelledby={`${id}-gantt-title`} className="mt-8 min-w-0 border-t border-slate-200 pt-6">
-          <h3 id={`${id}-gantt-title`} className="flex items-center gap-2 text-lg font-semibold"><ChartGantt aria-hidden="true" className="h-5 w-5 text-blue-700" />Занятость по автомобилям</h3><p className="mb-4 mt-2 text-sm leading-6 text-slate-600">Диаграмма Ганта: прокрутите даты вправо, нажмите полосу для деталей. Месяц и фильтр техники общие с календарём выше.</p>
-          <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly exclusiveEnd />
-        </section>
       </TabsContent>
     </Tabs>}
     <Dialog open={!!selection} onOpenChange={open => { if (!open) setSelection(null); }}><DialogContent onCloseAutoFocus={event => { if (draft) event.preventDefault(); }} className="max-h-[85vh] overflow-y-auto"><DialogHeader><DialogTitle>{selection?.day ? `События ${selection.day}` : 'Заявка парка'}</DialogTitle><DialogDescription>Время и даты относятся к часовому поясу парка. Сообщения клиентам пока не отправляются автоматически.</DialogDescription></DialogHeader>{selected.length ? details(selected) : <p>На этот день событий нет.</p>}{selection?.day && <Button disabled={!!draft || loading || busy || !assets.length} onClick={() => { setDraft({ day: selection.day, assetId }); setSelection(null); setSuccess(''); }}><Plus aria-hidden="true" />Добавить запись на этот день</Button>}{error && <p role="alert" className="text-sm text-rose-800">{error}</p>}</DialogContent></Dialog>
