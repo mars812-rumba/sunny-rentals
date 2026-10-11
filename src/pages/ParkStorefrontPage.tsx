@@ -9,7 +9,8 @@ import { ImageCarousel } from '@/components/CarCard';
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { fetchStorefront, Storefront, StorefrontAsset, storefrontMediaUrl } from '@/api/storefront';
 import HeroBanner from '@/components/HeroBanner';
-import { ParkTelegramEntry, type ParkView } from '@/components/platform/ParkTelegramEntry';
+import { ParkTelegramEntry } from '@/components/platform/ParkTelegramEntry';
+import type { ParkView } from '@/lib/park-entry';
 import { ParkBookingForm } from '@/components/platform/ParkBookingForm';
 import { ParkRentalFilters } from '@/components/platform/ParkRentalFilters';
 import { fetchParkAvailability, ParkAvailability } from '@/api/park-telegram';
@@ -70,9 +71,9 @@ function AssetCard({ asset, tenantId, currency, preview, bookingEnabled, period,
   </VehicleCardFrame>;
 }
 
-function ParkStorefront({ tenantId }: { tenantId: string }) {
+function ParkStorefront({ tenantId, ownerEntry }: { tenantId: string; ownerEntry: boolean }) {
   const [preview] = useState(() => new URLSearchParams(window.location.hash.slice(1)).get('preview') || '');
-  const [view, setView] = useState<ParkView>(() => !preview && window.Telegram?.WebApp?.initData ? 'checking' : 'client');
+  const [view, setView] = useState<ParkView>(() => ownerEntry && !preview && window.Telegram?.WebApp?.initData ? 'checking' : 'client');
   const [data, setData] = useState<Storefront | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -116,7 +117,7 @@ function ParkStorefront({ tenantId }: { tenantId: string }) {
   const rates = data?.assets.map((asset) => asset.daily_rate).filter((rate): rate is number => rate !== null && rate > 0) || [];
   return <main className={`min-h-screen text-slate-950 selection:bg-blue-200 ${view === 'owner' || view === 'checking' ? 'bg-slate-50' : 'bg-gradient-to-br from-blue-50 via-white to-orange-50'}`}>
     <Helmet><html lang="ru" /><title>{name} — транспорт в аренду</title><meta name="robots" content="noindex, nofollow" /><meta name="referrer" content="no-referrer" /><meta name="description" content={`Каталог транспорта ${name}: фотографии и цены проката.`} /><link rel="canonical" href={`${window.location.origin}/p/${encodeURIComponent(tenantId)}`} /><meta property="og:type" content="website" /><meta property="og:title" content={`${name} — транспорт в аренду`} /><meta property="og:description" content={`Каталог транспорта ${name}: фотографии и цены проката.`} /><meta property="og:url" content={`${window.location.origin}/p/${encodeURIComponent(tenantId)}`} /><meta name="twitter:card" content="summary" /></Helmet>
-    {data && !data.preview && <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"><ParkTelegramEntry key={tenantId} tenantId={tenantId} view={view} onViewChange={setView} /></div>}
+    {data && !data.preview && <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"><ParkTelegramEntry key={tenantId} tenantId={tenantId} ownerEntry={ownerEntry} view={view} onViewChange={setView} /></div>}
     {view === 'client' && <header><HeroBanner park={{ name, minimumPrice: data && rates.length ? rentalMoney(Math.min(...rates), data.tenant.currency) : null, logo: data?.tenant.logo ? <StorefrontImage tenantId={tenantId} reference={data.tenant.logo} preview={preview} alt={`Логотип ${name}`} className="mx-auto mb-2 h-10 w-10 rounded-lg bg-white object-contain p-1" /> : undefined }} /></header>}
     <div className="mx-auto max-w-6xl px-4 pb-10 sm:px-6 lg:px-8">
       {data?.preview && <p role="status" className="mt-4 rounded-xl bg-amber-100 p-3 text-sm text-amber-950">Закрытое превью · здесь видны и неопубликованные машины. Ссылка действует 24 часа и не даёт доступа к управлению парком.</p>}
@@ -130,7 +131,7 @@ function ParkStorefront({ tenantId }: { tenantId: string }) {
   </main>;
 }
 
-export default function ParkStorefrontPage() {
+export default function ParkStorefrontPage({ ownerEntry = false }: { ownerEntry?: boolean }) {
   const { tenantId = '' } = useParams();
-  return <ParkStorefront key={tenantId} tenantId={tenantId} />;
+  return <ParkStorefront key={`${tenantId}:${ownerEntry}`} tenantId={tenantId} ownerEntry={ownerEntry} />;
 }

@@ -3,10 +3,9 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { fetchParkBotLink, ParkIdentity, verifyParkTelegramIdentity } from '@/api/park-telegram';
 import { ParkOwnerFleet } from './ParkOwnerFleet';
+import { resolveParkEntryView, type ParkView } from '@/lib/park-entry';
 
-export type ParkView = 'checking' | 'owner' | 'client';
-
-export function ParkTelegramEntry({ tenantId, view = 'owner', onViewChange }: { tenantId: string; view?: ParkView; onViewChange?: (view: ParkView) => void }) {
+export function ParkTelegramEntry({ tenantId, ownerEntry = false, view = 'client', onViewChange }: { tenantId: string; ownerEntry?: boolean; view?: ParkView; onViewChange?: (view: ParkView) => void }) {
   const [link, setLink] = useState('');
   const [identity, setIdentity] = useState<ParkIdentity | null>(null);
   const [loading, setLoading] = useState(true);
@@ -14,13 +13,13 @@ export function ParkTelegramEntry({ tenantId, view = 'owner', onViewChange }: { 
   const [reload, setReload] = useState(0);
   const ownerControls = useRef<HTMLElement>(null);
   useEffect(() => {
-    if (identity?.role !== 'owner') return;
+    if (!ownerEntry || identity?.role !== 'owner') return;
     ownerControls.current?.querySelector<HTMLButtonElement>(view === 'client' ? 'button' : 'div:not([hidden]) button')?.focus();
-  }, [view, identity]);
+  }, [view, identity, ownerEntry]);
   useEffect(() => {
     const controller = new AbortController();
     setLink(''); setIdentity(null); setError(''); setLoading(true);
-    if (window.Telegram?.WebApp?.initData) onViewChange?.('checking');
+    if (ownerEntry && window.Telegram?.WebApp?.initData) onViewChange?.('checking');
     const load = async () => {
       try {
         const url = await fetchParkBotLink(tenantId, controller.signal);
@@ -31,7 +30,7 @@ export function ParkTelegramEntry({ tenantId, view = 'owner', onViewChange }: { 
           const verified = await verifyParkTelegramIdentity(tenantId, initData, controller.signal);
           if (!controller.signal.aborted) {
             setIdentity(verified);
-            onViewChange?.(verified.role === 'owner' ? 'owner' : 'client');
+            onViewChange?.(resolveParkEntryView(ownerEntry, verified.role));
           }
         } else {
           onViewChange?.('client');
@@ -45,9 +44,9 @@ export function ParkTelegramEntry({ tenantId, view = 'owner', onViewChange }: { 
     };
     void load();
     return () => controller.abort();
-  }, [tenantId, reload, onViewChange]);
+  }, [tenantId, reload, onViewChange, ownerEntry]);
 
-  if (identity?.role === 'owner') return <section ref={ownerControls} aria-label={view === 'client' ? 'Просмотр клиентской витрины' : 'Кабинет владельца'} className="py-4">
+  if (resolveParkEntryView(ownerEntry, identity?.role) === 'owner') return <section ref={ownerControls} aria-label={view === 'client' ? 'Просмотр клиентской витрины' : 'Кабинет владельца'} className="py-4">
     {view === 'client' && <Button variant="outline" className="min-h-11 gap-2 rounded-lg" onClick={() => onViewChange?.('owner')}><ArrowLeft aria-hidden="true" className="h-4 w-4" />Вернуться в кабинет</Button>}
     <div hidden={view !== 'owner'}>
       <ParkOwnerFleet key={`fleet-${tenantId}`} tenantId={tenantId} onViewStorefront={() => onViewChange?.('client')} />

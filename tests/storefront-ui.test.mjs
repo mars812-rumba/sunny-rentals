@@ -11,6 +11,7 @@ const bundle = await build({
     export { default as HeroBanner } from './src/components/HeroBanner';
     export { VehicleCardFrame } from './src/components/VehicleCardFrame';
     export { PlatformTenantWorkspace } from './src/components/platform/PlatformTenantWorkspace';
+    export { resolveParkEntryView } from './src/lib/park-entry';
     export { LanguageProvider } from './src/contexts/LanguageContext';`, resolveDir: process.cwd(), loader: 'tsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs',
   jsx: 'automatic',
@@ -23,6 +24,15 @@ compiled.paths = Module._nodeModulePaths(process.cwd());
 compiled._compile(bundle.outputFiles[0].text, compiled.filename);
 const ui = compiled.exports;
 const e = React.createElement;
+
+test('public entry stays a storefront for every role, owner entry requires a verified owner', () => {
+  for (const role of [undefined, 'customer', 'owner']) {
+    assert.equal(ui.resolveParkEntryView(false, role), 'client');
+  }
+  assert.equal(ui.resolveParkEntryView(true, 'owner'), 'owner');
+  assert.equal(ui.resolveParkEntryView(true, 'customer'), 'client');
+  assert.equal(ui.resolveParkEntryView(true, undefined), 'client');
+});
 
 test('shared Sunny gallery accepts scoped media without a legacy image URL', () => {
   const html = renderToStaticMarkup(e(ui.ImageCarousel, {

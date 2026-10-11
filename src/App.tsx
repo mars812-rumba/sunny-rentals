@@ -38,6 +38,7 @@ interface TelegramWebApp {
   close: () => void;
   expand?: () => void;
   openLink?: (url: string) => void;
+  openTelegramLink?: (url: string) => void;
 }
 
 declare global {
@@ -99,6 +100,7 @@ const App = () => {
             <Route path="/" element={<Site />} />
             <Route path="/app" element={<Index />} />
             <Route path="/p/:tenantId" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем витрину…</p>}><ParkStorefrontPage /></Suspense>} />
+            <Route path="/p/:tenantId/owner" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем кабинет…</p>}><ParkStorefrontPage ownerEntry /></Suspense>} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/offer" element={<OfferPage />} />
             <Route path="/admin/offer" element={<OfferAdminPage />} />

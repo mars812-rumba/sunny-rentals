@@ -129,6 +129,22 @@ class PartnerBotTests(unittest.TestCase):
         self.service.handle_update(self.update(self.invite(expected_user_id='42')))
         self.assertEqual(self.identity().json()['role'], 'owner')
 
+    def test_owner_invitation_opens_cabinet_but_client_link_always_opens_storefront(self):
+        self.service.handle_update(self.update(self.invite()))
+        rows = self.transport.sent[-1]['reply_markup']['inline_keyboard']
+        self.assertEqual(rows[0][0]['web_app']['url'], 'https://example.com/p/park-a/owner')
+        self.assertEqual(rows[1][0]['web_app']['url'], 'https://example.com/p/park-a')
+        self.service.handle_update(self.update('ppark-a', update_id=101))
+        rows = self.transport.sent[-1]['reply_markup']['inline_keyboard']
+        self.assertEqual(rows[0][0]['web_app']['url'], 'https://example.com/p/park-a')
+        self.assertEqual(rows[1][0]['web_app']['url'], 'https://example.com/p/park-a/owner')
+        self.assertEqual(self.identity().json()['role'], 'owner')
+        self.service.handle_update(self.update('ppark-a', uid=43, update_id=102))
+        rows = self.transport.sent[-1]['reply_markup']['inline_keyboard']
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0][0]['web_app']['url'], 'https://example.com/p/park-a')
+        self.assertEqual(self.identity(uid=43).json()['role'], 'customer')
+
     def test_invitation_lasts_a_day_and_expires_exactly_at_boundary(self):
         invitation = self.service.invite(self.admin, 'park-a')
         self.assertEqual(invitation['expires_in'], 86400)

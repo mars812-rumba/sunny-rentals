@@ -240,8 +240,13 @@ class PartnerBotService:
             first_name=str(user.get('first_name', ''))[:120] or None,
         )
         state.partner_bot.identities[self.identity_key(tenant_id, user_id)] = identity
-        payload['text'] = (f'Доступ владельца к парку «{tenant.name}» подключён. Откройте витрину: после проверки Telegram там доступен календарный список заявок.' if owner_invite else f'Добро пожаловать в «{tenant.name}»! Посмотрите доступный транспорт на витрине.')
-        payload['reply_markup'] = {'inline_keyboard': [[{'text': 'Открыть витрину', 'web_app': {'url': f'{self.config.public_origin}/p/{tenant_id}'}}]]}
+        payload['text'] = (f'Доступ владельца к парку «{tenant.name}» подключён. Откройте кабинет для управления автопарком и календарём.' if owner_invite else f'Добро пожаловать в «{tenant.name}»! Посмотрите доступный транспорт на витрине.')
+        storefront_button = {'text': 'Открыть витрину', 'web_app': {'url': f'{self.config.public_origin}/p/{tenant_id}'}}
+        owner_button = {'text': 'Кабинет владельца', 'web_app': {'url': f'{self.config.public_origin}/p/{tenant_id}/owner'}}
+        buttons = [owner_button, storefront_button] if owner_invite else [storefront_button]
+        if owner_invite is None and self._active_owner(state, tenant_id, user_id):
+            buttons.append(owner_button)
+        payload['reply_markup'] = {'inline_keyboard': [[button] for button in buttons]}
         if tenant.status == TenantStatus.DRAFT:
             # Drafts require a superadmin preview; no invalid public link.
             payload.pop('reply_markup')
