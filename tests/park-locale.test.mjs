@@ -9,7 +9,7 @@ import { build } from 'esbuild';
 
 const bundle = await build({ stdin: { contents: `export * from './src/lib/park-locale';
  export { parkEnglish } from './src/locales/park-en';
- export { ParkLocaleProvider } from './src/contexts/ParkLocaleContext';
+ export { ParkLocaleProvider, ParkLanguageSwitcher } from './src/contexts/ParkLocaleContext';
  export { ParkPickupFields, ParkPickupSummary } from './src/components/platform/ParkPickupFields';
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
  export { ParkRequestItem } from './src/components/platform/ParkRequestsPanel';
@@ -34,6 +34,23 @@ const render = (component, props, language = 'en') => {
  return renderToStaticMarkup(e(ui.ParkLocaleProvider, { initialLanguage: language }, e(component, props)));
 };
 const visible = html => html.replace(/<[^>]+>/g, '').replace(/&[^;]+;/g, ' ');
+
+test('owner toolbar has one inline language selector with flags and a named compact sign-out', () => {
+ for (const language of ['ru', 'en']) {
+  const html = renderToStaticMarkup(e(ui.ParkLocaleProvider, { initialLanguage: language, showSwitcher: false }, e(ui.ParkLanguageSwitcher, { compact: true })));
+  assert.equal((html.match(/<select /g) || []).length, 1);
+  assert.doesNotMatch(html, /<button/);
+  assert.match(html, /🇷🇺 RU/);
+  assert.match(html, /🇬🇧 EN/);
+  assert.match(html, new RegExp(`value="${language}"[^>]*selected=""`));
+  assert.match(html, language === 'ru' ? /aria-label="Язык интерфейса"/ : /aria-label="Interface language"/);
+ }
+ const page = readFileSync('src/pages/ParkOwnerWebPage.tsx', 'utf8');
+ assert.match(page, /items-center justify-end gap-2/);
+ assert.match(page, /<ParkLanguageSwitcher compact/);
+ assert.match(page, /sr-only sm:not-sr-only/);
+ assert.match(readFileSync('src/App.tsx', 'utf8'), /<ParkLocaleProvider showSwitcher=\{false\}><ParkOwnerWebPage/);
+});
 
 test('pickup/return English copy and labels do not translate customer addresses or change option codes', () => {
  const pickup = { time: '10:00', location: 'city', address: 'Отель клиента', return_time: '18:00', return_location: 'city', return_address: 'Адрес возврата клиента' };
