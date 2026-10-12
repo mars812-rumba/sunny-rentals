@@ -8,7 +8,7 @@ import json
 import re
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from pydantic import BaseModel, constr, validator
+from pydantic import BaseModel, constr, root_validator, validator
 from .pydantic_compat import pattern_string
 from .context import TenantContext
 from .models import AssetStatus, Booking, BookingStatus, Customer, RentalAsset
@@ -21,12 +21,28 @@ class BookingConflict(ValueError):
     pass
 
 
+class ParkPickupInput(BaseModel):
+    time: pattern_string(r'^(?:[01][0-9]|2[0-3]):[0-5][0-9]$')
+    location: Literal['airport', 'city', 'self_pickup']
+    address: constr(strip_whitespace=True, max_length=500) = ''
+
+    @root_validator(skip_on_failure=True)
+    def city_address(cls, values):
+        if values.get('location') != 'city':
+            values['address'] = ''
+        return values
+
+    class Config:
+        extra = 'forbid'
+
+
 class ParkQuoteRequest(BaseModel):
     tenant_id: constr(min_length=1, max_length=63)
     init_data: constr(min_length=1, max_length=8192)
     asset_id: pattern_string(r'^[a-f0-9]{32}$')
     start_date: date
     end_date: date
+    pickup: Optional[ParkPickupInput] = None
 
     class Config:
         extra = 'forbid'
@@ -71,6 +87,7 @@ class ParkOwnerStatusRequest(ParkStatusRequest):
 class ParkAvailabilityRequest(BaseModel):
     start_date: date
     end_date: date
+    pickup_time: Optional[pattern_string(r'^(?:[01][0-9]|2[0-3]):[0-5][0-9]$')] = None
 
     class Config:
         extra = 'forbid'
@@ -162,8 +179,11 @@ class ParkBookingService:
         earliest = today - timedelta(days=365) if manual else today
         if request.start_date < earliest or not 1 <= days <= 365:
             raise ValueError('Choose 1 to 365 days, starting no earlier than a year ago' if manual else 'Choose future dates, from 1 to 365 days')
-        start = datetime.combine(request.start_date, time.min, zone).astimezone(timezone.utc)
-        end = datetime.combine(request.end_date, time.min, zone).astimezone(timezone.utc)
+        pickup = getattr(request, 'pickup', None)
+        pickup_time = pickup.time if pickup else getattr(request, 'pickup_time', None)
+        clock = time.fromisoformat(pickup_time) if pickup_time else time.min
+        start = datetime.combine(request.start_date, clock, zone).astimezone(timezone.utc)
+        end = datetime.combine(request.end_date, clock, zone).astimezone(timezone.utc)
         return days, start, end
 
     def prepare(self, request, context):
@@ -178,6 +198,12 @@ class ParkBookingService:
                  'end_date': request.end_date.isoformat(), 'days': days, **rental,
                  'deposit': str(deposit), 'currency': tenant.currency,
                  'timezone': tenant.timezone}
+        if request.pickup is not None:
+            if request.pickup.location == 'city' and tenant.currency != 'THB':
+                raise ValueError('Городская доставка 500 THB доступна только для парков с валютой THB')
+            delivery = Decimal('500.00') if request.pickup.location == 'city' else Decimal('0.00')
+            quote.update(pickup=request.pickup.dict(), delivery_fee=str(delivery),
+                         total_payable=str(Decimal(rental['total_rental']) + delivery))
         # This is a change detector, not authentication. Identity is verified separately.
         quote['quote_token'] = hashlib.sha256(json.dumps(quote, sort_keys=True).encode()).hexdigest()
         return quote, start, end
@@ -223,7 +249,7 @@ class ParkBookingService:
     def dto(booking):
         return {'id': booking.id, 'booking_number': booking.booking_number, 'asset_id': booking.asset_id, 'status': booking.status,
                 'start_at': booking.start_at, 'end_at': booking.end_at,
-                'pricing': {k: booking.pricing.get(k) for k in ('asset_name', 'start_date', 'end_date', 'days', 'daily_rate', 'total_rental', 'timezone', 'tariff_breakdown') if k in booking.pricing},
+                'pricing': {k: booking.pricing.get(k) for k in ('asset_name', 'start_date', 'end_date', 'days', 'daily_rate', 'total_rental', 'timezone', 'tariff_breakdown', 'pickup', 'delivery_fee', 'total_payable') if k in booking.pricing},
                 'deposit': {'amount': booking.deposit.get('amount')}, 'currency': booking.currency,
                 'entry_type': booking.entry_type, 'source': booking.source,
                 'operator_details': {k: booking.operator_details.get(k, '') for k in ('customer_name', 'note')}}
@@ -297,6 +323,8 @@ class ParkBookingService:
             repo = self.repo(context, 'bookings.json', Booking)
             key = hashlib.sha256(f'{context.actor_id}:{request.request_id}'.encode()).hexdigest()
             fingerprint = f'{request.asset_id}:{request.start_date}:{request.end_date}:{request.quote_token}'
+            if request.pickup is not None:
+                fingerprint += ':' + json.dumps(request.pickup.dict(), sort_keys=True)
             if request.contact is not None:
                 fingerprint += ':' + json.dumps(request.contact.dict(), sort_keys=True)
             with repo.storage.exclusive(repo.path):
@@ -323,7 +351,7 @@ class ParkBookingService:
                 customers.upsert(customer)
                 booking = Booking(id=key, booking_number=self.next_booking_number(records), tenant_id=context.tenant_id, asset_id=request.asset_id, customer_id=customer_id,
                     start_at=start, end_at=end, currency=quote['currency'], source='telegram_partner',
-                    pricing={k: quote[k] for k in ('asset_name', 'start_date', 'end_date', 'days', 'daily_rate', 'total_rental', 'timezone', 'tariff_breakdown') if k in quote},
+                    pricing={k: quote[k] for k in ('asset_name', 'start_date', 'end_date', 'days', 'daily_rate', 'total_rental', 'timezone', 'tariff_breakdown', 'pickup', 'delivery_fee', 'total_payable') if k in quote},
                     deposit={'amount': quote['deposit']}, legacy={'request_fingerprint': fingerprint})
                 if request.contact is not None:
                     booking.operator_details.update(contact_channel=request.contact.channel, contact_value=request.contact.value,

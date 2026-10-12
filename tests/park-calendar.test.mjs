@@ -18,7 +18,9 @@ const bundle = await build({ stdin: { contents: `export * from './src/utils/park
  export { ParkCalendarViewButtons } from './src/components/platform/ParkBookingCalendar';
  export { Tabs, TabsContent } from './src/components/ui/tabs';
  export { schedulerInitialOffset, timetableFocusDay } from './src/lib/scheduler-scroll';
- export { parkToday } from './src/lib/park-rental';`, resolveDir: process.cwd(), loader: 'tsx' },
+ export { parkToday } from './src/lib/park-rental';
+ export { ParkPickupFields, ParkPickupSummary } from './src/components/platform/ParkPickupFields';
+ export { validParkPickup } from './src/lib/park-pickup';`, resolveDir: process.cwd(), loader: 'tsx' },
  bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic',
  external: ['react', 'react/jsx-runtime', 'react-dom'], define: { 'import.meta.env.VITE_API_URL': '""' } });
 const compiled = new Module(resolve('tests/park-calendar-fixture.cjs'));
@@ -29,6 +31,31 @@ const ui = compiled.exports;
 const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', start_at: '2026-08-01T17:00:00Z', end_at: '2026-08-03T17:00:00Z', currency: 'THB',
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
+
+test('pickup fields require time but allow an optional city address, and summary preserves details', () => {
+ const pickup = { time: '14:30', location: 'city', address: '<Hotel>' };
+ const html = renderToStaticMarkup(e(ui.ParkPickupFields, { id: 'pickup', pickup, currency: 'THB', onChange() {} }));
+ assert.match(html, /for="pickup-time"/); assert.match(html, /type="time"[^>]*required=""/);
+ for (const label of ['Аэропорт — 0 THB', 'Город — 500 THB', 'Самовывоз — 0 THB', 'Название отеля или адрес (необязательно)']) assert.ok(html.includes(label));
+ assert.match(html, /id="pickup-address"/);
+ assert.doesNotMatch(html, /id="pickup-address"[^>]*(?:required|pattern)=/);
+ const airport = renderToStaticMarkup(e(ui.ParkPickupFields, { id: 'pickup', pickup: { ...pickup, location: 'airport' }, onChange() {} }));
+ assert.doesNotMatch(airport, /id="pickup-address"/);
+ assert.equal(ui.validParkPickup(pickup), true);
+ assert.equal(ui.validParkPickup({ ...pickup, time: '24:00' }), false);
+ assert.equal(ui.validParkPickup({ ...pickup, address: '  ' }), true);
+ assert.equal(ui.validParkPickup({ ...pickup, address: '' }), true);
+ const summary = renderToStaticMarkup(e(ui.ParkPickupSummary, { pickup, deliveryFee: '500.00', total: '2900.00', currency: 'THB' }));
+ assert.match(summary, /Получение: 14:30/); assert.match(summary, /Доставка:/); assert.match(summary, /Итого аренда и доставка:/);
+ assert.match(summary, /&lt;Hotel&gt;/); assert.doesNotMatch(summary, /<Hotel>/);
+ const item = { ...booking, pricing: { ...booking.pricing, pickup, delivery_fee: '500.00', total_payable: '2100.00' } };
+ assert.equal(ui.calendarBooking(item).form_data.dates.pickupTime, '14:30');
+ assert.equal(ui.calendarLogistics(item).pickup_date, '2026-08-02T14:30:00');
+ const request = renderToStaticMarkup(e(ui.ParkRequestItem, { booking: item, detailed: true, busy: false, onAction() {} }));
+ assert.match(request, /Получение: 14:30/); assert.match(request, /Адрес: &lt;Hotel&gt;/);
+ const filters = readFileSync('src/components/platform/ParkRentalFilters.tsx', 'utf8');
+ assert.doesNotMatch(filters, /Марка или модель|park-search|onSearchChange/);
+});
 
 test('timetable focuses today in park timezone, other months retain their first day', () => {
  const today = ui.parkToday('Asia/Bangkok', new Date('2026-10-31T19:00:00Z'));

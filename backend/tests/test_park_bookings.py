@@ -46,6 +46,65 @@ class ParkBookingTests(unittest.TestCase):
         self.assertEqual(len(json.loads((self.root / 'tenants/park-a/customers.json').read_text())['items']), 1)
         self.assertEqual(json.loads((self.root / 'tenants/park-b/bookings.json').read_text())['items'], [])
 
+    def test_city_pickup_fee_time_and_address_are_server_snapshots(self):
+        pickup = {'time': '14:30', 'location': 'city', 'address': '  Marina Hotel  '}
+        payload = self.booking_payload(pickup=pickup)
+        quote = self.client.post('/api/partners/bookings/quote', json=self.payload(pickup=pickup)).json()
+        self.assertEqual(quote['total_rental'], '2400.00')
+        self.assertEqual(quote['delivery_fee'], '500.00')
+        self.assertEqual(quote['total_payable'], '2900.00')
+        self.assertEqual(quote['deposit'], '5000.00')
+        self.assertEqual(quote['pickup']['address'], 'Marina Hotel')
+        changed = self.client.post('/api/partners/bookings', json={**payload, 'pickup': {**pickup, 'time': '15:30'}})
+        self.assertEqual(changed.status_code, 409, changed.text)
+        result = self.client.post('/api/partners/bookings', json=payload)
+        self.assertEqual(result.status_code, 201, result.text)
+        saved = result.json()['booking']
+        self.assertEqual(saved['start_at'], '2026-10-11T07:30:00+00:00')
+        self.assertEqual(saved['end_at'], '2026-10-14T07:30:00+00:00')
+        self.assertEqual(saved['pricing']['pickup'], quote['pickup'])
+        self.assertEqual(saved['pricing']['delivery_fee'], '500.00')
+        self.assertEqual(saved['pricing']['total_payable'], '2900.00')
+        replay = self.client.post('/api/partners/bookings', json=payload)
+        self.assertEqual(replay.json()['booking']['id'], saved['id'])
+        tampered = self.client.post('/api/partners/bookings', json={**payload, 'pickup': {**pickup, 'address': 'Different Hotel'}})
+        self.assertEqual(tampered.status_code, 409, tampered.text)
+        headers = {'Authorization': 'Bearer ' + self.auth.issue_for_verified_actor('1')}
+        private = self.client.get('/api/partners/parks/park-a/calendar', headers=headers).json()['bookings'][0]
+        self.assertEqual(private['pricing']['pickup'], quote['pickup'])
+        for pickup_time, free in [('09:00', False), ('14:30', True), ('15:00', True)]:
+            available = self.client.post('/api/partners/parks/park-a/availability', json={'start_date': '2026-10-14', 'end_date': '2026-10-16', 'pickup_time': pickup_time})
+            self.assertEqual(available.status_code, 200, available.text)
+            self.assertEqual(self.asset.id in available.json()['available_asset_ids'], free)
+            self.assertNotIn('Marina', available.text)
+
+    def test_free_pickups_validation_and_fee_tampering(self):
+        for location in ('airport', 'self_pickup'):
+            result = self.client.post('/api/partners/bookings/quote', json=self.payload(pickup={'time': '09:00', 'location': location, 'address': 'Old city address'}))
+            self.assertEqual(result.status_code, 200, result.text)
+            self.assertEqual(result.json()['delivery_fee'], '0.00')
+            self.assertEqual(result.json()['total_payable'], '2400.00')
+            self.assertEqual(result.json()['pickup']['address'], '')
+        for pickup in ({'time': '24:00', 'location': 'airport'}, {'time': '', 'location': 'airport'}, {'time': '12:00', 'location': 'city', 'address': 'a' * 501}, {'time': '12:00', 'location': 'city', 'address': 'Hotel', 'delivery_fee': 0}):
+            response = self.client.post('/api/partners/bookings/quote', json=self.payload(pickup=pickup))
+            self.assertEqual(response.status_code, 422, response.text)
+        response = self.client.post('/api/partners/bookings/quote', json=self.payload(pickup={'time': '12:00', 'location': 'city', 'address': 'Hotel'}, delivery_fee=0))
+        self.assertEqual(response.status_code, 422)
+
+    def test_city_booking_can_omit_address_without_changing_delivery_fee(self):
+        for address in (None, '', '  '):
+            pickup = {'time': '12:00', 'location': 'city'}
+            if address is not None:
+                pickup['address'] = address
+            result = self.client.post('/api/partners/bookings/quote', json=self.payload(pickup=pickup))
+            self.assertEqual(result.status_code, 200, result.text)
+            self.assertEqual(result.json()['pickup']['address'], '')
+            self.assertEqual(result.json()['delivery_fee'], '500.00')
+        created = self.client.post('/api/partners/bookings', json=self.booking_payload(pickup={'time': '12:00', 'location': 'city'}))
+        self.assertEqual(created.status_code, 201, created.text)
+        self.assertEqual(created.json()['booking']['pricing']['pickup']['address'], '')
+        self.assertEqual(created.json()['booking']['pricing']['delivery_fee'], '500.00')
+
     def test_contacts_are_joined_only_into_private_scoped_operator_calendar(self):
         update = self.update('ppark-a', update_id=101)
         update['message']['from']['username'] = 'client_name'
