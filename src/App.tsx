@@ -21,6 +21,7 @@ import BlogDetailPage from "./pages/blog/BlogDetailPage";
 import React, { Suspense, useEffect } from 'react';
 import { trackLeadEvent } from '@/api/api';
 import { CarsProvider } from '@/contexts/CarsContext';
+import { ParkLocaleProvider } from '@/contexts/ParkLocaleContext';
 
 interface TelegramWebAppUser {
   id: number;
@@ -52,11 +53,12 @@ declare global {
 const AdminScheduler = React.lazy(() => import('./pages/AdminScheduler'));
 const PlatformAdminPage = React.lazy(() => import('./pages/PlatformAdminPage'));
 const ParkStorefrontPage = React.lazy(() => import('./pages/ParkStorefrontPage'));
+const ParkOwnerWebPage = React.lazy(() => import('./pages/ParkOwnerWebPage'));
 const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    if (window.location.pathname.startsWith('/platform-admin') || window.location.pathname.startsWith('/p/')) return;
+    if (window.location.pathname.startsWith('/platform-admin') || window.location.pathname.startsWith('/p/') || window.location.pathname.startsWith('/owner/')) return;
     const tg = window.Telegram?.WebApp;
     
     if (tg) {
@@ -99,8 +101,9 @@ const App = () => {
             {/* Основные роуты */}
             <Route path="/" element={<Site />} />
             <Route path="/app" element={<Index />} />
-            <Route path="/p/:tenantId" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем витрину…</p>}><ParkStorefrontPage /></Suspense>} />
-            <Route path="/p/:tenantId/owner" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем кабинет…</p>}><ParkStorefrontPage ownerEntry /></Suspense>} />
+            <Route path="/p/:tenantId" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем витрину…</p>}><ParkLocaleProvider><ParkStorefrontPage /></ParkLocaleProvider></Suspense>} />
+            <Route path="/p/:tenantId/owner" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем кабинет…</p>}><ParkLocaleProvider><ParkStorefrontPage ownerEntry /></ParkLocaleProvider></Suspense>} />
+            <Route path="/owner/:tenantId" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем кабинет…</p>}><ParkLocaleProvider><ParkOwnerWebPage /></ParkLocaleProvider></Suspense>} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/offer" element={<OfferPage />} />
             <Route path="/admin/offer" element={<OfferAdminPage />} />

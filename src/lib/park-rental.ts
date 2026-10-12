@@ -1,4 +1,11 @@
-export interface ParkRentalPeriod { start: string; end: string }
+import type { ParkPickup } from './park-pickup';
+import { parkIntlLocale } from './park-locale';
+export interface ParkRentalPeriod { start: string; end: string; pickup?: ParkPickup }
+
+export function paidRentalDays(period: ParkRentalPeriod): number {
+  const pickup = period.pickup;
+  return rentalDays(period) + (pickup?.time && pickup.return_time && pickup.return_time > pickup.time ? 1 : 0);
+}
 
 export function rentalDays({ start, end }: ParkRentalPeriod): number {
   const parse = (value: string) => {
@@ -16,10 +23,10 @@ export function parkToday(timezone: string, now = new Date()): string {
 }
 
 export function dateLabel(value: string): string {
-  return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${value}T00:00:00Z`));
+  return new Intl.DateTimeFormat(parkIntlLocale(), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${value}T00:00:00Z`));
 }
 
 export function rentalMoney(value: number | string, currency: string): string {
-  try { return new Intl.NumberFormat('ru-RU', { style: 'currency', currency, maximumFractionDigits: 2 }).format(Number(value)); }
+  try { return new Intl.NumberFormat(parkIntlLocale(), { style: 'currency', currency, maximumFractionDigits: 2 }).format(Number(value)); }
   catch { return `${value} ${currency}`; }
 }

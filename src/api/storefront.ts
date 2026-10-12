@@ -1,3 +1,4 @@
+import { parkText as pt } from '@/lib/park-locale';
 import type { TariffGrid, VehicleSpecs } from './platform-admin';
 export interface StorefrontAsset {
   id: string;
@@ -27,9 +28,9 @@ export async function fetchStorefront(tenantId: string, preview: string, signal:
     signal, headers: preview ? { 'X-Storefront-Preview': preview } : {}, cache: 'no-store',
   });
   if (!response.ok) {
-    if (response.status === 401) throw new Error('Ссылка превью истекла. Откройте её заново из суперадминки.');
-    if (response.status === 404) throw new Error('Витрина не найдена или ещё не опубликована.');
-    throw new Error('Не удалось загрузить витрину. Проверьте соединение и повторите попытку.');
+    if (response.status === 401) throw new Error(pt("Ссылка превью истекла. Откройте её заново из суперадминки."));
+    if (response.status === 404) throw new Error(pt("Витрина не найдена или ещё не опубликована."));
+    throw new Error(pt("Не удалось загрузить витрину. Проверьте соединение и повторите попытку."));
   }
   return response.json();
 }

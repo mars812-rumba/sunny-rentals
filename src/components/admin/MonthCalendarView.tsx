@@ -1,3 +1,5 @@
+import { parkText as pt } from '@/lib/park-locale';
+import { useParkLocale } from '@/contexts/park-locale';
 import React, { useMemo, useCallback, useEffect, memo, useState, useRef } from 'react';
 import { 
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, 
@@ -31,9 +33,9 @@ interface MonthCalendarViewProps {
   hideConfirmedOccupancy?: boolean;
 }
 
-const getMonthLetters = (date: Date) => {
-  let name = format(date, 'LLLL', { locale: ru }).toUpperCase();
-  if (name === 'СЕНТЯБРЬ') name = 'СЕНТЯБР'; 
+const getMonthLetters = (date: Date, dateLocale: typeof ru) => {
+  let name = format(date, dateLocale.code === 'ru' ? 'LLLL' : 'MMM', { locale: dateLocale }).toUpperCase();
+  if (dateLocale.code === 'ru' && name === "СЕНТЯБРЬ") name = "СЕНТЯБР";
   return name.split('');
 };
 
@@ -52,6 +54,7 @@ const MonthGrid = memo(({
   showOccupancy?: boolean
   hideConfirmedOccupancy?: boolean
 }) => {
+  const { pt, dateLocale } = useParkLocale();
   const days = useMemo(() => {
     const monthStart = startOfMonth(date);
     const monthEnd = endOfMonth(monthStart);
@@ -63,7 +66,7 @@ const MonthGrid = memo(({
     return res;
   }, [date]);
 
-  const monthLetters = useMemo(() => getMonthLetters(date), [date]);
+  const monthLetters = useMemo(() => getMonthLetters(date, dateLocale), [date, dateLocale]);
   const yearString = format(date, 'yyyy');
   const weeks = [];
   for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
@@ -83,9 +86,9 @@ const MonthGrid = memo(({
         </div>
       </div>
 
-      <div className="relative z-10 grid grid-flow-row auto-rows-fr divide-y divide-gray-100 border-t border-gray-100">
+      <div className={cn("relative z-10 grid grid-flow-row auto-rows-fr divide-y border-t", showOccupancy ? "divide-dotted divide-slate-200/60 border-dotted border-slate-200/60" : "divide-gray-100 border-gray-100")}>
         {weeks.map((week, wIdx) => (
-          <div key={wIdx} className="grid grid-cols-7 divide-x divide-gray-100">
+          <div key={wIdx} className={cn("grid grid-cols-7 divide-x", showOccupancy ? "divide-dotted divide-slate-200/60" : "divide-gray-100")}>
             {week.map((day) => {
               const dayKey = format(day, 'yyyy-MM-dd');
               const events = eventsByDay.get(dayKey) || [];
@@ -102,13 +105,13 @@ const MonthGrid = memo(({
                   data-calendar-day={dayKey}
                   className={cn(
                     "min-h-[100px] p-0.5 transition-colors cursor-pointer group bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700",
-                    showOccupancy && isWeekend(day) && "bg-slate-100",
+                    showOccupancy && isWeekend(day) && "bg-slate-100/40",
                     !isCurrentMonth ? "opacity-60" : "hover:bg-blue-60/50"
                   )}
                   onClick={() => onDayClick(day, events, false)}
                 >
                   <div className="flex justify-between items-start mb-1">
-                    {showOccupancy ? <button type="button" className={cn('min-h-11 w-full rounded-sm text-left px-1 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700', dayIsToday && 'bg-blue-600 text-white')} aria-label={`${format(day, 'd MMMM yyyy', { locale: ru })}, событий: ${events.length}`} onClick={event => { event.stopPropagation(); onDayClick(day, events); }}>{format(day, 'd')}</button> : <span className={cn(
+                    {showOccupancy ? <button type="button" className={cn('min-h-11 w-full rounded-sm text-left px-1 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700', dayIsToday && 'bg-blue-600 text-white')} aria-label={pt("{0}, событий: {1}", [format(day, 'd MMMM yyyy', { locale: dateLocale }), events.length])} onClick={event => { event.stopPropagation(); onDayClick(day, events); }}>{format(day, 'd')}</button> : <span className={cn(
                       "text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full transition-colors",
                       dayIsToday ? "bg-blue-600 text-white shadow-md" : isCurrentMonth ? "text-slate-500" : "text-gray-300"
                     )}>
@@ -136,15 +139,15 @@ const MonthGrid = memo(({
                             showOccupancy ? "w-full min-h-7 overflow-hidden px-1 py-1 text-[10px] leading-4 font-medium rounded-sm hover:ring-1 hover:ring-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
                             bgClass
                           )}
-                          aria-label={`${ev.booking?.status === 'blocked' ? 'Блокировка' : ev.type === 'pickup' ? 'Выдача' : ev.type === 'return' ? 'Возврат' : 'Занято'}: ${ev.carName}`}
+                          aria-label={`${ev.booking?.status === 'blocked' ? pt("Блокировка") : ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             onBadgeClick(ev, e);
                           }}
-                          title={`${ev.type === 'pickup' ? 'Выдача' : ev.type === 'return' ? 'Возврат' : 'Занято'}: ${ev.carName}`}
+                          title={`${ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}`}
                         >
                           <span className="block truncate tracking-tight">
-                            {ev.booking?.status === 'blocked' ? `Блок · ${ev.carName}` : ev.carName}
+                            {ev.booking?.status === 'blocked' ? pt("Блок · {0}", [ev.carName]) : ev.carName}
                           </span>
                         </button>
                       );
@@ -159,7 +162,7 @@ const MonthGrid = memo(({
                           onDayClick(day, visibleEvents.slice(4), true);
                         }}
                       >
-                        + ещё {visibleEvents.length - 4}
+                        {pt("+ ещё")}{visibleEvents.length - 4}
                       </button>
                     )}
                   </div>
@@ -184,6 +187,7 @@ export function MonthCalendarView({
   showOccupancy = false,
   hideConfirmedOccupancy = false,
 }: MonthCalendarViewProps) {
+  const { pt, dateLocale } = useParkLocale();
   
   const [selectedDayData, setSelectedDayData] = useState<{
     isOpen: boolean;
@@ -211,7 +215,7 @@ export function MonthCalendarView({
       const baseEvent = {
         carName: item.car_name,
         clientName: item.client_name,
-        location: item.location || 'Не указано',
+        location: item.location || pt("Не указано"),
         booking_id: item.booking_id,
         booking: fullBooking,
         bookingStatus: fullBooking.status  // для определения цвета
@@ -231,7 +235,7 @@ export function MonthCalendarView({
       if (rDate && !isNaN(rDate.getTime())) {
         const rKey = format(rDate, 'yyyy-MM-dd');
         if (!map.has(rKey)) map.set(rKey, []);
-        map.get(rKey)!.push({ ...baseEvent, type: 'return', time: format(rDate, 'HH:mm') });
+        map.get(rKey)!.push({ ...baseEvent, location: item.return_location || baseEvent.location, type: 'return', time: format(rDate, 'HH:mm') });
       }
       if (showOccupancy && pDate && rDate && !isNaN(pDate.getTime()) && !isNaN(rDate.getTime())) {
         // Return day is not occupied; retain a separate return event on that day.
@@ -244,7 +248,7 @@ export function MonthCalendarView({
     });
 
     return map;
-  }, [logisticsData, bookings, showOccupancy]);
+  }, [logisticsData, bookings, showOccupancy, pt]);
 
   const handleInnerDayClick = useCallback((date: Date, events: DayEvent[], isOverflowClick = false) => {
     // Click on empty space - create booking immediately (только если не overflow click)
@@ -290,17 +294,17 @@ export function MonthCalendarView({
     <div className="bg-white min-h-[600px] w-full flex flex-col select-none overflow-hidden relative">
       <div className="grid grid-cols-7 bg-white relative z-20 pt-2 border-b border-gray-50 font-sans">
         {[
-          { name: 'Пн', isWeekend: false },
-          { name: 'Вт', isWeekend: false },
-          { name: 'Ср', isWeekend: false },
-          { name: 'Чт', isWeekend: false },
-          { name: 'Пт', isWeekend: false },
-          { name: 'Сб', isWeekend: true },
-          { name: 'Вс', isWeekend: true }
+          { name: pt("Пн"), isWeekend: false },
+          { name: pt("Вт"), isWeekend: false },
+          { name: pt("Ср"), isWeekend: false },
+          { name: pt("Чт"), isWeekend: false },
+          { name: pt("Пт"), isWeekend: false },
+          { name: pt("Сб"), isWeekend: true },
+          { name: pt("Вс"), isWeekend: true }
         ].map((day, i) => (
           <div key={i} className={cn(
             "py-2 text-center text-[10px] font-bold uppercase",
-            day.isWeekend ? "text-red-400" : "text-slate-500"
+            day.isWeekend ? showOccupancy ? "text-red-700" : "text-red-400" : "text-slate-500"
           )}>{day.name}</div>
         ))}
       </div>

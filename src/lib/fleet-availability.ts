@@ -1,12 +1,13 @@
+import { parkText as pt } from '@/lib/park-locale';
 import type { ParkBooking } from '@/api/park-telegram';
 import { rentalDays, type ParkRentalPeriod } from '@/lib/park-rental';
 
 export function fleetPeriodError(period: ParkRentalPeriod): string {
   if (!period.start || !period.end) return '';
   const days = rentalDays(period);
-  if (!Number.isFinite(days)) return 'Укажите корректные даты начала и окончания.';
-  if (days <= 0) return 'Дата окончания должна быть позже даты начала.';
-  if (days > 365) return 'Выберите период не больше 365 суток.';
+  if (!Number.isFinite(days)) return pt("Укажите корректные даты начала и окончания.");
+  if (days <= 0) return pt("Дата окончания должна быть позже даты начала.");
+  if (days > 365) return pt("Выберите период не больше 365 суток.");
   return '';
 }
 

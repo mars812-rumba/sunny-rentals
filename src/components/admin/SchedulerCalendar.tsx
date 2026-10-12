@@ -1,3 +1,5 @@
+import { parkText as pt } from '@/lib/park-locale';
+import { useParkLocale } from '@/contexts/park-locale';
 import { webpImagePath } from "../../../shared/webp-image";
 import React, { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 import { format, isSameDay } from 'date-fns';
@@ -64,6 +66,7 @@ export function SchedulerCalendar({
   initialScrollDate,
   scrollResetKey = 0,
 }: SchedulerCalendarProps) {
+  const { pt, dateLocale } = useParkLocale();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
   const [selectedCarInfo, setSelectedCarInfo] = useState<{car: Car, owner: string | null} | null>(null);
@@ -129,7 +132,7 @@ export function SchedulerCalendar({
     const pickupTime = fd.dates.pickupTime || format(start, 'HH:mm');
     
     const line1Parts = [];
-    if (booking.status === 'blocked') line1Parts.push('Блокировка');
+    if (booking.status === 'blocked') line1Parts.push(pt("Блокировка"));
     line1Parts.push(`${startStr}-${endStr}`);
     line1Parts.push(pickupTime);
     if (fd.locations?.pickupLocation) line1Parts.push(fd.locations.pickupLocation);
@@ -153,7 +156,7 @@ export function SchedulerCalendar({
       style={{ height: readOnly ? HEADER_HEIGHT + Math.max(cars.length, 1) * CAR_ROW_HEIGHT + 16 : 'calc(100vh - 60px)', maxHeight: readOnly ? 'min(65vh, 520px)' : undefined }}
       tabIndex={readOnly ? 0 : undefined}
       role={readOnly ? 'region' : undefined}
-      aria-label={readOnly ? 'Гант занятости, прокрутка по датам' : undefined}
+      aria-label={readOnly ? pt("Гант занятости, прокрутка по датам") : undefined}
       onMouseUp={() => handleCellTouchEnd()}
       onMouseLeave={() => handleCellTouchEnd()}
     >
@@ -165,7 +168,7 @@ export function SchedulerCalendar({
             className="sticky left-0 z-30 flex-shrink-0 border-r border-gray-300 px-1 flex items-center justify-center bg-white shadow-sm"
             style={{ width: sidebarWidth, height: HEADER_HEIGHT }}
           >
-            <span className="text-[9px] font-bold text-gray-600">Авто</span>
+            <span className="text-[9px] font-bold text-gray-600">{pt("Авто")}</span>
           </div>
 
           {/* Date cells */}
@@ -188,14 +191,14 @@ export function SchedulerCalendar({
                 >
                   {isFirstOfMonth && (
                     <span className="absolute top-0 text-[7px] font-bold text-orange-600">
-                      {format(date, 'MMM', { locale: ru })}
+                      {format(date, 'MMM', { locale: dateLocale })}
                     </span>
                   )}
                   <span className={cn(
                     "text-[8px] uppercase",
                     isToday ? "text-blue-700 font-bold" : "text-gray-500"
                   )}>
-                    {format(date, 'EEEEEE', { locale: ru })}
+                    {format(date, 'EEEEEE', { locale: dateLocale })}
                   </span>
                   <span className={cn(
                     "text-[10px] font-semibold",
@@ -328,7 +331,7 @@ export function SchedulerCalendar({
   key={booking.booking_id}
   role={readOnly ? 'button' : undefined}
   tabIndex={readOnly ? 0 : undefined}
-  aria-label={readOnly ? `${booking.form_data.car.name}: ${booking.form_data.dates.start} — ${booking.form_data.dates.end}, ${booking.status === 'blocked' ? 'Блокировка' : booking.status === 'pre_booking' ? 'Ожидает подтверждения' : 'Занято'}` : undefined}
+  aria-label={readOnly ? `${booking.form_data.car.name}: ${booking.form_data.dates.start} — ${booking.form_data.dates.end}, ${booking.status === 'blocked' ? pt("Блокировка") : booking.status === 'pre_booking' ? pt("Ожидает подтверждения") : pt("Занято")}` : undefined}
   onKeyDown={readOnly ? (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onBookingClick(booking); } } : undefined}
   className={cn(
     "absolute top-[6px] bottom-[6px] pointer-events-auto cursor-pointer transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700",
@@ -349,13 +352,11 @@ export function SchedulerCalendar({
                       >
                         {booking.status === 'pre_booking' && (
                           <div className="absolute bottom-[1px] right-[6px] text-[6px] px-[2px] rounded-[1px] bg-gray-400/70 text-white font-semibold uppercase pointer-events-none">
-                            ПРЕДБРОНЬ
-                          </div>
+                            {pt("ПРЕДБРОНЬ")}</div>
                         )}
                         {booking.status === 'rejected' && (
                           <div className="absolute bottom-[1px] right-[6px] text-[6px] px-[2px] rounded-[1px] bg-red-500/30 text-red-600 font-semibold uppercase pointer-events-none">
-                            ОТКЛОНЕН
-                          </div>
+                            {pt("ОТКЛОНЕН")}</div>
                         )}
 
                         <div className="px-0.5 pl-[8px] pr-[2px] h-full flex flex-col justify-center overflow-hidden leading-tight">
@@ -419,7 +420,7 @@ export function SchedulerCalendar({
                 <div className="flex items-center gap-2 p-3 bg-purple-50 rounded-lg border border-purple-200">
                   <div className="w-2 h-2 rounded-full bg-purple-600"></div>
                   <div>
-                    <p className="text-xs text-gray-600">Владелец</p>
+                    <p className="text-xs text-gray-600">{pt("Владелец")}</p>
                     <p className="text-sm font-semibold text-purple-700">{selectedCarInfo.owner}</p>
                   </div>
                 </div>
@@ -429,8 +430,7 @@ export function SchedulerCalendar({
                 onClick={() => setSelectedCarInfo(null)}
                 className="w-full py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium text-sm transition-colors"
               >
-                Закрыть
-              </button>
+                {pt("Закрыть")}</button>
             </div>
           </div>
         </div>
