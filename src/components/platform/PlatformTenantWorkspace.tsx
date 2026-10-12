@@ -295,7 +295,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
       </section>
         </TabsContent>
         {calendarVisited && <TabsContent value="calendar" forceMount hidden={section !== 'calendar'} className="mt-6 min-w-0 data-[state=inactive]:hidden">
-          <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} fleetRevision={calendarRevision} />
+          <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} fleetRevision={calendarRevision} timezone={tenant.timezone} />
         </TabsContent>}
         {requestsVisited && <TabsContent value="requests" forceMount hidden={section !== 'requests'} className="mt-6 min-w-0 data-[state=inactive]:hidden">
           <ParkRequestsPanel key={`requests-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} revision={calendarRevision} />

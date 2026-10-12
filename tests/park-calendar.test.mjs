@@ -14,7 +14,11 @@ const bundle = await build({ stdin: { contents: `export * from './src/utils/park
  export { ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
  export { ParkRequestItem } from './src/components/platform/ParkRequestsPanel';
- export { ParkCalendarPhoto } from './src/components/platform/ParkCalendarPhoto';`, resolveDir: process.cwd(), loader: 'tsx' },
+ export { ParkCalendarPhoto } from './src/components/platform/ParkCalendarPhoto';
+ export { ParkCalendarViewButtons } from './src/components/platform/ParkBookingCalendar';
+ export { Tabs, TabsContent } from './src/components/ui/tabs';
+ export { schedulerInitialOffset, timetableFocusDay } from './src/lib/scheduler-scroll';
+ export { parkToday } from './src/lib/park-rental';`, resolveDir: process.cwd(), loader: 'tsx' },
  bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic',
  external: ['react', 'react/jsx-runtime', 'react-dom'], define: { 'import.meta.env.VITE_API_URL': '""' } });
 const compiled = new Module(resolve('tests/park-calendar-fixture.cjs'));
@@ -25,6 +29,36 @@ const ui = compiled.exports;
 const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', start_at: '2026-08-01T17:00:00Z', end_at: '2026-08-03T17:00:00Z', currency: 'THB',
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
+
+test('timetable focuses today in park timezone, other months retain their first day', () => {
+ const today = ui.parkToday('Asia/Bangkok', new Date('2026-10-31T19:00:00Z'));
+ assert.equal(today, '2026-11-01');
+ assert.equal(ui.timetableFocusDay('2026-11', today), '2026-11-01');
+ assert.equal(ui.timetableFocusDay('2026-10', today), '2026-10-01');
+ assert.equal(ui.timetableFocusDay('2026-12', today), '2026-12-01');
+ assert.equal(ui.timetableFocusDay('2026-10', '2026-10-12'), '2026-10-12');
+ const dates = Array.from({ length: 97 }, (_, index) => new Date(2026, 8, 24 + index));
+ assert.equal(ui.schedulerInitialOffset(dates, new Date(2026, 9, 12), 24), 18 * 24);
+ assert.equal(ui.schedulerInitialOffset(dates, new Date(2026, 9, 1), 24), 7 * 24);
+ assert.equal(ui.schedulerInitialOffset(dates, undefined, 24), 7 * 24);
+ assert.equal(ui.schedulerInitialOffset(dates, new Date(2025, 9, 1), 24), 7 * 24);
+});
+
+test('calendar view buttons separate timetable from delivery calendar and remove list', () => {
+ for (const view of ['timetable', 'deliveries']) {
+  const html = renderToStaticMarkup(e(ui.Tabs, { value: view }, e(ui.ParkCalendarViewButtons), e(ui.TabsContent, { value: 'timetable' }, 'TIMETABLE_ONLY'), e(ui.TabsContent, { value: 'deliveries' }, 'DELIVERIES_ONLY')));
+  assert.equal((html.match(/role="tab"/g) || []).length, 2);
+  assert.match(html, /Таймтейбл/); assert.match(html, /Календарь доставок/);
+  assert.doesNotMatch(html, />Список</);
+  assert.ok(html.includes(view === 'timetable' ? 'TIMETABLE_ONLY' : 'DELIVERIES_ONLY'));
+  assert.ok(!html.includes(view === 'timetable' ? 'DELIVERIES_ONLY' : 'TIMETABLE_ONLY'));
+ }
+ const source = readFileSync(resolve('src/components/platform/ParkBookingCalendar.tsx'), 'utf8');
+ assert.match(source, /useState\('timetable'\)/);
+ assert.match(source, /<TabsContent value="timetable"[\s\S]*<SchedulerCalendar[\s\S]*initialScrollDate=\{initialScrollDate\}/);
+ assert.match(source, /<TabsContent value="deliveries"[\s\S]*<MonthCalendarView/);
+ assert.doesNotMatch(source, /<TabsContent value="list"/);
+});
 
 test('Gantt uses thumbnail references for new and previously uploaded photos', () => {
  const main = `assets/${'a'.repeat(32)}/${'b'.repeat(32)}.webp`;
@@ -233,16 +267,17 @@ test('trial displays only the expiry date in the park timezone', () => {
  assert.match(renderToStaticMarkup(e(ui.ParkTrialStatus, { tenant: { ...tenant, trial: { ...tenant.trial, expired: true } } })), /Триал завершён/);
 });
 
-test('month view also contains the Gantt with shared dates and asset filter, without a Gantt switch', () => {
+test('timetable and deliveries keep shared month and asset filter in separate panels', () => {
  const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
- const monthPanel = source.match(/<TabsContent value="month"[\s\S]*?<\/TabsContent>/)?.[0];
- assert.ok(monthPanel);
- assert.ok(monthPanel.indexOf('<SchedulerCalendar') < monthPanel.indexOf('<MonthCalendarView'));
- assert.match(monthPanel, /currentDate=\{date\}/);
- assert.match(monthPanel, /startDate=\{date\}/);
- assert.match(monthPanel, /cars=\{cars\.filter\(car => !assetId \|\| car\.id === assetId\)\}/);
- assert.doesNotMatch(source, /TabsTrigger value="gantt"|TabsContent value="gantt"/);
- assert.match(source, /TabsTrigger value="list"/);
+ const timetable = source.match(/<TabsContent value="timetable"[\s\S]*?<\/TabsContent>/)?.[0];
+ const deliveries = source.match(/<TabsContent value="deliveries"[\s\S]*?<\/TabsContent>/)?.[0];
+ assert.ok(timetable); assert.ok(deliveries);
+ assert.match(timetable, /<SchedulerCalendar/); assert.doesNotMatch(timetable, /<MonthCalendarView/);
+ assert.match(deliveries, /<MonthCalendarView/); assert.doesNotMatch(deliveries, /<SchedulerCalendar/);
+ assert.match(deliveries, /currentDate=\{date\}/);
+ assert.match(timetable, /startDate=\{date\}/);
+ assert.match(timetable, /cars=\{cars\.filter\(car => !assetId \|\| car\.id === assetId\)\}/);
+ assert.match(source, /setScrollResetKey\(value => value \+ 1\)/);
 });
 
 test('manual form has labeled fields, inline validation hooks and date-only inputs', () => {

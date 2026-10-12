@@ -6,6 +6,7 @@ import { Car, Booking } from '@/api/api';
 import { cn } from '@/lib/utils';
 import { CarFront } from 'lucide-react';
 import { useCalendarGrid } from '@/hooks/useCalendarGrid';
+import { schedulerInitialOffset } from '@/lib/scheduler-scroll';
 
 // 🎨 Получить URL фото
 const getPhotoUrl = (filename: string | null | undefined): string | null => {
@@ -30,6 +31,8 @@ interface SchedulerCalendarProps {
   readOnly?: boolean;
   exclusiveEnd?: boolean;
   renderCarPhoto?: (car: Car) => React.ReactNode;
+  initialScrollDate?: Date;
+  scrollResetKey?: number;
 }
 
 const DAY_WIDTH = 24;
@@ -58,6 +61,8 @@ export function SchedulerCalendar({
   readOnly = false,
   exclusiveEnd = false,
   renderCarPhoto,
+  initialScrollDate,
+  scrollResetKey = 0,
 }: SchedulerCalendarProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
@@ -87,7 +92,7 @@ export function SchedulerCalendar({
 
   useEffect(() => {
     if (scrollRef.current) {
-      if (readOnly) { scrollRef.current.scrollLeft = 7 * DAY_WIDTH; return; }
+      if (readOnly) { scrollRef.current.scrollLeft = schedulerInitialOffset(dates, initialScrollDate, DAY_WIDTH); return; }
       const today = new Date();
       const todayIndex = dates.findIndex(date => isSameDay(date, today));
       
@@ -96,7 +101,7 @@ export function SchedulerCalendar({
         scrollRef.current.scrollLeft = scrollPosition;
       }
     }
-  }, [dates, readOnly]);
+  }, [dates, readOnly, initialScrollDate, scrollResetKey]);
 
   const handleBookingClick = (booking: Booking, e: React.MouseEvent) => {
     e.stopPropagation();
