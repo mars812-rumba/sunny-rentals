@@ -132,8 +132,10 @@ class TenantAssetAdmin:
             asset.name = data.name
             asset.asset_type = data.asset_type
             asset.specs = {**asset.specs, "brand": data.brand, "model": data.model, "year": data.year, "color": data.color}
-            asset.pricing = {**asset.pricing, "daily_rate": data.daily_rate, "currency": self.tenant.currency}
-            asset.deposit_policy = {**asset.deposit_policy, "amount": data.deposit, "currency": self.tenant.currency}
+            if not asset_id or 'daily_rate' in data.__fields_set__:
+                asset.pricing = {**asset.pricing, "daily_rate": data.daily_rate, "currency": self.tenant.currency}
+            if not asset_id or 'deposit' in data.__fields_set__:
+                asset.deposit_policy = {**asset.deposit_policy, "amount": data.deposit, "currency": self.tenant.currency}
             if data.public is not None:
                 asset.public = data.public
                 if data.public and asset.status == AssetStatus.DRAFT:

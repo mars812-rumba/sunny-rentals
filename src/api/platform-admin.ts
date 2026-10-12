@@ -197,8 +197,8 @@ export interface PlatformAssetInput {
   model: string;
   year: number | null;
   color: string;
-  daily_rate: number;
-  deposit: number;
+  daily_rate?: number;
+  deposit?: number;
   public?: boolean;
 }
 

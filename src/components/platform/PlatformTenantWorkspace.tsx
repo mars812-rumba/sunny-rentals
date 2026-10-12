@@ -1,5 +1,5 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
-import { ArrowLeft, CarFront, CalendarDays, CheckCircle2, ClipboardList, Eye, EyeOff, FileText, ImageIcon, Loader2, Pencil, Plus, RefreshCw, Store, Trash2, WalletCards, Banknote, Save, Wrench, X, Globe } from "lucide-react";
+import { FormEvent, useEffect, useId, useRef, useState } from "react";
+import { ArrowLeft, CarFront, CalendarDays, CheckCircle2, ClipboardList, Eye, EyeOff, ImageIcon, Loader2, Plus, RefreshCw, Store, WalletCards, Banknote, Save, X, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,10 @@ import { ParkRequestsPanel } from './ParkRequestsPanel';
 import { ParkTrialStatus } from './ParkTrialStatus';
 import { VehicleDetailsEditor, VehicleSpecSummary } from './VehicleDetailsEditor';
 import { activeVehicleGrid, minimumVehicleRate, vehiclePricingMode } from '@/lib/vehicle-pricing';
+import { FleetCardActions, FleetPhotoActions } from './FleetCardActions';
+import { useFleetAvailability } from '@/hooks/useFleetAvailability';
+import { fleetPeriodError, isFleetAssetFree } from '@/lib/fleet-availability';
+import { fleetBasicInput } from '@/lib/fleet-asset';
 import { fetchOwnerFleet, saveOwnerAsset, uploadOwnerPhoto, archiveOwnerAsset, loadOwnerMedia } from '@/api/park-owner-fleet';
 import { VehicleCardFrame } from '@/components/VehicleCardFrame';
 import { CardContent } from '@/components/ui/card';
@@ -64,6 +68,13 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
   const [calendarVisited, setCalendarVisited] = useState(false);
   const [requestsVisited, setRequestsVisited] = useState(true);
   const [calendarRevision, setCalendarRevision] = useState(0);
+  const filterId = useId();
+  const [fleetPeriod, setFleetPeriod] = useState({ start: '', end: '' });
+  const [fleetFilterRevision, setFleetFilterRevision] = useState(0);
+  const changeFleetPeriod = (period: { start: string; end: string }) => { setFleetPeriod(period); setFleetFilterRevision(value => value + 1); };
+  const periodError = fleetPeriodError(fleetPeriod);
+  const filterActive = Boolean(fleetPeriod.start && fleetPeriod.end && !periodError);
+  const availability = useFleetAvailability(tenant.tenant_id, !owner, fleetPeriod.start, fleetPeriod.end, filterActive, calendarRevision + fleetFilterRevision);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const [error, setError] = useState("");
@@ -84,6 +95,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
   const [previewBusy, setPreviewBusy] = useState(false);
   const [previewError, setPreviewError] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
+  const filteredAssets = !filterActive ? assets : availability.loading || availability.error ? [] : assets.filter(asset => isFleetAssetFree(asset.id, availability.bookings, fleetPeriod));
   const preview = async () => {
     setPreviewBusy(true); setPreviewError(""); setPreviewUrl("");
     try {
@@ -130,11 +142,22 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
     setBusy(true);
     setEditorError("");
     try {
-      const asset = await (owner ? saveOwnerAsset : savePlatformAsset)(tenant.tenant_id, form, editing === "new" ? undefined : editing.id);
+      const asset = await (owner ? saveOwnerAsset : savePlatformAsset)(tenant.tenant_id, fleetBasicInput(form), editing === "new" ? undefined : editing.id);
       replaceAsset(asset);
       setEditing(asset);
       toast.success("Техника сохранена. Можно добавить фотографии.");
     } catch (failure) { setEditorError(message(failure)); }
+    finally { setBusy(false); }
+  };
+
+  const visibility = async (asset: PlatformAsset) => {
+    setBusy(true); setError('');
+    try {
+      const data = fleetBasicInput({ name: asset.name, asset_type: asset.asset_type, brand: asset.specs.brand || '', model: asset.specs.model || '', year: asset.specs.year || null, color: asset.specs.color || '', public: !asset.public });
+      const saved = await (owner ? saveOwnerAsset : savePlatformAsset)(tenant.tenant_id, data, asset.id);
+      replaceAsset(saved);
+      if (editing !== 'new' && editing?.id === asset.id) { setEditing(saved); setForm(current => ({ ...current, public: saved.public })); }
+    } catch (failure) { setError(message(failure)); }
     finally { setBusy(false); }
   };
 
@@ -218,7 +241,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
       </section>}
       </details>}
 
-      <Tabs value={section} onValueChange={(value) => { setSection(value); if (value === 'calendar') setCalendarVisited(true); if (value === 'requests') setRequestsVisited(true); if (value === 'calendar' || value === 'requests') setCalendarRevision(current => current + 1); }} activationMode="manual" className="mt-6 min-w-0">
+      <Tabs value={section} onValueChange={(value) => { setSection(value); if (value === 'calendar') setCalendarVisited(true); if (value === 'requests') setRequestsVisited(true); setCalendarRevision(current => current + 1); }} activationMode="manual" className="mt-6 min-w-0">
         <TabsList aria-label="Управление парком" className="mx-auto grid h-auto w-full max-w-xl grid-cols-3 gap-1 rounded-xl bg-slate-200/70 p-1">
           <TabsTrigger value="requests" className={workspaceTab}><ClipboardList aria-hidden="true" className="h-4 w-4" />Заявки</TabsTrigger>
           <TabsTrigger value="calendar" className={workspaceTab}><CalendarDays aria-hidden="true" className="h-4 w-4" />Календарь</TabsTrigger>
@@ -227,17 +250,22 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
         <TabsContent value="fleet" forceMount hidden={section !== 'fleet'} className="mt-6 data-[state=inactive]:hidden">
       <section aria-labelledby="fleet-title">
         <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 id="fleet-title" className="text-xl font-semibold">Техника парка</h2><p className="mt-1 text-sm text-slate-600">{loading || loadFailed ? "Количество уточняется" : `${assets.length} единиц`} · для первого демо подготовьте 5</p></div><Button className={primaryButton} onClick={() => edit("new")} disabled={busy || loading || loadFailed}><Plus aria-hidden="true" /> Добавить технику</Button></div>
+        <fieldset className="mt-5 min-w-0"><legend className="mb-3 flex items-center gap-2 text-sm font-medium"><CalendarDays aria-hidden="true" className="size-4" />Свободная техника на даты</legend><div className="flex flex-wrap items-end gap-3">
+          {([['start', 'Дата начала'], ['end', 'Дата окончания']] as const).map(([key, label]) => <div key={key} className="min-w-0 flex-1"><Label htmlFor={`${filterId}-${key}`}>{label}</Label><Input id={`${filterId}-${key}`} type="date" value={fleetPeriod[key]} onChange={event => changeFleetPeriod({ ...fleetPeriod, [key]: event.target.value })} aria-invalid={Boolean(periodError)} aria-describedby={`${filterId}-hint${periodError ? ` ${filterId}-error` : ''}`} className="mt-2 min-h-11 w-full min-w-0 text-base" /></div>)}
+          <Button type="button" variant="outline" className="min-h-11 gap-2" disabled={!fleetPeriod.start && !fleetPeriod.end} onClick={() => changeFleetPeriod({ start: '', end: '' })}><X aria-hidden="true" className="size-4" />Сбросить</Button>
+        </div><p id={`${filterId}-hint`} className="mt-2 text-sm leading-6 text-slate-600">Выберите обе даты — покажем только свободную технику. День возврата свободен. Часовой пояс: {tenant.timezone}.</p>{periodError && <p id={`${filterId}-error`} role="alert" className="mt-2 text-sm text-red-800">{periodError}</p>}</fieldset>
+        {filterActive && (availability.loading ? <p role="status" className="mt-4 text-sm text-slate-600">Проверяем занятость…</p> : availability.error ? <div className="mt-4"><p role="alert" className="text-sm text-red-800">Не удалось проверить занятость. {availability.error}</p><Button type="button" variant="outline" className="mt-2 min-h-11" onClick={availability.retry}>Повторить проверку</Button></div> : !loading && !loadFailed && <p role="status" className="mt-4 text-sm text-slate-700">Свободно: {filteredAssets.length} из {assets.length}</p>)}
         {error && <div role="alert" className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-rose-50 p-4 text-sm text-rose-800"><span>{error}</span><Button variant="outline" disabled={busy} onClick={() => setReload((value) => value + 1)}><RefreshCw aria-hidden="true" /> Обновить данные</Button></div>}
         {loading ? <p role="status" className="py-8 text-slate-600">Загружаем данные парка…</p> : loadFailed ? null : <>
-          {assets.length === 0 && !editing && <div className="mt-4 rounded-2xl bg-white p-8 text-center"><CarFront className="mx-auto text-slate-500" aria-hidden="true" /><p className="mt-3 font-medium">Добавьте первую машину</p><p className="mt-2 text-sm text-slate-600">Название, характеристики, суточная цена и фотографии.</p></div>}
+          {assets.length === 0 && !editing && <div className="mt-4 rounded-2xl bg-white p-8 text-center"><CarFront className="mx-auto text-slate-500" aria-hidden="true" /><p className="mt-3 font-medium">Добавьте первую машину</p><p className="mt-2 text-sm text-slate-600">Название, характеристики и фотографии. Тарифы — в разделе «Цены».</p></div>}
+          {filterActive && !availability.loading && !availability.error && assets.length > 0 && !filteredAssets.length && <p className="mt-4 text-sm text-slate-600">На выбранный период свободной техники нет. Измените даты или сбросьте фильтр.</p>}
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {assets.map((asset) => <VehicleCardFrame key={asset.id} assetId={asset.id} media={asset.photos.main ? <PrivateImage owner={owner} tenantId={tenant.tenant_id} reference={asset.photos.main} alt={asset.name} className="aspect-[16/10] w-full object-cover" /> : <div className="grid aspect-[16/10] place-items-center bg-slate-100"><CarFront className="text-slate-500" aria-hidden="true" /></div>}>
+            {filteredAssets.map((asset) => <VehicleCardFrame key={asset.id} assetId={asset.id} media={<div className="relative">{asset.photos.main ? <PrivateImage owner={owner} tenantId={tenant.tenant_id} reference={asset.photos.main} alt={asset.name} className="aspect-[16/10] w-full object-cover" /> : <div className="grid aspect-[16/10] place-items-center bg-slate-100"><CarFront className="text-slate-500" aria-hidden="true" /></div>}<FleetPhotoActions name={asset.name} busy={busy} onEdit={() => edit(asset)} onArchive={() => { setArchiveError(''); setArchiveTarget(asset); }} /></div>}>
               <CardContent className="flex flex-1 flex-col gap-4 p-4">
               <div className="min-w-0 flex-1"><h3 className="break-words text-lg font-semibold leading-snug">{asset.name}</h3><p className="mt-2 flex items-center gap-2 text-sm text-slate-600"><CarFront aria-hidden="true" className="h-4 w-4 shrink-0" />{TYPES[asset.asset_type]}</p><p className="mt-3 flex items-center gap-2 text-base font-semibold tabular-nums text-blue-700"><Banknote aria-hidden="true" className="h-4 w-4 shrink-0" />{activeVehicleGrid(asset) ? 'от ' : ''}{minimumRate(asset).toLocaleString('ru-RU')} {tenant.currency}/день</p><p className="mt-2 flex items-center gap-2 text-sm tabular-nums text-slate-600"><WalletCards aria-hidden="true" className="h-4 w-4 shrink-0" />Депозит: {asset.deposit_policy.amount || 0} {tenant.currency}</p><p className="mt-2 flex items-center gap-2 text-sm text-slate-600"><ImageIcon aria-hidden="true" className="h-4 w-4 shrink-0" />Фото: {asset.photos.gallery?.length || 0}</p></div>
-              <div className="flex gap-2"><Button variant="outline" disabled={busy} aria-label={`Редактировать ${asset.name}`} onClick={() => edit(asset)}><Pencil aria-hidden="true" /> Изменить</Button><Button variant="outline" disabled={busy} aria-label={`В архив: ${asset.name}`} onClick={() => { setArchiveError(""); setArchiveTarget(asset); }}><Trash2 aria-hidden="true" /></Button></div>
               <VehicleSpecSummary specs={asset.specs} />
               {activeVehicleGrid(asset) && <p className="text-sm text-slate-600">{vehiclePricingMode(asset) === 'duration' ? 'Тарифы по сроку' : 'Сезонная сетка'} · 4 диапазона аренды</p>}
-              <div className="flex flex-wrap gap-2">{([['pricing', 'Цены', WalletCards], ['specs', 'Характеристики', Wrench], ['description', 'Описание', FileText]] as const).map(([section, label, Icon]) => <Button key={section} variant="outline" className="min-h-11 gap-2 text-sm" disabled={busy} aria-label={`${label}: ${asset.name}`} onClick={event => { detailTrigger.current = event.currentTarget; setDetailEditor({ asset, section }); }}><Icon aria-hidden="true" className="size-4" />{label}</Button>)}</div>
+              <FleetCardActions name={asset.name} visible={asset.public} busy={busy} onDetails={(section, trigger) => { detailTrigger.current = trigger; setDetailEditor({ asset, section }); }} onVisibility={() => void visibility(asset)} />
               <p className={`flex items-center gap-2 text-sm ${asset.public ? 'text-emerald-700' : 'text-slate-600'}`}>{asset.public ? <Eye aria-hidden="true" className="h-4 w-4 shrink-0" /> : <EyeOff aria-hidden="true" className="h-4 w-4 shrink-0" />}{asset.public ? 'Показывается клиентам' : 'Скрыто с витрины'}</p>
               </CardContent></VehicleCardFrame>)}
           </div>
@@ -252,11 +280,9 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
               <div><Label htmlFor="asset-kind">Тип транспорта</Label><select id="asset-kind" className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm focus:outline-cyan-600" value={form.asset_type} onChange={(e) => setForm({ ...form, asset_type: e.target.value as AssetType })}>{Object.entries(TYPES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>
               <div><Label htmlFor="asset-year">Год выпуска</Label><Input id="asset-year" type="number" min={1950} max={2100} value={form.year ?? ""} onChange={(e) => setForm({ ...form, year: e.target.value ? Number(e.target.value) : null })} className="mt-2" /></div>
               {([ ["brand", "Марка"], ["model", "Модель"], ["color", "Цвет"] ] as const).map(([field, label]) => <div key={field}><Label htmlFor={`asset-${field}`}>{label}</Label><Input id={`asset-${field}`} maxLength={80} value={form[field]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} className="mt-2" /></div>)}
-              <div><Label htmlFor="asset-rate">Базовая цена без сетки, {tenant.currency}</Label><Input id="asset-rate" type="number" required min={0} max={100000000} step="0.01" value={form.daily_rate} onChange={(e) => setForm({ ...form, daily_rate: Number(e.target.value) })} className="mt-2" /></div>
-              <div><Label htmlFor="asset-deposit">Депозит, {tenant.currency}</Label><Input id="asset-deposit" type="number" required min={0} max={100000000} step="0.01" value={form.deposit} onChange={(e) => setForm({ ...form, deposit: Number(e.target.value) })} className="mt-2" /></div>
               <div className="sm:col-span-2"><label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={Boolean(form.public)} onChange={(event) => setForm({ ...form, public: event.target.checked })} className="h-4 w-4 accent-blue-700 focus-visible:outline focus-visible:outline-2" />Показывать на витрине</label><p className="mt-2 text-sm text-slate-600">После публикации парка машина, её цены и фотографии станут доступны по публичной ссылке.</p></div>
             </fieldset>
-            <p className="mt-4 text-sm text-slate-600">Здесь задаётся базовая цена без сетки. После сохранения сезонные тарифы, характеристики и описание можно настроить кнопками в карточке автомобиля.</p>
+            <p className="mt-4 text-sm text-slate-600">Цены и депозит настраиваются только через «Действия → Цены» в карточке. После создания техники настройте тарифы перед приёмом заявок.</p>
             <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className={primaryButton}>{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />} Сохранить технику</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}><X aria-hidden="true" />Закрыть редактор</Button></div>
           </form>
           {editing !== "new" && <div className="mt-7 border-t border-slate-200 pt-5">

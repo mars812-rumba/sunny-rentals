@@ -13,6 +13,9 @@ const bundle = await build({
     export { PlatformTenantWorkspace } from './src/components/platform/PlatformTenantWorkspace';
     export { VehicleSpecSummary, VehicleTariffTable, VehiclePricingFields } from './src/components/platform/VehicleDetailsEditor';
     export { activeVehicleGrid, minimumVehicleRate, vehiclePricingMode } from './src/lib/vehicle-pricing';
+    export { fleetPeriodError, isFleetAssetFree } from './src/lib/fleet-availability';
+    export { fleetBasicInput } from './src/lib/fleet-asset';
+    export { FleetCardActions, FleetPhotoActions } from './src/components/platform/FleetCardActions';
     export { resolveParkEntryView } from './src/lib/park-entry';
     export { LanguageProvider } from './src/contexts/LanguageContext';`, resolveDir: process.cwd(), loader: 'tsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs',
@@ -26,6 +29,35 @@ compiled.paths = Module._nodeModulePaths(process.cwd());
 compiled._compile(bundle.outputFiles[0].text, compiled.filename);
 const ui = compiled.exports;
 const e = React.createElement;
+
+test('fleet occupancy uses half-open park-local dates and all active booking types', () => {
+ const period = { start: '2026-10-12', end: '2026-10-19' };
+ const booking = { asset_id: 'car', status: 'confirmed', pricing: { start_date: '2026-10-15', end_date: '2026-10-18' } };
+ for (const status of ['requested', 'confirmed', 'in_progress']) assert.equal(ui.isFleetAssetFree('car', [{ ...booking, status }], period), false);
+ for (const status of ['cancelled', 'completed']) assert.equal(ui.isFleetAssetFree('car', [{ ...booking, status }], period), true);
+ assert.equal(ui.isFleetAssetFree('car', [{ ...booking, entry_type: 'block' }], period), false);
+ assert.equal(ui.isFleetAssetFree('other', [booking], period), true);
+ for (const [start_date, end_date] of [['2026-10-05', '2026-10-12'], ['2026-10-19', '2026-10-25']]) assert.equal(ui.isFleetAssetFree('car', [{ ...booking, pricing: { start_date, end_date } }], period), true);
+ for (const [start_date, end_date] of [['2026-10-01', '2026-10-25'], ['2026-10-12', '2026-10-19'], ['2026-10-11', '2026-10-13'], ['2026-10-18', '2026-10-20']]) assert.equal(ui.isFleetAssetFree('car', [{ ...booking, pricing: { start_date, end_date } }], period), false);
+ assert.equal(ui.fleetPeriodError(period), '');
+ assert.equal(ui.fleetPeriodError({ start: period.start, end: '' }), '');
+ for (const end of ['2026-10-11', '2026-10-12', '2026-02-30', '2027-10-20']) assert.ok(ui.fleetPeriodError({ start: period.start, end }));
+});
+
+test('fleet card has one actions trigger and two named photo controls', () => {
+ const menu = renderToStaticMarkup(e(ui.FleetCardActions, { name: 'Toyota', busy: false, visible: true, onDetails() {}, onVisibility() {} }));
+ assert.equal((menu.match(/<button/g) || []).length, 1);
+ assert.match(menu, /aria-label="Действия: Toyota"/);
+ assert.match(menu, /aria-haspopup="menu"/);
+ const photo = renderToStaticMarkup(e(ui.FleetPhotoActions, { name: 'Toyota', busy: false, onEdit() {}, onArchive() {} }));
+ assert.match(photo, /absolute right-2 top-2/);
+ assert.equal((photo.match(/<button/g) || []).length, 2);
+ assert.match(photo, /aria-label="Редактировать Toyota"/);
+ assert.match(photo, /aria-label="В архив: Toyota"/);
+ const basic = ui.fleetBasicInput({ name: 'Toyota', asset_type: 'car', brand: 'Toyota', model: 'Yaris', year: 2024, color: 'White', daily_rate: 1, deposit: 2, public: true });
+ assert.equal(basic.name, 'Toyota'); assert.equal(basic.public, true);
+ assert.ok(!('daily_rate' in basic)); assert.ok(!('deposit' in basic));
+});
 
 test('public vehicle specs keep icon labels and escape custom text', () => {
  const html = renderToStaticMarkup(e(ui.VehicleSpecSummary, { specs: { fuel: 'Гибрид', transmission: 'CVT', seats: 5, doors: 4, mileage: 12000, air_conditioning: false, features: ['<script>alert(1)</script>'] }, detailed: true }));
@@ -103,6 +135,12 @@ test('owner workspace does not render platform management controls', () => {
     onBack: () => {}, onTenantChanged: () => {},
   }));
   assert.match(html, /Техника парка/);
+  assert.match(html, /Свободная техника на даты/);
+  assert.match(html, /Дата начала/);
+  assert.match(html, /Дата окончания/);
+  assert.equal((html.match(/type="date"/g) || []).length, 2);
+  assert.match(html, /Сбросить/);
+  assert.doesNotMatch(html, /id="asset-rate"|id="asset-deposit"/);
   assert.match(html, /role="tablist"[^>]+aria-label="Управление парком"/);
   assert.equal((html.match(/role="tab"/g) || []).length, 3);
   assert.match(html, /aria-selected="false"[^>]*>[\s\S]*?Автопарк<\/button>/);

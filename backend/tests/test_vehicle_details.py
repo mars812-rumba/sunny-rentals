@@ -111,6 +111,20 @@ class VehicleDetailsApiTests(unittest.TestCase):
         self.assertEqual(seasonal.status_code, 200, seasonal.text)
         self.assertEqual(self.client.get('/api/storefront/park-a').json()['assets'][0]['daily_rate'], 1)
 
+    def test_basic_editor_omitting_prices_preserves_latest_tariffs_and_deposit(self):
+        self.assets.save_details(self.asset.id, VehicleDetailsInput(section='pricing', pricing_mode='seasonal', pricing=grid(), deposit=6000, daily_rate=950))
+        result = self.client.request('PUT', f'/api/platform/tenants/park-a/assets/{self.asset.id}', json={'name': 'Updated Toyota', 'brand': 'Toyota', 'public': False}, headers=self.admin_headers)
+        self.assertEqual(result.status_code, 200, result.text)
+        saved = result.json()['asset']
+        self.assertEqual(saved['pricing']['daily_rate'], 950)
+        self.assertEqual(saved['pricing']['pricing_mode'], 'seasonal')
+        self.assertEqual(saved['pricing']['tariff_grid'], grid())
+        self.assertEqual(saved['deposit_policy']['amount'], 6000)
+        owner = self.client.post('/api/partners/fleet/save', json={'tenant_id': 'park-a', 'init_data': self.token(), 'asset_id': self.asset.id, 'data': {'name': 'Owner Toyota', 'brand': 'Toyota'}})
+        self.assertEqual(owner.status_code, 200, owner.text)
+        self.assertEqual(owner.json()['asset']['pricing'], saved['pricing'])
+        self.assertEqual(owner.json()['asset']['deposit_policy'], saved['deposit_policy'])
+
     def test_owner_and_admin_patch_only_selected_section_and_public_projection(self):
         result = self.details({'section': 'pricing', 'pricing': grid(), 'deposit': 5000})
         self.assertEqual(result.status_code, 200, result.text)
