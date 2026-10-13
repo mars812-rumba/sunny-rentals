@@ -1,5 +1,10 @@
 // Only interface copy. Customer and vehicle data are never passed through this catalogue.
 export const parkEnglish: Record<string, string> = {
+  "Добавить бронь": "Add booking",
+  "Бронь создана.": "Booking created.",
+  "Клиент": "Customer",
+  "Период аренды": "Rental period",
+  "Укажите время получения и возврата.": "Enter pickup and return times.",
   "Сбросить даты": "Clear dates",
   "Дата окончания не может быть раньше даты начала.": "The end date cannot be before the start date.",
   "За выбранный период заявок с этим статусом нет.": "No requests with this status in the selected period.",

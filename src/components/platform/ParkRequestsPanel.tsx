@@ -2,7 +2,9 @@ import { parkText } from '@/lib/park-locale';
 import { parkText as pt } from '@/lib/park-locale';
 import { useParkLocale } from '@/contexts/park-locale';
 import { FormEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { Banknote, CalendarDays, CarFront, Check, ClipboardList, Clock3, Copy, MapPin, MessageCircle, Pencil, Phone, RefreshCw, UserRound, WalletCards, X } from 'lucide-react';
+import { Banknote, CalendarDays, CarFront, Check, ClipboardList, Clock3, Copy, MapPin, MessageCircle, Pencil, Phone, Plus, RefreshCw, UserRound, WalletCards, X } from 'lucide-react';
+import type { PlatformAsset } from '@/api/platform-admin';
+import { ParkManualBookingForm } from './ParkManualBookingForm';
 import { changeParkBookingStatus, editParkBooking, fetchParkCalendar, type ParkBooking, type ParkContact } from '@/api/park-telegram';
 import { subscribeParkCalendar } from '@/lib/park-calendar-updates';
 import { dateLabel, rentalMoney } from '@/lib/park-rental';
@@ -94,7 +96,7 @@ function ParkBookingEditor({ booking, tenantId, admin, onClose }: { booking: Par
       <div><label htmlFor={`${id}-note`} className="block text-sm font-medium">{pt("Внутренняя пометка")}</label><Textarea id={`${id}-note`} maxLength={1000} value={note} onChange={event => setNote(event.target.value)} className="mt-2 text-base" /><p className="mt-2 text-sm text-slate-600">{pt("Видна только в кабинете парка.")}</p></div>
     </fieldset>
     {error && <p id={`${id}-error`} role="alert" className="text-sm text-red-700">{pt(error)}</p>}
-    <div className="flex flex-wrap gap-2"><Button type="submit" className="min-h-11 bg-blue-700 text-white hover:bg-blue-800" disabled={busy}>{busy ? pt("Сохраняем…") : pt("Сохранить изменения")}</Button><Button type="button" variant="outline" className="min-h-11" disabled={busy} onClick={onClose}>{pt("Не сохранять")}</Button></div>
+    <div className="flex flex-wrap gap-2"><Button type="submit" className="min-h-11 bg-emerald-700 text-white hover:bg-emerald-800" disabled={busy}>{busy ? pt("Сохраняем…") : pt("Сохранить изменения")}</Button><Button type="button" variant="outline" className="min-h-11" disabled={busy} onClick={onClose}>{pt("Не сохранять")}</Button></div>
   </form>;
 }
 
@@ -150,11 +152,11 @@ export function ParkRequestItem({ booking, busy, onAction, detailed = false, ten
     {tenantId && booking.entry_type !== 'block' && editing && <div id={editorId}><ParkBookingEditor booking={booking} tenantId={tenantId} admin={admin} onClose={closeEditor} /></div>}
     <p className="mt-3 text-xs text-slate-600">{booking.source?.endsWith('_manual') ? pt("Ручная запись") : booking.source === 'web_storefront' ? pt("Заявка с веб-витрины") : pt("Заявка через Telegram")} · {booking.pricing.timezone}</p>
     {detailed && <div className="mt-4"><p className="text-sm font-medium">{pt("Номер заявки")}</p><div className="mt-2 flex min-w-0 items-center gap-2"><span className="min-w-0 select-text break-all text-sm font-medium tabular-nums">{bookingNumber}</span><Button type="button" variant="outline" className="size-11 shrink-0 p-0" aria-label={pt("Скопировать номер заявки")} onClick={async () => { try { await navigator.clipboard.writeText(bookingNumber); setReferenceMessage(pt("Номер скопирован.")); } catch { setReferenceMessage(pt("Выделите и скопируйте номер вручную.")); } }}><Copy aria-hidden="true" className="size-4" /></Button></div>{referenceMessage && <p role="status" className="mt-2 text-sm text-slate-600">{pt(referenceMessage)}</p>}</div>}
-    {['requested', 'confirmed'].includes(booking.status) && <div className="mt-4 flex flex-wrap gap-2">{booking.status === 'requested' && <Button className="min-h-11 gap-2 bg-blue-700 text-white hover:bg-blue-800" disabled={busy || editing} onClick={() => onAction(booking, 'confirmed')}><Check aria-hidden="true" className="h-4 w-4" />{pt("Подтвердить")}</Button>}<Button variant="outline" className="min-h-11 gap-2" disabled={busy || editing} onClick={() => onAction(booking, 'cancelled')}><X aria-hidden="true" className="h-4 w-4" />{pt("Отменить")}</Button></div>}
+    {['requested', 'confirmed'].includes(booking.status) && <div className="mt-4 flex flex-wrap gap-2">{booking.status === 'requested' && <Button className="min-h-11 gap-2 bg-emerald-700 text-white hover:bg-emerald-800" disabled={busy || editing} onClick={() => onAction(booking, 'confirmed')}><Check aria-hidden="true" className="h-4 w-4" />{pt("Подтвердить")}</Button>}<Button variant="outline" className="min-h-11 gap-2" disabled={busy || editing} onClick={() => onAction(booking, 'cancelled')}><X aria-hidden="true" className="h-4 w-4" />{pt("Отменить")}</Button></div>}
   </li>;
 }
 
-export function ParkRequestsPanel({ tenantId, admin, revision = 0 }: { tenantId: string; admin: boolean; revision?: number }) {
+export function ParkRequestsPanel({ tenantId, admin, revision = 0, assets = [], onCreated }: { tenantId: string; admin: boolean; revision?: number; assets?: PlatformAsset[]; onCreated?: () => void }) {
   const { pt, intlLocale } = useParkLocale();
   const id = useId();
   const [bookings, setBookings] = useState<ParkBooking[]>([]);
@@ -167,6 +169,9 @@ export function ParkRequestsPanel({ tenantId, admin, revision = 0 }: { tenantId:
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [reload, setReload] = useState(0);
+  const [creating, setCreating] = useState(false);
+  const createTrigger = useRef<HTMLButtonElement>(null);
+  const closeCreate = () => { setCreating(false); requestAnimationFrame(() => createTrigger.current?.focus()); };
   useEffect(() => { setStartDate(''); setEndDate(''); setFilter('requested'); }, [tenantId]);
   useEffect(() => subscribeParkCalendar(tenantId, () => setReload(value => value + 1)), [tenantId]);
   useEffect(() => {
@@ -189,7 +194,8 @@ export function ParkRequestsPanel({ tenantId, admin, revision = 0 }: { tenantId:
     finally { setBusy(false); }
   };
   return <section aria-labelledby={`${id}-title`} aria-busy={loading || busy}>
-    <div className="flex flex-wrap items-center justify-between gap-3"><h2 id={`${id}-title`} className="flex items-center gap-2 text-xl font-semibold"><ClipboardList aria-hidden="true" className="h-5 w-5 text-blue-700" />{pt("Заявки парка")}</h2><Button variant="outline" className="min-h-11 gap-2" disabled={busy || loading} onClick={() => setReload(value => value + 1)}><RefreshCw aria-hidden="true" className="h-4 w-4" />{pt("Обновить")}</Button></div>
+    <div className="flex flex-wrap items-center justify-between gap-3"><h2 id={`${id}-title`} className="flex items-center gap-2 text-xl font-semibold"><ClipboardList aria-hidden="true" className="h-5 w-5 text-blue-700" />{pt("Заявки парка")}</h2><div className="flex flex-wrap gap-2"><Button ref={createTrigger} type="button" variant="outline" className="min-h-11 gap-2" disabled={busy || loading || creating || !assets.length} onClick={() => setCreating(true)}><Plus aria-hidden="true" className="size-4" />{pt('Добавить бронь')}</Button><Button variant="outline" className="min-h-11 gap-2" disabled={busy || loading} onClick={() => setReload(value => value + 1)}><RefreshCw aria-hidden="true" className="h-4 w-4" />{pt("Обновить")}</Button></div></div>
+    {creating && <ParkManualBookingForm tenantId={tenantId} assets={assets} admin={admin} onClose={closeCreate} onSaved={booking => { closeCreate(); setFilter(booking.status); setStartDate(''); setEndDate(''); setReload(value => value + 1); setSuccess(pt('Бронь создана.')); onCreated?.(); }} />}
     <div className="my-5 grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2 sm:grid-cols-4 sm:gap-3">
       <div className="col-span-3 min-w-0 sm:col-span-1"><label htmlFor={`${id}-status`} className="block text-sm font-medium">{pt("Статус заявки")}</label><select id={`${id}-status`} value={filter} onChange={event => setFilter(event.target.value)} className="mt-2 h-11 w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 text-base"><option value="requested">{pt("Ожидают подтверждения")}</option><option value="confirmed">{pt("Подтверждённые")}</option><option value="cancelled">{pt("Отменённые")}</option><option value="all">{pt("Все заявки")}</option></select></div>
       <div className="min-w-0"><label htmlFor={`${id}-start`} className="block text-sm font-medium">{pt('Дата начала')}</label><ParkDateField id={`${id}-start`} className="mt-2" value={startDate} onChange={event => setStartDate(event.target.value)} aria-invalid={invalidPeriod || undefined} aria-describedby={invalidPeriod ? `${id}-period-error` : undefined} /></div>

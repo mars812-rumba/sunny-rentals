@@ -35,6 +35,32 @@ class ManualCalendarTests(unittest.TestCase):
     def documents(self):
         return json.loads((self.root / 'tenants/park-a/bookings.json').read_text())['items']
 
+    def test_manual_contact_pickup_return_prices_and_idempotency(self):
+        details = {'time': '09:00', 'location': 'city', 'address': 'Pickup hotel',
+            'return_time': '10:00', 'return_location': 'city', 'return_address': 'Return hotel'}
+        args = {'pickup': details, 'contact_channel': 'whatsapp', 'contact_value': '+66 812345678', 'daily_rate': '800', 'deposit': '5000'}
+        response = self.create(**args)
+        self.assertEqual(response.status_code, 201, response.text)
+        pricing = response.json()['booking']['pricing']
+        self.assertEqual(pricing['days'], 4)
+        self.assertEqual(pricing['total_rental'], '3200.00')
+        self.assertEqual(pricing['total_payable'], '4200.00')
+        self.assertEqual(pricing['delivery_fee'], '500.00')
+        self.assertEqual(pricing['return_fee'], '500.00')
+        self.assertTrue(pricing['extra_day'])
+        self.assertEqual(pricing['pickup'], details)
+        self.assertEqual(self.create(**args).json(), response.json())
+        calendar = self.bookings.calendar('park-a', init_data=self.token())
+        self.assertEqual(calendar[0]['customer']['contact'], {'channel': 'whatsapp', 'value': '+66812345678'})
+        self.assertEqual(len(self.documents()), 1)
+        self.assertEqual(calendar[0]['end_at'].isoformat(), '2026-10-14T03:00:00+00:00')
+        self.assertEqual(self.create(**{**args, 'contact_value': '+66899999999'}).status_code, 409)
+
+    def test_manual_bad_contact_and_block_logistics_are_rejected_without_writes(self):
+        self.assertEqual(self.create(contact_value='not a phone').status_code, 422)
+        self.assertEqual(self.create(entry_type='block', customer_name='', note='Repair', pickup={'time': '09:00', 'location': 'airport'}).status_code, 422)
+        self.assertEqual(self.documents(), [])
+
     def test_short_numbers_are_persisted_unique_and_stable_on_retry_and_cancellation(self):
         first = self.create().json()['booking']
         self.assertEqual(first['booking_number'], '100001')
@@ -175,6 +201,16 @@ class ManualCalendarTests(unittest.TestCase):
         self.assertEqual(first.status_code, 201)
         self.assertEqual(self.create(booking_status='confirmed').json(), first.json())
         self.assertEqual(len(self.documents()), 1)
+
+    def test_legacy_manual_fingerprint_does_not_gain_empty_contact_or_pickup_fields(self):
+        import hashlib
+        request = ParkManualRequest(**self.payload())
+        payload = json.loads(request.json(exclude={'request_id', 'init_data', 'tenant_id'}))
+        for field in ('booking_status', 'pickup', 'contact_channel', 'contact_value'):
+            payload.pop(field, None)
+        old_fingerprint = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+        self.assertEqual(self.create().status_code, 201)
+        self.assertEqual(self.documents()[0]['legacy']['request_fingerprint'], old_fingerprint)
 
     def test_owner_customer_foreign_asset_and_untrusted_fields_fail_closed(self):
         self.service.handle_update(self.update('ppark-a', uid=43, update_id=101))

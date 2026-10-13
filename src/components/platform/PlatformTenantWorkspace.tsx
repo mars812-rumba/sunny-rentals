@@ -290,7 +290,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
               <div className="sm:col-span-2"><label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={Boolean(form.public)} onChange={(event) => setForm({ ...form, public: event.target.checked })} className="h-4 w-4 accent-blue-700 focus-visible:outline focus-visible:outline-2" />{pt("Показывать на витрине")}</label><p className="mt-2 text-sm text-slate-600">{pt("После публикации парка машина, её цены и фотографии станут доступны по публичной ссылке.")}</p></div>
             </fieldset>
             <p className="mt-4 text-sm text-slate-600">{pt("Цены и депозит настраиваются только через «Действия → Цены» в карточке. После создания техники настройте тарифы перед приёмом заявок.")}</p>
-            <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className={primaryButton}>{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />} {pt(" Сохранить технику")}</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}><X aria-hidden="true" />{pt("Закрыть редактор")}</Button></div>
+            <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className="min-h-11 rounded-lg bg-emerald-700 text-white hover:bg-emerald-800">{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />} {pt(" Сохранить технику")}</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}><X aria-hidden="true" />{pt("Закрыть редактор")}</Button></div>
           </form>
           {editing !== "new" && <div className="mt-7 border-t border-slate-200 pt-5">
             <Label htmlFor="asset-photos">{pt("Фотографии машины")}</Label><p id="photo-hint" className="mt-1 text-sm text-slate-600">{pt("Первая фотография станет главной. Можно выбрать несколько файлов; до 20 фото, каждое до 8 МБ.")}</p>
@@ -305,7 +305,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
           <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} fleetRevision={calendarRevision} timezone={tenant.timezone} />
         </TabsContent>}
         {requestsVisited && <TabsContent value="requests" forceMount hidden={section !== 'requests'} className="mt-6 min-w-0 data-[state=inactive]:hidden">
-          <ParkRequestsPanel key={`requests-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} revision={calendarRevision} />
+          <ParkRequestsPanel key={`requests-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} assets={assets} revision={calendarRevision} onCreated={() => setCalendarRevision(value => value + 1)} />
         </TabsContent>}
       </Tabs>
     </div>

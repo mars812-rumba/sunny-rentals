@@ -114,7 +114,7 @@ export function VehicleDetailsEditor({ asset, section, currency, owner, onSaved,
         {section === 'description' && <div><label htmlFor={`${id}-description`} className="font-medium">{pt("Публичное описание автомобиля")}</label><Textarea id={`${id}-description`} maxLength={5000} rows={8} value={description} onChange={event => setDescription(event.target.value)} aria-describedby={`${id}-description-hint`} className="mt-2 text-base leading-6" /><p id={`${id}-description-hint`} className="mt-2 text-sm leading-6 text-slate-600">{pt("Особенности, комплектация, нестандартные условия. Этот текст увидят клиенты — не добавляйте внутренние заметки или чужие контакты. До 5000 символов.")}</p></div>}
       </fieldset>
       {error && <p role="alert" className="text-sm leading-6 text-red-800">{pt(error)}</p>}
-      <div className="flex flex-wrap justify-end gap-2 border-t border-slate-200 pt-4"><Button type="button" variant="outline" disabled={busy} onClick={onClose}>{pt("Отмена")}</Button><Button type="submit" disabled={busy} className="min-h-11 gap-2 bg-blue-700 text-white hover:bg-blue-800"><Save aria-hidden="true" className="size-4" />{busy ? pt("Сохраняем…") : pt("Сохранить")}</Button></div>
+      <div className="flex flex-wrap justify-end gap-2 border-t border-slate-200 pt-4"><Button type="button" variant="outline" disabled={busy} onClick={onClose}>{pt("Отмена")}</Button><Button type="submit" disabled={busy} className="min-h-11 gap-2 bg-emerald-700 text-white hover:bg-emerald-800"><Save aria-hidden="true" className="size-4" />{busy ? pt("Сохраняем…") : pt("Сохранить")}</Button></div>
     </form>
   </DialogContent></Dialog>;
 }

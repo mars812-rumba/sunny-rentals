@@ -15,7 +15,7 @@ import { ownerWebRequest } from '@/api/park-owner-web';
 import type { PlatformTenant } from '@/api/platform-admin';
 
 const message = (error: unknown) => error instanceof Error ? error.message : pt("Не удалось выполнить действие. Повторите попытку.");
-const primary = 'min-h-11 bg-blue-700 text-white hover:bg-blue-800';
+const primary = 'min-h-11 bg-emerald-700 text-white hover:bg-emerald-800';
 
 export default function ParkOwnerWebPage() {
   const { pt, intlLocale } = useParkLocale();

@@ -15,6 +15,7 @@ const bundle = await build({ stdin: { contents: `export * from './src/lib/park-l
  export { ParkRequestItem, ParkRequestsPanel } from './src/components/platform/ParkRequestsPanel';
  export { ParkCalendarMonthSelect } from './src/components/platform/ParkBookingCalendar';
  export { ParkDateField } from './src/components/platform/ParkDateField';
+ export { ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';
  export { openParkDatePicker } from './src/lib/park-date-picker';
  export { filterParkRequests } from './src/lib/park-request-filters';
  export { VehiclePricingFields, VehicleTariffTable, VehicleSpecSummary } from './src/components/platform/VehicleDetailsEditor';
@@ -207,6 +208,27 @@ test('date fields show Lucide/calendar hints and localized dates while retaining
  assert.equal(calls, 1);
  assert.equal(ui.openParkDatePicker({}), false);
  assert.equal(ui.openParkDatePicker({ showPicker() { throw new Error('Unavailable in this WebView'); } }), false);
+});
+
+test('shared manual form has compact grouped dates/prices, contact and return logistics in RU/EN', () => {
+ const asset = { id: 'asset-a', name: 'Toyota', specs: {}, pricing: { daily_rate: 800, currency: 'THB' }, deposit_policy: { amount: 5000 } };
+ for (const language of ['ru', 'en']) {
+  const html = render(ui.ParkManualBookingForm, { tenantId: 'park-a', assets: [asset], admin: false, onSaved() {}, onClose() {} }, language);
+  for (const tone of ['blue', 'violet', 'emerald', 'amber']) assert.match(html, new RegExp(`bg-${tone}-50`));
+  assert.match(html, /grid-cols-2 gap-2/);
+  assert.equal((html.match(/type="date"/g) || []).length, 2);
+  assert.equal((html.match(/type="time"/g) || []).length, 2);
+  assert.match(html, /type="tel"/);
+  assert.match(html, /bg-emerald-700 text-white hover:bg-emerald-800/);
+  assert.match(html, language === 'en' ? /Return location/ : /Место возврата/);
+  assert.match(html, /value="whatsapp"/);
+  if (language === 'en') assert.doesNotMatch(visible(html), /[А-Яа-яЁё]/);
+ }
+ const panel = render(ui.ParkRequestsPanel, { tenantId: 'park-a', admin: false, assets: [asset] });
+ assert.match(panel, /Add booking/);
+ assert.match(readFileSync('src/components/platform/ParkRequestsPanel.tsx', 'utf8'), /creating && <ParkManualBookingForm/);
+ const form = readFileSync('src/components/platform/ParkManualBookingForm.tsx', 'utf8');
+ assert.match(form, /deposit: deposit.trim\(\), pickup, contact_channel: channel, contact_value:/);
 });
 
 test('English fleet/navigation and month/day labels render without Russian interface text', () => {

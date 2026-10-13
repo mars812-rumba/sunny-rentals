@@ -155,6 +155,8 @@ export interface ParkManualInput {
   entry_type: 'rental' | 'block'; customer_name: string; note: string;
   daily_rate?: string; deposit?: string;
   booking_status?: 'confirmed' | 'requested';
+  pickup?: import('@/lib/park-pickup').ParkPickup;
+  contact_channel?: ParkContact['channel']; contact_value?: string;
 }
 export async function createParkManualBooking(tenantId: string, data: ParkManualInput, admin: boolean, signal?: AbortSignal): Promise<ParkBooking> {
   const web = !admin && browserOwnerMode();
