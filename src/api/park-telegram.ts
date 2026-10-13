@@ -90,6 +90,14 @@ export interface ParkAvailability {
   end_date: string;
   days: number;
   available_asset_ids: string[];
+  prices?: Record<string, ParkCatalogRentalPrice>;
+  pickup_time?: string | null;
+  return_time?: string | null;
+}
+
+export interface ParkCatalogRentalPrice {
+  days: number; daily_rate: string; total_rental: string; deposit: string;
+  currency: string; tariff_breakdown?: TariffBreakdown[];
 }
 
 async function storefrontBookingRequest<T>(tenantId: string, endpoint: string, body: object, signal?: AbortSignal): Promise<T> {

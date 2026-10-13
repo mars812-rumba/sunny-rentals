@@ -8,6 +8,9 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { build } from 'esbuild';
 
 const bundle = await build({ stdin: { contents: `export * from './src/lib/park-locale';
+ export { ParkCatalogPrice } from './src/components/platform/ParkCatalogPrice';
+ export { catalogRentalPrice } from './src/lib/catalog-rental-price';
+ export * from './src/lib/season-date-input';
  export { parkEnglish } from './src/locales/park-en';
  export { ParkLocaleProvider, ParkLanguageSwitcher } from './src/contexts/ParkLocaleContext';
  export { ParkPickupFields, ParkPickupSummary } from './src/components/platform/ParkPickupFields';
@@ -43,6 +46,51 @@ const render = (component, props, language = 'en') => {
  return renderToStaticMarkup(e(ui.ParkLocaleProvider, { initialLanguage: language }, e(component, props)));
 };
 const visible = html => html.replace(/<[^>]+>/g, '').replace(/&[^;]+;/g, ' ');
+
+test('catalog uses server totals for all pricing modes and rejects stale date/time prices', () => {
+ const period = { start: '2026-11-18', end: '2026-11-29', pickup: { time: '08:02', return_time: '08:02' } };
+ const rental = { days: 11, total_rental: '13200', daily_rate: '1200', deposit: '8000', currency: 'THB' };
+ const availability = { start_date: period.start, end_date: period.end, pickup_time: '08:02', return_time: '08:02', available_asset_ids: ['zs'], prices: { zs: rental } };
+ assert.equal(ui.catalogRentalPrice(availability, period, 'zs'), rental);
+ assert.equal(ui.catalogRentalPrice(availability, { ...period, end: '2026-11-30' }, 'zs'), undefined);
+ assert.equal(ui.catalogRentalPrice(availability, { ...period, pickup: { ...period.pickup, return_time: '09:00' } }, 'zs'), undefined);
+ assert.equal(ui.catalogRentalPrice(availability, period, 'private'), undefined);
+ assert.equal(ui.catalogRentalPrice({ ...availability, prices: undefined }, period, 'zs'), undefined);
+ for (const language of ['ru', 'en']) {
+  for (const tariff_grid of [null, { mode: 'duration' }, { mode: 'seasonal' }]) {
+   const asset = { daily_rate: 900, deposit: 8000, tariff_grid };
+   const html = render(ui.ParkCatalogPrice, { asset, currency: 'THB', selected: true, rental }, language);
+   assert.ok(html.includes(ui.rentalMoney('13200', 'THB'))); assert.ok(html.includes(ui.rentalMoney('1200', 'THB')));
+   assert.doesNotMatch(visible(html), /from |от /);
+   const noPrice = render(ui.ParkCatalogPrice, { asset, currency: 'THB', selected: true }, language);
+   assert.ok(!noPrice.includes(ui.rentalMoney('900', 'THB')));
+  }
+ }
+ const mixed = render(ui.ParkCatalogPrice, { asset: { daily_rate: 900, deposit: 8000 }, currency: 'THB', selected: true, rental: { ...rental, tariff_breakdown: [{ season: 'low_season' }, { season: 'high_season' }] } });
+ assert.match(mixed, /mixed seasons/); assert.doesNotMatch(mixed, /\/ day/);
+});
+
+test('season editor shows day-first dates and shorter hints while keeping MM-DD wire values', () => {
+ for (const [wire, display] of [['11-01', '01.11'], ['03-31', '31.03'], ['02-29', '29.02']]) {
+  assert.equal(ui.seasonDateInputValue(wire), display);
+  assert.equal(ui.seasonDateWireValue(display), wire);
+ }
+ for (const partial of ['', '0', '01', '01.', '01.1', '01.11']) assert.equal(ui.seasonDateInputValue(ui.seasonDateWireValue(partial)), partial);
+ const rates = { price_1_6: 800, price_7_14: 700, price_15_29: 600, price_30: 500 };
+ const props = { id: 'season', currency: 'THB', mode: 'seasonal', dailyRate: '800', grid: { low_season: rates, high_season: rates, high_start: '11-01', high_end: '03-31' }, onModeChange() {}, onDailyRateChange() {}, onGridChange() {} };
+ for (const language of ['ru', 'en']) {
+  const html = render(ui.VehiclePricingFields, props, language);
+  assert.match(html, /id="season-high_start"[^>]*value="01\.11"/);
+  assert.match(html, /id="season-high_end"[^>]*value="31\.03"/);
+  assert.doesNotMatch(html, /value="11-01"|value="03-31"|MM-DD|ММ-ДД/);
+  assert.match(html, /aria-describedby="season-season-hint"/);
+  const input = html.match(/<input[^>]*id="season-high_start"[^>]*>/)[0];
+  const pattern = new RegExp(`^(?:${input.match(/pattern="([^"]+)"/)[1]})$`);
+  assert.ok(pattern.test('01.11')); assert.ok(pattern.test('31.03'));
+  for (const bad of ['11-01', '31.13', '00.11']) assert.equal(pattern.test(bad), false);
+  if (language === 'en') assert.doesNotMatch(visible(html), /[А-Яа-яЁё]/);
+ }
+});
 
 test('storefront receipt preserves the actual booking number and pending meaning in RU/EN', () => {
  const booking = { id: 'internal-id', booking_number: '100017', currency: 'THB', pricing: { asset_name: 'MG 5', start_date: '2026-10-14', end_date: '2026-10-22', days: 8, total_rental: '7700', total_payable: '8700' }, deposit: { amount: '8000' } };

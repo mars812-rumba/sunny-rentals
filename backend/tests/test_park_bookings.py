@@ -33,6 +33,35 @@ class ParkBookingTests(unittest.TestCase):
         return {**payload, 'quote_token': quote.json()['quote_token'], 'request_id': 'request_test_12345',
                 'contact': {'channel': 'whatsapp', 'value': '+66123456789', 'consent': True}}
 
+    def test_owner_and_admin_edit_only_one_booking_not_shared_customer_or_price(self):
+        payload = self.booking_payload()
+        first = self.client.post('/api/partners/bookings', json=payload).json()['booking']
+        second_payload = self.booking_payload(start_date='2026-10-14', end_date='2026-10-17')
+        second_payload['request_id'] = 'second_request_123456'
+        second = self.client.post('/api/partners/bookings', json=second_payload).json()['booking']
+        data = {'customer_name': 'Updated customer', 'contact_channel': 'phone', 'contact_value': '+66888888888',
+                'note': 'Internal only', 'expected_updated_at': first['updated_at']}
+        signed = {'tenant_id': 'park-a', 'init_data': self.token(), 'booking_id': first['id'], **data}
+        self.assertEqual(self.client.post('/api/partners/bookings/edit', json=signed).status_code, 403)
+        header = {'Authorization': f'Bearer {self.auth.issue_for_verified_actor("1")}'}
+        endpoint = f'/api/partners/parks/park-a/bookings/{first["id"]}/details'
+        changed = self.client.patch(endpoint, json=data, headers=header) if hasattr(self.client, 'patch') else self.client.request('PATCH', endpoint, json=data, headers=header)
+        self.assertEqual(changed.status_code, 200, changed.text)
+        self.assertEqual(changed.json()['booking']['pricing'], first['pricing'])
+        self.service.handle_update(self.update(self.invite(), update_id=777))
+        self.assertEqual(self.client.post('/api/partners/bookings/edit', json=signed).status_code, 409)
+        signed['expected_updated_at'] = changed.json()['booking']['updated_at']
+        signed['note'] = 'Changed by owner'
+        self.assertEqual(self.client.post('/api/partners/bookings/edit', json=signed).status_code, 200)
+        retry = self.client.post('/api/partners/bookings', json=payload)
+        self.assertEqual(retry.status_code, 201, retry.text)
+        self.assertNotIn('Changed by owner', retry.text)
+        private = self.client.post('/api/partners/calendar', json={'tenant_id': 'park-a', 'init_data': self.token()}).json()['bookings']
+        untouched = next(item for item in private if item['id'] == second['id'])
+        self.assertEqual(untouched['operator_details']['customer_name'], '')
+        self.assertEqual(untouched['customer']['name'], 'Test')
+        self.assertEqual(untouched['customer']['contact']['value'], '+66123456789')
+
     def test_quote_and_booking_use_server_price_customer_and_timezone(self):
         payload = self.booking_payload()
         result = self.client.post('/api/partners/bookings', json=payload)
@@ -268,7 +297,10 @@ class ParkBookingTests(unittest.TestCase):
         result = self.availability()
         self.assertEqual(result.status_code, 200, result.text)
         self.assertEqual(result.json(), {'tenant_id': 'park-a', 'start_date': '2026-10-11',
-            'end_date': '2026-10-14', 'days': 3, 'available_asset_ids': [self.asset.id]})
+            'end_date': '2026-10-14', 'days': 3, 'available_asset_ids': [self.asset.id],
+            'pickup_time': None, 'return_time': None,
+            'prices': {self.asset.id: {'days': 3, 'daily_rate': '800.00', 'total_rental': '2400.00',
+                                      'deposit': '5000.00', 'currency': 'THB'}}})
 
     def test_availability_hold_adjacent_dates_and_cancel_release(self):
         booking = self.client.post('/api/partners/bookings', json=self.booking_payload()).json()['booking']

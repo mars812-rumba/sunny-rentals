@@ -280,18 +280,22 @@ class ParkBookingService:
             days, start, end = self.period_bounds(tenant, request)
             records = self.repo(context, 'bookings.json', Booking).list()
             available = []
+            prices = {}
             for asset in self.repo(context, 'assets.json', RentalAsset).list():
                 if not asset.public or asset.status != AssetStatus.AVAILABLE:
                     continue
                 try:
-                    calculate_rental(asset.pricing, request.start_date, days)
+                    rental = calculate_rental(asset.pricing, request.start_date, days)
                     self.check_overlap(records, asset.id, start, end)
                 except (ValueError, BookingConflict):
                     continue
                 available.append(asset.id)
+                prices[asset.id] = {**rental, 'days': days, 'currency': tenant.currency,
+                                    'deposit': str(self.money(asset.deposit_policy.get('amount', 0)))}
             return {'tenant_id': tenant.tenant_id, 'start_date': request.start_date.isoformat(),
                     'end_date': request.end_date.isoformat(), 'days': days,
-                    'available_asset_ids': available}
+                    'available_asset_ids': available, 'prices': prices,
+                    'pickup_time': request.pickup_time, 'return_time': request.return_time}
 
     def check_overlap(self, records, asset_id, start, end):
         for booking in records:

@@ -1,5 +1,13 @@
 // Only interface copy. Customer and vehicle data are never passed through this catalogue.
 export const parkEnglish: Record<string, string> = {
+  "Расчёт в карточке автомобиля": "Price available in vehicle details",
+  "Аренда за {0} суток · разные сезоны": "Rental for {0} days · mixed seasons",
+  "Аренда без доставки. Цена повторно проверяется при отправке.": "Rental excludes delivery. Price is rechecked when submitting.",
+  "ДД.ММ": "DD.MM",
+  "День и месяц: 01.11": "Day and month: 01.11",
+  "День и месяц. Остальные даты — низкий сезон.": "Day and month. Other dates use low-season rates.",
+  "Неактивные тарифы не используются.": "Inactive rates are not applied.",
+  "Новые цены — только для новых заявок.": "New prices apply to new requests only.",
   "Откройте карточку транспорта, чтобы проверить даты и отправить заявку.": "Open a vehicle to check dates and send a request.",
   "Укажите имя и контакт после проверки стоимости.": "Enter your name and contact after checking the price.",
   "Понятно": "Got it",
