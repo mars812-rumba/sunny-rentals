@@ -12,7 +12,8 @@ const bundle = await build({ stdin: { contents: `export * from './src/lib/park-l
  export { ParkLocaleProvider, ParkLanguageSwitcher } from './src/contexts/ParkLocaleContext';
  export { ParkPickupFields, ParkPickupSummary } from './src/components/platform/ParkPickupFields';
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
- export { ParkRequestItem } from './src/components/platform/ParkRequestsPanel';
+ export { ParkRequestItem, ParkRequestsPanel } from './src/components/platform/ParkRequestsPanel';
+ export { filterParkRequests } from './src/lib/park-request-filters';
  export { VehiclePricingFields, VehicleTariffTable, VehicleSpecSummary } from './src/components/platform/VehicleDetailsEditor';
  export { PlatformTenantWorkspace } from './src/components/platform/PlatformTenantWorkspace';
  export { SchedulerCalendar } from './src/components/admin/SchedulerCalendar';
@@ -123,6 +124,30 @@ test('request details group pickup and return before prices, with a separate dep
   assert.doesNotMatch(withoutContact, /aria-label="(?:Скопировать контакт|Copy contact)"/);
   assert.match(withoutContact, /aria-expanded="false" disabled=""/);
  }
+});
+
+test('request period intersects park civil dates, combines status and excludes blocks without mutating input', () => {
+ const make = (id, start, end, status = 'requested', entry_type = 'rental') => ({ id, status, entry_type, start_at: start, pricing: { start_date: start, end_date: end } });
+ const bookings = [make('later', '2026-11-16', '2026-11-20'), make('overlap', '2026-11-08', '2026-11-12'), make('return', '2026-11-05', '2026-11-10'), make('ends-before', '2026-11-01', '2026-11-09'), make('starts-at-end', '2026-11-15', '2026-11-17'), make('confirmed', '2026-11-11', '2026-11-20', 'confirmed'), make('block', '2026-11-10', '2026-11-15', 'requested', 'block')];
+ const snapshot = JSON.stringify(bookings);
+ assert.deepEqual(ui.filterParkRequests(bookings, 'requested', '2026-11-10', '2026-11-15').map(item => item.id), ['return', 'overlap', 'starts-at-end']);
+ assert.deepEqual(ui.filterParkRequests(bookings, 'confirmed', '2026-11-10', '2026-11-15').map(item => item.id), ['confirmed']);
+ assert.equal(ui.filterParkRequests(bookings, 'all', '2026-11-10', '2026-11-15').length, 4);
+ assert.equal(ui.filterParkRequests(bookings, 'all').length, 6);
+ assert.deepEqual(ui.filterParkRequests(bookings, 'all', '2026-11-20', '2026-11-10'), []);
+ assert.deepEqual(ui.filterParkRequests(bookings, 'requested', '2026-11-18').map(item => item.id), ['later']);
+ assert.deepEqual(ui.filterParkRequests(bookings, 'confirmed', '', '2026-11-10'), []);
+ assert.equal(JSON.stringify(bookings), snapshot);
+ for (const language of ['ru', 'en']) {
+  const html = render(ui.ParkRequestsPanel, { tenantId: 'park-a', admin: false }, language);
+  assert.equal((html.match(/type="date"/g) || []).length, 2);
+  assert.doesNotMatch(html, /Все даты, независимо|All dates, regardless|automatically sent|автоматически не отправляются/);
+  assert.match(html, language === 'ru' ? /Дата начала/ : /Start date/);
+  assert.match(html, language === 'ru' ? /Сбросить даты/ : /Clear dates/);
+ }
+ const source = readFileSync('src/components/platform/ParkRequestsPanel.tsx', 'utf8');
+ assert.match(source, /aria-invalid=\{invalidPeriod/);
+ assert.match(source, /onClick=\{\(\) => \{ setStartDate\(''\); setEndDate\(''\); \}\}/);
 });
 
 test('English fleet/navigation and month/day labels render without Russian interface text', () => {

@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { ParkTariffBreakdown } from './ParkTariffBreakdown';
 import { pickupLabels } from '@/lib/park-pickup';
+import { filterParkRequests } from '@/lib/park-request-filters';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждена', cancelled: 'Отменена', in_progress: 'В аренде', completed: 'Завершена' };
 const statusColors: Record<string, string> = {
@@ -146,11 +147,15 @@ export function ParkRequestsPanel({ tenantId, admin, revision = 0 }: { tenantId:
   const id = useId();
   const [bookings, setBookings] = useState<ParkBooking[]>([]);
   const [filter, setFilter] = useState('requested');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const invalidPeriod = !!(startDate && endDate && endDate < startDate);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [reload, setReload] = useState(0);
+  useEffect(() => { setStartDate(''); setEndDate(''); setFilter('requested'); }, [tenantId]);
   useEffect(() => subscribeParkCalendar(tenantId, () => setReload(value => value + 1)), [tenantId]);
   useEffect(() => {
     const controller = new AbortController();
@@ -160,7 +165,7 @@ export function ParkRequestsPanel({ tenantId, admin, revision = 0 }: { tenantId:
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [tenantId, admin, revision, reload]);
-  const items = useMemo(() => bookings.filter(item => item.entry_type !== 'block' && (filter === 'all' || item.status === filter)).sort((a, b) => a.start_at.localeCompare(b.start_at)), [bookings, filter]);
+  const items = useMemo(() => filterParkRequests(bookings, filter, startDate, endDate), [bookings, filter, startDate, endDate]);
   const action = async (booking: ParkBooking, status: 'confirmed' | 'cancelled') => {
     if (busy || loading) return;
     if (status === 'cancelled' && !window.confirm(pt("Отменить заявку на {0}? Даты освободятся для других клиентов.", [booking.pricing.asset_name]))) return;
@@ -173,10 +178,15 @@ export function ParkRequestsPanel({ tenantId, admin, revision = 0 }: { tenantId:
   };
   return <section aria-labelledby={`${id}-title`} aria-busy={loading || busy}>
     <div className="flex flex-wrap items-center justify-between gap-3"><h2 id={`${id}-title`} className="flex items-center gap-2 text-xl font-semibold"><ClipboardList aria-hidden="true" className="h-5 w-5 text-blue-700" />{pt("Заявки парка")}</h2><Button variant="outline" className="min-h-11 gap-2" disabled={busy || loading} onClick={() => setReload(value => value + 1)}><RefreshCw aria-hidden="true" className="h-4 w-4" />{pt("Обновить")}</Button></div>
-    <p className="mt-2 text-sm leading-6 text-slate-600">{pt("Все даты, независимо от месяца календаря. Ожидающие заявки занимают период. Сообщения клиентам автоматически не отправляются.")}</p>
-    <div className="my-5"><label htmlFor={`${id}-status`} className="block text-sm font-medium">{pt("Статус заявки")}</label><select id={`${id}-status`} value={filter} onChange={event => setFilter(event.target.value)} className="mt-2 h-11 max-w-full rounded-md border border-slate-300 bg-white px-3 text-base"><option value="requested">{pt("Ожидают подтверждения")}</option><option value="confirmed">{pt("Подтверждённые")}</option><option value="cancelled">{pt("Отменённые")}</option><option value="all">{pt("Все заявки")}</option></select></div>
+    <div className="my-5 grid min-w-0 grid-cols-2 items-end gap-3 sm:grid-cols-4">
+      <div className="col-span-2 min-w-0 sm:col-span-1"><label htmlFor={`${id}-status`} className="block text-sm font-medium">{pt("Статус заявки")}</label><select id={`${id}-status`} value={filter} onChange={event => setFilter(event.target.value)} className="mt-2 h-11 w-full min-w-0 rounded-md border border-slate-300 bg-white px-3 text-base"><option value="requested">{pt("Ожидают подтверждения")}</option><option value="confirmed">{pt("Подтверждённые")}</option><option value="cancelled">{pt("Отменённые")}</option><option value="all">{pt("Все заявки")}</option></select></div>
+      <div className="min-w-0"><label htmlFor={`${id}-start`} className="block text-sm font-medium">{pt('Дата начала')}</label><Input id={`${id}-start`} type="date" className="mt-2 min-h-11 w-full min-w-0 text-base" value={startDate} onChange={event => setStartDate(event.target.value)} aria-invalid={invalidPeriod || undefined} aria-describedby={invalidPeriod ? `${id}-period-error` : undefined} /></div>
+      <div className="min-w-0"><label htmlFor={`${id}-end`} className="block text-sm font-medium">{pt('Дата окончания')}</label><Input id={`${id}-end`} type="date" className="mt-2 min-h-11 w-full min-w-0 text-base" value={endDate} min={startDate || undefined} onChange={event => setEndDate(event.target.value)} aria-invalid={invalidPeriod || undefined} aria-describedby={invalidPeriod ? `${id}-period-error` : undefined} /></div>
+      <Button type="button" variant="outline" className="min-h-11 gap-2" disabled={!startDate && !endDate} onClick={() => { setStartDate(''); setEndDate(''); }}><X aria-hidden="true" className="size-4" />{pt('Сбросить даты')}</Button>
+    </div>
+    {invalidPeriod && <p id={`${id}-period-error`} role="alert" className="mb-4 text-sm text-red-700">{pt('Дата окончания не может быть раньше даты начала.')}</p>}
     {error && <div className="mb-4"><p role="alert" className="text-sm text-rose-800">{pt(error)}</p><Button variant="outline" className="mt-3 min-h-11" disabled={busy || loading} onClick={() => setReload(value => value + 1)}>{pt("Повторить загрузку")}</Button></div>}
     {success && <p role="status" className="mb-4 text-sm text-emerald-800">{pt(success)}</p>}
-    {loading ? <p role="status" className="py-6 text-slate-600">{pt("Загружаем заявки…")}</p> : !error && (items.length ? <ul className="space-y-4">{items.map(booking => <ParkRequestItem key={booking.id} booking={booking} tenantId={tenantId} admin={admin} busy={busy} onAction={(item, status) => void action(item, status)} />)}</ul> : <p role="status" className="py-6 text-slate-600">{filter === 'requested' ? pt("Нет заявок, ожидающих подтверждения.") : pt("Заявок с этим статусом пока нет.")}</p>)}
+    {loading ? <p role="status" className="py-6 text-slate-600">{pt("Загружаем заявки…")}</p> : !error && !invalidPeriod && (items.length ? <ul className="space-y-4">{items.map(booking => <ParkRequestItem key={booking.id} booking={booking} tenantId={tenantId} admin={admin} busy={busy} onAction={(item, status) => void action(item, status)} />)}</ul> : <p role="status" className="py-6 text-slate-600">{startDate || endDate ? pt('За выбранный период заявок с этим статусом нет.') : filter === 'requested' ? pt("Нет заявок, ожидающих подтверждения.") : pt("Заявок с этим статусом пока нет.")}</p>)}
   </section>;
 }

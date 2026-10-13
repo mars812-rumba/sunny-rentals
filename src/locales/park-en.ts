@@ -1,5 +1,8 @@
 // Only interface copy. Customer and vehicle data are never passed through this catalogue.
 export const parkEnglish: Record<string, string> = {
+  "Сбросить даты": "Clear dates",
+  "Дата окончания не может быть раньше даты начала.": "The end date cannot be before the start date.",
+  "За выбранный период заявок с этим статусом нет.": "No requests with this status in the selected period.",
   "Заявки из бота и витрины — в одном календаре. Полоса включает день возврата. Следующая аренда возможна после времени возврата.": "Bot and storefront requests share one calendar. The bar includes the return day. The next rental can start after the return time.",
   "Стоимость": "Cost",
   "Доставка": "Delivery",
