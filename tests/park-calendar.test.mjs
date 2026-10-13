@@ -35,6 +35,17 @@ const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', sta
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
 
+test('park calendar shadows preserve clipped bar shapes and fixed badge rows', () => {
+ const scheduler = readFileSync(resolve('src/components/admin/SchedulerCalendar.tsx'), 'utf8');
+ const month = readFileSync(resolve('src/components/admin/MonthCalendarView.tsx'), 'utf8');
+ assert.match(scheduler, /filter: readOnly \? "drop-shadow\(0 2px 2px rgba\(15,23,42,0\.14\)\)"/);
+ assert.match(scheduler, /className="relative h-full"/);
+ assert.match(scheduler, /clipPath: "polygon\(6px/);
+ assert.match(month, /boxShadow: '0 1px 4px rgba\(15,23,42,0\.12\)'/);
+ assert.match(month, /'grid gap-0\.5 font-sans'/);
+ assert.match(month, /flex h-5 min-h-5/);
+});
+
 test('park timetable starts a blocked bar with its reason, safely escaping custom text', () => {
  const item = { ...booking, entry_type: 'block', status: 'confirmed', operator_details: { customer_name: '', note: 'Repair <script>inspection</script>' } };
  const projected = ui.calendarBooking(item);
@@ -118,7 +129,7 @@ test('empty, plain, pending and colored calendar lanes have the same fixed box h
  const item = { ...booking, id: 'toyota', status: 'confirmed', pricing: { ...booking.pricing, start_date: '2026-10-20', end_date: '2026-10-25' } };
  const pending = { ...item, id: 'pending', status: 'requested', pricing: { ...item.pricing, asset_name: 'MG 5', start_date: '2026-10-19', end_date: '2026-10-22' } };
  const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-10-01T00:00:00'), bookings: [item, pending].map(ui.calendarBooking), logisticsData: [item, pending].map(ui.calendarLogistics), onDateChange() {}, onBookingClick() {}, showOccupancy: true }));
- assert.match(html, /class="grid gap-0\.5 overflow-hidden font-sans"/);
+ assert.match(html, /class="grid gap-0\.5 font-sans"/);
  const rows = [...html.matchAll(/<button[^>]*data-calendar-booking="([^"]+)"[^>]*class="([^"]+)"/g)];
  assert.ok(rows.length > 0);
  for (const [, , classes] of rows) assert.match(classes, /flex h-5 min-h-5 w-full items-center justify-center/);

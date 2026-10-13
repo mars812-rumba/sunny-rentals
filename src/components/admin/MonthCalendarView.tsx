@@ -128,7 +128,7 @@ const MonthGrid = memo(({
                     </span>}
                   </div>
                   
-                  <div className={showOccupancy ? 'grid gap-0.5 overflow-hidden font-sans' : 'space-y-0.5 overflow-hidden font-sans'}>
+                  <div className={showOccupancy ? 'grid gap-0.5 font-sans' : 'space-y-0.5 overflow-hidden font-sans'}>
                     {slots.map((ev, idx) => {
                       if (!ev) return <div key={`empty-${idx}`} data-calendar-lane={idx} aria-hidden="true" className="h-5" />;
                       // Цвет в зависимости от статуса брони
@@ -148,6 +148,7 @@ const MonthGrid = memo(({
                           data-compact-event={showOccupancy ? true : undefined}
                           data-calendar-lane={showOccupancy ? idx : undefined}
                           data-calendar-booking={showOccupancy ? ev.booking_id : undefined}
+                          style={showOccupancy ? { boxShadow: '0 1px 4px rgba(15,23,42,0.12)' } : undefined}
                           data-plain-occupancy={showOccupancy && ev.type === 'rental' ? true : undefined}
                           key={idx}
                           className={cn(
