@@ -13,6 +13,7 @@ const bundle = await build({ stdin: { contents: `export * from './src/lib/park-l
  export { ParkPickupFields, ParkPickupSummary } from './src/components/platform/ParkPickupFields';
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
  export { ParkRequestItem, ParkRequestsPanel } from './src/components/platform/ParkRequestsPanel';
+ export { ParkCalendarMonthSelect } from './src/components/platform/ParkBookingCalendar';
  export { filterParkRequests } from './src/lib/park-request-filters';
  export { VehiclePricingFields, VehicleTariffTable, VehicleSpecSummary } from './src/components/platform/VehicleDetailsEditor';
  export { PlatformTenantWorkspace } from './src/components/platform/PlatformTenantWorkspace';
@@ -148,6 +149,19 @@ test('request period intersects park civil dates, combines status and excludes b
  const source = readFileSync('src/components/platform/ParkRequestsPanel.tsx', 'utf8');
  assert.match(source, /aria-invalid=\{invalidPeriod/);
  assert.match(source, /onClick=\{\(\) => \{ setStartDate\(''\); setEndDate\(''\); \}\}/);
+});
+
+test('month selector follows app language rather than browser month-input locale, and reset stays beside dates', () => {
+ const en = render(ui.ParkCalendarMonthSelect, { id: 'month', month: '2026-10', onChange() {} });
+ assert.match(en, /value="2026-10" selected="">October 2026/);
+ assert.doesNotMatch(visible(en), /[А-Яа-яЁё]/);
+ const ru = render(ui.ParkCalendarMonthSelect, { id: 'month', month: '2026-10', onChange() {} }, 'ru');
+ assert.match(ru, /value="2026-10" selected="">октябрь 2026/);
+ assert.match(en, /value="2027-01"/); assert.match(en, /value="2025-10"/);
+ const panel = render(ui.ParkRequestsPanel, { tenantId: 'park-a', admin: false });
+ assert.match(panel, /aria-label="Clear dates"/);
+ assert.match(panel, /grid-cols-\[minmax\(0,1fr\)_minmax\(0,1fr\)_auto\]/);
+ assert.match(panel, /size-11 gap-2 p-0/);
 });
 
 test('English fleet/navigation and month/day labels render without Russian interface text', () => {

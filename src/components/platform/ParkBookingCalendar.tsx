@@ -6,7 +6,6 @@ import { addMonths, format, startOfMonth } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { CalendarDays, ChartGantt, Check, ChevronLeft, ChevronRight, ClipboardList, Info, Plus, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { changeParkBookingStatus, fetchParkCalendar, ParkBooking } from '@/api/park-telegram';
 import { listPlatformAssets, PlatformAsset } from '@/api/platform-admin';
 import { fetchOwnerFleet } from '@/api/park-owner-fleet';
@@ -25,6 +24,14 @@ import { timetableFocusDay } from '@/lib/scheduler-scroll';
 import { parkBookingColors } from '@/lib/park-booking-colors';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждено', cancelled: 'Отменено', in_progress: 'В аренде', completed: 'Завершено' };
+
+export function ParkCalendarMonthSelect({ id, month, onChange }: { id: string; month: string; onChange: (month: string) => void }) {
+  const { dateLocale } = useParkLocale();
+  const date = new Date(`${month}-01T00:00:00`);
+  return <select id={id} value={month} onChange={event => onChange(event.target.value)} className="mt-2 h-11 max-w-full rounded-md border border-slate-300 bg-white px-3 text-base">
+    {Array.from({ length: 25 }, (_, index) => addMonths(date, index - 12)).map(value => <option key={format(value, 'yyyy-MM')} value={format(value, 'yyyy-MM')}>{format(value, 'LLLL yyyy', { locale: dateLocale })}</option>)}
+  </select>;
+}
 
 export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0, timezone = 'Asia/Bangkok' }: { tenantId: string; admin?: boolean; fleetRevision?: number; timezone?: string }) {
   const { pt, dateLocale } = useParkLocale();
@@ -84,7 +91,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
     <div className="flex flex-wrap items-center justify-between gap-3"><h2 id={`${id}-title`} className="flex items-center gap-2 text-xl font-semibold"><CalendarDays aria-hidden="true" className="h-5 w-5 text-blue-700" />{pt("Календарь заявок парка")}</h2><div className="flex flex-wrap gap-2"><Button className="gap-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800" ref={createButton} disabled={loading || busy || !!draft || !assets.length || !!error} onClick={() => { setSuccess(''); setDraft({ assetId }); }}><Plus aria-hidden="true" />{pt("Добавить бронь / блокировку")}</Button><Button variant="outline" className="gap-2 rounded-lg bg-white" disabled={loading || busy || !!draft} onClick={() => setReload((value) => value + 1)}><RefreshCw aria-hidden="true" />{pt("Обновить")}</Button></div></div>
     <p className="mt-2 text-sm text-slate-600">{pt("Заявки из бота и витрины — в одном календаре. Полоса включает день возврата. Следующая аренда возможна после времени возврата.")}</p>
     <div className="mt-4 flex flex-wrap items-end gap-3">
-      <div><label htmlFor={`${id}-month`} className="block text-sm font-medium">{pt("Месяц")}</label><Input id={`${id}-month`} type="month" value={month} onChange={(event) => { if (/^\d{4}-\d{2}$/.test(event.target.value)) setMonth(event.target.value); }} className="mt-2 max-w-xs text-base" /></div>
+      <div><label htmlFor={`${id}-month`} className="block text-sm font-medium">{pt("Месяц")}</label><ParkCalendarMonthSelect id={`${id}-month`} month={month} onChange={setMonth} /></div>
       <Button variant="outline" className="h-11 w-11 p-0" aria-label={pt("Предыдущий месяц")} onClick={() => setMonth(format(addMonths(date, -1), 'yyyy-MM'))}><ChevronLeft aria-hidden="true" /></Button>
       <Button variant="outline" className="h-11 w-11 p-0" aria-label={pt("Следующий месяц")} onClick={() => setMonth(format(addMonths(date, 1), 'yyyy-MM'))}><ChevronRight aria-hidden="true" /></Button>
       <Button variant="outline" className="h-11 gap-2" onClick={() => { setMonth(today.slice(0, 7)); setScrollResetKey(value => value + 1); }}><CalendarDays aria-hidden="true" className="h-4 w-4" />{pt("Сегодня")}</Button>

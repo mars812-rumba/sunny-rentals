@@ -294,7 +294,8 @@ test('shared month has occupied-day and return badges, with named keyboard contr
  assert.match(html, /aria-label="Занято: Toyota, Ожидает подтверждения"/);
  assert.match(html, /aria-label="Возврат: Toyota, Ожидает подтверждения"/);
  assert.match(html, /<button[^>]+aria-label="3 августа 2026, событий: 1"/);
- assert.match(html, /min-h-7/);
+ assert.match(html, /min-h-5/);
+ assert.match(html, /py-0.5/);
  assert.match(html, /text-purple-900/);
  assert.doesNotMatch(html, /class="[^"]*opacity-[^\"]*"[^>]*aria-label="Занято/);
 });
