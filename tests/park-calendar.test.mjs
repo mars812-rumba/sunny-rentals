@@ -9,6 +9,7 @@ import { build } from 'esbuild';
 
 const bundle = await build({ stdin: { contents: `export * from './src/utils/park-calendar';
  export * from './src/lib/calendar-booking-lanes';
+ export * from './src/lib/calendar-model-label';
  export { SchedulerCalendar } from './src/components/admin/SchedulerCalendar';
  export { MonthCalendarView } from './src/components/admin/MonthCalendarView';
  export { ParkTrialStatus } from './src/components/platform/ParkTrialStatus';
@@ -33,6 +34,28 @@ const ui = compiled.exports;
 const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', start_at: '2026-08-01T17:00:00Z', end_at: '2026-08-03T17:00:00Z', currency: 'THB',
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
+
+test('compact calendar labels prefer the model, preserve full names and remove Block from gray badges', () => {
+ for (const [name, model, brand, short] of [
+  ['Toyota Yaris', 'Yaris', 'Toyota', 'Yaris'],
+  ['MG ZS 2020', 'ZS', 'MG', 'ZS'],
+  ['MG 5', '5', 'MG', 'MG5'],
+  ['Toyota Yaris', '', '', 'Yaris'],
+  ['MG ZS 2020', '', '', 'ZS'],
+  ['MG 5', '', '', 'MG5'],
+  ['Custom vehicle', '', '', 'Custom vehicle'],
+ ]) assert.equal(ui.calendarModelLabel(name, model, brand), short);
+ const item = { ...booking, entry_type: 'block', status: 'confirmed', pricing: { ...booking.pricing, asset_name: 'Toyota Yaris' } };
+ const projected = ui.calendarBookingWithAsset(item, { specs: { brand: 'Toyota', model: 'Yaris' } });
+ assert.equal(projected.form_data.car.name, 'Toyota Yaris');
+ assert.equal(projected.form_data.car.model, 'Yaris');
+ const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: [projected], logisticsData: [ui.calendarLogistics(item)], showOccupancy: true, onDateChange() {}, onBookingClick() {} }));
+ assert.match(html, /aria-label="Блокировка: Toyota Yaris"/);
+ assert.match(html, /bg-slate-200 text-slate-900/);
+ assert.match(html, /text-\[9px\]/);
+ const text = html.replace(/<[^>]+>/g, '');
+ assert.match(text, /Yaris/); assert.doesNotMatch(text, /Toyota|Блок|Block/);
+});
 
 test('booking lanes remain fixed despite another pickup, across weeks and reversed API ordering', () => {
  const make = (id, start, end, name, status = 'confirmed') => ({ ...booking, id, asset_id: id, status, pricing: { ...booking.pricing, asset_name: name, start_date: start, end_date: end } });
@@ -410,7 +433,7 @@ test('park month hides confirmed middle-day badges but retains handovers, preboo
  assert.match(retained, /aria-label="Занято: Toyota, Ожидает подтверждения"/);
  assert.match(retained, /aria-label="Блокировка: Blocked car"/);
  assert.match(retained, /text-purple-900/);
- assert.match(retained, /text-slate-700/);
+ assert.match(retained, /bg-slate-200 text-slate-900/);
  const many = Array.from({ length: 6 }, (_, index) => ({ ...confirmed, id: `confirmed-${index}` }));
  const overflow = renderToStaticMarkup(e(ui.MonthCalendarView, { ...props, bookings: many.map(ui.calendarBooking), logisticsData: many.map(ui.calendarLogistics) }));
  const middleCell = overflow.match(/data-calendar-day="2026-08-03"[\s\S]*?(?=data-calendar-day="2026-08-04")/)[0];

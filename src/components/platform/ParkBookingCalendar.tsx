@@ -14,7 +14,7 @@ import { SchedulerCalendar } from '@/components/admin/SchedulerCalendar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { bookingsOnDay, calendarBooking, calendarCars, calendarLogistics, calendarThumbnail } from '@/utils/park-calendar';
+import { bookingsOnDay, calendarBooking, calendarBookingWithAsset, calendarCars, calendarLogistics, calendarThumbnail } from '@/utils/park-calendar';
 import { ParkManualBookingForm } from './ParkManualBookingForm';
 import { ParkCalendarPhoto } from './ParkCalendarPhoto';
 import { ParkRequestItem } from './ParkRequestsPanel';
@@ -74,6 +74,10 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
   const photos = useMemo(() => new Map(assets.map(asset => [asset.id, calendarThumbnail(asset)])), [assets]);
   const filtered = useMemo(() => bookings.filter(item => !assetId || item.asset_id === assetId), [bookings, assetId]);
   const active = useMemo(() => filtered.filter(item => item.status !== 'cancelled'), [filtered]);
+  const monthBookings = useMemo(() => {
+    const fleet = new Map(assets.map(asset => [asset.id, asset]));
+    return active.map(item => calendarBookingWithAsset(item, fleet.get(item.asset_id)));
+  }, [active, assets]);
   const date = useMemo(() => startOfMonth(new Date(`${month}-01T00:00:00`)), [month]);
   const focusDay = timetableFocusDay(month, today);
   const initialScrollDate = useMemo(() => new Date(`${focusDay}T00:00:00`), [focusDay]);
@@ -116,7 +120,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
         <h3 className="mb-2 text-lg font-semibold">{pt("Календарь доставок")}</h3>
         <p className="mb-3 text-sm leading-6 text-slate-600">{format(date, 'LLLL yyyy', { locale: dateLocale })} {pt(" · Нажмите день или заявку.")}</p>
         <div className="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-700">{[[parkBookingColors.pickup.dot, 'Выдача'], [parkBookingColors.return.dot, 'Возврат'], [parkBookingColors.pending.dot, 'Ожидает подтверждения'], [parkBookingColors.blocked.dot, 'Блокировка']].map(([color, label]) => <span key={pt(label)} className="inline-flex items-center gap-2"><span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${color}`} />{pt(label)}</span>)}</div>
-        <MonthCalendarView currentDate={date} bookings={active.map(calendarBooking)} logisticsData={active.map(calendarLogistics)} onDateChange={value => setMonth(format(value, 'yyyy-MM'))} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onDayClick={value => setSelection({ day: format(value, 'yyyy-MM-dd') })} showOccupancy />
+        <MonthCalendarView currentDate={date} bookings={monthBookings} logisticsData={active.map(calendarLogistics)} onDateChange={value => setMonth(format(value, 'yyyy-MM'))} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onDayClick={value => setSelection({ day: format(value, 'yyyy-MM-dd') })} showOccupancy />
       </TabsContent>
     </Tabs>}
 <Dialog open={!!selection} onOpenChange={open => { if (!open) setSelection(null); }}><DialogContent closeLabel={pt("Закрыть заявку")} closeButtonClassName="right-2 top-2 flex size-11 items-center justify-center" onCloseAutoFocus={event => { if (draft) event.preventDefault(); }} className="max-h-[85vh] w-[calc(100%-2rem)] overflow-y-auto rounded-2xl bg-white text-slate-900 sm:max-w-xl"><DialogHeader className="pr-6 text-left"><DialogTitle className="flex items-center gap-2 text-balance"><ClipboardList aria-hidden="true" className="size-5 shrink-0 text-blue-700" />{selection?.day ? pt("События {0}", [dateLabel(selection.day)]) : pt("Заявка парка")}</DialogTitle><DialogDescription className="flex items-start gap-2 pt-2 text-pretty leading-6 text-slate-600"><Info aria-hidden="true" className="mt-1 size-4 shrink-0" />{pt("Даты указаны по часовому поясу парка. Автоматические сообщения клиентам пока не отправляются.")}</DialogDescription></DialogHeader>{selected.length ? details(selected) : <p>{pt("На этот день событий нет.")}</p>}{selection?.day && <Button disabled={!!draft || loading || busy || !assets.length} onClick={() => { setDraft({ day: selection.day, assetId }); setSelection(null); setSuccess(''); }}><Plus aria-hidden="true" />{pt("Добавить запись на этот день")}</Button>}{error && <p role="alert" className="text-sm text-rose-800">{pt(error)}</p>}</DialogContent></Dialog>

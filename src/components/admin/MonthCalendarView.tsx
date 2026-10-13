@@ -13,6 +13,7 @@ import { LogisticsDate, Booking } from '@/api/api.ts';
 import { cn } from '@/lib/utils';
 import { DayDetailsModal } from './DayDetailsModal'; 
 import { calendarBookingLanes, calendarDaySlots } from '@/lib/calendar-booking-lanes';
+import { calendarModelLabel } from '@/lib/calendar-model-label';
 
 interface DayEvent {
   type: 'pickup' | 'return' | 'rental';
@@ -134,7 +135,7 @@ const MonthGrid = memo(({
                       const isPreBooking = ev.booking?.status === 'pre_booking';
                       const bgClass = showOccupancy
                         ? ev.type === 'rental'
-                          ? ev.booking?.status === 'blocked' ? parkBookingColors.blocked.text : isPreBooking ? parkBookingColors.pending.text : parkBookingColors.confirmed.text
+                          ? ev.booking?.status === 'blocked' ? parkBookingColors.blocked.badge : isPreBooking ? parkBookingColors.pending.text : parkBookingColors.confirmed.text
                           : ev.booking?.status === 'blocked' ? parkBookingColors.blocked.badge : isPreBooking ? parkBookingColors.pending.badge : ev.type === 'pickup' ? parkBookingColors.pickup.badge : parkBookingColors.return.badge
                         : ev.booking?.status === 'blocked' ? 'bg-purple-100 text-purple-900' : isPreBooking
                         ? "bg-slate-200 text-slate-600"
@@ -150,7 +151,7 @@ const MonthGrid = memo(({
                           data-plain-occupancy={showOccupancy && ev.type === 'rental' ? true : undefined}
                           key={idx}
                           className={cn(
-                            showOccupancy ? "flex h-5 min-h-5 w-full items-center justify-center overflow-hidden px-1 py-0.5 text-[10px] leading-4 font-medium rounded hover:ring-1 hover:ring-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
+                            showOccupancy ? "flex h-5 min-h-5 w-full items-center justify-center overflow-hidden px-0.5 py-0.5 text-[9px] leading-4 font-medium rounded hover:ring-1 hover:ring-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
                             bgClass
                           )}
                           aria-label={`${ev.booking?.status === 'blocked' ? pt("Блокировка") : ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}${showOccupancy && isPreBooking ? `, ${pt('Ожидает подтверждения')}` : ''}`}
@@ -158,11 +159,11 @@ const MonthGrid = memo(({
                             e.stopPropagation();
                             onBadgeClick(ev, e);
                           }}
-                          title={`${ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}`}
+                          title={`${ev.booking?.status === 'blocked' ? pt('Блокировка') : ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}`}
                         >
                           <span className={showOccupancy ? 'block h-4 min-w-0 w-full truncate leading-4 tracking-tight' : 'block truncate tracking-tight'}>
-                            {showOccupancy && isPreBooking && <Clock3 aria-hidden="true" className="mr-0.5 inline size-3" />}
-                            {ev.booking?.status === 'blocked' ? pt("Блок · {0}", [ev.carName]) : ev.carName}
+                            {showOccupancy && isPreBooking && <Clock3 aria-hidden="true" className="mr-0.5 inline size-2.5" />}
+                            {showOccupancy ? calendarModelLabel(ev.carName, ev.booking.form_data.car.model, ev.booking.form_data.car.brand) : ev.booking?.status === 'blocked' ? pt("Блок · {0}", [ev.carName]) : ev.carName}
                           </span>
                         </button>
                       );
