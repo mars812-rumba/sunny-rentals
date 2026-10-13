@@ -2,7 +2,7 @@ import { parkText } from '@/lib/park-locale';
 import { parkText as pt } from '@/lib/park-locale';
 import { useParkLocale } from '@/contexts/park-locale';
 import { FormEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { Banknote, CalendarDays, CarFront, Check, ClipboardList, Clock3, Copy, MapPin, MessageCircle, Phone, RefreshCw, UserRound, WalletCards, X } from 'lucide-react';
+import { Banknote, CalendarDays, CarFront, Check, ClipboardList, Clock3, Copy, MapPin, MessageCircle, Pencil, Phone, RefreshCw, UserRound, WalletCards, X } from 'lucide-react';
 import { changeParkBookingStatus, editParkBooking, fetchParkCalendar, type ParkBooking, type ParkContact } from '@/api/park-telegram';
 import { subscribeParkCalendar } from '@/lib/park-calendar-updates';
 import { dateLabel, rentalMoney } from '@/lib/park-rental';
@@ -95,6 +95,7 @@ function ParkBookingEditor({ booking, tenantId, admin, onClose }: { booking: Par
 
 export function ParkRequestItem({ booking, busy, onAction, detailed = false, tenantId, admin = false }: { booking: ParkBooking; busy: boolean; detailed?: boolean; tenantId?: string; admin?: boolean; onAction: (booking: ParkBooking, status: 'confirmed' | 'cancelled') => void }) {
   const { pt, intlLocale } = useParkLocale();
+  const editorId = useId();
   const [editing, setEditing] = useState(false);
   const editTrigger = useRef<HTMLButtonElement>(null);
   const closeEditor = () => { setEditing(false); requestAnimationFrame(() => editTrigger.current?.focus()); };
@@ -114,21 +115,26 @@ export function ParkRequestItem({ booking, busy, onAction, detailed = false, ten
     <p className="mt-3 flex items-start gap-2 text-sm font-medium leading-6 text-slate-900"><CalendarDays aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 text-blue-700" /><span>{dateLabel(booking.pricing.start_date)} — {dateLabel(booking.pricing.end_date)}<span className="mt-0.5 block text-sm font-normal text-slate-600">{booking.pricing.days} {pt(" суток", [booking.pricing.days])}</span></span></p>
     <ParkRequestJourney pickup={booking.pricing.pickup} />
     <ParkRequestPrices booking={booking} detailed={detailed} />
-    <div className="mt-4 space-y-2 border-t border-slate-200 pt-4"><p className="flex items-start gap-2 break-words font-medium"><UserRound aria-hidden="true" className="h-4 w-4 shrink-0 text-blue-700" />{name}</p>
+    <div className="mt-4 space-y-2 border-t border-slate-200 pt-3">
+      <div className="flex min-w-0 items-start justify-between gap-2">
+        <div className="min-w-0 flex-1 pt-2">
+          <p className="flex items-start gap-2 font-medium"><UserRound aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 text-blue-700" /><span className="min-w-0 break-words">{name}</span></p>
+          {contact && <p className="mt-1 break-all text-sm text-slate-700">{contactLabel}: {contact.value}</p>}
+        </div>
+        {(contact || (tenantId && booking.entry_type !== 'block')) && <div className="flex shrink-0 items-center gap-1">
+          {contact && <Button type="button" variant="ghost" className="size-11 shrink-0 p-0 text-blue-700 hover:bg-blue-50 hover:text-blue-800" aria-label={pt("Скопировать контакт")} title={pt("Скопировать контакт")} onClick={async () => { try { await navigator.clipboard.writeText(contact.value); setCopyMessage(pt("Контакт скопирован.")); } catch { setCopyMessage(pt("Выделите и скопируйте контакт вручную.")); } }}><Copy aria-hidden="true" className="size-4" /></Button>}
+          {tenantId && booking.entry_type !== 'block' && <Button ref={editTrigger} type="button" variant="ghost" className="size-11 shrink-0 p-0 text-blue-700 hover:bg-blue-50 hover:text-blue-800" aria-label={pt("Изменить заявку")} title={pt("Изменить заявку")} aria-expanded={editing} aria-controls={editing ? editorId : undefined} disabled={busy || editing} onClick={() => setEditing(true)}><Pencil aria-hidden="true" className="size-4" /></Button>}
+        </div>}
+      </div>
       {username && <p className="break-all text-sm text-slate-700">@{username}</p>}
       {booking.customer?.telegram_user_id && <p className="text-xs tabular-nums text-slate-600">Telegram ID: {booking.customer.telegram_user_id}</p>}
       {phone && <p className="break-words text-sm text-slate-700">{pt("Телефон: ")}{phone}</p>}
-      {contact && <p className="break-all text-sm text-slate-700">{contactLabel}: {contact.value}</p>}
       {!username && !phone && !contact && <p className="text-sm leading-6 text-slate-600">{pt("Контакт для прямой связи не указан. Telegram не передаёт номер телефона автоматически.")}</p>}
-      <div className="flex flex-wrap gap-2">{telegramUrl && <Button asChild variant="outline" className="min-h-11 gap-2"><a href={telegramUrl} target="_blank" rel="noopener noreferrer"><MessageCircle aria-hidden="true" className="h-4 w-4" />{pt("Написать в Telegram")}</a></Button>}{phoneUrl && <Button asChild variant="outline" className="min-h-11 gap-2"><a href={phoneUrl}><Phone aria-hidden="true" className="h-4 w-4" />{pt("Позвонить")}</a></Button>}</div>
+      {(telegramUrl || phoneUrl) && <div className="flex flex-wrap gap-2">{telegramUrl && <Button asChild variant="outline" className="min-h-11 gap-2"><a href={telegramUrl} target="_blank" rel="noopener noreferrer"><MessageCircle aria-hidden="true" className="h-4 w-4" />{pt("Написать в Telegram")}</a></Button>}{phoneUrl && <Button asChild variant="outline" className="min-h-11 gap-2"><a href={phoneUrl}><Phone aria-hidden="true" className="h-4 w-4" />{pt("Позвонить")}</a></Button>}</div>}
     </div>
     {booking.operator_details?.note && <p className="mt-3 whitespace-pre-wrap break-words text-sm text-slate-600">{booking.operator_details.note}</p>}
-    {(contact || (tenantId && booking.entry_type !== 'block')) && <div className="mt-4 flex min-w-0 items-stretch gap-2">
-      {contact && <Button type="button" variant="outline" className="h-auto min-h-11 min-w-0 flex-1 whitespace-normal px-3 py-2 leading-5 sm:flex-none" onClick={async () => { try { await navigator.clipboard.writeText(contact.value); setCopyMessage(pt("Контакт скопирован.")); } catch { setCopyMessage(pt("Выделите и скопируйте контакт вручную.")); } }}><Copy aria-hidden="true" className="h-4 w-4 shrink-0" />{pt("Скопировать контакт")}</Button>}
-      {tenantId && booking.entry_type !== 'block' && !editing && <Button ref={editTrigger} type="button" variant="outline" className="h-auto min-h-11 min-w-0 flex-1 whitespace-normal px-3 py-2 leading-5 sm:flex-none" disabled={busy} onClick={() => setEditing(true)}>{pt("Изменить заявку")}</Button>}
-    </div>}
     {copyMessage && <p role="status" className="mt-2 text-sm text-slate-600">{pt(copyMessage)}</p>}
-    {tenantId && booking.entry_type !== 'block' && editing && <ParkBookingEditor booking={booking} tenantId={tenantId} admin={admin} onClose={closeEditor} />}
+    {tenantId && booking.entry_type !== 'block' && editing && <div id={editorId}><ParkBookingEditor booking={booking} tenantId={tenantId} admin={admin} onClose={closeEditor} /></div>}
     <p className="mt-3 text-xs text-slate-600">{booking.source?.endsWith('_manual') ? pt("Ручная запись") : booking.source === 'web_storefront' ? pt("Заявка с веб-витрины") : pt("Заявка через Telegram")} · {booking.pricing.timezone}</p>
     {detailed && <div className="mt-4"><p className="text-sm font-medium">{pt("Номер заявки")}</p><div className="mt-2 flex min-w-0 items-center gap-2"><span className="min-w-0 select-text break-all text-sm font-medium tabular-nums">{bookingNumber}</span><Button type="button" variant="outline" className="size-11 shrink-0 p-0" aria-label={pt("Скопировать номер заявки")} onClick={async () => { try { await navigator.clipboard.writeText(bookingNumber); setReferenceMessage(pt("Номер скопирован.")); } catch { setReferenceMessage(pt("Выделите и скопируйте номер вручную.")); } }}><Copy aria-hidden="true" className="size-4" /></Button></div>{referenceMessage && <p role="status" className="mt-2 text-sm text-slate-600">{pt(referenceMessage)}</p>}</div>}
     {['requested', 'confirmed'].includes(booking.status) && <div className="mt-4 flex flex-wrap gap-2">{booking.status === 'requested' && <Button className="min-h-11 gap-2 bg-blue-700 text-white hover:bg-blue-800" disabled={busy || editing} onClick={() => onAction(booking, 'confirmed')}><Check aria-hidden="true" className="h-4 w-4" />{pt("Подтвердить")}</Button>}<Button variant="outline" className="min-h-11 gap-2" disabled={busy || editing} onClick={() => onAction(booking, 'cancelled')}><X aria-hidden="true" className="h-4 w-4" />{pt("Отменить")}</Button></div>}

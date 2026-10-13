@@ -109,12 +109,19 @@ test('request details group pickup and return before prices, with a separate dep
  const withContact = { ...booking, customer: { name: 'Somchai', contact: { channel: 'whatsapp', value: '+66812345678' } } };
  for (const language of ['ru', 'en']) {
   const html = render(ui.ParkRequestItem, { booking: withContact, tenantId: 'park-a', busy: false, onAction() {} }, language);
-  const toolbar = html.match(/<div class="mt-4 flex min-w-0 items-stretch gap-2">(.*?)<\/div>/s)?.[1];
+  const toolbar = html.match(/<div class="flex shrink-0 items-center gap-1">(.*?)<\/div>/s)?.[1];
   assert.ok(toolbar);
   assert.equal((toolbar.match(/<button/g) || []).length, 2);
-  assert.match(toolbar, /whitespace-normal/);
-  assert.match(toolbar, language === 'ru' ? /Скопировать контакт/ : /Copy contact/);
-  assert.match(toolbar, language === 'ru' ? /Изменить заявку/ : /Edit request/);
+  assert.match(toolbar, /size-11 shrink-0 p-0/);
+  assert.match(toolbar, language === 'ru' ? /aria-label="Скопировать контакт"/ : /aria-label="Copy contact"/);
+  assert.match(toolbar, language === 'ru' ? /aria-label="Изменить заявку"/ : /aria-label="Edit request"/);
+  assert.match(toolbar, /lucide-copy/); assert.match(toolbar, /lucide-pencil/);
+  assert.match(toolbar, /aria-expanded="false"/);
+  assert.equal(visible(toolbar).trim(), '', 'Contact actions are icon-only');
+  assert.doesNotMatch(html, /mt-4 flex min-w-0 items-stretch/);
+  const withoutContact = render(ui.ParkRequestItem, { booking, tenantId: 'park-a', busy: true, onAction() {} }, language);
+  assert.doesNotMatch(withoutContact, /aria-label="(?:Скопировать контакт|Copy contact)"/);
+  assert.match(withoutContact, /aria-expanded="false" disabled=""/);
  }
 });
 
