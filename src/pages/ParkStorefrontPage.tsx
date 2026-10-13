@@ -85,7 +85,7 @@ function AssetCard({ asset, tenantId, currency, preview, bookingEnabled, period,
             <div><dt className="flex items-center gap-2 text-sm text-slate-600"><WalletCards aria-hidden="true" className="h-4 w-4" />{pt("Возвратный депозит")}</dt><dd className="mt-1 text-lg font-semibold tabular-nums">{asset.deposit !== null ? price(asset.deposit) : pt("Уточняется")}</dd></div>
           </dl>
           <VehicleSpecSummary specs={asset.specs} detailed />
-          {asset.description && <section><h4 className="flex items-center gap-2 font-semibold"><FileText aria-hidden="true" className="size-4" />{pt("Описание")}</h4><p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-slate-700">{asset.description}</p></section>}
+          {asset.description && <section className="rounded-lg bg-slate-100 p-3 text-slate-900"><h4 className="flex items-center gap-2 font-semibold"><FileText aria-hidden="true" className="size-4 text-slate-600" />{pt("Описание")}</h4><p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">{asset.description}</p></section>}
           {asset.tariff_grid && <VehicleTariffTable grid={asset.tariff_grid} currency={currency} />}
           {bookingEnabled && !preview && <ParkBookingForm key={`${asset.id}:${period?.start}:${period?.end}`} tenantId={tenantId} assetId={asset.id} initialPeriod={period} initialPickup={pickup} currency={currency} onCreated={() => setCreated(true)} onEditPickup={value => { returnPeriod.current = value; setOpen(false); }} />}
         </DialogContent>

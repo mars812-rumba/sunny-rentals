@@ -84,7 +84,7 @@ test('pickup fields require time but allow an optional city address, and summary
  assert.equal(ui.validParkPickup({ ...pickup, address: '  ' }), true);
  assert.equal(ui.validParkPickup({ ...pickup, address: '' }), true);
  const summary = renderToStaticMarkup(e(ui.ParkPickupSummary, { pickup, deliveryFee: '500.00', total: '2900.00', currency: 'THB' }));
- assert.match(summary, /Получение: 14:30/); assert.match(summary, /Доставка:/); assert.match(summary, /Итого аренда и доставка:/);
+ assert.match(summary, /Получение<\/h4>/); assert.match(summary, />14:30<\/span>/); assert.match(summary, /Доставка:/); assert.match(summary, /Итого аренда и доставка:/);
  assert.match(summary, /&lt;Hotel&gt;/); assert.doesNotMatch(summary, /<Hotel>/);
  const item = { ...booking, pricing: { ...booking.pricing, pickup, delivery_fee: '500.00', total_payable: '2100.00' } };
  assert.equal(ui.calendarBooking(item).form_data.dates.pickupTime, '14:30');

@@ -24,7 +24,7 @@ const bundle = await build({ stdin: { contents: `export * from './src/lib/park-l
  export { MonthCalendarView } from './src/components/admin/MonthCalendarView';
  export { quoteParkBooking, submitParkBooking } from './src/api/park-telegram';
  export { ownerWebRequest } from './src/api/park-owner-web';
- export { dateLabel, parkDateDisplay, rentalMoney, paidRentalDays } from './src/lib/park-rental';`, resolveDir: process.cwd(), loader: 'tsx' }, bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic', external: ['react', 'react/jsx-runtime', 'react-dom'], define: { 'import.meta.env.VITE_API_URL': '""' } });
+ export { dateLabel, parkDateDisplay, seasonDateLabel, rentalMoney, paidRentalDays } from './src/lib/park-rental';`, resolveDir: process.cwd(), loader: 'tsx' }, bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic', external: ['react', 'react/jsx-runtime', 'react-dom'], define: { 'import.meta.env.VITE_API_URL': '""' } });
 const compiled = new Module(resolve('tests/park-locale-fixture.cjs'));
 compiled.filename = resolve('tests/park-locale-fixture.cjs');
 compiled.paths = Module._nodeModulePaths(process.cwd());
@@ -49,6 +49,29 @@ test('park dates are always day-first with localized words, never American order
  assert.equal(ui.dateLabel('2026-11-18', 'long', 'en-US'), '18 November 2026');
  assert.equal(ui.parkDateDisplay(new Date('2026-11-17T20:00:00Z'), 'en-GB', 'long', 'Asia/Bangkok'), '18 November 2026');
  assert.equal(ui.parkDateDisplay(new Date('invalid')), '—');
+});
+
+test('season boundaries use words without an invented year in both languages', () => {
+ assert.equal(ui.seasonDateLabel('11-01', 'ru-RU'), '1 ноября');
+ assert.equal(ui.seasonDateLabel('03-31', 'en-GB'), '31 March');
+ assert.equal(ui.seasonDateLabel('02-29', 'en-GB'), '29 February');
+ for (const bad of ['02-30', '13-01', '11/01', '']) assert.equal(ui.seasonDateLabel(bad), '—');
+ const rates = { price_1_6: 800, price_7_14: 700, price_15_29: 600, price_30: 500 };
+ const html = render(ui.VehicleTariffTable, { grid: { low_season: rates, high_season: rates, high_start: '11-01', high_end: '03-31' }, currency: 'THB' });
+ assert.match(html, /1 November — 31 March/);
+ assert.doesNotMatch(visible(html), /[А-Яа-яЁё]|11-01|03-31/);
+});
+
+test('storefront quote groups dates, deposit, seasonal cost and long addresses without changing totals', () => {
+ const quote = { asset_name: 'MG ZS', start_date: '2026-10-15', end_date: '2026-10-22', days: 7, daily_rate: '1100', total_rental: '7700', deposit: '8000', currency: 'THB', timezone: 'Asia/Bangkok', tariff_breakdown: [{ season: 'low_season', days: 7, daily_rate: '1100', subtotal: '7700' }], pickup: { time: '08:00', location: 'city', address: 'Long pickup address <script>', return_time: '08:00', return_location: 'city', return_address: 'Long return address' }, delivery_fee: '500', return_fee: '500', total_payable: '8700' };
+ for (const language of ['ru', 'en']) {
+  const html = render(ui.ParkQuoteSummary, { quote }, language);
+  for (const tone of ['bg-blue-50', 'bg-emerald-50', 'bg-amber-50', 'bg-violet-50']) assert.ok(html.includes(tone));
+  assert.match(html, /Long pickup address &lt;script&gt;/); assert.match(html, /Long return address/);
+  assert.ok(html.includes(ui.rentalMoney('8700', 'THB'))); assert.ok(html.includes(ui.rentalMoney('8000', 'THB')));
+  assert.match(html, language === 'ru' ? /15 октября 2026/ : /15 October 2026/);
+  assert.doesNotMatch(html, /2026-10-15|10\/15\/2026|<script>/);
+ }
 });
 
 test('owner toolbar has one inline language selector with flags and a named compact sign-out', () => {

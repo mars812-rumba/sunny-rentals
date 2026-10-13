@@ -71,6 +71,9 @@ test('seasonal tariff table names all four periods and both seasons', () => {
  const html = renderToStaticMarkup(e(ui.VehicleTariffTable, { grid: { low_season: rates, high_season: rates, high_start: '11-01', high_end: '03-31' }, currency: 'THB' }));
  for (const label of ['1–6 дней', '7–14 дней', '15–29 дней', '30 дней и больше', 'Низкий сезон', 'Высокий сезон']) assert.ok(html.includes(label));
  assert.match(html, /<caption class="sr-only">/); assert.match(html, /scope="row"/);
+ assert.match(html, /1 ноября — 31 марта/);
+ assert.doesNotMatch(html, /11-01|03-31|ММ-ДД/);
+ assert.match(html, /bg-emerald-50/); assert.match(html, /bg-amber-50/);
 });
 
 test('pricing editor has three named modes and only active fields are required', () => {

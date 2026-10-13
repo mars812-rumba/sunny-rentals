@@ -1,7 +1,7 @@
 import { parkText as pt } from '@/lib/park-locale';
 import { useParkLocale } from '@/contexts/park-locale';
 import { FormEvent, useId, useState } from 'react';
-import { CloudSun, FileText, Fuel, ImageIcon, Save, Settings2, Sun, Users, WalletCards, Wrench, Zap } from 'lucide-react';
+import { CalendarDays, CarFront, CircleCheck, CloudSun, DoorOpen, FileText, Fuel, Gauge, ImageIcon, Save, Settings2, Snowflake, Sun, Users, WalletCards, Wrench, Zap } from 'lucide-react';
 import type { PlatformAsset, PricingMode, TariffGrid, VehicleDetailsInput, VehicleSpecs } from '@/api/platform-admin';
 import { savePlatformAssetDetails } from '@/api/platform-admin';
 import { saveOwnerAssetDetails } from '@/api/park-owner-fleet';
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { rentalMoney } from '@/lib/park-rental';
+import { rentalMoney, seasonDateLabel } from '@/lib/park-rental';
 import { vehiclePricingMode } from '@/lib/vehicle-pricing';
 
 const tariffPeriods = [['price_1_6', '1–6 дней'], ['price_7_14', '7–14 дней'], ['price_15_29', '15–29 дней'], ['price_30', '30 дней и больше']] as const;
@@ -27,14 +27,19 @@ export function VehicleSpecSummary({ specs, detailed = false, photoCount }: { sp
     [Wrench, specs.engine && pt("Двигатель: {0}", [specs.engine]), 'bg-blue-50 text-blue-950', 'text-blue-700'],
     [Users, specs.seats ? pt("{0} мест", [specs.seats]) : '', 'bg-cyan-50 text-cyan-950', 'text-cyan-700'],
     [ImageIcon, photoCount !== undefined ? `${pt('Фото: ')}${photoCount}` : '', 'bg-slate-100 text-slate-900', 'text-slate-600'],
+    [Settings2, detailed && specs.drive && pt('Привод: {0}', [specs.drive]), 'bg-violet-50 text-violet-950', 'text-violet-700'],
+    [CarFront, detailed && specs.body_type && pt('Кузов: {0}', [specs.body_type]), 'bg-blue-50 text-blue-950', 'text-blue-700'],
+    [DoorOpen, detailed && specs.doors && pt('Двери: {0}', [specs.doors]), 'bg-slate-100 text-slate-900', 'text-slate-600'],
+    [Gauge, detailed && specs.mileage != null && pt('Пробег: {0} км', [specs.mileage.toLocaleString(intlLocale)]), 'bg-amber-50 text-amber-950', 'text-amber-700'],
+    [Snowflake, detailed && specs.air_conditioning != null && pt('Кондиционер: {0}', [specs.air_conditioning ? pt('есть') : pt('нет')]), 'bg-cyan-50 text-cyan-950', 'text-cyan-700'],
   ] as const;
-  return <><ul className="mt-3 grid min-w-0 grid-cols-2 gap-2 text-sm">{entries.filter(([, value]) => value).map(([Icon, value, tone, iconTone], index) => <li key={index} className={`flex min-w-0 items-start gap-2 rounded-md px-3 py-2 ${tone}`}><Icon aria-hidden="true" className={`mt-0.5 size-4 shrink-0 ${iconTone}`} /><span className="min-w-0 break-words font-medium leading-5">{value}</span></li>)}</ul>{detailed && <ul className="mt-3 space-y-2 break-words text-sm text-slate-700">{[specs.drive && pt("Привод: {0}", [specs.drive]), specs.body_type && pt("Кузов: {0}", [specs.body_type]), specs.doors && pt("Двери: {0}", [specs.doors]), specs.mileage != null && pt("Пробег: {0} км", [specs.mileage.toLocaleString(intlLocale)]), specs.air_conditioning != null && pt("Кондиционер: {0}", [specs.air_conditioning ? pt("есть") : pt("нет")]), ...(specs.features || [])].filter(Boolean).map((value, index) => <li key={index}>{value}</li>)}</ul>}</>;
+  return <><ul className="mt-3 grid min-w-0 grid-cols-2 gap-2 text-sm">{entries.filter(([, value]) => value).map(([Icon, value, tone, iconTone], index) => <li key={index} className={`flex min-w-0 items-start gap-2 rounded-md px-3 py-2 ${tone}`}><Icon aria-hidden="true" className={`mt-0.5 size-4 shrink-0 ${iconTone}`} /><span className="min-w-0 break-words font-medium leading-5">{value}</span></li>)}</ul>{detailed && !!specs.features?.length && <ul className="mt-2 grid min-w-0 grid-cols-2 gap-2 text-sm">{specs.features.map((value, index) => <li key={index} className="flex min-w-0 items-start gap-2 rounded-md bg-emerald-50 px-3 py-2 text-emerald-950"><CircleCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-emerald-700" /><span className="min-w-0 break-words">{value}</span></li>)}</ul>}</>;
 }
 
 export function VehicleTariffTable({ grid, currency }: { grid: TariffGrid; currency: string }) {
   const { pt, intlLocale } = useParkLocale();
   if (grid.mode === 'duration') return <div className="overflow-x-auto"><table className="w-full text-left text-sm tabular-nums"><caption className="mb-2 text-left text-slate-600">{pt("Цена за сутки в зависимости от срока аренды")}</caption><thead><tr className="border-b border-slate-200"><th className="py-2 pr-3">{pt("Срок аренды")}</th><th className="p-2">{pt("Цена за сутки")}</th></tr></thead><tbody>{tariffPeriods.map(([key, label]) => <tr key={key} className="border-b border-slate-100"><th scope="row" className="py-2 pr-3 font-medium">{pt(label)}</th><td className="p-2">{rentalMoney(grid.low_season[key], currency)}</td></tr>)}</tbody></table></div>;
-  return <div className="space-y-3"><p className="text-sm text-slate-600">{pt("Цена за сутки. Высокий сезон: ")}{grid.high_start} — {grid.high_end} {pt(" (ММ-ДД), включительно.")}</p><div className="overflow-x-auto"><table className="w-full text-left text-sm tabular-nums"><caption className="sr-only">{pt("Тарифы по длительности аренды")}</caption><thead><tr className="border-b border-slate-200"><th className="py-2 pr-3">{pt("Период")}</th><th className="p-2">{pt("Низкий сезон")}</th><th className="p-2">{pt("Высокий сезон")}</th></tr></thead><tbody>{tariffPeriods.map(([key, label]) => <tr key={key} className="border-b border-slate-100"><th scope="row" className="py-2 pr-3 font-medium">{pt(label)}</th><td className="p-2">{rentalMoney(grid.low_season[key], currency)}</td><td className="p-2">{rentalMoney(grid.high_season[key], currency)}</td></tr>)}</tbody></table></div></div>;
+  return <div className="space-y-3"><p className="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-950"><CalendarDays aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-amber-700" /><span><span className="block font-semibold">{pt('Высокий сезон')}</span>{seasonDateLabel(grid.high_start, intlLocale)} — {seasonDateLabel(grid.high_end, intlLocale)}</span></p><div className="overflow-x-auto"><table className="w-full text-left text-sm tabular-nums"><caption className="sr-only">{pt("Тарифы по длительности аренды")}</caption><thead><tr className="border-b border-slate-200"><th scope="col" className="py-2 pr-3">{pt("Период")}</th><th scope="col" className="bg-emerald-50 p-2 text-emerald-950"><CloudSun aria-hidden="true" className="mb-1 size-4 text-emerald-700" />{pt("Низкий сезон")}</th><th scope="col" className="bg-amber-50 p-2 text-amber-950"><Sun aria-hidden="true" className="mb-1 size-4 text-amber-700" />{pt("Высокий сезон")}</th></tr></thead><tbody>{tariffPeriods.map(([key, label]) => <tr key={key} className="border-b border-slate-100"><th scope="row" className="py-2 pr-3 font-medium">{pt(label)}</th><td className="bg-emerald-50 p-2 text-emerald-950">{rentalMoney(grid.low_season[key], currency)}</td><td className="bg-amber-50 p-2 text-amber-950">{rentalMoney(grid.high_season[key], currency)}</td></tr>)}</tbody></table></div><p className="text-sm text-slate-600">{pt('Цена за сутки')}</p></div>;
 }
 
 export function VehiclePricingFields({ id, currency, mode, onModeChange, dailyRate, onDailyRateChange, grid, onGridChange }: {
