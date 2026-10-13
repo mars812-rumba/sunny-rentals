@@ -134,7 +134,7 @@ export function SchedulerCalendar({
     const pickupTime = fd.dates.pickupTime || format(start, 'HH:mm');
     
     const line1Parts = [];
-    if (booking.status === 'blocked') line1Parts.push(pt("Блокировка"));
+    if (booking.status === 'blocked') line1Parts.push(readOnly && fd.personalInfo?.notes?.trim() ? fd.personalInfo.notes.trim() : pt("Блокировка"));
     line1Parts.push(`${startStr}-${endStr}`);
     line1Parts.push(pickupTime);
     if (fd.locations?.pickupLocation) line1Parts.push(fd.locations.pickupLocation);

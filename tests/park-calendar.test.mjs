@@ -35,6 +35,23 @@ const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', sta
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
 
+test('park timetable starts a blocked bar with its reason, safely escaping custom text', () => {
+ const item = { ...booking, entry_type: 'block', status: 'confirmed', operator_details: { customer_name: '', note: 'Repair <script>inspection</script>' } };
+ const projected = ui.calendarBooking(item);
+ assert.equal(projected.form_data.personalInfo.notes, item.operator_details.note);
+ const props = { cars: ui.calendarCars([], [item]), bookings: [projected], startDate: new Date('2026-08-01T00:00:00'), daysToShow: 97, readOnly: true, onDateChange() {}, onCreateBooking() {}, onBookingClick() {} };
+ const html = renderToStaticMarkup(e(ui.SchedulerCalendar, props));
+ assert.match(html, /title="Repair &lt;script&gt;inspection&lt;\/script&gt; • /);
+ assert.match(html, /Repair &lt;script&gt;inspection&lt;\/script&gt;/); assert.doesNotMatch(html, /<script>/);
+ for (const note of ['', '   ']) {
+  const blank = ui.calendarBooking({ ...item, operator_details: { customer_name: '', note } });
+  assert.match(renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, bookings: [blank] })), /title="Блокировка • /);
+ }
+ assert.equal(ui.calendarBooking({ ...booking, operator_details: { customer_name: '', note: 'Private rental note' } }).form_data.personalInfo, undefined);
+ const legacy = renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, readOnly: false }));
+ assert.doesNotMatch(legacy, /Repair &lt;script/);
+});
+
 test('compact calendar labels prefer the model, preserve full names and remove Block from gray badges', () => {
  for (const [name, model, brand, short] of [
   ['Toyota Yaris', 'Yaris', 'Toyota', 'Yaris'],

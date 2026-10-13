@@ -19,6 +19,7 @@ export function calendarBooking(item: ParkBooking): Booking {
       locations: { pickupLocation: item.pricing.pickup ? item.pricing.pickup.address || pickupLabels[item.pricing.pickup.location] : '', returnLocation: item.pricing.pickup?.return_location ? item.pricing.pickup.return_address || pickupLabels[item.pricing.pickup.return_location] : '' }, contact: { value: '', type: '', name: item.operator_details?.customer_name || '' },
       pricing: { dailyRate: Number(item.pricing.daily_rate), totalRental: Number(item.pricing.total_rental), deposit: Number(item.deposit.amount), deliveryPickup: Number(item.pricing.delivery_fee || 0), deliveryReturn: Number(item.pricing.return_fee || 0), totalDelivery: Number(item.pricing.delivery_fee || 0) + Number(item.pricing.return_fee || 0), grandTotal: Number(item.pricing.total_payable || item.pricing.total_rental) },
       timestamp: item.start_at,
+      personalInfo: item.entry_type === 'block' ? { notes: item.operator_details?.note } : undefined,
     },
   };
 }
