@@ -15,9 +15,11 @@ import HeroBanner from '@/components/HeroBanner';
 import { ParkTelegramEntry } from '@/components/platform/ParkTelegramEntry';
 import type { ParkView } from '@/lib/park-entry';
 import { ParkBookingForm } from '@/components/platform/ParkBookingForm';
+import { ParkBookingReceipt } from '@/components/platform/ParkBookingReceipt';
+import { ParkStorefrontHeader } from '@/components/platform/ParkStorefrontHeader';
 import { VehicleSpecSummary, VehicleTariffTable } from '@/components/platform/VehicleDetailsEditor';
 import { ParkRentalFilters } from '@/components/platform/ParkRentalFilters';
-import { fetchParkAvailability, ParkAvailability } from '@/api/park-telegram';
+import { fetchParkAvailability, ParkAvailability, type ParkBooking } from '@/api/park-telegram';
 import { ParkRentalPeriod, paidRentalDays, rentalMoney } from '@/lib/park-rental';
 import type { ParkPickup } from '@/lib/park-pickup';
 import { focusStorefrontFilters } from '@/lib/storefront-return';
@@ -50,8 +52,15 @@ function StorefrontImage({ tenantId, reference, preview, alt, className }: { ten
 function AssetCard({ asset, tenantId, currency, preview, bookingEnabled, period, pickup, onBooked, onEditPickup }: { asset: StorefrontAsset; tenantId: string; currency: string; preview: string; bookingEnabled: boolean; period: ParkRentalPeriod | null; pickup: ParkPickup; onBooked: () => void; onEditPickup: (period: ParkRentalPeriod) => void }) {
   const { pt, intlLocale } = useParkLocale();
   const [photo, setPhoto] = useState(0);
-  const [created, setCreated] = useState(false);
+  const [created, setCreated] = useState<ParkBooking | null>(null);
   const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const receiptTitle = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (!created) return;
+    if (dialogRef.current) dialogRef.current.scrollTop = 0;
+    receiptTitle.current?.focus({ preventScroll: true });
+  }, [created]);
   const returnPeriod = useRef<ParkRentalPeriod | null>(null);
   const days = period ? paidRentalDays(period) : 0;
   const price = (amount: number) => {
@@ -68,9 +77,15 @@ function AssetCard({ asset, tenantId, currency, preview, bookingEnabled, period,
       <VehicleSpecSummary specs={asset.specs} />
       {asset.description && <details className="mt-3 text-sm"><summary className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md font-medium text-blue-700 focus-visible:outline focus-visible:outline-2"><FileText aria-hidden="true" className="size-4" />{pt("Описание")}</summary><p className="mt-2 whitespace-pre-wrap break-words leading-6 text-slate-700">{asset.description}</p></details>}
       <div className="mt-auto pt-5"><p className="break-words text-2xl font-bold tabular-nums text-blue-700">{asset.daily_rate ? asset.tariff_grid ? pt("от {0}", [price(asset.daily_rate)]) : price(asset.daily_rate * (days || 1)) : pt("Цена по запросу")}</p>{Boolean(asset.daily_rate) && <p className="text-sm text-slate-600">{asset.tariff_grid ? pt("за сутки · точный расчёт после выбора дат") : days ? pt("{0} / сутки · за {1} суток", [price(asset.daily_rate), days]) : pt("за сутки")}</p>}{days > 0 && <p className="mt-1 text-xs text-slate-600">{pt("Ориентир; точный расчёт подтвердит сервер")}</p>}<p className="mt-2 text-sm text-slate-600">{asset.deposit !== null ? pt("Депозит отдельно: {0}", [price(asset.deposit)]) : pt("Депозит уточняется")}</p></div>
-      <Dialog open={open} onOpenChange={(nextOpen) => { setOpen(nextOpen); if (nextOpen) { returnPeriod.current = null; setPhoto(0); setCreated(false); } else if (created) onBooked(); }}>
+      <Dialog open={open} onOpenChange={(nextOpen) => { setOpen(nextOpen); if (nextOpen) { returnPeriod.current = null; setPhoto(0); setCreated(null); } else if (created) onBooked(); }}>
         <DialogTrigger asChild><Button className={`mt-4 min-h-12 w-full rounded-xl ${actionClass}`} aria-label={`${period && bookingEnabled ? pt("Выбрать") : pt("Посмотреть")} ${asset.name}`}>{period && bookingEnabled ? pt("Выбрать транспорт") : pt("Посмотреть")} <ArrowRight aria-hidden="true" className="h-4 w-4" /></Button></DialogTrigger>
-        <DialogContent onCloseAutoFocus={event => { if (returnPeriod.current) { event.preventDefault(); const previous = returnPeriod.current; returnPeriod.current = null; onEditPickup(previous); } }} className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto rounded-xl p-4 sm:p-6">
+        <DialogContent ref={dialogRef} closeLabel={pt('Закрыть')} closeButtonClassName="right-2 top-2 flex size-11 items-center justify-center" onCloseAutoFocus={event => { if (returnPeriod.current) { event.preventDefault(); const previous = returnPeriod.current; returnPeriod.current = null; onEditPickup(previous); } }} className={`max-h-[90dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-xl p-4 sm:p-6 ${created ? 'max-w-lg' : 'max-w-3xl'}`}>
+          {created ? <>
+            <DialogTitle ref={receiptTitle} tabIndex={-1} className="pr-10 text-left text-xl leading-snug focus:outline-none">{pt('Заявка принята')}</DialogTitle>
+            <DialogDescription className="text-left">{pt('Заявка отправлена парку.')}</DialogDescription>
+            <ParkBookingReceipt booking={created} />
+            <Button type="button" className="min-h-12 w-full bg-emerald-700 text-white hover:bg-emerald-800" onClick={() => { setOpen(false); onBooked(); }}>{pt('Понятно')}</Button>
+          </> : <>
           <DialogTitle className="break-words pr-8 leading-snug">{asset.name}</DialogTitle>
           <DialogDescription>{period ? pt("Проверьте автомобиль и условия на выбранные даты.") : pt("Посмотрите фотографии и выберите даты для расчёта аренды.")}</DialogDescription>
           <StorefrontImage key={asset.photos[photo]} tenantId={tenantId} reference={asset.photos[photo]} preview={preview} alt={pt("{0}, фото {1}", [asset.name, photo + 1])} className="aspect-[4/3] max-h-[50dvh] w-full rounded-lg object-contain" />
@@ -87,7 +102,8 @@ function AssetCard({ asset, tenantId, currency, preview, bookingEnabled, period,
           <VehicleSpecSummary specs={asset.specs} detailed />
           {asset.description && <section className="rounded-lg bg-slate-100 p-3 text-slate-900"><h4 className="flex items-center gap-2 font-semibold"><FileText aria-hidden="true" className="size-4 text-slate-600" />{pt("Описание")}</h4><p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">{asset.description}</p></section>}
           {asset.tariff_grid && <VehicleTariffTable grid={asset.tariff_grid} currency={currency} />}
-          {bookingEnabled && !preview && <ParkBookingForm key={`${asset.id}:${period?.start}:${period?.end}`} tenantId={tenantId} assetId={asset.id} initialPeriod={period} initialPickup={pickup} currency={currency} onCreated={() => setCreated(true)} onEditPickup={value => { returnPeriod.current = value; setOpen(false); }} />}
+          {bookingEnabled && !preview && <ParkBookingForm key={`${asset.id}:${period?.start}:${period?.end}`} tenantId={tenantId} assetId={asset.id} initialPeriod={period} initialPickup={pickup} currency={currency} onCreated={setCreated} onEditPickup={value => { returnPeriod.current = value; setOpen(false); }} />}
+          </>}
         </DialogContent>
       </Dialog>
     </CardContent>
@@ -147,7 +163,7 @@ function ParkStorefront({ tenantId, ownerEntry }: { tenantId: string; ownerEntry
   return <main className={`min-h-screen text-slate-950 selection:bg-blue-200 ${view === 'owner' || view === 'checking' ? 'bg-slate-50' : 'bg-gradient-to-br from-blue-50 via-white to-orange-50'}`}>
     <Helmet><title>{name} {pt(" — транспорт в аренду")}</title><meta name="robots" content="noindex, nofollow" /><meta name="referrer" content="no-referrer" /><meta name="description" content={pt("Каталог транспорта {0}: фотографии и цены проката.", [name])} /><link rel="canonical" href={`${window.location.origin}/p/${encodeURIComponent(tenantId)}`} /><meta property="og:type" content="website" /><meta property="og:title" content={pt("{0} — транспорт в аренду", [name])} /><meta property="og:description" content={pt("Каталог транспорта {0}: фотографии и цены проката.", [name])} /><meta property="og:url" content={`${window.location.origin}/p/${encodeURIComponent(tenantId)}`} /><meta name="twitter:card" content="summary" /></Helmet>
     {data && !data.preview && <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"><ParkTelegramEntry key={tenantId} tenantId={tenantId} ownerEntry={ownerEntry} view={view} onViewChange={setView} /></div>}
-    {view === 'client' && <header><HeroBanner park={{ name, minimumPrice: data && rates.length ? rentalMoney(Math.min(...rates), data.tenant.currency) : null, logo: data?.tenant.logo ? <StorefrontImage tenantId={tenantId} reference={data.tenant.logo} preview={preview} alt={pt("Логотип {0}", [name])} className="mx-auto mb-2 h-10 w-10 rounded-lg bg-white object-contain p-1" /> : undefined }} /></header>}
+    {view === 'client' && <><ParkStorefrontHeader name={name} logo={data?.tenant.logo ? <StorefrontImage tenantId={tenantId} reference={data.tenant.logo} preview={preview} alt={pt('Логотип {0}', [name])} className="h-full w-full bg-white object-contain" /> : undefined} /><HeroBanner park={{ name, minimumPrice: data && rates.length ? rentalMoney(Math.min(...rates), data.tenant.currency) : null }} /></>}
     <div className="mx-auto max-w-6xl px-4 pb-10 sm:px-6 lg:px-8">
       {data?.preview && <p role="status" className="mt-4 rounded-xl bg-amber-100 p-3 text-sm text-amber-950">{pt("Закрытое превью · здесь видны и неопубликованные машины. Ссылка действует 24 часа и не даёт доступа к управлению парком.")}</p>}
       {loading ? <p role="status" aria-live="polite" className="py-12 text-center text-slate-600">{pt("Загружаем транспорт парка…")}</p> : error ? <div role="alert" className="py-12 text-center"><p className="text-slate-700">{pt(error)}</p><Button className={`mt-4 ${actionClass}`} onClick={() => setReload((value) => value + 1)}>{pt("Повторить загрузку")}</Button></div> : data && view === 'client' && <>

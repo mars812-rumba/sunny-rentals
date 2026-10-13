@@ -1,5 +1,7 @@
 // Only interface copy. Customer and vehicle data are never passed through this catalogue.
 export const parkEnglish: Record<string, string> = {
+  "Понятно": "Got it",
+  "Заявка отправлена парку.": "Your request has been sent to the rental company.",
   "Добавить бронь": "Add booking",
   "Бронь создана.": "Booking created.",
   "Клиент": "Customer",

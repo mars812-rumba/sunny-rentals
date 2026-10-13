@@ -12,6 +12,8 @@ const bundle = await build({ stdin: { contents: `export * from './src/lib/park-l
  export { ParkLocaleProvider, ParkLanguageSwitcher } from './src/contexts/ParkLocaleContext';
  export { ParkPickupFields, ParkPickupSummary } from './src/components/platform/ParkPickupFields';
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
+ export { ParkBookingReceipt } from './src/components/platform/ParkBookingReceipt';
+ export { ParkStorefrontHeader } from './src/components/platform/ParkStorefrontHeader';
  export { ParkRequestItem, ParkRequestsPanel } from './src/components/platform/ParkRequestsPanel';
  export { ParkCalendarMonthSelect } from './src/components/platform/ParkBookingCalendar';
  export { ParkDateField } from './src/components/platform/ParkDateField';
@@ -39,6 +41,33 @@ const render = (component, props, language = 'en') => {
  return renderToStaticMarkup(e(ui.ParkLocaleProvider, { initialLanguage: language }, e(component, props)));
 };
 const visible = html => html.replace(/<[^>]+>/g, '').replace(/&[^;]+;/g, ' ');
+
+test('storefront receipt preserves the actual booking number and pending meaning in RU/EN', () => {
+ const booking = { id: 'internal-id', booking_number: '100017', currency: 'THB', pricing: { asset_name: 'MG 5', start_date: '2026-10-14', end_date: '2026-10-22', days: 8, total_rental: '7700', total_payable: '8700' }, deposit: { amount: '8000' } };
+ for (const language of ['ru', 'en']) {
+  const html = render(ui.ParkBookingReceipt, { booking }, language);
+  assert.match(html, /100017/); assert.doesNotMatch(html, /internal-id/);
+  assert.match(html, /MG 5/); assert.ok(html.includes(ui.rentalMoney('8700', 'THB')));
+  assert.match(html, language === 'ru' ? /14 октября 2026/ : /14 October 2026/);
+  assert.match(html, language === 'ru' ? /ещё не подтверждённая бронь/ : /not a confirmed booking/);
+ }
+ const source = readFileSync('src/pages/ParkStorefrontPage.tsx', 'utf8');
+ assert.match(source, /created \? <>/);
+ assert.match(source, /dialogRef\.current\.scrollTop = 0/);
+ assert.match(source, /receiptTitle\.current\?\.focus\(\{ preventScroll: true \}\)/);
+ assert.match(source, /onCreated=\{setCreated\}/);
+ assert.match(readFileSync('src/components/platform/ParkBookingForm.tsx', 'utf8'), /onCreated\?\.\(result\)/);
+});
+
+test('storefront header is sticky, left aligned and handles a long name with or without a logo', () => {
+ const name = 'Rental company with a very long name';
+ for (const logo of [undefined, e('img', { src: 'blob:logo', alt: 'Rental logo' })]) {
+  const html = render(ui.ParkStorefrontHeader, { name, logo });
+  assert.match(html, /sticky top-0 z-30/); assert.match(html, /text-left/);
+  assert.match(html, /min-w-0 break-words/); assert.ok(html.includes(name));
+  assert.equal(html.includes('blob:logo'), Boolean(logo));
+ }
+});
 
 test('park dates are always day-first with localized words, never American order', () => {
  for (const [language, full, short] of [['ru', '18 ноября 2026', '18 нояб. 2026'], ['en', '18 November 2026', '18 Nov 2026']]) {

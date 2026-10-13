@@ -39,7 +39,7 @@ export function ParkContactFields({ id, contact, onChange, busy, error = '', bro
   </fieldset>;
 }
 
-export function ParkBookingForm({ tenantId, assetId, initialPeriod, initialPickup, onCreated, onEditPickup, currency = 'THB' }: { tenantId: string; assetId: string; initialPeriod?: ParkRentalPeriod | null; initialPickup?: ParkPickup; onCreated?: () => void; onEditPickup?: (period: ParkRentalPeriod) => void; currency?: string }) {
+export function ParkBookingForm({ tenantId, assetId, initialPeriod, initialPickup, onCreated, onEditPickup, currency = 'THB' }: { tenantId: string; assetId: string; initialPeriod?: ParkRentalPeriod | null; initialPickup?: ParkPickup; onCreated?: (booking: ParkBooking) => void; onEditPickup?: (period: ParkRentalPeriod) => void; currency?: string }) {
   const { pt, intlLocale } = useParkLocale();
   const id = useId();
   const [start, setStart] = useState(initialPeriod?.start || '');
@@ -87,7 +87,7 @@ export function ParkBookingForm({ tenantId, assetId, initialPeriod, initialPicku
     const controller = new AbortController(); active.current = controller;
     setBusy(true); setError('');
     if (!requestId.current) requestId.current = Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, '0')).join('');
-    try { const result = await submitParkBooking(period(), quote.quote_token, requestId.current, controller.signal, quote.requires_contact ? { ...contact, value: number, consent: true } : undefined, customerName.trim()); if (!controller.signal.aborted) { setBooking(result); onCreated?.(); } }
+    try { const result = await submitParkBooking(period(), quote.quote_token, requestId.current, controller.signal, quote.requires_contact ? { ...contact, value: number, consent: true } : undefined, customerName.trim()); if (!controller.signal.aborted) { setBooking(result); onCreated?.(result); } }
     catch (failure) { if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : pt("Не удалось отправить заявку. Повторите с тем же расчётом.")); }
     finally { if (active.current === controller) active.current = null; if (!controller.signal.aborted) setBusy(false); }
   };

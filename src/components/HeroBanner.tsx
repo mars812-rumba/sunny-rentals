@@ -28,24 +28,24 @@ const HeroBanner = ({ park }: { park?: { name: string; minimumPrice: string | nu
   </div>
 </div>}
       {/* Main content */}
-      <div className="relative h-full flex flex-col justify-center px-4 text-white">
+      <div className={`relative h-full flex flex-col justify-center px-4 text-white ${park ? 'mx-auto max-w-6xl sm:px-6 lg:px-8' : ''}`}>
         {/* Main title */}
         {park?.logo}
-        <h1 className="text-3xl font-bold mb-2 drop-shadow-lg text-center break-words">
+        <h1 className={`text-3xl font-bold mb-2 drop-shadow-lg break-words ${park ? 'text-left' : 'text-center'}`}>
           {park ? park.name : language === 'ru'
             ? 'Аренда на Пхукете'
             : 'Car Rental in Phuket'}
         </h1>
        
         {/* Subtitle */}
-        <p className="text-lg mb-6 drop-shadow-md text-center opacity-90">
+        <p className={`text-lg mb-6 drop-shadow-md opacity-90 ${park ? 'text-left' : 'text-center'}`}>
           {park ? 'Выберите транспорт и даты вашей поездки' : language === 'ru'
             ? 'Sunny Rentals - большой выбор проверенных авто и байков'
             : 'Sunny Rentals - wide selection of verified cars'}
         </p>
 
         {/* Feature cards - HORIZONTAL LAYOUT */}
-        <div className="grid grid-cols-3 gap-2 max-w-2xl mx-auto">
+        <div className={`grid grid-cols-3 gap-2 max-w-2xl ${park ? 'w-full' : 'mx-auto'}`}>
           {/* Card 1 */}
           <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 flex flex-row items-center gap-2">
             <CircleDollarSign className="w-6 h-6 flex-shrink-0" />
