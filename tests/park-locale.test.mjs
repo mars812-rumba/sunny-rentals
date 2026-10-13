@@ -24,7 +24,7 @@ const bundle = await build({ stdin: { contents: `export * from './src/lib/park-l
  export { MonthCalendarView } from './src/components/admin/MonthCalendarView';
  export { quoteParkBooking, submitParkBooking } from './src/api/park-telegram';
  export { ownerWebRequest } from './src/api/park-owner-web';
- export { dateLabel, rentalMoney, paidRentalDays } from './src/lib/park-rental';`, resolveDir: process.cwd(), loader: 'tsx' }, bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic', external: ['react', 'react/jsx-runtime', 'react-dom'], define: { 'import.meta.env.VITE_API_URL': '""' } });
+ export { dateLabel, parkDateDisplay, rentalMoney, paidRentalDays } from './src/lib/park-rental';`, resolveDir: process.cwd(), loader: 'tsx' }, bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic', external: ['react', 'react/jsx-runtime', 'react-dom'], define: { 'import.meta.env.VITE_API_URL': '""' } });
 const compiled = new Module(resolve('tests/park-locale-fixture.cjs'));
 compiled.filename = resolve('tests/park-locale-fixture.cjs');
 compiled.paths = Module._nodeModulePaths(process.cwd());
@@ -39,6 +39,17 @@ const render = (component, props, language = 'en') => {
  return renderToStaticMarkup(e(ui.ParkLocaleProvider, { initialLanguage: language }, e(component, props)));
 };
 const visible = html => html.replace(/<[^>]+>/g, '').replace(/&[^;]+;/g, ' ');
+
+test('park dates are always day-first with localized words, never American order', () => {
+ for (const [language, full, short] of [['ru', '18 ноября 2026', '18 нояб. 2026'], ['en', '18 November 2026', '18 Nov 2026']]) {
+  ui.saveParkLanguage(language);
+  assert.equal(ui.dateLabel('2026-11-18'), full);
+  assert.equal(ui.dateLabel('2026-11-18', 'short'), short);
+ }
+ assert.equal(ui.dateLabel('2026-11-18', 'long', 'en-US'), '18 November 2026');
+ assert.equal(ui.parkDateDisplay(new Date('2026-11-17T20:00:00Z'), 'en-GB', 'long', 'Asia/Bangkok'), '18 November 2026');
+ assert.equal(ui.parkDateDisplay(new Date('invalid')), '—');
+});
 
 test('owner toolbar has one inline language selector with flags and a named compact sign-out', () => {
  for (const language of ['ru', 'en']) {

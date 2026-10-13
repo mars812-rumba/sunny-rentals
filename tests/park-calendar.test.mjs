@@ -179,7 +179,7 @@ test('day details include pickup, ongoing occupancy and return, but not cancelle
 test('park timetable includes return day and preserves the optional exclusive range for other callers', () => {
  const props = { cars: ui.calendarCars([], [booking]), bookings: [ui.calendarBooking(booking)], startDate: new Date('2026-08-01T00:00:00'), daysToShow: 97, onDateChange() {}, onCreateBooking() {}, onBookingClick() {} };
  const html = renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, readOnly: true }));
- assert.match(html, /role="button" tabindex="0" aria-label="Toyota/);
+ assert.match(html, /role="button" tabindex="0"[^>]*aria-label="Toyota/);
  assert.match(html, /width:66px/);
  const exclusive = renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, readOnly: true, exclusiveEnd: true }));
  assert.match(exclusive, /width:42px/);
@@ -195,7 +195,7 @@ test('11–16 October covers six timetable cells without changing the five paid 
  const item = { ...booking, pricing: { ...booking.pricing, start_date: '2026-10-11', end_date: '2026-10-16', days: 5, pickup: { time: '09:45', location: 'airport', address: '', return_time: '09:45', return_location: 'airport' } } };
  const projected = ui.calendarBooking(item);
  const html = renderToStaticMarkup(e(ui.SchedulerCalendar, { cars: ui.calendarCars([], [item]), bookings: [projected], startDate: new Date('2026-10-01T00:00:00'), daysToShow: 97, readOnly: true, onDateChange() {}, onCreateBooking() {}, onBookingClick() {} }));
- assert.match(html, /11\.10-16\.10/);
+ assert.match(html, /11 окт\. 2026-16 окт\. 2026/);
  assert.match(html, /width:138px/); // Six 24px cells, minus the existing 6px visual inset.
  assert.equal(projected.form_data.dates.days, 5);
  assert.equal(projected.form_data.dates.end, '2026-10-16T09:45:00');
@@ -320,6 +320,20 @@ test('park month shades Saturday and Sunday, including adjacent-month days, with
  assert.doesNotMatch(legacy, /divide-dotted|text-red-700/);
 });
 
+test('today fills the entire park calendar cell with opaque soft blue instead of a bright date badge', () => {
+ const today = new Date();
+ const key = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+ const props = { currentDate: today, bookings: [], logisticsData: [], onDateChange() {}, onBookingClick() {} };
+ const html = renderToStaticMarkup(e(ui.MonthCalendarView, { ...props, showOccupancy: true }));
+ const cell = html.match(new RegExp(`data-calendar-day="${key}"[^]*?(?=data-calendar-day=|$)`))[0];
+ assert.match(cell, /class="[^"]*\bbg-blue-50\b/);
+ assert.doesNotMatch(cell, /bg-blue-50\/|bg-blue-600|bg-slate-100\/40/);
+ assert.match(cell, /aria-current="date"/);
+ assert.match(cell, /font-bold text-blue-800/);
+ const legacy = renderToStaticMarkup(e(ui.MonthCalendarView, props));
+ assert.match(legacy, /bg-blue-600 text-white shadow-md/);
+});
+
 test('confirmed occupancy is quiet but pickup and return retain their distinct colors', () => {
  const confirmed = { ...booking, status: 'confirmed' };
  const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: [ui.calendarBooking(confirmed)], logisticsData: [ui.calendarLogistics(confirmed)], onDateChange() {}, onBookingClick() {}, showOccupancy: true }));
@@ -387,7 +401,7 @@ test('client quote has semantic icons and clearly separates rent from refundable
 test('trial displays only the expiry date in the park timezone', () => {
  const tenant = { timezone: 'Asia/Bangkok', trial: { status: 'trialing', days: 7, started_at: '2026-10-10T00:00:00Z', ends_at: '2026-10-17T00:00:00Z', expired: false } };
  const html = renderToStaticMarkup(e(ui.ParkTrialStatus, { tenant }));
- assert.match(html, /Триал до 17 окт\. 2026/);
+ assert.match(html, /Триал до 17 октября 2026/);
  assert.doesNotMatch(html, /Asia\/Bangkok|07:00|10 окт/);
  const boundary = { ...tenant, trial: { ...tenant.trial, ends_at: '2026-10-16T20:00:00Z' } };
  assert.match(renderToStaticMarkup(e(ui.ParkTrialStatus, { tenant: boundary })), /Триал до 17 окт/);

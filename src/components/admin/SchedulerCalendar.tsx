@@ -10,6 +10,7 @@ import { CarFront } from 'lucide-react';
 import { useCalendarGrid } from '@/hooks/useCalendarGrid';
 import { schedulerInitialOffset } from '@/lib/scheduler-scroll';
 import { parkBookingColors } from '@/lib/park-booking-colors';
+import { dateLabel } from '@/lib/park-rental';
 
 // 🎨 Получить URL фото
 const getPhotoUrl = (filename: string | null | undefined): string | null => {
@@ -128,8 +129,8 @@ export function SchedulerCalendar({
     const start = new Date(fd.dates.start);
     const end = new Date(fd.dates.end);
     
-    const startStr = `${String(start.getDate()).padStart(2, '0')}.${String(start.getMonth() + 1).padStart(2, '0')}`;
-    const endStr = `${String(end.getDate()).padStart(2, '0')}.${String(end.getMonth() + 1).padStart(2, '0')}`;
+    const startStr = readOnly ? dateLabel(fd.dates.start.slice(0, 10), 'short') : `${String(start.getDate()).padStart(2, '0')}.${String(start.getMonth() + 1).padStart(2, '0')}`;
+    const endStr = readOnly ? dateLabel(fd.dates.end.slice(0, 10), 'short') : `${String(end.getDate()).padStart(2, '0')}.${String(end.getMonth() + 1).padStart(2, '0')}`;
     const pickupTime = fd.dates.pickupTime || format(start, 'HH:mm');
     
     const line1Parts = [];
@@ -334,7 +335,8 @@ export function SchedulerCalendar({
   key={booking.booking_id}
   role={readOnly ? 'button' : undefined}
   tabIndex={readOnly ? 0 : undefined}
-  aria-label={readOnly ? `${booking.form_data.car.name}: ${booking.form_data.dates.start} — ${booking.form_data.dates.end}, ${booking.status === 'blocked' ? pt("Блокировка") : booking.status === 'pre_booking' ? pt("Ожидает подтверждения") : pt("Занято")}` : undefined}
+  title={readOnly ? `${badgeData.line1}\n${badgeData.line2}` : undefined}
+  aria-label={readOnly ? `${booking.form_data.car.name}: ${dateLabel(booking.form_data.dates.start.slice(0, 10))} — ${dateLabel(booking.form_data.dates.end.slice(0, 10))}, ${booking.status === 'blocked' ? pt("Блокировка") : booking.status === 'pre_booking' ? pt("Ожидает подтверждения") : pt("Занято")}` : undefined}
   onKeyDown={readOnly ? (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onBookingClick(booking); } } : undefined}
   className={cn(
     "absolute top-[6px] bottom-[6px] pointer-events-auto cursor-pointer transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700",

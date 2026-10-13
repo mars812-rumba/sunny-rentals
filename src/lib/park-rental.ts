@@ -22,8 +22,17 @@ export function parkToday(timezone: string, now = new Date()): string {
   return `${get('year')}-${get('month')}-${get('day')}`;
 }
 
-export function dateLabel(value: string): string {
-  return new Intl.DateTimeFormat(parkIntlLocale(), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${value}T00:00:00Z`));
+// Assemble the parts explicitly: even an en-US/browser locale must never
+// change the product's day-first display. ISO values remain unchanged.
+export function parkDateDisplay(date: Date, locale = parkIntlLocale(), month: 'long' | 'short' = 'long', timeZone = 'UTC'): string {
+  if (!Number.isFinite(date.getTime())) return '—';
+  const parts = new Intl.DateTimeFormat(locale, { day: 'numeric', month, year: 'numeric', timeZone }).formatToParts(date);
+  const get = (type: string) => parts.find(part => part.type === type)?.value;
+  return `${get('day')} ${get('month')} ${get('year')}`;
+}
+
+export function dateLabel(value: string, month: 'long' | 'short' = 'long', locale = parkIntlLocale()): string {
+  return parkDateDisplay(new Date(`${value}T00:00:00Z`), locale, month);
 }
 
 export function rentalMoney(value: number | string, currency: string): string {
