@@ -14,6 +14,8 @@ const bundle = await build({ stdin: { contents: `export * from './src/lib/park-l
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
  export { ParkRequestItem, ParkRequestsPanel } from './src/components/platform/ParkRequestsPanel';
  export { ParkCalendarMonthSelect } from './src/components/platform/ParkBookingCalendar';
+ export { ParkDateField } from './src/components/platform/ParkDateField';
+ export { openParkDatePicker } from './src/lib/park-date-picker';
  export { filterParkRequests } from './src/lib/park-request-filters';
  export { VehiclePricingFields, VehicleTariffTable, VehicleSpecSummary } from './src/components/platform/VehicleDetailsEditor';
  export { PlatformTenantWorkspace } from './src/components/platform/PlatformTenantWorkspace';
@@ -185,6 +187,26 @@ test('fleet specs use a compact two-column color grid, retain data and do not in
  assert.doesNotMatch(sparse, /Power:|Engine:|seats|<CVT/);
  const workspace = readFileSync('src/components/platform/PlatformTenantWorkspace.tsx', 'utf8');
  assert.match(workspace, /<VehicleSpecSummary specs=\{asset.specs\} photoCount=/);
+});
+
+test('date fields show Lucide/calendar hints and localized dates while retaining native min/error/disabled state', () => {
+ for (const language of ['ru', 'en']) {
+  const empty = render(ui.ParkDateField, { id: 'start', value: '', onChange() {} }, language);
+  assert.match(empty, /lucide-calendar-days/);
+  assert.match(empty, language === 'ru' ? /Выберите дату/ : /Choose a date/);
+  assert.match(empty, /type="date"/);
+  assert.match(empty, /focus-within:ring-2/);
+  const chosen = render(ui.ParkDateField, { id: 'end', value: '2026-11-18', min: '2026-11-17', disabled: true, 'aria-invalid': true, 'aria-describedby': 'period-error', onChange() {} }, language);
+  assert.match(chosen, language === 'ru' ? /18 нояб\. 2026/ : /18 Nov 2026/);
+  assert.match(chosen, /value="2026-11-18"/); assert.match(chosen, /min="2026-11-17"/);
+  assert.match(chosen, /aria-invalid="true"/); assert.match(chosen, /aria-describedby="period-error"/);
+  assert.match(chosen, /disabled=""/);
+ }
+ let calls = 0;
+ assert.equal(ui.openParkDatePicker({ showPicker() { calls++; } }), true);
+ assert.equal(calls, 1);
+ assert.equal(ui.openParkDatePicker({}), false);
+ assert.equal(ui.openParkDatePicker({ showPicker() { throw new Error('Unavailable in this WebView'); } }), false);
 });
 
 test('English fleet/navigation and month/day labels render without Russian interface text', () => {
