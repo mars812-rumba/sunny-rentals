@@ -73,7 +73,7 @@ test('seasonal tariff table names all four periods and both seasons', () => {
  assert.match(html, /<caption class="sr-only">/); assert.match(html, /scope="row"/);
  assert.match(html, /1 ноября — 31 марта/);
  assert.doesNotMatch(html, /11-01|03-31|ММ-ДД/);
- assert.match(html, /bg-emerald-50/); assert.match(html, /bg-amber-50/);
+ assert.match(html, /bg-slate-100/); assert.doesNotMatch(html, /bg-emerald-50|bg-amber-50/);
 });
 
 test('pricing editor has three named modes and only active fields are required', () => {
@@ -83,7 +83,7 @@ test('pricing editor has three named modes and only active fields are required',
   const html = renderToStaticMarkup(e(ui.VehiclePricingFields, { ...props, mode }));
   assert.equal((html.match(/type="radio"/g) || []).length, 3);
   assert.match(html, new RegExp(`type="radio"[^>]*checked=""[^>]*value="${mode}"`));
-  for (const label of ['Одна цена за сутки', 'Цена зависит от срока аренды', 'Сезонная цена и срок аренды', 'При смене режима введённые цены сохраняются']) assert.ok(html.includes(label));
+  for (const label of ['Одна цена за сутки', 'Цена зависит от срока аренды', 'Сезонная цена и срок аренды', 'Неактивные тарифы не используются']) assert.ok(html.includes(label));
   assert.equal((html.match(/type="number"/g) || []).length, mode === 'flat' ? 1 : mode === 'duration' ? 4 : 8);
   assert.equal(html.includes('Начало высокого сезона'), mode === 'seasonal');
   assert.equal(html.includes('Например, аренда на 10 суток'), mode === 'duration');

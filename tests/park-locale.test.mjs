@@ -96,6 +96,9 @@ test('storefront receipt preserves the actual booking number and pending meaning
  const booking = { id: 'internal-id', booking_number: '100017', currency: 'THB', pricing: { asset_name: 'MG 5', start_date: '2026-10-14', end_date: '2026-10-22', days: 8, total_rental: '7700', total_payable: '8700' }, deposit: { amount: '8000' } };
  for (const language of ['ru', 'en']) {
   const html = render(ui.ParkBookingReceipt, { booking }, language);
+  for (const tone of ['bg-slate-100', 'bg-emerald-50', 'bg-amber-50', 'bg-purple-50']) assert.ok(html.includes(tone));
+  assert.doesNotMatch(html, /bg-blue-50/);
+  assert.match(html, /bg-slate-100[^>]*>.*?Номер:|bg-slate-100[^>]*>.*?Number:/);
   assert.match(html, /100017/); assert.doesNotMatch(html, /internal-id/);
   assert.match(html, /MG 5/); assert.ok(html.includes(ui.rentalMoney('8700', 'THB')));
   assert.match(html, language === 'ru' ? /14 октября 2026/ : /14 October 2026/);
@@ -158,7 +161,11 @@ test('storefront quote groups dates, deposit, seasonal cost and long addresses w
  const quote = { asset_name: 'MG ZS', start_date: '2026-10-15', end_date: '2026-10-22', days: 7, daily_rate: '1100', total_rental: '7700', deposit: '8000', currency: 'THB', timezone: 'Asia/Bangkok', tariff_breakdown: [{ season: 'low_season', days: 7, daily_rate: '1100', subtotal: '7700' }], pickup: { time: '08:00', location: 'city', address: 'Long pickup address <script>', return_time: '08:00', return_location: 'city', return_address: 'Long return address' }, delivery_fee: '500', return_fee: '500', total_payable: '8700' };
  for (const language of ['ru', 'en']) {
   const html = render(ui.ParkQuoteSummary, { quote }, language);
-  for (const tone of ['bg-blue-50', 'bg-emerald-50', 'bg-amber-50', 'bg-violet-50']) assert.ok(html.includes(tone));
+  for (const tone of ['bg-slate-100', 'bg-emerald-50', 'bg-amber-50']) assert.ok(html.includes(tone));
+  assert.doesNotMatch(html, /bg-blue-50|bg-violet-50/);
+  assert.equal((html.match(/bg-amber-50/g) || []).length, 1); // Deposit, not seasonal details.
+  assert.match(html, /text-3xl font-bold text-emerald-800/);
+  assert.match(html, /bg-slate-100 p-3 text-slate-900[^>]*><h4[^>]*>.*?Rental period|bg-slate-100 p-3 text-slate-900/);
   assert.match(html, /Long pickup address &lt;script&gt;/); assert.match(html, /Long return address/);
   assert.ok(html.includes(ui.rentalMoney('8700', 'THB'))); assert.ok(html.includes(ui.rentalMoney('8000', 'THB')));
   assert.match(html, language === 'ru' ? /15 октября 2026/ : /15 October 2026/);
@@ -224,8 +231,7 @@ test('request details group pickup and return before prices, with a separate dep
    const formatted = ui.rentalMoney(amount, 'THB');
    assert.equal(html.split(formatted).length - 1, 1, `${language}, detailed=${detailed}, ${amount} must appear once`);
   }
-  assert.match(html, /bg-blue-50 text-blue-950/);
-  assert.match(html, /bg-emerald-50 text-emerald-950/);
+  assert.match(html, /bg-slate-100 text-slate-900/);
   assert.match(html, /border-t border-slate-200/);
   assert.match(html, /09:45[^]*City<\/span> · Pickup hotel<\/dd>|09:45[^]*Город<\/span> · Pickup hotel<\/dd>/);
   assert.doesNotMatch(html, /NaN|undefined/);
@@ -293,14 +299,15 @@ test('month selector follows app language rather than browser month-input locale
  assert.match(panel, /size-11 gap-2 p-0/);
 });
 
-test('fleet specs use a compact two-column color grid, retain data and do not invent missing values', () => {
+test('fleet specs use a compact neutral two-column grid, retain data and do not invent missing values', () => {
  const specs = { fuel: 'Бензин', transmission: 'CVT', power: '120', engine: '1.5', seats: 5 };
  const snapshot = JSON.stringify(specs);
  for (const language of ['ru', 'en']) {
   const html = render(ui.VehicleSpecSummary, { specs, photoCount: 4 }, language);
   assert.match(html, /grid-cols-2 gap-2/);
   assert.equal((html.match(/<li /g) || []).length, 6);
-  for (const tone of ['emerald', 'violet', 'amber', 'blue', 'cyan']) assert.match(html, new RegExp(`bg-${tone}-50 text-${tone}-950`));
+  assert.match(html, /bg-slate-100 text-slate-900/);
+  assert.doesNotMatch(html, /bg-(emerald|violet|amber|blue|cyan)-50/);
   assert.match(html, /bg-slate-100 text-slate-900/);
   assert.match(html, language === 'ru' ? /Мощность: 120/ : /Power: 120/);
   assert.match(html, language === 'ru' ? /Фото: 4/ : /Photos: 4/);
@@ -340,7 +347,8 @@ test('shared manual form has compact grouped dates/prices, contact and return lo
  const asset = { id: 'asset-a', name: 'Toyota', specs: {}, pricing: { daily_rate: 800, currency: 'THB' }, deposit_policy: { amount: 5000 } };
  for (const language of ['ru', 'en']) {
   const html = render(ui.ParkManualBookingForm, { tenantId: 'park-a', assets: [asset], admin: false, onSaved() {}, onClose() {} }, language);
-  for (const tone of ['blue', 'violet', 'emerald', 'amber']) assert.match(html, new RegExp(`bg-${tone}-50`));
+  for (const tone of ['bg-slate-100', 'bg-emerald-50', 'bg-amber-50']) assert.ok(html.includes(tone));
+  assert.doesNotMatch(html, /bg-blue-50|bg-violet-50/);
   assert.match(html, /grid-cols-2 gap-2/);
   assert.equal((html.match(/type="date"/g) || []).length, 2);
   assert.equal((html.match(/type="time"/g) || []).length, 2);

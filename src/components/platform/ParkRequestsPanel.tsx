@@ -34,8 +34,8 @@ function ParkRequestJourney({ pickup }: { pickup: ParkBooking['pricing']['pickup
   if (!pickup) return null;
   return <dl className="mt-3 overflow-hidden rounded-lg text-sm">
     {([
-      { label: 'Получение', time: pickup.time, location: pickup.location, address: pickup.address, color: 'bg-blue-50 text-blue-950' },
-      { label: 'Возврат', time: pickup.return_time || pickup.time, location: pickup.return_location, address: pickup.return_address, color: 'bg-emerald-50 text-emerald-950' },
+      { label: 'Получение', time: pickup.time, location: pickup.location, address: pickup.address, color: 'bg-slate-100 text-slate-900' },
+      { label: 'Возврат', time: pickup.return_time || pickup.time, location: pickup.return_location, address: pickup.return_address, color: 'bg-slate-100 text-slate-900' },
     ] as const).map(item => <div key={item.label} className={cn('min-w-0 px-3 py-3 sm:px-4', item.color)}>
       <dt className="flex items-center gap-2 font-semibold"><MapPin aria-hidden="true" className="size-4 shrink-0" />{pt(item.label)}</dt>
       <dd className="mt-1 break-words pl-6 leading-6"><span className="inline-flex items-center gap-1.5 whitespace-nowrap font-medium tabular-nums"><Clock3 aria-hidden="true" className="size-3.5 shrink-0" />{item.time}{item.location && <> · {pt(pickupLabels[item.location])}</>}</span>{item.location === 'city' && <> · {item.address?.trim() || pt(item.label === 'Получение' ? 'Адрес не указан' : 'Адрес возврата не указан')}</>}</dd>
@@ -48,19 +48,19 @@ function ParkRequestPrices({ booking, detailed }: { booking: ParkBooking; detail
   const { pricing, currency } = booking;
   return <section className="mt-4 border-t border-slate-200 pt-4" aria-label={pt('Стоимость')}>
     <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-900"><Banknote aria-hidden="true" className="size-4 text-blue-700" />{pt('Стоимость')}</h4>
-    <div className="rounded-lg bg-slate-50 px-3 py-3 sm:px-4">
+    <div className="rounded-lg bg-emerald-50 px-3 py-3 text-emerald-950 sm:px-4">
       <dl className="space-y-2 text-sm">
         {([
           ['Аренда', pricing.total_rental],
           ['Доставка', pricing.delivery_fee],
           ['Возврат', pricing.return_fee],
         ] as const).map(([label, amount]) => amount === undefined ? null : <div key={label} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"><dt className="text-slate-600">{pt(label)}</dt><dd className="min-w-0 break-words font-medium tabular-nums text-slate-900">{rentalMoney(amount, currency)}</dd></div>)}
-        {pricing.total_payable !== undefined && <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-slate-200 pt-3 font-semibold text-blue-800"><dt>{pt('Итого аренда и доставка')}</dt><dd className="min-w-0 break-words text-base tabular-nums">{rentalMoney(pricing.total_payable, currency)}</dd></div>}
+        {pricing.total_payable !== undefined && <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-emerald-200 pt-3 font-semibold text-emerald-800"><dt>{pt('Итого аренда и доставка')}</dt><dd className="min-w-0 break-words text-xl tabular-nums">{rentalMoney(pricing.total_payable, currency)}</dd></div>}
       </dl>
       {pricing.extra_day && <p className="mt-2 text-xs leading-5 text-amber-900">{pt('Дополнительные сутки за позднее время возврата включены в расчёт.')}</p>}
       {detailed && <ParkTariffBreakdown items={pricing.tariff_breakdown} currency={currency} />}
     </div>
-    <dl className="mt-3 text-sm"><div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"><dt className="flex items-center gap-2 font-medium text-amber-900"><WalletCards aria-hidden="true" className="size-4 shrink-0" />{pt('Депозит отдельно')}</dt><dd className="min-w-0 break-words font-semibold tabular-nums text-slate-900">{rentalMoney(booking.deposit.amount, currency)}</dd></div></dl>
+    <dl className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-950"><div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"><dt className="flex items-center gap-2 font-medium"><WalletCards aria-hidden="true" className="size-4 shrink-0" />{pt('Депозит отдельно')}</dt><dd className="min-w-0 break-words font-semibold tabular-nums">{rentalMoney(booking.deposit.amount, currency)}</dd></div></dl>
   </section>;
 }
 
