@@ -1,7 +1,7 @@
 import { parkText as pt } from '@/lib/park-locale';
 import { useParkLocale } from '@/contexts/park-locale';
 import { FormEvent, useId, useState } from 'react';
-import { CloudSun, FileText, Fuel, Save, Settings2, Sun, Users, WalletCards, Wrench, Zap } from 'lucide-react';
+import { CloudSun, FileText, Fuel, ImageIcon, Save, Settings2, Sun, Users, WalletCards, Wrench, Zap } from 'lucide-react';
 import type { PlatformAsset, PricingMode, TariffGrid, VehicleDetailsInput, VehicleSpecs } from '@/api/platform-admin';
 import { savePlatformAssetDetails } from '@/api/platform-admin';
 import { saveOwnerAssetDetails } from '@/api/park-owner-fleet';
@@ -18,13 +18,17 @@ const titles = { pricing: 'Тарифы', specs: 'Характеристики',
 const icons = { pricing: WalletCards, specs: Wrench, description: FileText };
 const defaultGrid = (rate: number): TariffGrid => ({ low_season: { price_1_6: rate, price_7_14: rate, price_15_29: rate, price_30: rate }, high_season: { price_1_6: rate, price_7_14: rate, price_15_29: rate, price_30: rate }, high_start: '11-01', high_end: '03-31' });
 
-export function VehicleSpecSummary({ specs, detailed = false }: { specs: VehicleSpecs; detailed?: boolean }) {
+export function VehicleSpecSummary({ specs, detailed = false, photoCount }: { specs: VehicleSpecs; detailed?: boolean; photoCount?: number }) {
   const { pt, intlLocale } = useParkLocale();
   const entries = [
-    [Fuel, specs.fuel && pt(specs.fuel)], [Settings2, specs.transmission && pt(specs.transmission)], [Zap, specs.power && pt("Мощность: {0}", [specs.power])], [Wrench, specs.engine && pt("Двигатель: {0}", [specs.engine])],
-    [Users, specs.seats ? pt("{0} мест", [specs.seats]) : ''],
+    [Fuel, specs.fuel && pt(specs.fuel), 'bg-emerald-50 text-emerald-950', 'text-emerald-700'],
+    [Settings2, specs.transmission && pt(specs.transmission), 'bg-violet-50 text-violet-950', 'text-violet-700'],
+    [Zap, specs.power && pt("Мощность: {0}", [specs.power]), 'bg-amber-50 text-amber-950', 'text-amber-700'],
+    [Wrench, specs.engine && pt("Двигатель: {0}", [specs.engine]), 'bg-blue-50 text-blue-950', 'text-blue-700'],
+    [Users, specs.seats ? pt("{0} мест", [specs.seats]) : '', 'bg-cyan-50 text-cyan-950', 'text-cyan-700'],
+    [ImageIcon, photoCount !== undefined ? `${pt('Фото: ')}${photoCount}` : '', 'bg-slate-100 text-slate-900', 'text-slate-600'],
   ] as const;
-  return <><ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-700">{entries.filter(([, value]) => value).map(([Icon, value], index) => <li key={index} className="inline-flex items-center gap-1.5"><Icon aria-hidden="true" className="size-4 shrink-0" />{value}</li>)}</ul>{detailed && <ul className="mt-3 space-y-2 break-words text-sm text-slate-700">{[specs.drive && pt("Привод: {0}", [specs.drive]), specs.body_type && pt("Кузов: {0}", [specs.body_type]), specs.doors && pt("Двери: {0}", [specs.doors]), specs.mileage != null && pt("Пробег: {0} км", [specs.mileage.toLocaleString(intlLocale)]), specs.air_conditioning != null && pt("Кондиционер: {0}", [specs.air_conditioning ? pt("есть") : pt("нет")]), ...(specs.features || [])].filter(Boolean).map((value, index) => <li key={index}>{value}</li>)}</ul>}</>;
+  return <><ul className="mt-3 grid min-w-0 grid-cols-2 gap-2 text-sm">{entries.filter(([, value]) => value).map(([Icon, value, tone, iconTone], index) => <li key={index} className={`flex min-w-0 items-start gap-2 rounded-md px-3 py-2 ${tone}`}><Icon aria-hidden="true" className={`mt-0.5 size-4 shrink-0 ${iconTone}`} /><span className="min-w-0 break-words font-medium leading-5">{value}</span></li>)}</ul>{detailed && <ul className="mt-3 space-y-2 break-words text-sm text-slate-700">{[specs.drive && pt("Привод: {0}", [specs.drive]), specs.body_type && pt("Кузов: {0}", [specs.body_type]), specs.doors && pt("Двери: {0}", [specs.doors]), specs.mileage != null && pt("Пробег: {0} км", [specs.mileage.toLocaleString(intlLocale)]), specs.air_conditioning != null && pt("Кондиционер: {0}", [specs.air_conditioning ? pt("есть") : pt("нет")]), ...(specs.features || [])].filter(Boolean).map((value, index) => <li key={index}>{value}</li>)}</ul>}</>;
 }
 
 export function VehicleTariffTable({ grid, currency }: { grid: TariffGrid; currency: string }) {

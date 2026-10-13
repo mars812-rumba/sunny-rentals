@@ -164,6 +164,29 @@ test('month selector follows app language rather than browser month-input locale
  assert.match(panel, /size-11 gap-2 p-0/);
 });
 
+test('fleet specs use a compact two-column color grid, retain data and do not invent missing values', () => {
+ const specs = { fuel: 'Бензин', transmission: 'CVT', power: '120', engine: '1.5', seats: 5 };
+ const snapshot = JSON.stringify(specs);
+ for (const language of ['ru', 'en']) {
+  const html = render(ui.VehicleSpecSummary, { specs, photoCount: 4 }, language);
+  assert.match(html, /grid-cols-2 gap-2/);
+  assert.equal((html.match(/<li /g) || []).length, 6);
+  for (const tone of ['emerald', 'violet', 'amber', 'blue', 'cyan']) assert.match(html, new RegExp(`bg-${tone}-50 text-${tone}-950`));
+  assert.match(html, /bg-slate-100 text-slate-900/);
+  assert.match(html, language === 'ru' ? /Мощность: 120/ : /Power: 120/);
+  assert.match(html, language === 'ru' ? /Фото: 4/ : /Photos: 4/);
+  assert.doesNotMatch(html, /120 hp|1\.5 L/);
+ }
+ assert.equal(JSON.stringify(specs), snapshot);
+ const sparse = render(ui.VehicleSpecSummary, { specs: { transmission: '<CVT long custom text>' }, photoCount: 0 });
+ assert.equal((sparse.match(/<li /g) || []).length, 2);
+ assert.match(sparse, /Photos: 0/);
+ assert.match(sparse, /&lt;CVT long custom text&gt;/);
+ assert.doesNotMatch(sparse, /Power:|Engine:|seats|<CVT/);
+ const workspace = readFileSync('src/components/platform/PlatformTenantWorkspace.tsx', 'utf8');
+ assert.match(workspace, /<VehicleSpecSummary specs=\{asset.specs\} photoCount=/);
+});
+
 test('English fleet/navigation and month/day labels render without Russian interface text', () => {
  const tenant = { tenant_id: 'park-a', name: 'Thai Rentals', status: 'active', primary_asset_type: 'car', currency: 'THB', timezone: 'Asia/Bangkok' };
  const workspace = render(ui.PlatformTenantWorkspace, { tenant, owner: true, onBack() {}, onTenantChanged() {} });
