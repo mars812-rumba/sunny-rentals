@@ -127,7 +127,7 @@ const MonthGrid = memo(({
                     </span>}
                   </div>
                   
-                  <div className="space-y-0.5 overflow-hidden font-sans">
+                  <div className={showOccupancy ? 'grid gap-0.5 overflow-hidden font-sans' : 'space-y-0.5 overflow-hidden font-sans'}>
                     {slots.map((ev, idx) => {
                       if (!ev) return <div key={`empty-${idx}`} data-calendar-lane={idx} aria-hidden="true" className="h-5" />;
                       // Цвет в зависимости от статуса брони
@@ -150,7 +150,7 @@ const MonthGrid = memo(({
                           data-plain-occupancy={showOccupancy && ev.type === 'rental' ? true : undefined}
                           key={idx}
                           className={cn(
-                            showOccupancy ? "w-full min-h-5 overflow-hidden px-1 py-0.5 text-[10px] leading-4 font-medium rounded hover:ring-1 hover:ring-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
+                            showOccupancy ? "flex h-5 min-h-5 w-full items-center justify-center overflow-hidden px-1 py-0.5 text-[10px] leading-4 font-medium rounded hover:ring-1 hover:ring-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
                             bgClass
                           )}
                           aria-label={`${ev.booking?.status === 'blocked' ? pt("Блокировка") : ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}${showOccupancy && isPreBooking ? `, ${pt('Ожидает подтверждения')}` : ''}`}
@@ -160,7 +160,7 @@ const MonthGrid = memo(({
                           }}
                           title={`${ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}`}
                         >
-                          <span className="block truncate tracking-tight">
+                          <span className={showOccupancy ? 'block h-4 min-w-0 w-full truncate leading-4 tracking-tight' : 'block truncate tracking-tight'}>
                             {showOccupancy && isPreBooking && <Clock3 aria-hidden="true" className="mr-0.5 inline size-3" />}
                             {ev.booking?.status === 'blocked' ? pt("Блок · {0}", [ev.carName]) : ev.carName}
                           </span>

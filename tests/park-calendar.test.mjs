@@ -74,6 +74,19 @@ test('lanes reserve empty slots, reuse only after return and keep every overflow
  assert.equal(twin.laneCount, 2); assert.equal(ui.calendarDaySlots(sameDay, twin.lanes, 2).overflow.length, 0);
 });
 
+test('empty, plain, pending and colored calendar lanes have the same fixed box height', () => {
+ const item = { ...booking, id: 'toyota', status: 'confirmed', pricing: { ...booking.pricing, start_date: '2026-10-20', end_date: '2026-10-25' } };
+ const pending = { ...item, id: 'pending', status: 'requested', pricing: { ...item.pricing, asset_name: 'MG 5', start_date: '2026-10-19', end_date: '2026-10-22' } };
+ const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-10-01T00:00:00'), bookings: [item, pending].map(ui.calendarBooking), logisticsData: [item, pending].map(ui.calendarLogistics), onDateChange() {}, onBookingClick() {}, showOccupancy: true }));
+ assert.match(html, /class="grid gap-0\.5 overflow-hidden font-sans"/);
+ const rows = [...html.matchAll(/<button[^>]*data-calendar-booking="([^"]+)"[^>]*class="([^"]+)"/g)];
+ assert.ok(rows.length > 0);
+ for (const [, , classes] of rows) assert.match(classes, /flex h-5 min-h-5 w-full items-center justify-center/);
+ assert.match(html, /data-calendar-lane="1" aria-hidden="true" class="h-5"/);
+ assert.match(html, /data-plain-occupancy="true"/);
+ assert.match(html, /bg-green-400/); assert.match(html, /bg-purple-100/);
+});
+
 test('return fields, price explanation and calendar carry the real clock and both fees', () => {
  const pickup = { time: '10:00', location: 'city', address: 'Pickup Hotel', return_time: '18:00', return_location: 'city', return_address: 'Return Hotel' };
  const fields = renderToStaticMarkup(e(ui.ParkPickupFields, { id: 'journey', pickup, onChange() {} }));
