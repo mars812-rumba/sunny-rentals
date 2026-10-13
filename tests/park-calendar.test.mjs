@@ -234,7 +234,7 @@ test('request item displays private contacts with safe links and actionable stat
  assert.match(html, /href="tel:\+66123456789"/);
  assert.match(html, /Telegram ID: 42/);
  assert.match(html, /Подтвердить/);
- assert.match(html, /bg-amber-50 text-amber-900[^>]*>Ожидает подтверждения/);
+ assert.match(html, /bg-purple-100 text-purple-950[^>]*>Ожидает подтверждения/);
  assert.match(html, /Отменить/);
  const missing = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking } }));
  assert.match(missing, /Контакт для прямой связи не указан/);
@@ -242,7 +242,7 @@ test('request item displays private contacts with safe links and actionable stat
  const unsafe = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, customer: { username: 'evil?start=secret', phone: 'javascript:alert(1)' } } }));
  assert.doesNotMatch(unsafe, /href="(?:https:\/\/t.me|tel:|javascript:)/);
  const confirmed = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, status: 'confirmed' } }));
- assert.match(confirmed, /bg-emerald-100 text-emerald-900[^>]*>Подтверждена/);
+ assert.match(confirmed, /bg-emerald-100 text-emerald-950[^>]*>Подтверждена/);
  assert.doesNotMatch(confirmed, />Подтвердить<\/button>/);
  assert.match(confirmed, />Отменить<\/button>/);
  const cancelled = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, status: 'cancelled' } }));
@@ -263,7 +263,7 @@ test('opened request has readable amounts, private contacts and a plain-text cop
  assert.match(html, /size-11 shrink-0 p-0/);
  assert.match(html, /@ivan_test/);
  assert.doesNotMatch(html, /a{64}/);
- assert.match(html, /bg-amber-50 text-amber-900/);
+ assert.match(html, /bg-purple-100 text-purple-950/);
  assert.doesNotMatch(html, /2026-08-02 — 2026-08-04/);
  const legacy = renderToStaticMarkup(e(ui.ParkRequestItem, { booking: { ...booking, id: 'a'.repeat(64) }, detailed: true, busy: false, onAction() {} }));
  assert.match(legacy, new RegExp(`tabular-nums">${'a'.repeat(64)}<\\/span>`));
@@ -272,12 +272,12 @@ test('opened request has readable amounts, private contacts and a plain-text cop
 
 test('shared month has occupied-day and return badges, with named keyboard controls', () => {
  const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: [ui.calendarBooking(booking)], logisticsData: [ui.calendarLogistics(booking)], onDateChange() {}, onBookingClick() {}, onDayClick() {}, showOccupancy: true }));
- assert.match(html, /aria-label="Выдача: Toyota"/);
- assert.match(html, /aria-label="Занято: Toyota"/);
- assert.match(html, /aria-label="Возврат: Toyota"/);
+ assert.match(html, /aria-label="Выдача: Toyota, Ожидает подтверждения"/);
+ assert.match(html, /aria-label="Занято: Toyota, Ожидает подтверждения"/);
+ assert.match(html, /aria-label="Возврат: Toyota, Ожидает подтверждения"/);
  assert.match(html, /<button[^>]+aria-label="3 августа 2026, событий: 1"/);
  assert.match(html, /min-h-7/);
- assert.match(html, /bg-slate-500\/5 text-slate-700/);
+ assert.match(html, /text-purple-900/);
  assert.doesNotMatch(html, /class="[^"]*opacity-[^\"]*"[^>]*aria-label="Занято/);
 });
 
@@ -304,9 +304,9 @@ test('park month shades Saturday and Sunday, including adjacent-month days, with
 test('confirmed occupancy is quiet but pickup and return retain their distinct colors', () => {
  const confirmed = { ...booking, status: 'confirmed' };
  const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: [ui.calendarBooking(confirmed)], logisticsData: [ui.calendarLogistics(confirmed)], onDateChange() {}, onBookingClick() {}, showOccupancy: true }));
- assert.match(html, /bg-blue-500\/5 text-blue-950/);
- assert.match(html, /bg-green-400 text-green-900/);
- assert.match(html, /bg-yellow-400 text-yellow-900/);
+ assert.match(html, /text-slate-800/);
+ assert.match(html, /bg-green-400 text-green-950/);
+ assert.match(html, /bg-yellow-400 text-yellow-950/);
 });
 
 test('park month hides confirmed middle-day badges but retains handovers, prebookings, blocks and day details', () => {
@@ -320,15 +320,39 @@ test('park month hides confirmed middle-day badges but retains handovers, preboo
  assert.equal(ui.bookingsOnDay([confirmed], '2026-08-03')[0].id, confirmed.id);
  const items = [booking, { ...booking, id: 'block-a', entry_type: 'block', status: 'confirmed', pricing: { ...booking.pricing, asset_name: 'Blocked car' } }];
  const retained = renderToStaticMarkup(e(ui.MonthCalendarView, { ...props, bookings: items.map(ui.calendarBooking), logisticsData: items.map(ui.calendarLogistics) }));
- assert.match(retained, /aria-label="Занято: Toyota"/);
+ assert.match(retained, /aria-label="Занято: Toyota, Ожидает подтверждения"/);
  assert.match(retained, /aria-label="Блокировка: Blocked car"/);
- assert.match(retained, /bg-slate-500\/5 text-slate-700/);
- assert.match(retained, /bg-purple-500\/5 text-purple-950/);
+ assert.match(retained, /text-purple-900/);
+ assert.match(retained, /text-slate-700/);
  const many = Array.from({ length: 6 }, (_, index) => ({ ...confirmed, id: `confirmed-${index}` }));
  const overflow = renderToStaticMarkup(e(ui.MonthCalendarView, { ...props, bookings: many.map(ui.calendarBooking), logisticsData: many.map(ui.calendarLogistics) }));
  const middleCell = overflow.match(/data-calendar-day="2026-08-03"[\s\S]*?(?=data-calendar-day="2026-08-04")/)[0];
  assert.doesNotMatch(middleCell, /data-compact-event|\+ ещё/);
  assert.match(middleCell, /событий: 6/);
+});
+
+test('park periods use plain middle-day text for all sources and consistent purple/gray timetable bars', () => {
+ const props = { currentDate: new Date('2026-08-01T00:00:00'), onDateChange() {}, onBookingClick() {}, onDayClick() {}, showOccupancy: true };
+ for (const status of ['requested', 'confirmed']) {
+  const variants = ['owner_manual', 'web_storefront', 'telegram_storefront'].map(source => {
+   const item = { ...booking, status, source };
+   return renderToStaticMarkup(e(ui.MonthCalendarView, { ...props, bookings: [ui.calendarBooking(item)], logisticsData: [ui.calendarLogistics(item)] }));
+  });
+  assert.equal(variants[0], variants[1]); assert.equal(variants[1], variants[2]);
+  const middle = variants[0].match(/data-calendar-day="2026-08-03"[\s\S]*?(?=data-calendar-day="2026-08-04")/)[0];
+  const classes = [...middle.matchAll(/data-plain-occupancy="true"[^>]*class="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(classes.length, 1); assert.doesNotMatch(classes[0], /\bbg-/);
+  assert.match(middle, /Toyota/);
+  if (status === 'requested') { assert.match(middle, /text-purple-900/); assert.match(middle, /lucide-clock/); }
+ }
+ for (const [entry_type, status, color] of [['rental', 'requested', '#e9d5ff'], ['block', 'confirmed', '#e2e8f0'], ['rental', 'confirmed', '#86efac']]) {
+  const item = { ...booking, entry_type, status };
+  const html = renderToStaticMarkup(e(ui.SchedulerCalendar, { cars: ui.calendarCars([], [item]), bookings: [ui.calendarBooking(item)], startDate: new Date('2026-08-01T00:00:00'), daysToShow: 97, readOnly: true, onDateChange() {}, onCreateBooking() {}, onBookingClick() {} }));
+  assert.ok(html.includes(`background-color:${color}`));
+ }
+ const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ assert.doesNotMatch(source, /showOccupancy hideConfirmedOccupancy/);
+ assert.match(source, /parkBookingColors.pending.dot/); assert.match(source, /parkBookingColors.blocked.dot/);
 });
 
 test('client quote has semantic icons and clearly separates rent from refundable deposit', () => {
@@ -396,6 +420,6 @@ test('block projects to a distinct calendar label and color without altering sto
  assert.equal(block.status, 'confirmed');
  const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: [ui.calendarBooking(block)], logisticsData: [ui.calendarLogistics(block)], onDateChange() {}, onBookingClick() {}, onDayClick() {}, showOccupancy: true }));
  assert.match(html, /aria-label="Блокировка: Toyota"/);
- assert.match(html, /bg-purple-100/);
+ assert.match(html, /bg-slate-200/);
  assert.equal(ui.calendarBooking({ ...block, status: 'cancelled' }).status, 'cancelled');
 });

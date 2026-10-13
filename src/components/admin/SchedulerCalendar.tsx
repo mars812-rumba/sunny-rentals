@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { CarFront } from 'lucide-react';
 import { useCalendarGrid } from '@/hooks/useCalendarGrid';
 import { schedulerInitialOffset } from '@/lib/scheduler-scroll';
+import { parkBookingColors } from '@/lib/park-booking-colors';
 
 // 🎨 Получить URL фото
 const getPhotoUrl = (filename: string | null | undefined): string | null => {
@@ -319,7 +320,9 @@ export function SchedulerCalendar({
 
                     const badgeData = formatBookingBadge(booking);
                     // Color coding for new booking status system
-                    const bgColor =
+                    const bgColor = readOnly && ['blocked', 'pre_booking', 'confirmed'].includes(booking.status)
+                      ? booking.status === 'blocked' ? parkBookingColors.blocked.bar : booking.status === 'pre_booking' ? parkBookingColors.pending.bar : parkBookingColors.confirmed.bar
+                      :
                       booking.status === 'blocked' ? '#e9d5ff' : booking.status === 'confirmed'
                         ? 'rgba(74, 227, 69, 0.9)'
                         : booking.status === 'rejected'
@@ -351,7 +354,7 @@ export function SchedulerCalendar({
                         onMouseLeave={() => setHoveredBooking(null)}
                       >
                         {booking.status === 'pre_booking' && (
-                          <div className="absolute bottom-[1px] right-[6px] text-[6px] px-[2px] rounded-[1px] bg-gray-400/70 text-white font-semibold uppercase pointer-events-none">
+                          <div className={cn("absolute bottom-[1px] right-[6px] text-[6px] px-[2px] rounded-[1px] font-semibold uppercase pointer-events-none", readOnly ? parkBookingColors.pending.badge : 'bg-gray-400/70 text-white')}>
                             {pt("ПРЕДБРОНЬ")}</div>
                         )}
                         {booking.status === 'rejected' && (

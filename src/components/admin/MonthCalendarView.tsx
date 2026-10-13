@@ -1,4 +1,6 @@
 import { parkText as pt } from '@/lib/park-locale';
+import { parkBookingColors } from '@/lib/park-booking-colors';
+import { Clock3 } from 'lucide-react';
 import { useParkLocale } from '@/contexts/park-locale';
 import React, { useMemo, useCallback, useEffect, memo, useState, useRef } from 'react';
 import { 
@@ -123,8 +125,10 @@ const MonthGrid = memo(({
                     {visibleEvents.slice(0, 4).map((ev, idx) => {
                       // Цвет в зависимости от статуса брони
                       const isPreBooking = ev.booking?.status === 'pre_booking';
-                      const bgClass = showOccupancy && ev.type === 'rental'
-                        ? ev.booking?.status === 'blocked' ? 'bg-purple-500/5 text-purple-950' : isPreBooking ? 'bg-slate-500/5 text-slate-700' : 'bg-blue-500/5 text-blue-950'
+                      const bgClass = showOccupancy
+                        ? ev.type === 'rental'
+                          ? ev.booking?.status === 'blocked' ? parkBookingColors.blocked.text : isPreBooking ? parkBookingColors.pending.text : parkBookingColors.confirmed.text
+                          : ev.booking?.status === 'blocked' ? parkBookingColors.blocked.badge : isPreBooking ? parkBookingColors.pending.badge : ev.type === 'pickup' ? parkBookingColors.pickup.badge : parkBookingColors.return.badge
                         : ev.booking?.status === 'blocked' ? 'bg-purple-100 text-purple-900' : isPreBooking
                         ? "bg-slate-200 text-slate-600"
                         : ev.type === 'pickup' 
@@ -134,12 +138,13 @@ const MonthGrid = memo(({
                       return (
                         <button type="button"
                           data-compact-event={showOccupancy ? true : undefined}
+                          data-plain-occupancy={showOccupancy && ev.type === 'rental' ? true : undefined}
                           key={idx}
                           className={cn(
                             showOccupancy ? "w-full min-h-7 overflow-hidden px-1 py-1 text-[10px] leading-4 font-medium rounded-sm hover:ring-1 hover:ring-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
                             bgClass
                           )}
-                          aria-label={`${ev.booking?.status === 'blocked' ? pt("Блокировка") : ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}`}
+                          aria-label={`${ev.booking?.status === 'blocked' ? pt("Блокировка") : ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}${showOccupancy && isPreBooking ? `, ${pt('Ожидает подтверждения')}` : ''}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             onBadgeClick(ev, e);
@@ -147,6 +152,7 @@ const MonthGrid = memo(({
                           title={`${ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}`}
                         >
                           <span className="block truncate tracking-tight">
+                            {showOccupancy && isPreBooking && <Clock3 aria-hidden="true" className="mr-0.5 inline size-3" />}
                             {ev.booking?.status === 'blocked' ? pt("Блок · {0}", [ev.carName]) : ev.carName}
                           </span>
                         </button>

@@ -138,7 +138,9 @@ test('owner workspace does not render platform management controls', () => {
   assert.match(html, /Свободная техника на даты/);
   assert.match(html, /Дата начала/);
   assert.match(html, /Дата окончания/);
-  assert.equal((html.match(/type="date"/g) || []).length, 2);
+  // Both mounted panels have their own period filter: requests and fleet.
+  assert.equal((html.match(/type="date"/g) || []).length, 4);
+  assert.match(html, /Сбросить даты/);
   assert.match(html, /Сбросить/);
   assert.doesNotMatch(html, /id="asset-rate"|id="asset-deposit"/);
   assert.match(html, /role="tablist"[^>]+aria-label="Управление парком"/);

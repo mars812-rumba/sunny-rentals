@@ -13,11 +13,13 @@ import { cn } from '@/lib/utils';
 import { ParkTariffBreakdown } from './ParkTariffBreakdown';
 import { pickupLabels } from '@/lib/park-pickup';
 import { filterParkRequests } from '@/lib/park-request-filters';
+import { parkBookingColors } from '@/lib/park-booking-colors';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждена', cancelled: 'Отменена', in_progress: 'В аренде', completed: 'Завершена' };
 const statusColors: Record<string, string> = {
-  requested: 'bg-amber-50 text-amber-900',
-  confirmed: 'bg-emerald-100 text-emerald-900',
+  requested: parkBookingColors.pending.badge,
+  confirmed: parkBookingColors.confirmed.badge,
+  blocked: parkBookingColors.blocked.badge,
   cancelled: 'bg-red-100 text-red-900',
   in_progress: 'bg-blue-100 text-blue-900',
   completed: 'bg-slate-100 text-slate-700',
