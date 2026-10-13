@@ -8,6 +8,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { build } from 'esbuild';
 
 const bundle = await build({ stdin: { contents: `export * from './src/utils/park-calendar';
+ export * from './src/lib/calendar-booking-lanes';
  export { SchedulerCalendar } from './src/components/admin/SchedulerCalendar';
  export { MonthCalendarView } from './src/components/admin/MonthCalendarView';
  export { ParkTrialStatus } from './src/components/platform/ParkTrialStatus';
@@ -32,6 +33,46 @@ const ui = compiled.exports;
 const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', start_at: '2026-08-01T17:00:00Z', end_at: '2026-08-03T17:00:00Z', currency: 'THB',
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
+
+test('booking lanes remain fixed despite another pickup, across weeks and reversed API ordering', () => {
+ const make = (id, start, end, name, status = 'confirmed') => ({ ...booking, id, asset_id: id, status, pricing: { ...booking.pricing, asset_name: name, start_date: start, end_date: end } });
+ const items = [make('mg', '2026-10-14', '2026-10-22', 'MG 5'), make('pending', '2026-10-15', '2026-10-22', 'Other car', 'requested'), make('block', '2026-10-16', '2026-10-18', 'Blocked car')];
+ const props = { currentDate: new Date('2026-10-01T00:00:00'), onDateChange() {}, onBookingClick() {}, onDayClick() {}, showOccupancy: true };
+ const render = values => renderToStaticMarkup(e(ui.MonthCalendarView, { ...props, bookings: values.map(ui.calendarBooking), logisticsData: values.map(ui.calendarLogistics) }));
+ for (const html of [render(items), render([...items].reverse())]) {
+  for (let day = 14; day <= 22; day++) {
+   const key = `2026-10-${day}`;
+   const cells = html.split(`data-calendar-day="${key}"`).slice(1);
+   assert.ok(cells.length);
+   for (const cell of cells) {
+    const contents = cell.split('data-calendar-day=')[0];
+    assert.match(contents, /data-calendar-lane="0" data-calendar-booking="mg"/);
+    if (day >= 15) assert.match(contents, /data-calendar-lane="1" data-calendar-booking="pending"/);
+   }
+  }
+ }
+});
+
+test('lanes reserve empty slots, reuse only after return and keep every overflow event', () => {
+ const events = new Map([
+  ['2026-10-14', [{ booking_id: 'mg' }]],
+  ['2026-10-15', [{ booking_id: 'p' }, { booking_id: 'mg' }]],
+  ['2026-10-16', [{ booking_id: 'mg' }, { booking_id: 'p' }]],
+  ['2026-10-17', [{ booking_id: 'after' }]],
+ ]);
+ const { lanes, laneCount } = ui.calendarBookingLanes(events, [...events.keys()]);
+ assert.equal(laneCount, 2); assert.equal(lanes.get('mg'), 0); assert.equal(lanes.get('p'), 1); assert.equal(lanes.get('after'), 0);
+ const start = ui.calendarDaySlots(events.get('2026-10-14'), lanes, 2);
+ assert.equal(start.slots[0].booking_id, 'mg'); assert.equal(start.slots[1], undefined);
+ const many = Array.from({ length: 7 }, (_, index) => ({ booking_id: `b${index}` }));
+ const dense = ui.calendarBookingLanes(new Map([['2026-10-14', many]]), ['2026-10-14']);
+ const slots = ui.calendarDaySlots([...many].reverse(), dense.lanes, 4);
+ assert.equal(slots.slots.length, 4); assert.equal(slots.overflow.length, 3);
+ assert.equal(new Set([...slots.slots, ...slots.overflow].map(event => event.booking_id)).size, 7);
+ const sameDay = [{ booking_id: 'same' }, { booking_id: 'same' }];
+ const twin = ui.calendarBookingLanes(new Map([['2026-10-14', sameDay]]), ['2026-10-14']);
+ assert.equal(twin.laneCount, 2); assert.equal(ui.calendarDaySlots(sameDay, twin.lanes, 2).overflow.length, 0);
+});
 
 test('return fields, price explanation and calendar carry the real clock and both fees', () => {
  const pickup = { time: '10:00', location: 'city', address: 'Pickup Hotel', return_time: '18:00', return_location: 'city', return_address: 'Return Hotel' };

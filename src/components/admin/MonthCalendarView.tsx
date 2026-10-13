@@ -12,6 +12,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { LogisticsDate, Booking } from '@/api/api.ts'; 
 import { cn } from '@/lib/utils';
 import { DayDetailsModal } from './DayDetailsModal'; 
+import { calendarBookingLanes, calendarDaySlots } from '@/lib/calendar-booking-lanes';
 
 interface DayEvent {
   type: 'pickup' | 'return' | 'rental';
@@ -68,6 +69,8 @@ const MonthGrid = memo(({
     return res;
   }, [date]);
 
+  const laneLayout = useMemo(() => calendarBookingLanes(eventsByDay, days.map(day => format(day, 'yyyy-MM-dd'))), [eventsByDay, days]);
+
   const monthLetters = useMemo(() => getMonthLetters(date, dateLocale), [date, dateLocale]);
   const yearString = format(date, 'yyyy');
   const weeks = [];
@@ -100,20 +103,23 @@ const MonthGrid = memo(({
                 : events;
               const isCurrentMonth = isSameMonth(day, date);
               const dayIsToday = isToday(day);
+              const { slots, overflow } = showOccupancy
+                ? calendarDaySlots(visibleEvents, laneLayout.lanes, Math.min(4, laneLayout.laneCount))
+                : { slots: visibleEvents.slice(0, 4), overflow: visibleEvents.slice(4) };
 
               return (
                 <div
                   key={dayKey}
                   data-calendar-day={dayKey}
                   className={cn(
-                    "min-h-[100px] p-0.5 transition-colors cursor-pointer group bg-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700",
-                    showOccupancy && isWeekend(day) && "bg-slate-100/40",
-                    !isCurrentMonth ? "opacity-60" : "hover:bg-blue-60/50"
+                    "min-h-[100px] p-0.5 transition-colors cursor-pointer group focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700",
+                    showOccupancy && dayIsToday ? 'bg-blue-50' : showOccupancy && isWeekend(day) ? 'bg-slate-100/40' : 'bg-transparent',
+                    !(showOccupancy && dayIsToday) && (!isCurrentMonth ? "opacity-60" : "hover:bg-blue-60/50")
                   )}
                   onClick={() => onDayClick(day, events, false)}
                 >
                   <div className="flex justify-between items-start mb-1">
-                    {showOccupancy ? <button type="button" className={cn('min-h-11 w-full rounded-sm text-left px-1 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700', dayIsToday && 'bg-blue-600 text-white')} aria-label={pt("{0}, событий: {1}", [format(day, 'd MMMM yyyy', { locale: dateLocale }), events.length])} onClick={event => { event.stopPropagation(); onDayClick(day, events); }}>{format(day, 'd')}</button> : <span className={cn(
+                    {showOccupancy ? <button type="button" className={cn('min-h-11 w-full rounded-sm text-left px-1 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700', dayIsToday && 'font-bold text-blue-800')} aria-current={dayIsToday ? 'date' : undefined} aria-label={pt("{0}, событий: {1}", [format(day, 'd MMMM yyyy', { locale: dateLocale }), events.length])} onClick={event => { event.stopPropagation(); onDayClick(day, events); }}>{format(day, 'd')}</button> : <span className={cn(
                       "text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full transition-colors",
                       dayIsToday ? "bg-blue-600 text-white shadow-md" : isCurrentMonth ? "text-slate-500" : "text-gray-300"
                     )}>
@@ -122,7 +128,8 @@ const MonthGrid = memo(({
                   </div>
                   
                   <div className="space-y-0.5 overflow-hidden font-sans">
-                    {visibleEvents.slice(0, 4).map((ev, idx) => {
+                    {slots.map((ev, idx) => {
+                      if (!ev) return <div key={`empty-${idx}`} data-calendar-lane={idx} aria-hidden="true" className="h-5" />;
                       // Цвет в зависимости от статуса брони
                       const isPreBooking = ev.booking?.status === 'pre_booking';
                       const bgClass = showOccupancy
@@ -138,6 +145,8 @@ const MonthGrid = memo(({
                       return (
                         <button type="button"
                           data-compact-event={showOccupancy ? true : undefined}
+                          data-calendar-lane={showOccupancy ? idx : undefined}
+                          data-calendar-booking={showOccupancy ? ev.booking_id : undefined}
                           data-plain-occupancy={showOccupancy && ev.type === 'rental' ? true : undefined}
                           key={idx}
                           className={cn(
@@ -159,16 +168,16 @@ const MonthGrid = memo(({
                       );
                     })}
                     
-                    {visibleEvents.length > 4 && (
+                    {overflow.length > 0 && (
                       <button type="button"
                         className={showOccupancy ? "min-h-11 w-full text-xs font-semibold text-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "text-[7px] text-blue-500 font-bold pl-1 cursor-pointer hover:text-blue-700"}
                         onClick={(e) => { 
                           e.stopPropagation(); 
                           // Открыть popup только с теми бейджами которые не влезли
-                          onDayClick(day, visibleEvents.slice(4), true);
+                          onDayClick(day, overflow, true);
                         }}
                       >
-                        {pt("+ ещё")}{visibleEvents.length - 4}
+                        {pt("+ ещё")}{overflow.length}
                       </button>
                     )}
                   </div>
