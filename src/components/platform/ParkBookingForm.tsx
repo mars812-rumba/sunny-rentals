@@ -97,7 +97,7 @@ export function ParkBookingForm({ tenantId, assetId, initialPeriod, initialPicku
   }}>{copied ? pt("Номер скопирован") : pt("Скопировать номер заявки")}</Button><p className="text-sm text-slate-600">{pt("Заявка появилась в календаре парка. Уведомления в чате пока не подключены.")}</p>{error && <p role="alert" className="text-sm text-rose-800">{pt(error)}</p>}</div>;
   return <form onSubmit={event => { if (quote) { event.preventDefault(); void submit(); } else void calculate(event); }} aria-busy={busy} className="space-y-4 border-t pt-4">
     <h3 className="flex items-center gap-2 text-lg font-semibold"><CalendarCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-blue-700" />{quote ? pt("Проверьте заявку") : pt("Проверка дат и цены")}</h3>
-    {!connected && <p className="text-sm leading-6 text-slate-600">{pt("Заявку можно отправить без регистрации и Telegram. Укажите имя и контакт после проверки стоимости.")}</p>}
+    {!connected && <p className="text-sm leading-6 text-slate-600">{pt("Укажите имя и контакт после проверки стоимости.")}</p>}
     {!quote && <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2">
       <div><label htmlFor={`${id}-start`} className="block text-sm font-medium">{pt("Получение")}</label><ParkDateField id={`${id}-start`} required value={start} onChange={(event) => change(event.target.value, 'start')} className="mt-2" aria-describedby={`${id}-hint`} /></div>
       <div><label htmlFor={`${id}-end`} className="block text-sm font-medium">{pt("Возврат")}</label><ParkDateField id={`${id}-end`} required min={start || undefined} value={end} onChange={(event) => change(event.target.value, 'end')} className="mt-2" aria-describedby={`${id}-hint`} /></div>

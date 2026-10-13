@@ -11,7 +11,8 @@ import { VehicleCardFrame } from '@/components/VehicleCardFrame';
 import { ImageCarousel } from '@/components/CarCard';
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { fetchStorefront, Storefront, StorefrontAsset, storefrontMediaUrl } from '@/api/storefront';
-import HeroBanner from '@/components/HeroBanner';
+import { ParkStorefrontHero } from '@/components/platform/ParkStorefrontHero';
+import { ParkLanguageSwitcher } from '@/contexts/ParkLocaleContext';
 import { ParkTelegramEntry } from '@/components/platform/ParkTelegramEntry';
 import type { ParkView } from '@/lib/park-entry';
 import { ParkBookingForm } from '@/components/platform/ParkBookingForm';
@@ -20,7 +21,7 @@ import { ParkStorefrontHeader } from '@/components/platform/ParkStorefrontHeader
 import { VehicleSpecSummary, VehicleTariffTable } from '@/components/platform/VehicleDetailsEditor';
 import { ParkRentalFilters } from '@/components/platform/ParkRentalFilters';
 import { fetchParkAvailability, ParkAvailability, type ParkBooking } from '@/api/park-telegram';
-import { ParkRentalPeriod, paidRentalDays, rentalMoney } from '@/lib/park-rental';
+import { ParkRentalPeriod, paidRentalDays } from '@/lib/park-rental';
 import type { ParkPickup } from '@/lib/park-pickup';
 import { focusStorefrontFilters } from '@/lib/storefront-return';
 
@@ -159,18 +160,17 @@ function ParkStorefront({ tenantId, ownerEntry }: { tenantId: string; ownerEntry
   }, [tenantId, preview, reload]);
   const assets = useMemo(() => data?.assets.filter((asset) => (!period || (availability?.start_date === period.start && availability.end_date === period.end && availability.available_asset_ids.includes(asset.id))) && (type === 'all' || asset.asset_type === type)) || [], [data, type, period, availability]);
   const name = data?.tenant.name || pt("Витрина проката");
-  const rates = data?.assets.map((asset) => asset.daily_rate).filter((rate): rate is number => rate !== null && rate > 0) || [];
   return <main className={`min-h-screen text-slate-950 selection:bg-blue-200 ${view === 'owner' || view === 'checking' ? 'bg-slate-50' : 'bg-gradient-to-br from-blue-50 via-white to-orange-50'}`}>
     <Helmet><title>{name} {pt(" — транспорт в аренду")}</title><meta name="robots" content="noindex, nofollow" /><meta name="referrer" content="no-referrer" /><meta name="description" content={pt("Каталог транспорта {0}: фотографии и цены проката.", [name])} /><link rel="canonical" href={`${window.location.origin}/p/${encodeURIComponent(tenantId)}`} /><meta property="og:type" content="website" /><meta property="og:title" content={pt("{0} — транспорт в аренду", [name])} /><meta property="og:description" content={pt("Каталог транспорта {0}: фотографии и цены проката.", [name])} /><meta property="og:url" content={`${window.location.origin}/p/${encodeURIComponent(tenantId)}`} /><meta name="twitter:card" content="summary" /></Helmet>
     {data && !data.preview && <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"><ParkTelegramEntry key={tenantId} tenantId={tenantId} ownerEntry={ownerEntry} view={view} onViewChange={setView} /></div>}
-    {view === 'client' && <><ParkStorefrontHeader name={name} logo={data?.tenant.logo ? <StorefrontImage tenantId={tenantId} reference={data.tenant.logo} preview={preview} alt={pt('Логотип {0}', [name])} className="h-full w-full bg-white object-contain" /> : undefined} /><HeroBanner park={{ name, minimumPrice: data && rates.length ? rentalMoney(Math.min(...rates), data.tenant.currency) : null }} /></>}
+    {view === 'client' ? <><ParkStorefrontHeader name={name} logo={data?.tenant.logo ? <StorefrontImage tenantId={tenantId} reference={data.tenant.logo} preview={preview} alt={pt('Логотип {0}', [name])} className="h-full w-full bg-white object-contain" /> : undefined} /><ParkStorefrontHero name={name} /></> : <div className="mx-auto flex max-w-6xl justify-end px-4 py-2"><ParkLanguageSwitcher compact /></div>}
     <div className="mx-auto max-w-6xl px-4 pb-10 sm:px-6 lg:px-8">
       {data?.preview && <p role="status" className="mt-4 rounded-xl bg-amber-100 p-3 text-sm text-amber-950">{pt("Закрытое превью · здесь видны и неопубликованные машины. Ссылка действует 24 часа и не даёт доступа к управлению парком.")}</p>}
       {loading ? <p role="status" aria-live="polite" className="py-12 text-center text-slate-600">{pt("Загружаем транспорт парка…")}</p> : error ? <div role="alert" className="py-12 text-center"><p className="text-slate-700">{pt(error)}</p><Button className={`mt-4 ${actionClass}`} onClick={() => setReload((value) => value + 1)}>{pt("Повторить загрузку")}</Button></div> : data && view === 'client' && <>
         <ParkRentalFilters period={period} onPeriodChange={value => setPeriod(value ? { ...value, pickup } : null)} pickup={pickup} onPickupChange={value => { setPickup(value); setPeriod(current => current ? { ...current, pickup: value } : null); }} currency={data.tenant.currency} type={type} onTypeChange={setType} types={Array.from(new Set(data.assets.map((asset) => asset.asset_type)))} timezone={data.tenant.timezone} datesEnabled={data.booking_enabled && !data.preview} />
         <section aria-labelledby="park-catalog-title" className="mt-8"><h2 id="park-catalog-title" className="text-xl font-semibold">{period ? pt("Доступно на ваши даты") : pt("Выберите транспорт")}</h2><p role="status" className="mb-4 mt-1 text-sm text-slate-600">{checking ? pt("Проверяем наличие…") : pt("Найдено: {0}", [assets.length])}{period && !checking ? pt(" · {0} суток", [paidRentalDays(period)]) : ''}</p>
           {checking ? <p role="status" className="py-8 text-slate-600">{pt("Проверяем свободные машины на выбранные даты…")}</p> : availabilityError ? <div role="alert" className="py-6"><p>{availabilityError}</p><Button variant="outline" className="mt-3" onClick={() => setAvailabilityReload((value) => value + 1)}>{pt("Повторить поиск")}</Button></div> : assets.length ? <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">{assets.map((asset) => <AssetCard key={asset.id} asset={asset} tenantId={tenantId} currency={data.tenant.currency} preview={preview} bookingEnabled={data.booking_enabled} period={period} pickup={pickup} onEditPickup={editPickup} onBooked={() => setAvailabilityReload((value) => value + 1)} />)}</div> : <div className="rounded-xl bg-white px-5 py-10 text-center"><CarFront aria-hidden="true" className="mx-auto text-slate-500" /><p className="mt-3 font-medium">{data.assets.length ? period ? pt("На эти даты подходящий транспорт не найден") : pt("По вашему запросу ничего не найдено") : pt("Транспорт пока не опубликован")}</p>{data.assets.length > 0 && <Button variant="outline" className="mt-4" onClick={() => { setType('all'); setPeriod(null); }}>{pt("Сбросить фильтры")}</Button>}</div>}
-        </section><p className="mt-8 text-sm text-slate-600">{data.booking_enabled ? pt("Откройте карточку транспорта, чтобы проверить даты и отправить заявку. Telegram не обязателен.") : pt("Бронирование на этой витрине ещё не включено.")}</p>
+        </section><p className="mt-8 text-sm text-slate-600">{data.booking_enabled ? pt("Откройте карточку транспорта, чтобы проверить даты и отправить заявку.") : pt("Бронирование на этой витрине ещё не включено.")}</p>
       </>}
     </div>
   </main>;

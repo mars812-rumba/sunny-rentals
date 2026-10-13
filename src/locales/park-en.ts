@@ -1,5 +1,7 @@
 // Only interface copy. Customer and vehicle data are never passed through this catalogue.
 export const parkEnglish: Record<string, string> = {
+  "Откройте карточку транспорта, чтобы проверить даты и отправить заявку.": "Open a vehicle to check dates and send a request.",
+  "Укажите имя и контакт после проверки стоимости.": "Enter your name and contact after checking the price.",
   "Понятно": "Got it",
   "Заявка отправлена парку.": "Your request has been sent to the rental company.",
   "Добавить бронь": "Add booking",

@@ -101,8 +101,8 @@ const App = () => {
             {/* Основные роуты */}
             <Route path="/" element={<Site />} />
             <Route path="/app" element={<Index />} />
-            <Route path="/p/:tenantId" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем витрину…</p>}><ParkLocaleProvider><ParkStorefrontPage /></ParkLocaleProvider></Suspense>} />
-            <Route path="/p/:tenantId/owner" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем кабинет…</p>}><ParkLocaleProvider><ParkStorefrontPage ownerEntry /></ParkLocaleProvider></Suspense>} />
+            <Route path="/p/:tenantId" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем витрину…</p>}><ParkLocaleProvider showSwitcher={false}><ParkStorefrontPage /></ParkLocaleProvider></Suspense>} />
+            <Route path="/p/:tenantId/owner" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем кабинет…</p>}><ParkLocaleProvider showSwitcher={false}><ParkStorefrontPage ownerEntry /></ParkLocaleProvider></Suspense>} />
             <Route path="/owner/:tenantId" element={<Suspense fallback={<p role="status" className="p-8 text-center">Загружаем кабинет…</p>}><ParkLocaleProvider showSwitcher={false}><ParkOwnerWebPage /></ParkLocaleProvider></Suspense>} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/offer" element={<OfferPage />} />

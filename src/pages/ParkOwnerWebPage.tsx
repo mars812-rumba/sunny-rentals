@@ -4,12 +4,12 @@ import { useParkLocale } from '@/contexts/park-locale';
 import { ParkLanguageSwitcher } from '@/contexts/ParkLocaleContext';
 import { FormEvent, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { KeyRound, LogOut } from 'lucide-react';
+import { KeyRound, LogOut, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { PlatformTenantWorkspace } from '@/components/platform/PlatformTenantWorkspace';
+import { PlatformTenantWorkspace, PrivateImage } from '@/components/platform/PlatformTenantWorkspace';
 import { fetchOwnerFleet } from '@/api/park-owner-fleet';
 import { ownerWebRequest } from '@/api/park-owner-web';
 import type { PlatformTenant } from '@/api/platform-admin';
@@ -94,10 +94,14 @@ export default function ParkOwnerWebPage() {
 
   return <main className="min-h-screen bg-white text-slate-900">
     <h1 className="sr-only">{pt("Кабинет владельца ")}{tenant.name}</h1>
-    <div className="mx-auto flex max-w-6xl items-center justify-end gap-2 px-4 py-2">
+    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
+    <div className="mx-auto flex min-h-16 max-w-6xl items-center gap-2 px-4 py-2">
+      {tenant.branding?.logo ? <PrivateImage owner tenantId={tenant.tenant_id} reference={tenant.branding.logo} alt={pt('Логотип {0}', [tenant.name])} className="size-11 shrink-0 rounded-lg object-contain" /> : <span role="img" aria-label={pt('Логотип {0}', [tenant.name])} className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700"><Store aria-hidden="true" className="size-6" /></span>}
+      <div className="ml-auto">
       <ParkLanguageSwitcher compact />
+      </div>
       <Dialog open={passwordOpen} onOpenChange={open => { if (!busy) { setPasswordOpen(open); setPasswordError(''); } }}>
-        <DialogTrigger asChild><Button variant="outline" className="min-h-11 px-2 sm:px-4"><KeyRound className="h-4 w-4" aria-hidden="true" />{pt("Поменять пароль")}</Button></DialogTrigger>
+        <DialogTrigger asChild><Button variant="outline" title={pt("Поменять пароль")} className="min-h-11 min-w-11 shrink-0 px-2 sm:px-4"><KeyRound className="h-4 w-4" aria-hidden="true" /><span className="sr-only sm:not-sr-only">{pt("Поменять пароль")}</span></Button></DialogTrigger>
         <DialogContent closeLabel={pt("Закрыть")} className="bg-white text-slate-900"><DialogHeader><DialogTitle>{pt("Поменять пароль")}</DialogTitle><DialogDescription>{pt("От 12 до 128 символов. После смены другие браузерные сессии завершатся.")}</DialogDescription></DialogHeader>
           <form onSubmit={changePassword} className="space-y-4" aria-busy={busy}>
             {[['old_password', 'Текущий пароль', 'current-password'], ['new_password', 'Новый пароль', 'new-password'], ['confirm_password', 'Повторите новый пароль', 'new-password']].map(([name, label, autocomplete]) => <div className="space-y-2" key={name}><Label htmlFor={`owner-${name}`}>{pt(label)}</Label><Input id={`owner-${name}`} name={name} type="password" autoComplete={autocomplete} required minLength={name === 'old_password' ? 1 : 12} maxLength={128} aria-describedby={passwordError ? 'owner-password-error' : undefined} /></div>)}
@@ -108,8 +112,9 @@ export default function ParkOwnerWebPage() {
       </Dialog>
       <Button variant="outline" className="min-h-11 min-w-11 shrink-0 px-2 sm:px-4" title={pt("Выйти")} onClick={logout} disabled={busy}><LogOut className="h-4 w-4" aria-hidden="true" /><span className="sr-only sm:not-sr-only">{pt("Выйти")}</span></Button>
     </div>
+    </header>
     {error && <p role="alert" className="mx-auto mt-3 max-w-6xl px-4 text-sm text-red-700">{pt(error)}</p>}
     {notice && <p role="status" className="mx-auto mt-3 max-w-6xl px-4 text-sm text-slate-600">{pt(notice)}</p>}
-    <PlatformTenantWorkspace tenant={tenant} owner onTenantChanged={setTenant} onBack={() => window.location.assign(`/p/${encodeURIComponent(tenantId)}`)} onViewStorefront={() => window.location.assign(`/p/${encodeURIComponent(tenantId)}`)} />
+    <PlatformTenantWorkspace tenant={tenant} owner hideHeaderLogo onTenantChanged={setTenant} onBack={() => window.location.assign(`/p/${encodeURIComponent(tenantId)}`)} onViewStorefront={() => window.location.assign(`/p/${encodeURIComponent(tenantId)}`)} />
   </main>;
 }

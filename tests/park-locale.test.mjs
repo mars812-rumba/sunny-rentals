@@ -14,6 +14,8 @@ const bundle = await build({ stdin: { contents: `export * from './src/lib/park-l
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
  export { ParkBookingReceipt } from './src/components/platform/ParkBookingReceipt';
  export { ParkStorefrontHeader } from './src/components/platform/ParkStorefrontHeader';
+ export { ParkStorefrontHero } from './src/components/platform/ParkStorefrontHero';
+ export { ParkTelegramEntry } from './src/components/platform/ParkTelegramEntry';
  export { ParkRequestItem, ParkRequestsPanel } from './src/components/platform/ParkRequestsPanel';
  export { ParkCalendarMonthSelect } from './src/components/platform/ParkBookingCalendar';
  export { ParkDateField } from './src/components/platform/ParkDateField';
@@ -59,14 +61,27 @@ test('storefront receipt preserves the actual booking number and pending meaning
  assert.match(readFileSync('src/components/platform/ParkBookingForm.tsx', 'utf8'), /onCreated\?\.\(result\)/);
 });
 
-test('storefront header is sticky, left aligned and handles a long name with or without a logo', () => {
+test('storefront header contains only logo and language, with the park name in the clean hero', () => {
  const name = 'Rental company with a very long name';
  for (const logo of [undefined, e('img', { src: 'blob:logo', alt: 'Rental logo' })]) {
   const html = render(ui.ParkStorefrontHeader, { name, logo });
   assert.match(html, /sticky top-0 z-30/); assert.match(html, /text-left/);
-  assert.match(html, /min-w-0 break-words/); assert.ok(html.includes(name));
+  assert.match(html, /aria-label="Interface language"/); assert.doesNotMatch(visible(html), /Rental company with a very long name/);
   assert.equal(html.includes('blob:logo'), Boolean(logo));
  }
+ const hero = render(ui.ParkStorefrontHero, { name });
+ assert.match(hero, /<h1[^>]*>Rental company with a very long name<\/h1>/);
+ assert.match(hero, /from-cyan-800 via-blue-800 to-blue-950/);
+ assert.doesNotMatch(hero, /Telegram|<img|<p|Deposit|Daily price/);
+ for (const initData of ['', 'telegram-signed-data']) {
+  globalThis.window = { Telegram: { WebApp: { initData } } };
+  const html = renderToStaticMarkup(e(ui.ParkLocaleProvider, { initialLanguage: 'en', showSwitcher: false }, e(ui.ParkTelegramEntry, { tenantId: 'park-a', view: 'client' })));
+  assert.equal(visible(html), '');
+ }
+ const owner = readFileSync('src/pages/ParkOwnerWebPage.tsx', 'utf8');
+ assert.match(owner, /<header className="sticky top-0 z-30/);
+ assert.match(owner, /<PrivateImage owner tenantId=/);
+ assert.match(owner, /<PlatformTenantWorkspace tenant=\{tenant\} owner hideHeaderLogo/);
 });
 
 test('park dates are always day-first with localized words, never American order', () => {
@@ -114,7 +129,7 @@ test('owner toolbar has one inline language selector with flags and a named comp
   assert.match(html, language === 'ru' ? /aria-label="Язык интерфейса"/ : /aria-label="Interface language"/);
  }
  const page = readFileSync('src/pages/ParkOwnerWebPage.tsx', 'utf8');
- assert.match(page, /items-center justify-end gap-2/);
+ assert.match(page, /items-center gap-2/);
  assert.match(page, /<ParkLanguageSwitcher compact/);
  assert.match(page, /sr-only sm:not-sr-only/);
  assert.match(readFileSync('src/App.tsx', 'utf8'), /<ParkLocaleProvider showSwitcher=\{false\}><ParkOwnerWebPage/);

@@ -57,6 +57,10 @@ export function ParkTelegramEntry({ tenantId, ownerEntry = false, view = 'client
     </div>
   </section>;
 
+  // Identity/owner routing still runs, but the client storefront has no
+  // Telegram onboarding banner or external bot call-to-action.
+  if (!ownerEntry || view === 'client') return null;
+
   if (!ownerEntry && !window.Telegram?.WebApp?.initData) return link ? <p className="py-4 text-sm text-slate-600">{pt("Можно отправить заявку прямо здесь. ")}<a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-700 underline underline-offset-4">{pt("Или открыть парк в Telegram")}</a></p> : null;
 
   return <section aria-labelledby="park-telegram-entry" aria-busy={loading} className="mt-5 px-1 py-2">

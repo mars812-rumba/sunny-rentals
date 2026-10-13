@@ -45,7 +45,7 @@ function validateImage(file: File) {
   if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) throw new Error(pt("{0}: выберите JPEG, PNG или WebP", [file.name]));
 }
 
-function PrivateImage({ tenantId, reference, alt, className, owner = false }: { tenantId: string; reference: string; alt: string; className: string; owner?: boolean }) {
+export function PrivateImage({ tenantId, reference, alt, className, owner = false }: { tenantId: string; reference: string; alt: string; className: string; owner?: boolean }) {
   const { pt, intlLocale } = useParkLocale();
   const [url, setUrl] = useState("");
   const [failed, setFailed] = useState(false);
@@ -65,8 +65,8 @@ function PrivateImage({ tenantId, reference, alt, className, owner = false }: { 
   return url ? <img src={url} alt={alt} className={className} /> : <div className={`${className} grid place-items-center bg-slate-100 text-xs text-slate-600`} role="img" aria-label={alt}>{failed ? pt("Фото недоступно") : <Loader2 className="animate-spin" aria-hidden="true" />}</div>;
 }
 
-export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner = false, onViewStorefront }: {
-  tenant: PlatformTenant; onBack: () => void; onTenantChanged: (tenant: PlatformTenant) => void; owner?: boolean; onViewStorefront?: () => void;
+export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner = false, onViewStorefront, hideHeaderLogo = false }: {
+  tenant: PlatformTenant; onBack: () => void; onTenantChanged: (tenant: PlatformTenant) => void; owner?: boolean; onViewStorefront?: () => void; hideHeaderLogo?: boolean;
 }) {
   const { pt, intlLocale } = useParkLocale();
   const [assets, setAssets] = useState<PlatformAsset[]>([]);
@@ -218,7 +218,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
     <div className="mx-auto max-w-6xl">
       {!owner && <Button variant="ghost" onClick={onBack} disabled={busy}><ArrowLeft aria-hidden="true" /> {pt(" Все прокаты")}</Button>}
       <header className="flex items-start gap-3 sm:gap-4">
-        {tenant.branding?.logo ? <PrivateImage owner={owner} tenantId={tenant.tenant_id} reference={tenant.branding.logo} alt={pt("Логотип {0}", [tenant.name])} className="h-12 w-12 shrink-0 rounded-xl bg-white object-contain p-1 sm:h-14 sm:w-14" /> : <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-700 sm:h-14 sm:w-14"><Store aria-hidden="true" className="h-6 w-6" /></div>}
+        {!hideHeaderLogo && (tenant.branding?.logo ? <PrivateImage owner={owner} tenantId={tenant.tenant_id} reference={tenant.branding.logo} alt={pt("Логотип {0}", [tenant.name])} className="h-12 w-12 shrink-0 rounded-xl bg-white object-contain p-1 sm:h-14 sm:w-14" /> : <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-blue-100 text-blue-700 sm:h-14 sm:w-14"><Store aria-hidden="true" className="h-6 w-6" /></div>)}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 sm:gap-4"><Heading className="min-w-0 flex-1 break-words text-xl font-semibold leading-tight tracking-tight sm:text-3xl">{tenant.name}</Heading>
             {owner && onViewStorefront ? <Button variant="outline" className="shrink-0 gap-2 rounded-lg border-blue-200 bg-white px-3 text-blue-700 hover:bg-blue-50" onClick={onViewStorefront}><Store aria-hidden="true" className="h-4 w-4" />{pt("Витрина")}</Button> : !owner && tenant.status !== 'draft' && <Button asChild variant="outline" className="shrink-0 gap-2 rounded-lg border-blue-200 bg-white px-3 text-blue-700 hover:bg-blue-50"><a href={`/p/${encodeURIComponent(tenant.tenant_id)}`} target="_blank" rel="noopener noreferrer"><Store aria-hidden="true" className="h-4 w-4" />{pt("Витрина")}</a></Button>}
