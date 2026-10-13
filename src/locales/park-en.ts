@@ -1,5 +1,9 @@
 // Only interface copy. Customer and vehicle data are never passed through this catalogue.
 export const parkEnglish: Record<string, string> = {
+  "Заявки из бота и витрины — в одном календаре. Полоса включает день возврата. Следующая аренда возможна после времени возврата.": "Bot and storefront requests share one calendar. The bar includes the return day. The next rental can start after the return time.",
+  "Стоимость": "Cost",
+  "Доставка": "Delivery",
+  "Итого аренда и доставка": "Total rental and delivery",
   "Получение и возврат транспорта": "Vehicle pickup and return",
   "Время получения": "Pickup time",
   "Время местное, по часовому поясу парка.": "Local time in the rental company's time zone.",

@@ -20,7 +20,8 @@ const bundle = await build({ stdin: { contents: `export * from './src/utils/park
  export { schedulerInitialOffset, timetableFocusDay } from './src/lib/scheduler-scroll';
  export { parkToday } from './src/lib/park-rental';
  export { ParkPickupFields, ParkPickupSummary } from './src/components/platform/ParkPickupFields';
- export { validParkPickup } from './src/lib/park-pickup';`, resolveDir: process.cwd(), loader: 'tsx' },
+ export { validParkPickup, validParkReturn } from './src/lib/park-pickup';
+ export { focusStorefrontFilters } from './src/lib/storefront-return';`, resolveDir: process.cwd(), loader: 'tsx' },
  bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic',
  external: ['react', 'react/jsx-runtime', 'react-dom'], define: { 'import.meta.env.VITE_API_URL': '""' } });
 const compiled = new Module(resolve('tests/park-calendar-fixture.cjs'));
@@ -31,6 +32,43 @@ const ui = compiled.exports;
 const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', start_at: '2026-08-01T17:00:00Z', end_at: '2026-08-03T17:00:00Z', currency: 'THB',
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
+
+test('return fields, price explanation and calendar carry the real clock and both fees', () => {
+ const pickup = { time: '10:00', location: 'city', address: 'Pickup Hotel', return_time: '18:00', return_location: 'city', return_address: 'Return Hotel' };
+ const fields = renderToStaticMarkup(e(ui.ParkPickupFields, { id: 'journey', pickup, onChange() {} }));
+ assert.match(fields, /<input(?=[^>]*id="journey-return-time")(?=[^>]*type="time")[^>]*>/);
+ assert.match(fields, /id="journey-return-location"/);
+ assert.match(fields, /id="journey-return-address"/);
+ assert.doesNotMatch(fields, /id="journey-return-address"[^>]*required/);
+ assert.equal(ui.validParkReturn(pickup), true);
+ assert.equal(ui.validParkReturn({ ...pickup, return_time: '24:00' }), false);
+ const summary = renderToStaticMarkup(e(ui.ParkPickupSummary, { pickup, deliveryFee: '500', returnFee: '500', extraDay: true, total: '4200', currency: 'THB' }));
+ assert.match(summary, /18:00/); assert.match(summary, /Return Hotel/); assert.match(summary, /Дополнительные сутки/);
+ const adapted = ui.calendarBooking({ ...booking, pricing: { ...booking.pricing, pickup, return_fee: '500', delivery_fee: '500', total_payable: '4200' } });
+ assert.equal(adapted.form_data.dates.returnTime, '18:00');
+ assert.equal(adapted.form_data.locations.returnLocation, 'Return Hotel');
+ assert.equal(adapted.form_data.pricing.deliveryReturn, 500);
+ assert.equal(adapted.form_data.pricing.totalDelivery, 1000);
+ assert.match(ui.calendarLogistics({ ...booking, pricing: { ...booking.pricing, pickup } }).return_date, /T18:00:00$/);
+});
+
+test('edit dates returns to same storefront filters after dialog focus release', () => {
+ const calls = [];
+ ui.focusStorefrontFilters({ focus: options => calls.push(['focus', options]), scrollIntoView: options => calls.push(['scroll', options]) });
+ assert.deepEqual(calls, [['focus', { preventScroll: true }], ['scroll', { block: 'start', behavior: 'instant' }]]);
+ ui.focusStorefrontFilters(null);
+ const form = readFileSync('src/components/platform/ParkBookingForm.tsx', 'utf8');
+ assert.match(form, /onEditPickup\?\.\(\{ start, end, pickup \}\)/);
+ const page = readFileSync('src/pages/ParkStorefrontPage.tsx', 'utf8');
+ assert.match(page, /<Dialog open=\{open\}/);
+ assert.match(page, /returnPeriod\.current = value; setOpen\(false\)/);
+ assert.match(page, /onCloseAutoFocus=[\s\S]*event\.preventDefault\(\)[\s\S]*onEditPickup\(previous\)/);
+ assert.match(page, /onEditPickup=\{editPickup\}/);
+ assert.match(page, /focusStorefrontFilters\(document\.getElementById\('park-rental-filters'\)\)/);
+ assert.match(page, /setPeriod\(value\)/); assert.match(page, /setPickup\(value\.pickup\)/);
+ const filters = readFileSync('src/components/platform/ParkRentalFilters.tsx', 'utf8');
+ assert.match(filters, /id="park-rental-filters" tabIndex=\{-1\}/);
+});
 
 test('pickup fields require time but allow an optional city address, and summary preserves details', () => {
  const pickup = { time: '14:30', location: 'city', address: '<Hotel>' };
@@ -52,7 +90,7 @@ test('pickup fields require time but allow an optional city address, and summary
  assert.equal(ui.calendarBooking(item).form_data.dates.pickupTime, '14:30');
  assert.equal(ui.calendarLogistics(item).pickup_date, '2026-08-02T14:30:00');
  const request = renderToStaticMarkup(e(ui.ParkRequestItem, { booking: item, detailed: true, busy: false, onAction() {} }));
- assert.match(request, /Получение: 14:30/); assert.match(request, /Адрес: &lt;Hotel&gt;/);
+ assert.match(request, /Получение<\/dt>/); assert.match(request, /14:30/); assert.match(request, /&lt;Hotel&gt;/); assert.doesNotMatch(request, /<Hotel>/);
  const filters = readFileSync('src/components/platform/ParkRentalFilters.tsx', 'utf8');
  assert.doesNotMatch(filters, /Марка или модель|park-search|onSearchChange/);
 });
@@ -98,6 +136,9 @@ test('Gantt uses thumbnail references for new and previously uploaded photos', (
 test('fallback contact form labels all channels and requires a number and consent', () => {
  for (const channel of ['whatsapp', 'max', 'phone']) {
   const html = renderToStaticMarkup(e(ui.ParkContactFields, { id: 'client', contact: { channel, value: '' }, busy: false, onChange() {} }));
+  const pattern = html.match(/pattern="([^"]+)"/)?.[1];
+  assert.ok(pattern);
+  assert.equal(new RegExp(`^(?:${pattern})$`, 'v').test('+66123456789'), true);
   assert.match(html, /WhatsApp/); assert.match(html, /MAX/); assert.match(html, /Телефон/);
   assert.match(html, /for="client-contact"/);
   assert.match(html, /type="tel"[^>]*required=""/);
@@ -135,16 +176,32 @@ test('day details include pickup, ongoing occupancy and return, but not cancelle
  assert.equal(ui.bookingsOnDay([{ ...booking, status: 'cancelled' }], '2026-08-03').length, 0);
 });
 
-test('shared Gantt excludes return day for parks, keeps legacy inclusive range by default', () => {
+test('park timetable includes return day and preserves the optional exclusive range for other callers', () => {
  const props = { cars: ui.calendarCars([], [booking]), bookings: [ui.calendarBooking(booking)], startDate: new Date('2026-08-01T00:00:00'), daysToShow: 97, onDateChange() {}, onCreateBooking() {}, onBookingClick() {} };
- const html = renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, readOnly: true, exclusiveEnd: true }));
+ const html = renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, readOnly: true }));
  assert.match(html, /role="button" tabindex="0" aria-label="Toyota/);
- assert.match(html, /width:42px/);
+ assert.match(html, /width:66px/);
+ const exclusive = renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, readOnly: true, exclusiveEnd: true }));
+ assert.match(exclusive, /width:42px/);
+ assert.doesNotMatch(readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8'), /readOnly exclusiveEnd/);
  assert.doesNotMatch(html, /images_web|park-b/);
  const legacy = renderToStaticMarkup(e(ui.SchedulerCalendar, props));
  assert.match(legacy, /width:66px/);
  assert.match(html, /height:96px;max-height:min\(65vh, 520px\)/);
  assert.match(legacy, /height:calc\(100vh - 60px\)/);
+});
+
+test('11–16 October covers six timetable cells without changing the five paid days or real return time', () => {
+ const item = { ...booking, pricing: { ...booking.pricing, start_date: '2026-10-11', end_date: '2026-10-16', days: 5, pickup: { time: '09:45', location: 'airport', address: '', return_time: '09:45', return_location: 'airport' } } };
+ const projected = ui.calendarBooking(item);
+ const html = renderToStaticMarkup(e(ui.SchedulerCalendar, { cars: ui.calendarCars([], [item]), bookings: [projected], startDate: new Date('2026-10-01T00:00:00'), daysToShow: 97, readOnly: true, onDateChange() {}, onCreateBooking() {}, onBookingClick() {} }));
+ assert.match(html, /11\.10-16\.10/);
+ assert.match(html, /width:138px/); // Six 24px cells, minus the existing 6px visual inset.
+ assert.equal(projected.form_data.dates.days, 5);
+ assert.equal(projected.form_data.dates.end, '2026-10-16T09:45:00');
+ const crossing = { ...item, pricing: { ...item.pricing, start_date: '2026-10-30', end_date: '2026-11-02' } };
+ const crossHtml = renderToStaticMarkup(e(ui.SchedulerCalendar, { cars: ui.calendarCars([], [crossing]), bookings: [ui.calendarBooking(crossing)], startDate: new Date('2026-10-01T00:00:00'), daysToShow: 97, readOnly: true, onDateChange() {}, onCreateBooking() {}, onBookingClick() {} }));
+ assert.match(crossHtml, /width:90px/); // Four date cells across the month boundary.
 });
 
 test('park Gantt renders a private thumbnail above the truncated name in the sticky column', () => {

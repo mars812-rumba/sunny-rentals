@@ -76,6 +76,48 @@ test('rates and booking summary are English, calculations and private customer t
  assert.equal(ui.paidRentalDays({ start: '2026-10-15', end: '2026-10-18', pickup: { time: '10:00', return_time: '18:00' } }), 4);
 });
 
+test('request details group pickup and return before prices, with a separate deposit in RU and EN', () => {
+ const booking = { id: 'journey', status: 'requested', currency: 'THB', pricing: { asset_name: 'MG ZS', start_date: '2026-11-02', end_date: '2026-11-14', days: 12, total_rental: '14400', timezone: 'Asia/Bangkok', pickup: { time: '09:45', location: 'city', address: 'Pickup hotel', return_time: '10:15', return_location: 'city', return_address: 'Return hotel' }, delivery_fee: '500', return_fee: '500', total_payable: '15400', extra_day: true }, deposit: { amount: '8000' }, customer: { name: 'Somchai' } };
+ for (const language of ['ru', 'en']) for (const detailed of [false, true]) {
+  const html = render(ui.ParkRequestItem, { booking, detailed, busy: false, onAction() {} }, language);
+  const text = visible(html);
+  assert.ok(text.indexOf('09:45') < text.indexOf('Pickup hotel'));
+  assert.ok(text.indexOf('Pickup hotel') < text.indexOf('10:15'));
+  assert.ok(text.indexOf('10:15') < text.indexOf('Return hotel'));
+  const cost = language === 'en' ? 'Cost' : 'Стоимость';
+  const deposit = language === 'en' ? 'Deposit, separate' : 'Депозит отдельно';
+  assert.ok(text.indexOf('Return hotel') < text.indexOf(cost));
+  assert.ok(text.indexOf(cost) < text.indexOf(deposit));
+  assert.ok(text.indexOf(deposit) < text.indexOf('Somchai'));
+  for (const amount of ['14400', '15400', '8000']) {
+   const formatted = ui.rentalMoney(amount, 'THB');
+   assert.equal(html.split(formatted).length - 1, 1, `${language}, detailed=${detailed}, ${amount} must appear once`);
+  }
+  assert.match(html, /bg-blue-50 text-blue-950/);
+  assert.match(html, /bg-emerald-50 text-emerald-950/);
+  assert.match(html, /border-t border-slate-200/);
+  assert.match(html, /09:45[^]*City<\/span> · Pickup hotel<\/dd>|09:45[^]*Город<\/span> · Pickup hotel<\/dd>/);
+  assert.doesNotMatch(html, /NaN|undefined/);
+ }
+ const emptyAddress = { ...booking, pricing: { ...booking.pricing, pickup: { time: '09:45', location: 'city', address: '', return_location: 'city', return_address: '' } } };
+ const empty = render(ui.ParkRequestItem, { booking: emptyAddress, busy: false, onAction() {} });
+ assert.match(empty, /No address provided/);
+ const legacy = { ...booking, pricing: { asset_name: 'Legacy car', start_date: '2026-11-02', end_date: '2026-11-14', days: 12, total_rental: '14400', timezone: 'Asia/Bangkok' } };
+ const legacyHtml = render(ui.ParkRequestItem, { booking: legacy, busy: false, onAction() {} });
+ assert.doesNotMatch(legacyHtml, /NaN|undefined|Total rental and delivery|09:45/);
+ assert.match(legacyHtml, /Deposit, separate/);
+ const withContact = { ...booking, customer: { name: 'Somchai', contact: { channel: 'whatsapp', value: '+66812345678' } } };
+ for (const language of ['ru', 'en']) {
+  const html = render(ui.ParkRequestItem, { booking: withContact, tenantId: 'park-a', busy: false, onAction() {} }, language);
+  const toolbar = html.match(/<div class="mt-4 flex min-w-0 items-stretch gap-2">(.*?)<\/div>/s)?.[1];
+  assert.ok(toolbar);
+  assert.equal((toolbar.match(/<button/g) || []).length, 2);
+  assert.match(toolbar, /whitespace-normal/);
+  assert.match(toolbar, language === 'ru' ? /Скопировать контакт/ : /Copy contact/);
+  assert.match(toolbar, language === 'ru' ? /Изменить заявку/ : /Edit request/);
+ }
+});
+
 test('English fleet/navigation and month/day labels render without Russian interface text', () => {
  const tenant = { tenant_id: 'park-a', name: 'Thai Rentals', status: 'active', primary_asset_type: 'car', currency: 'THB', timezone: 'Asia/Bangkok' };
  const workspace = render(ui.PlatformTenantWorkspace, { tenant, owner: true, onBack() {}, onTenantChanged() {} });
