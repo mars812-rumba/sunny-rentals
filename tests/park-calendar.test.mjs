@@ -270,6 +270,24 @@ test('opened request has readable amounts, private contacts and a plain-text cop
  assert.doesNotMatch(legacy, /<input/);
 });
 
+test('opened request reserves a compact private photo beside its name, with a safe fallback', () => {
+ const props = { booking, tenantId: 'park-a', admin: true, detailed: true, busy: false, onAction() {} };
+ const withPhoto = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, photoReference: '/private/asset/thumb.webp' }));
+ assert.match(withPhoto, /h-14 w-20 shrink-0 overflow-hidden rounded-lg/);
+ assert.match(withPhoto, /data-request-photo/);
+ assert.match(withPhoto, /Загружаем фото/);
+ assert.doesNotMatch(withPhoto, /src="\/private|images_web/);
+ const missing = renderToStaticMarkup(e(ui.ParkRequestItem, props));
+ assert.match(missing, /Фото пока нет/); assert.match(missing, /lucide-car-front/);
+ const list = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, detailed: false }));
+ assert.doesNotMatch(list, /data-request-photo/);
+ const calendar = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ assert.match(calendar, /photoReference=\{photos.get\(booking.asset_id\)\}/);
+ const source = readFileSync('src/components/platform/ParkCalendarPhoto.tsx', 'utf8');
+ assert.match(source, /loadPlatformMedia : loadOwnerMedia/);
+ assert.match(source, /URL.revokeObjectURL/); assert.match(source, /onError=\{\(\) => setFailed\(true\)\}/);
+});
+
 test('shared month has occupied-day and return badges, with named keyboard controls', () => {
  const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: [ui.calendarBooking(booking)], logisticsData: [ui.calendarLogistics(booking)], onDateChange() {}, onBookingClick() {}, onDayClick() {}, showOccupancy: true }));
  assert.match(html, /aria-label="Выдача: Toyota, Ожидает подтверждения"/);

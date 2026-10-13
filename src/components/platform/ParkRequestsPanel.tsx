@@ -14,6 +14,7 @@ import { ParkTariffBreakdown } from './ParkTariffBreakdown';
 import { pickupLabels } from '@/lib/park-pickup';
 import { filterParkRequests } from '@/lib/park-request-filters';
 import { parkBookingColors } from '@/lib/park-booking-colors';
+import { ParkCalendarPhoto } from './ParkCalendarPhoto';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждена', cancelled: 'Отменена', in_progress: 'В аренде', completed: 'Завершена' };
 const statusColors: Record<string, string> = {
@@ -96,7 +97,7 @@ function ParkBookingEditor({ booking, tenantId, admin, onClose }: { booking: Par
   </form>;
 }
 
-export function ParkRequestItem({ booking, busy, onAction, detailed = false, tenantId, admin = false }: { booking: ParkBooking; busy: boolean; detailed?: boolean; tenantId?: string; admin?: boolean; onAction: (booking: ParkBooking, status: 'confirmed' | 'cancelled') => void }) {
+export function ParkRequestItem({ booking, busy, onAction, detailed = false, tenantId, admin = false, photoReference }: { booking: ParkBooking; busy: boolean; detailed?: boolean; tenantId?: string; admin?: boolean; photoReference?: string; onAction: (booking: ParkBooking, status: 'confirmed' | 'cancelled') => void }) {
   const { pt, intlLocale } = useParkLocale();
   const editorId = useId();
   const [editing, setEditing] = useState(false);
@@ -113,7 +114,15 @@ export function ParkRequestItem({ booking, busy, onAction, detailed = false, ten
   const phoneUrl = /^\+?[\d ()-]{5,30}$/.test(phone) ? `tel:${phone.replace(/[ ()-]/g, '')}` : '';
   const name = booking.operator_details?.customer_name || booking.customer?.name || pt("Имя не указано");
   return <li className={cn('min-w-0', detailed ? 'py-2' : 'rounded-xl border border-slate-300 bg-white p-4 sm:p-5')}>
-    <div className="flex flex-wrap items-start justify-between gap-2"><h3 className="flex items-start gap-2 break-words text-lg font-semibold">{detailed && <CarFront aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-blue-700" />}{booking.pricing.asset_name || pt("Транспорт парка")}</h3><span className={cn('rounded-full px-3 py-1 text-xs font-medium', statusColors[booking.status] || 'bg-slate-100 text-slate-700')}>{pt(statuses[booking.status] || booking.status)}</span></div>
+    <div className={cn('flex gap-3', detailed ? 'items-center' : 'flex-wrap items-start justify-between')}>
+      {detailed && tenantId && <div className="h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-100" data-request-photo>
+        <ParkCalendarPhoto key={`${tenantId}:${booking.asset_id}:${photoReference || ''}`} tenantId={tenantId} reference={photoReference} admin={admin} />
+      </div>}
+      <div className={detailed ? 'min-w-0 flex-1' : 'contents'}>
+        <h3 className="flex items-start gap-2 break-words text-lg font-semibold">{detailed && !tenantId && <CarFront aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-blue-700" />}<span className="min-w-0 break-words">{booking.pricing.asset_name || pt("Транспорт парка")}</span></h3>
+        <span className={cn('inline-block rounded-full px-3 py-1 text-xs font-medium', detailed && 'mt-1', statusColors[booking.status] || 'bg-slate-100 text-slate-700')}>{pt(statuses[booking.status] || booking.status)}</span>
+      </div>
+    </div>
     {!detailed && booking.booking_number && <p className="mt-2 text-xs tabular-nums text-slate-600">{pt("Заявка № ")}{booking.booking_number}</p>}
     <p className="mt-3 flex items-start gap-2 text-sm font-medium leading-6 text-slate-900"><CalendarDays aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 text-blue-700" /><span>{dateLabel(booking.pricing.start_date)} — {dateLabel(booking.pricing.end_date)}<span className="mt-0.5 block text-sm font-normal text-slate-600">{booking.pricing.days} {pt(" суток", [booking.pricing.days])}</span></span></p>
     <ParkRequestJourney pickup={booking.pricing.pickup} />
