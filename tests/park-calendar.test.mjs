@@ -545,18 +545,17 @@ test('timetable and deliveries keep shared month and asset filter in separate pa
  assert.match(deliveries, /currentDate=\{date\}/);
  assert.match(timetable, /startDate=\{date\}/);
  assert.match(timetable, /cars=\{cars\.filter\(car => !assetId \|\| car\.id === assetId\)\}/);
- assert.match(source, /setScrollResetKey\(value => value \+ 1\)/);
+ assert.match(source, /timetableFocusDay\(month, today\)/);
 });
 
-test('today belongs to a single date navigation row, before month and arrows', () => {
+test('month and transport occupy two columns without a separate today row', () => {
  const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
- const navigation = source.match(/<div className="mt-3 grid grid-cols-\[auto_minmax\(0,1fr\)_44px_44px\][\s\S]*?(?=    <div className="mt-3 min-w-0 max-w-full")/)?.[0];
- assert.ok(navigation);
- assert.ok(navigation.indexOf('aria-label={pt("Сегодня")}') < navigation.indexOf('<ParkCalendarMonthSelect'));
- assert.ok(navigation.indexOf('<ParkCalendarMonthSelect') < navigation.indexOf('Предыдущий месяц'));
- assert.match(navigation, /setMonth\(today\.slice\(0, 7\)\); setScrollResetKey\(value => value \+ 1\)/);
- assert.match(navigation, /sr-only min-\[400px\]:not-sr-only/);
- assert.doesNotMatch(navigation, /-asset|Техника|flex-wrap/);
+ assert.match(source, /mt-3 grid grid-cols-2 items-end gap-2/);
+ assert.match(source, /<ParkCalendarMonthSelect[^>]*onChange=\{setMonth\}/);
+ assert.match(source, /htmlFor=\{`\$\{id\}-asset`\}[^>]*>\{pt\("Транспорт"\)\}/);
+ assert.match(source, /pt\("Весь транспорт"\)/);
+ assert.match(source, /onChange=\{event => setAssetId\(event.target.value\)\}/);
+ assert.doesNotMatch(source, /pt\("Сегодня"\)|Предыдущий месяц|Следующий месяц|setScrollResetKey/);
 });
 
 test('rental request sheet omits technical copy and keeps its accessible title', () => {

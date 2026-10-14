@@ -5,7 +5,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { Ref } from 'react';
 import { addMonths, format, startOfMonth } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { CalendarDays, ChartGantt, Check, ChevronLeft, ChevronRight, ClipboardList, Plus, RefreshCw, X } from 'lucide-react';
+import { CalendarDays, ChartGantt, Check, ClipboardList, Plus, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { changeParkBookingStatus, fetchParkCalendar, ParkBooking } from '@/api/park-telegram';
 import { listPlatformAssets, PlatformAsset } from '@/api/platform-admin';
@@ -52,7 +52,6 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
   const [month, setMonth] = useState(() => today.slice(0, 7));
   const [assetId, setAssetId] = useState('');
   const [view, setView] = useState('timetable');
-  const [scrollResetKey, setScrollResetKey] = useState(0);
   const [selection, setSelection] = useState<{ bookingId?: string; day?: string } | null>(null);
   const [draft, setDraft] = useState<{ day?: string; assetId?: string } | null>(null);
   const [success, setSuccess] = useState('');
@@ -104,13 +103,10 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
   return <section aria-labelledby={`${id}-title`} aria-busy={loading || busy} className="min-w-0">
     <h2 id={`${id}-title`} className="sr-only">{pt('Календарь заявок парка')}</h2>
     <ParkCalendarActions createRef={createButton} createDisabled={loading || busy || !!draft || !assets.length || !!error} refreshDisabled={loading || busy || !!draft} onCreate={() => { setSuccess(''); setDraft({ assetId }); }} onRefresh={() => setReload(value => value + 1)} />
-    <div className="mt-3 grid grid-cols-[auto_minmax(0,1fr)_44px_44px] items-end gap-2 sm:max-w-lg" role="group" aria-label={pt("Месяц")}>
-      <Button type="button" variant="outline" className="h-11 min-w-11 gap-2 px-3" aria-label={pt("Сегодня")} title={pt("Сегодня")} onClick={() => { setMonth(today.slice(0, 7)); setScrollResetKey(value => value + 1); }}><CalendarDays aria-hidden="true" className="h-4 w-4 shrink-0" /><span className="sr-only min-[400px]:not-sr-only">{pt("Сегодня")}</span></Button>
+    <div className="mt-3 grid grid-cols-2 items-end gap-2 sm:max-w-lg">
       <div className="min-w-0"><label htmlFor={`${id}-month`} className="block text-sm font-medium">{pt("Месяц")}</label><ParkCalendarMonthSelect id={`${id}-month`} month={month} onChange={setMonth} /></div>
-      <Button variant="outline" className="h-11 w-11 p-0" aria-label={pt("Предыдущий месяц")} onClick={() => setMonth(format(addMonths(date, -1), 'yyyy-MM'))}><ChevronLeft aria-hidden="true" /></Button>
-      <Button variant="outline" className="h-11 w-11 p-0" aria-label={pt("Следующий месяц")} onClick={() => setMonth(format(addMonths(date, 1), 'yyyy-MM'))}><ChevronRight aria-hidden="true" /></Button>
+      <div className="min-w-0"><label htmlFor={`${id}-asset`} className="block text-sm font-medium">{pt("Транспорт")}</label><select id={`${id}-asset`} className="mt-2 h-11 w-full min-w-0 max-w-full rounded-md border border-slate-300 bg-white px-2 text-base" value={assetId} onChange={event => setAssetId(event.target.value)}><option value="">{pt("Весь транспорт")}</option>{cars.map(car => <option key={car.id} value={car.id}>{car.name}</option>)}</select></div>
     </div>
-    <div className="mt-3 min-w-0 max-w-full"><label htmlFor={`${id}-asset`} className="block text-sm font-medium">{pt("Техника")}</label><select id={`${id}-asset`} className="mt-2 h-11 max-w-full rounded-md border border-slate-300 bg-white px-3 text-base" value={assetId} onChange={event => setAssetId(event.target.value)}><option value="">{pt("Весь парк")}</option>{cars.map(car => <option key={car.id} value={car.id}>{car.name}</option>)}</select></div>
     {error && <p role="alert" className="mt-3 text-sm text-rose-800">{pt(error)}</p>}
     {!loading && !assets.length && !error && <p className="mt-3 text-sm text-slate-600">{pt("Чтобы создать запись, сначала добавьте машину в автопарк.")}</p>}
     {success && <p role="status" className="mt-3 text-sm text-emerald-800">{pt(success)}</p>}
@@ -123,7 +119,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
       <TabsContent value="timetable" className="mt-3 min-w-0">
         <section aria-labelledby={`${id}-gantt-title`} className="min-w-0">
           <h3 id={`${id}-gantt-title`} className="sr-only">{pt('Таймтейбл')}</h3>
-          <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} scrollResetKey={scrollResetKey} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly renderCarPhoto={car => <ParkCalendarPhoto key={`${tenantId}:${car.id}:${photos.get(car.id) || ''}`} tenantId={tenantId} reference={photos.get(car.id)} admin={admin} />} />
+          <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly renderCarPhoto={car => <ParkCalendarPhoto key={`${tenantId}:${car.id}:${photos.get(car.id) || ''}`} tenantId={tenantId} reference={photos.get(car.id)} admin={admin} />} />
         </section>
       </TabsContent>
       <TabsContent value="deliveries" className="mt-5 min-w-0">
