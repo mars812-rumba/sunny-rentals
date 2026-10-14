@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Keep the header's place in page flow: hiding chrome must not jump the timetable. */
+html[data-park-timetable-immersed="true"] [data-park-owner-chrome] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

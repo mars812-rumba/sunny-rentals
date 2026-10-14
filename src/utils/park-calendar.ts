@@ -37,10 +37,11 @@ export function calendarBookingWithAsset(item: ParkBooking, asset?: PlatformAsse
 }
 
 export function calendarCars(assets: PlatformAsset[], bookings: ParkBooking[]): Car[] {
+  const fleet = new Map(assets.map(asset => [asset.id, asset]));
   const names = new Map(assets.map(asset => [asset.id, asset.name]));
   // Archived cars still have bookings: keep their historical rows visible.
   for (const item of bookings) if (!names.has(item.asset_id)) names.set(item.asset_id, item.pricing.asset_name || item.asset_id);
-  return [...names].map(([id, name]) => ({ id, name, class: '', brand: '', model: '', year: '', color: '', available: true,
+  return [...names].map(([id, name]) => ({ id, name, class: '', brand: String(fleet.get(id)?.specs?.brand || ''), model: String(fleet.get(id)?.specs?.model || ''), year: '', color: '', available: true,
     photos: { main: '', gallery: [] }, specs: { fuel: '', engine: '', power: '', transmission: '' }, supplier: '', rating: 0,
     pricing: { low_season: { price_1_6: 0, price_7_14: 0, price_15_29: 0, price_30: 0 }, high_season: { price_1_6: 0, price_7_14: 0, price_15_29: 0, price_30: 0 }, deposit: 0 } }));
 }

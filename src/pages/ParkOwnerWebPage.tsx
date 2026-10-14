@@ -95,7 +95,7 @@ export default function ParkOwnerWebPage() {
 
   return <main className="min-h-screen bg-white text-slate-900">
     <h1 className="sr-only">{pt("Кабинет владельца ")}{tenant.name}</h1>
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
+    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white" data-park-owner-chrome>
     <div className="mx-auto flex min-h-16 max-w-6xl items-center gap-2 px-4 py-2">
       {tenant.branding?.logo ? <PrivateImage owner tenantId={tenant.tenant_id} reference={tenant.branding.logo} alt={pt('Логотип {0}', [tenant.name])} className="size-11 shrink-0 rounded-lg object-contain" /> : <span role="img" aria-label={pt('Логотип {0}', [tenant.name])} className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700"><Store aria-hidden="true" className="size-6" /></span>}
       <div className="ml-auto">

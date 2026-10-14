@@ -123,9 +123,9 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
       <ParkCalendarViewButtons />
       <TabsContent value="timetable" className="mt-3 min-w-0">
         <ParkCalendarLegend view="timetable" />
-        <section aria-labelledby={`${id}-gantt-title`} className="min-w-0">
+        <section aria-labelledby={`${id}-gantt-title`} className="-mx-4 min-w-0 sm:mx-0">
           <h3 id={`${id}-gantt-title`} className="sr-only">{pt('Таймтейбл')}</h3>
-          <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly
+          <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly pageScroll
             dayCellsDisabled={loading || busy || !!draft}
             onDayCellClick={(carId, clickedDate) => {
               if (loading || busy || draft) return;

@@ -11,6 +11,8 @@ import { useCalendarGrid } from '@/hooks/useCalendarGrid';
 import { schedulerInitialOffset } from '@/lib/scheduler-scroll';
 import { parkBookingColors } from '@/lib/park-booking-colors';
 import { dateLabel } from '@/lib/park-rental';
+import { calendarModelLabel } from '@/lib/calendar-model-label';
+import { observeTimetableViewport } from '@/lib/timetable-viewport';
 
 // 🎨 Получить URL фото
 const getPhotoUrl = (filename: string | null | undefined): string | null => {
@@ -39,6 +41,7 @@ interface SchedulerCalendarProps {
   scrollResetKey?: number;
   onDayCellClick?: (carId: string, day: Date) => void;
   dayCellsDisabled?: boolean;
+  pageScroll?: boolean;
 }
 
 const DAY_WIDTH = 24;
@@ -71,9 +74,12 @@ export function SchedulerCalendar({
   scrollResetKey = 0,
   onDayCellClick,
   dayCellsDisabled = false,
+  pageScroll = false,
 }: SchedulerCalendarProps) {
   const { pt, dateLocale } = useParkLocale();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const headerScrollRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const tap = useRef<{ x: number; y: number; left: number; top: number; moved: boolean } | null>(null);
   const focusedDays = useRef(new Map<string, number>());
   const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
@@ -86,7 +92,13 @@ export function SchedulerCalendar({
 
   // 🆕 Динамическая высота
   const CAR_ROW_HEIGHT = readOnly ? 48 : getRowHeight(isCompactMode);
-  const sidebarWidth = readOnly ? 120 : SIDEBAR_WIDTH;
+  const sidebarWidth = pageScroll ? 72 : readOnly ? 120 : SIDEBAR_WIDTH;
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!pageScroll || !sentinel) return;
+    return observeTimetableViewport(sentinel);
+  }, [pageScroll]);
 
   const {
     dates,
@@ -103,7 +115,12 @@ export function SchedulerCalendar({
 
   useEffect(() => {
     if (scrollRef.current) {
-      if (readOnly) { scrollRef.current.scrollLeft = schedulerInitialOffset(dates, initialScrollDate, DAY_WIDTH); return; }
+      if (readOnly) {
+        const offset = schedulerInitialOffset(dates, initialScrollDate, DAY_WIDTH);
+        scrollRef.current.scrollLeft = offset;
+        if (headerScrollRef.current) headerScrollRef.current.scrollLeft = offset;
+        return;
+      }
       const today = new Date();
       const todayIndex = dates.findIndex(date => isSameDay(date, today));
       
@@ -135,12 +152,12 @@ export function SchedulerCalendar({
     const start = new Date(fd.dates.start);
     const end = new Date(fd.dates.end);
     
-    const startStr = readOnly ? dateLabel(fd.dates.start.slice(0, 10), 'short') : `${String(start.getDate()).padStart(2, '0')}.${String(start.getMonth() + 1).padStart(2, '0')}`;
-    const endStr = readOnly ? dateLabel(fd.dates.end.slice(0, 10), 'short') : `${String(end.getDate()).padStart(2, '0')}.${String(end.getMonth() + 1).padStart(2, '0')}`;
+    const startStr = readOnly && !pageScroll ? dateLabel(fd.dates.start.slice(0, 10), 'short') : `${String(start.getDate()).padStart(2, '0')}.${String(start.getMonth() + 1).padStart(2, '0')}`;
+    const endStr = readOnly && !pageScroll ? dateLabel(fd.dates.end.slice(0, 10), 'short') : `${String(end.getDate()).padStart(2, '0')}.${String(end.getMonth() + 1).padStart(2, '0')}`;
     const pickupTime = fd.dates.pickupTime || format(start, 'HH:mm');
     
     const line1Parts = [];
-    if (booking.status === 'blocked') line1Parts.push(readOnly && fd.personalInfo?.notes?.trim() ? fd.personalInfo.notes.trim() : pt("Блокировка"));
+    if (booking.status === 'blocked') line1Parts.push(readOnly && !pageScroll && fd.personalInfo?.notes?.trim() ? fd.personalInfo.notes.trim() : pt("Блокировка"));
     line1Parts.push(`${startStr}-${endStr}`);
     line1Parts.push(pickupTime);
     if (fd.locations?.pickupLocation) line1Parts.push(fd.locations.pickupLocation);
@@ -156,32 +173,8 @@ export function SchedulerCalendar({
     };
   };
 
- return (
-  <div className={readOnly ? 'relative' : 'relative h-full'}>
-    <div
-      ref={scrollRef}
-      className="overflow-x-auto overflow-y-auto"
-      style={{ height: readOnly ? HEADER_HEIGHT + Math.max(cars.length, 1) * CAR_ROW_HEIGHT + 16 : 'calc(100vh - 60px)', maxHeight: readOnly ? 'min(65vh, 520px)' : undefined }}
-      tabIndex={readOnly ? 0 : undefined}
-      role={readOnly ? 'region' : undefined}
-      aria-label={readOnly ? pt("Гант занятости, прокрутка по датам") : undefined}
-      onPointerDownCapture={readOnly && onDayCellClick ? event => {
-        tap.current = { x: event.clientX, y: event.clientY, left: event.currentTarget.scrollLeft, top: event.currentTarget.scrollTop, moved: false };
-      } : undefined}
-      onPointerMoveCapture={readOnly && onDayCellClick ? event => {
-        if (tap.current && Math.hypot(event.clientX - tap.current.x, event.clientY - tap.current.y) > 8) tap.current.moved = true;
-      } : undefined}
-      onPointerCancelCapture={readOnly && onDayCellClick ? () => { if (tap.current) tap.current.moved = true; } : undefined}
-      onClickCapture={readOnly && onDayCellClick ? event => {
-        const gesture = tap.current;
-        if (event.detail !== 0 && gesture && (gesture.moved || Math.abs(event.currentTarget.scrollLeft - gesture.left) > 8 || Math.abs(event.currentTarget.scrollTop - gesture.top) > 8)) {
-          event.preventDefault(); event.stopPropagation();
-        }
-      } : undefined}
-      onMouseUp={() => handleCellTouchEnd()}
-      onMouseLeave={() => handleCellTouchEnd()}
-    >
-      <div style={{ width: totalWidth + sidebarWidth }}>
+  const dateHeader = (
+    <>
         {/* Header dates */}
         <div className="sticky top-0 z-20 flex bg-white border-b border-gray-300 shadow-md">
           {/* Sidebar header */}
@@ -233,6 +226,44 @@ export function SchedulerCalendar({
           </div>
         </div>
 
+    </>
+  );
+
+ return (
+  <div className={pageScroll ? 'relative min-h-[100dvh] bg-white' : readOnly ? 'relative' : 'relative h-full'} data-page-timetable={pageScroll || undefined}>
+    {pageScroll && <>
+      <div ref={sentinelRef} aria-hidden="true" className="h-px" />
+      <div className="sticky top-0 z-40 bg-white" data-timetable-date-header>
+        <div ref={headerScrollRef} className="overflow-hidden"><div style={{ width: totalWidth + sidebarWidth }}>{dateHeader}</div></div>
+      </div>
+    </>}
+    <div
+      ref={scrollRef}
+      className={pageScroll ? 'overflow-x-auto' : 'overflow-x-auto overflow-y-auto'}
+      style={{ height: pageScroll ? undefined : readOnly ? HEADER_HEIGHT + Math.max(cars.length, 1) * CAR_ROW_HEIGHT + 16 : 'calc(100vh - 60px)', maxHeight: readOnly && !pageScroll ? 'min(65vh, 520px)' : undefined }}
+      onScroll={pageScroll ? event => { if (headerScrollRef.current) headerScrollRef.current.scrollLeft = event.currentTarget.scrollLeft; } : undefined}
+      tabIndex={readOnly ? 0 : undefined}
+      role={readOnly ? 'region' : undefined}
+      aria-label={readOnly ? pt("Гант занятости, прокрутка по датам") : undefined}
+      onPointerDownCapture={readOnly && onDayCellClick ? event => {
+        tap.current = { x: event.clientX, y: event.clientY, left: event.currentTarget.scrollLeft, top: event.currentTarget.scrollTop, moved: false };
+      } : undefined}
+      onPointerMoveCapture={readOnly && onDayCellClick ? event => {
+        if (tap.current && Math.hypot(event.clientX - tap.current.x, event.clientY - tap.current.y) > 8) tap.current.moved = true;
+      } : undefined}
+      onPointerCancelCapture={readOnly && onDayCellClick ? () => { if (tap.current) tap.current.moved = true; } : undefined}
+      onClickCapture={readOnly && onDayCellClick ? event => {
+        const gesture = tap.current;
+        if (event.detail !== 0 && gesture && (gesture.moved || Math.abs(event.currentTarget.scrollLeft - gesture.left) > 8 || Math.abs(event.currentTarget.scrollTop - gesture.top) > 8)) {
+          event.preventDefault(); event.stopPropagation();
+        }
+      } : undefined}
+      onMouseUp={() => handleCellTouchEnd()}
+      onMouseLeave={() => handleCellTouchEnd()}
+    >
+      <div style={{ width: totalWidth + sidebarWidth }}>
+        {!pageScroll && dateHeader}
+
         {/* Car rows */}
         {cars.map((car) => {
           const carBookings = bookingsByCarId.get(car.id) || [];
@@ -261,7 +292,7 @@ export function SchedulerCalendar({
                   setSelectedCarInfo({ car, owner: ownerBadge || null });
                 }}
               >
-                {readOnly && <div className="h-7 w-20 shrink-0 overflow-hidden rounded bg-slate-100">
+                {readOnly && <div className={pageScroll ? 'h-7 w-16 shrink-0 overflow-hidden rounded bg-slate-100' : 'h-7 w-20 shrink-0 overflow-hidden rounded bg-slate-100'}>
                   {renderCarPhoto ? renderCarPhoto(car) : <div className="grid h-full w-full place-items-center"><CarFront aria-hidden="true" className="h-4 w-4 text-slate-500" /></div>}
                 </div>}
                 {/* 🆕 Фото - показываем только если НЕ компактный режим */}
@@ -285,9 +316,9 @@ export function SchedulerCalendar({
                 )}>
                   <div title={car.name} className={cn(
                     "font-bold text-gray-900 leading-none truncate",
-                    readOnly ? "text-xs leading-4" : isCompactMode ? "text-[6px]" : "text-[7px]"
+                    pageScroll ? "text-[10px] leading-4" : readOnly ? "text-xs leading-4" : isCompactMode ? "text-[6px]" : "text-[7px]"
                   )}>
-                    {readOnly ? car.name : `${car.brand} ${car.model}`}
+                    {pageScroll ? calendarModelLabel(car.name, car.model, car.brand) : readOnly ? car.name : `${car.brand} ${car.model}`}
                   </div>
                 </div>
               </div>
@@ -413,7 +444,7 @@ export function SchedulerCalendar({
                         <div className="px-0.5 pl-[8px] pr-[2px] h-full flex flex-col justify-center overflow-hidden leading-tight">
                           <div className={cn(
                             "font-semibold text-white-800 whitespace-nowrap overflow-hidden text-ellipsis",
-                            readOnly ? "text-xs" : isCompactMode ? "text-[6px]" : "text-[7px]"
+                            pageScroll ? "text-[9px]" : readOnly ? "text-xs" : isCompactMode ? "text-[6px]" : "text-[7px]"
                           )}>
                             {badgeData.line1}
                           </div>

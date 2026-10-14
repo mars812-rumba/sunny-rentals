@@ -350,6 +350,26 @@ test('park Gantt renders a private thumbnail above the truncated name in the sti
  assert.doesNotMatch(legacy, /blob:private-park-photo/);
 });
 
+test('page timetable has natural vertical height, compact cars and an independent sticky date header', () => {
+ const cars = ui.calendarCars([{ id: 'asset-a', name: 'Toyota FORTUNER 2023 Gray', specs: { brand: 'Toyota', model: 'FORTUNER' } }], []);
+ const html = renderToStaticMarkup(e(ui.SchedulerCalendar, { cars, bookings: [ui.calendarBooking(booking)], startDate: new Date('2026-08-01T00:00:00'), daysToShow: 97, readOnly: true, pageScroll: true, onDayCellClick() {}, onDateChange() {}, onCreateBooking() {}, onBookingClick() {} }));
+ assert.match(html, /data-page-timetable="true"/);
+ assert.match(html, /min-h-\[100dvh\]/);
+ assert.match(html, /sticky top-0 z-40[^>]*data-timetable-date-header/);
+ assert.match(html, /h-7 w-16/);
+ assert.match(html, /width:72px/);
+ assert.match(html, />FORTUNER<\/div>/);
+ assert.doesNotMatch(html, /max-height:|65vh|520px|overflow-y-auto/);
+ assert.equal((html.match(/data-timetable-date-header/g) || []).length, 1);
+ const source = readFileSync('src/components/admin/SchedulerCalendar.tsx', 'utf8');
+ assert.match(source, /headerScrollRef.current.scrollLeft = event.currentTarget.scrollLeft/);
+ assert.match(source, /headerScrollRef.current.scrollLeft = offset/);
+ assert.match(source, /!pageScroll && dateHeader/);
+ assert.match(readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8'), /readOnly pageScroll/);
+ const css = readFileSync('src/index.css', 'utf8');
+ assert.match(css, /data-park-timetable-immersed="true"[^]*?visibility: hidden/);
+});
+
 test('request item displays private contacts with safe links and actionable statuses', () => {
  const props = { booking: { ...booking, customer: { name: 'Иван', username: 'ivan_test', phone: '+66 123-456-789', telegram_user_id: '42' } }, busy: false, onAction() {} };
  const html = renderToStaticMarkup(e(ui.ParkRequestItem, props));
