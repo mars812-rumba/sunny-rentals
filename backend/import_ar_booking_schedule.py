@@ -20,6 +20,26 @@ from platform_core.vehicle_details import calculate_rental
 
 SOURCE = 'AR-booking-on-hand-2026-10-12'
 TENANT = 'ar-rentals'
+NOTE_TRANSLATIONS = {
+    'Агент:': 'Agent:',
+    'Источник: сводка парка от 12.10.2026.': 'Source: Fleet summary dated 12 October 2026.',
+    'Даты начала неизвестны. Блок поставлен с ': 'The rental start date is unknown. The block was created from ',
+    '; фактическая дата начала аренды не указана.': '; the actual rental start date was not provided.',
+    'Имя клиента и контакты заполнит владелец.': 'The owner will fill in the customer name and contact details.',
+    'Стоимость рассчитана по текущему тарифу; требуется подтверждение владельцем.': 'The price is estimated using the current rate and requires owner confirmation.',
+    'Время 09:00 задано по умолчанию; место передачи не указано.': 'The default pickup and return time is 09:00; the handover location was not provided.',
+    'Замена с City RS.': 'Vehicle change from City RS.',
+    'Замена с Mazda2.': 'Vehicle change from Mazda2.',
+}
+
+
+def english_note(note):
+    """Translate only our import text, preserving agent names and owner additions."""
+    for original, translated in NOTE_TRANSLATIONS.items():
+        note = note.replace(original, translated)
+    return note
+
+
 VEHICLES = {
     'Fortuner grey': 'toyota_fortuner_2023_gray',
     'Veloz': 'Ar_veloz_gray_2024', 'Xpander': 'Ar_xpander_hev_white_2024',
@@ -136,7 +156,7 @@ def plan(assets, existing, zone_name, now):
         planned.append(Booking(id=key, booking_number=str(number), tenant_id=TENANT, asset_id=asset.id,
             customer_id=None, status=BookingStatus.CONFIRMED, start_at=start_at, end_at=end_at,
             currency='THB', source='platform_manual', entry_type=entry_type,
-            operator_details={'customer_name': '', 'note': note.strip(), 'created_by': 'AR-schedule-import'},
+            operator_details={'customer_name': '', 'note': english_note(note.strip()), 'created_by': 'AR-schedule-import'},
             pricing={'asset_name': asset.name, 'start_date': start_date.isoformat(), 'end_date': end,
                 'days': days, 'timezone': zone_name, **rental}, deposit={'amount': deposit},
             legacy={'schedule_import': SOURCE, 'agent': agent, 'original_start_unknown': entry_type == 'block',
@@ -149,7 +169,7 @@ def plan(assets, existing, zone_name, now):
     return planned, skipped
 
 
-def run(root, apply=False, now=None):
+def run(root, apply=False, now=None, translate_notes=False):
     root = Path(root)
     admin = PlatformContext.for_admin('AR-schedule-import')
     provisioner = TenantProvisioner(root)
@@ -165,6 +185,35 @@ def run(root, apply=False, now=None):
         if current is None:
             raise ValueError('Target park no longer available')
         document = repo._read_document()
+        if translate_notes:
+            # Do not re-import, recalculate prices, change agents, or overwrite owner edits.
+            result = json.loads(json.dumps(document))
+            changed = []
+            for item in result['items']:
+                if item.get('tenant_id') != TENANT or item.get('legacy', {}).get('schedule_import') != SOURCE:
+                    continue
+                details = item.get('operator_details', {})
+                original = details.get('note', '')
+                translated = english_note(original)
+                if original != translated:
+                    details['note'] = translated
+                    item['updated_at'] = timestamp.isoformat()
+                    Booking.parse_obj(item)
+                    changed.append(item['id'])
+            backup = None
+            if apply and changed:
+                backup = Path(tempfile.mkdtemp(prefix='ar-notes-backup-'))
+                (backup / 'bookings.json').write_bytes(repo.path.read_bytes())
+                try:
+                    repo._write_document(result)
+                    JsonlEventRepository(root, context, 'audit.jsonl').append({
+                        'type': 'schedule_notes_translated', 'schema_version': 1,
+                        'source': SOURCE, 'timestamp': timestamp.isoformat(),
+                        'actor_id': admin.actor_id, 'booking_ids': changed, 'language': 'en'})
+                except Exception:
+                    repo._write_document(document)
+                    raise
+            return {'applied': apply, 'translated_notes': len(changed), 'backup': str(backup) if backup else None}
         existing = [Booking.parse_obj(item) for item in document['items']]
         planned, skipped = plan(assets.list(), existing, current.timezone, timestamp)
         backup = None
@@ -195,5 +244,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--translate-notes', action='store_true')
     args = parser.parse_args()
-    print(json.dumps(run(args.root, args.apply), ensure_ascii=False, indent=2))
+    print(json.dumps(run(args.root, args.apply, translate_notes=args.translate_notes), ensure_ascii=False, indent=2))

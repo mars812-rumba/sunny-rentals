@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from import_ar_booking_schedule import plan, run, VEHICLES, SOURCE
+from import_ar_booking_schedule import plan, run, VEHICLES, SOURCE, english_note, NOTE_TRANSLATIONS
 from platform_core.models import Booking, BookingStatus, RentalAsset
 from platform_core.provisioning import PlatformContext, TenantProvisioner, TenantProvisionRequest, _jsonable, _atomic_json_write
 
@@ -33,12 +33,12 @@ class ARScheduleTests(unittest.TestCase):
             self.assertEqual(item.end_at.hour, 2)
             self.assertEqual(item.pricing['pickup']['time'], '09:00')
             self.assertNotIn('location', item.pricing['pickup'])
-            self.assertIn('Агент:', item.operator_details['note'])
+            self.assertIn('Agent:', item.operator_details['note'])
             if item.entry_type == 'block':
                 self.assertEqual(item.pricing['start_date'], '2026-10-14')
                 self.assertEqual(item.pricing['total_rental'], '0.00')
                 self.assertEqual(item.deposit['amount'], '0.00')
-                self.assertIn('Даты начала неизвестны', item.operator_details['note'])
+                self.assertIn('The rental start date is unknown', item.operator_details['note'])
             else:
                 self.assertGreater(float(item.pricing['total_rental']), 0)
                 self.assertTrue(item.legacy['pricing_estimated'])
@@ -55,6 +55,51 @@ class ARScheduleTests(unittest.TestCase):
         self.assertEqual(second, [])
         self.assertEqual(sum(item['reason'] == 'Уже импортировано.' for item in skipped), 28)
         self.assertEqual(first[0].status, BookingStatus.CANCELLED)
+
+    def test_note_translation_preserves_agents_dates_owner_additions_and_is_idempotent(self):
+        original = 'Агент: F. Источник: сводка парка от 12.10.2026. Даты начала неизвестны. Блок поставлен с 14.10.2026; фактическая дата начала аренды не указана. Owner addition.'
+        translated = english_note(original)
+        self.assertIn('Agent: F.', translated)
+        self.assertIn('14.10.2026', translated)
+        self.assertTrue(translated.endswith('Owner addition.'))
+        self.assertEqual(english_note(translated), translated)
+
+    def test_translate_existing_notes_only_and_retry_is_noop(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            admin = PlatformContext.for_admin('test')
+            TenantProvisioner(root).create_tenant(admin, TenantProvisionRequest(name='AR', slug='ar-rentals'))
+            target = root / 'tenants/ar-rentals/bookings.json'
+            planned, _ = plan(self.assets, [], 'Asia/Bangkok', self.now)
+            original = [_jsonable(item) for item in planned]
+            for item in original:
+                for ru, en in NOTE_TRANSLATIONS.items():
+                    item['operator_details']['note'] = item['operator_details']['note'].replace(en, ru)
+            unrelated = json.loads(json.dumps(original[0]))
+            unrelated['id'] = 'unrelated'
+            unrelated['legacy'] = {}
+            unrelated['operator_details']['note'] = 'Агент: Jay.'
+            original.append(unrelated)
+            _atomic_json_write(target, {'tenant_id': 'ar-rentals', 'items': original})
+            before = target.read_bytes()
+            self.assertEqual(run(root, translate_notes=True)['translated_notes'], 28)
+            self.assertEqual(target.read_bytes(), before)
+            with patch('import_ar_booking_schedule.JsonlEventRepository.append', side_effect=RuntimeError('audit failure')):
+                with self.assertRaises(RuntimeError):
+                    run(root, apply=True, translate_notes=True)
+            self.assertEqual(target.read_bytes(), before)
+            result = run(root, apply=True, translate_notes=True)
+            self.assertEqual(result['translated_notes'], 28)
+            self.assertEqual((Path(result['backup']) / 'bookings.json').read_bytes(), before)
+            after = json.loads(target.read_text())['items']
+            for old, new in zip(original[:-1], after[:-1]):
+                new['updated_at'] = old['updated_at']
+                new['operator_details']['note'] = old['operator_details']['note']
+                self.assertEqual(new, old)
+            self.assertEqual(after[-1], unrelated)
+            saved = target.read_bytes()
+            self.assertEqual(run(root, apply=True, translate_notes=True)['translated_notes'], 0)
+            self.assertEqual(target.read_bytes(), saved)
 
     def test_conflicts_abort_and_adjacent_handover_day_is_allowed(self):
         first, _ = plan(self.assets, [], 'Asia/Bangkok', self.now)
