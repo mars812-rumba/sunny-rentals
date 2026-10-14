@@ -566,6 +566,8 @@ test('rental request sheet omits technical copy and keeps its accessible title',
  assert.match(sheet, /aria-describedby=\{undefined\}/);
  assert.match(sheet, /<DialogTitle/);
  assert.match(sheet, /details\(selected\)/);
+ assert.match(sheet, /<DialogHeader className="text-left">/);
+ assert.doesNotMatch(sheet, /<DialogHeader[^>]*sticky/);
 });
 
 test('manual form has labeled fields, inline validation hooks and date-only inputs', () => {
