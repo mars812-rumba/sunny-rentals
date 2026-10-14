@@ -35,13 +35,13 @@ const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', sta
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
 
-test('park calendar shadows preserve clipped bar shapes and fixed badge rows', () => {
+test('calendar events and timetable bars omit shadows and clock icons, preserving fixed rows and clipped shapes', () => {
  const scheduler = readFileSync(resolve('src/components/admin/SchedulerCalendar.tsx'), 'utf8');
  const month = readFileSync(resolve('src/components/admin/MonthCalendarView.tsx'), 'utf8');
- assert.match(scheduler, /filter: readOnly \? "drop-shadow\(0 2px 2px rgba\(15,23,42,0\.14\)\)"/);
+ assert.doesNotMatch(scheduler, /drop-shadow|boxShadow/);
  assert.match(scheduler, /className="relative h-full"/);
  assert.match(scheduler, /clipPath: "polygon\(6px/);
- assert.match(month, /boxShadow: '0 1px 4px rgba\(15,23,42,0\.12\)'/);
+ assert.doesNotMatch(month, /boxShadow|Clock3/);
  assert.match(month, /'grid gap-0\.5 font-sans'/);
  assert.match(month, /flex h-5 min-h-5/);
 });
@@ -157,20 +157,18 @@ test('return fields, price explanation and calendar carry the real clock and bot
  assert.match(ui.calendarLogistics({ ...booking, pricing: { ...booking.pricing, pickup } }).return_date, /T18:00:00$/);
 });
 
-test('edit dates returns to same storefront filters after dialog focus release', () => {
+test('dates and pickup are edited inline without closing the vehicle dialog', () => {
  const calls = [];
  ui.focusStorefrontFilters({ focus: options => calls.push(['focus', options]), scrollIntoView: options => calls.push(['scroll', options]) });
  assert.deepEqual(calls, [['focus', { preventScroll: true }], ['scroll', { block: 'start', behavior: 'instant' }]]);
  ui.focusStorefrontFilters(null);
  const form = readFileSync('src/components/platform/ParkBookingForm.tsx', 'utf8');
- assert.match(form, /onEditPickup\?\.\(\{ start, end, pickup \}\)/);
+ assert.match(form, /<fieldset disabled=\{busy\} className="grid gap-3 sm:grid-cols-2">/);
+ assert.match(form, /<ParkPickupFields/);
+ assert.doesNotMatch(form, /onEditPickup\?\./);
  const page = readFileSync('src/pages/ParkStorefrontPage.tsx', 'utf8');
  assert.match(page, /<Dialog open=\{open\}/);
- assert.match(page, /returnPeriod\.current = value; setOpen\(false\)/);
- assert.match(page, /onCloseAutoFocus=[\s\S]*event\.preventDefault\(\)[\s\S]*onEditPickup\(previous\)/);
- assert.match(page, /onEditPickup=\{editPickup\}/);
- assert.match(page, /focusStorefrontFilters\(document\.getElementById\('park-rental-filters'\)\)/);
- assert.match(page, /setPeriod\(value\)/); assert.match(page, /setPickup\(value\.pickup\)/);
+ assert.match(page, /initialRental=\{rental\}/);
  const filters = readFileSync('src/components/platform/ParkRentalFilters.tsx', 'utf8');
  assert.match(filters, /id="park-rental-filters" tabIndex=\{-1\}/);
 });
@@ -481,7 +479,7 @@ test('park periods use plain middle-day text for all sources and consistent purp
   const classes = [...middle.matchAll(/data-plain-occupancy="true"[^>]*class="([^"]+)"/g)].map(match => match[1]);
   assert.equal(classes.length, 1); assert.doesNotMatch(classes[0], /\bbg-/);
   assert.match(middle, /Toyota/);
-  if (status === 'requested') { assert.match(middle, /text-purple-900/); assert.match(middle, /lucide-clock/); }
+  if (status === 'requested') { assert.match(middle, /text-purple-900/); assert.doesNotMatch(middle, /lucide-clock/); }
  }
  for (const [entry_type, status, color] of [['rental', 'requested', '#e9d5ff'], ['block', 'confirmed', '#e2e8f0'], ['rental', 'confirmed', '#86efac']]) {
   const item = { ...booking, entry_type, status };

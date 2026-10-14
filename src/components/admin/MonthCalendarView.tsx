@@ -1,6 +1,5 @@
 import { parkText as pt } from '@/lib/park-locale';
 import { parkBookingColors } from '@/lib/park-booking-colors';
-import { Clock3 } from 'lucide-react';
 import { useParkLocale } from '@/contexts/park-locale';
 import React, { useMemo, useCallback, useEffect, memo, useState, useRef } from 'react';
 import { 
@@ -148,7 +147,6 @@ const MonthGrid = memo(({
                           data-compact-event={showOccupancy ? true : undefined}
                           data-calendar-lane={showOccupancy ? idx : undefined}
                           data-calendar-booking={showOccupancy ? ev.booking_id : undefined}
-                          style={showOccupancy ? { boxShadow: '0 1px 4px rgba(15,23,42,0.12)' } : undefined}
                           data-plain-occupancy={showOccupancy && ev.type === 'rental' ? true : undefined}
                           key={idx}
                           className={cn(
@@ -163,7 +161,6 @@ const MonthGrid = memo(({
                           title={`${ev.booking?.status === 'blocked' ? pt('Блокировка') : ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}`}
                         >
                           <span className={showOccupancy ? 'block h-4 min-w-0 w-full truncate leading-4 tracking-tight' : 'block truncate tracking-tight'}>
-                            {showOccupancy && isPreBooking && <Clock3 aria-hidden="true" className="mr-0.5 inline size-2.5" />}
                             {showOccupancy ? calendarModelLabel(ev.carName, ev.booking.form_data.car.model, ev.booking.form_data.car.brand) : ev.booking?.status === 'blocked' ? pt("Блок · {0}", [ev.carName]) : ev.carName}
                           </span>
                         </button>

@@ -345,7 +345,6 @@ export function SchedulerCalendar({
   style={{
     left: position.left + 2,
     width: position.width - 4,
-    filter: readOnly ? "drop-shadow(0 2px 2px rgba(15,23,42,0.14))" : undefined,
   }}
 
 
@@ -356,7 +355,6 @@ export function SchedulerCalendar({
                         <div className="relative h-full" style={{
                           backgroundColor: bgColor,
                           clipPath: "polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%)",
-                          boxShadow: readOnly ? undefined : "0 4px 8px rgba(0,0,0,0.3)",
                         }}>
                         {booking.status === 'pre_booking' && (
                           <div className={cn("absolute bottom-[1px] right-[6px] text-[6px] px-[2px] rounded-[1px] font-semibold uppercase pointer-events-none", readOnly ? parkBookingColors.pending.badge : 'bg-gray-400/70 text-white')}>
