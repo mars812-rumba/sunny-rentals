@@ -24,9 +24,9 @@ const statusColors: Record<string, string> = {
   requested: parkBookingColors.pending.badge,
   confirmed: parkBookingColors.confirmed.badge,
   blocked: parkBookingColors.blocked.badge,
-  cancelled: 'bg-red-100 text-red-900',
-  in_progress: 'bg-blue-100 text-blue-900',
-  completed: 'bg-slate-100 text-slate-700',
+  cancelled: 'bg-red-300 text-red-950',
+  in_progress: 'bg-blue-300 text-blue-950',
+  completed: 'bg-sky-300 text-sky-950',
 };
 
 function ParkRequestJourney({ pickup }: { pickup: ParkBooking['pricing']['pickup'] }) {
@@ -123,7 +123,7 @@ export function ParkRequestItem({ booking, busy, onAction, detailed = false, ten
       </div>}
       <div className={detailed ? 'min-w-0 flex-1' : 'contents'}>
         <h3 className="flex items-start gap-2 break-words text-lg font-semibold">{detailed && !tenantId && <CarFront aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-blue-700" />}<span className="min-w-0 break-words">{booking.pricing.asset_name || pt("Транспорт парка")}</span></h3>
-        <span className={cn('inline-block rounded-full px-3 py-1 text-xs font-medium', detailed && 'mt-1', statusColors[booking.status] || 'bg-slate-100 text-slate-700')}>{pt(statuses[booking.status] || booking.status)}</span>
+        <span className={cn('inline-block rounded-full px-3 py-1 text-xs font-semibold', detailed && 'mt-1', statusColors[booking.status] || 'bg-slate-100 text-slate-700')}>{pt(statuses[booking.status] || booking.status)}</span>
       </div>
     </div>
     {!detailed && booking.booking_number && <p className="mt-2 text-xs tabular-nums text-slate-600">{pt("Заявка № ")}{booking.booking_number}</p>}

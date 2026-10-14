@@ -345,11 +345,11 @@ test('request item displays private contacts with safe links and actionable stat
  const unsafe = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, customer: { username: 'evil?start=secret', phone: 'javascript:alert(1)' } } }));
  assert.doesNotMatch(unsafe, /href="(?:https:\/\/t.me|tel:|javascript:)/);
  const confirmed = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, status: 'confirmed' } }));
- assert.match(confirmed, /bg-emerald-100 text-emerald-950[^>]*>Подтверждена/);
+ assert.match(confirmed, /bg-green-400 text-green-950[^>]*>Подтверждена/);
  assert.doesNotMatch(confirmed, />Подтвердить<\/button>/);
  assert.match(confirmed, />Отменить<\/button>/);
  const cancelled = renderToStaticMarkup(e(ui.ParkRequestItem, { ...props, booking: { ...booking, status: 'cancelled' } }));
- assert.match(cancelled, /bg-red-100 text-red-900[^>]*>Отменена/);
+ assert.match(cancelled, /bg-red-300 text-red-950[^>]*>Отменена/);
  assert.doesNotMatch(cancelled, />Отменить<\/button>|>Подтвердить<\/button>/);
 });
 
@@ -437,10 +437,10 @@ test('today fills the entire park calendar cell with opaque soft blue instead of
  assert.match(legacy, /bg-blue-600 text-white shadow-md/);
 });
 
-test('confirmed occupancy is quiet but pickup and return retain their distinct colors', () => {
+test('confirmed occupancy has green text while pickup and return retain their distinct colors', () => {
  const confirmed = { ...booking, status: 'confirmed' };
  const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: [ui.calendarBooking(confirmed)], logisticsData: [ui.calendarLogistics(confirmed)], onDateChange() {}, onBookingClick() {}, showOccupancy: true }));
- assert.match(html, /text-slate-800/);
+ assert.match(html, /text-green-700/);
  assert.match(html, /bg-green-400 text-green-950/);
  assert.match(html, /bg-yellow-400 text-yellow-950/);
 });
@@ -480,6 +480,7 @@ test('park periods use plain middle-day text for all sources and consistent purp
   assert.equal(classes.length, 1); assert.doesNotMatch(classes[0], /\bbg-/);
   assert.match(middle, /Toyota/);
   if (status === 'requested') { assert.match(middle, /text-purple-700/); assert.doesNotMatch(middle, /lucide-clock/); }
+  else { assert.match(classes[0], /text-green-700/); assert.doesNotMatch(middle, /box-shadow|lucide-clock/); }
  }
  for (const [entry_type, status, color] of [['rental', 'requested', '#d8b4fe'], ['block', 'confirmed', '#e2e8f0'], ['rental', 'confirmed', '#86efac']]) {
   const item = { ...booking, entry_type, status };
