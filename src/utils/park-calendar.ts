@@ -49,3 +49,7 @@ export function bookingsOnDay(bookings: ParkBooking[], day: string): ParkBooking
   // Include return events, but the occupancy range itself remains [start, end).
   return bookings.filter(item => item.status !== 'cancelled' && item.pricing.start_date <= day && item.pricing.end_date >= day);
 }
+
+export function timetableCellBooking(bookings: ParkBooking[], assetId: string, day: string): ParkBooking | undefined {
+  return bookingsOnDay(bookings, day).find(item => item.asset_id === assetId);
+}

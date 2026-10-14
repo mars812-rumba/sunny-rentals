@@ -3,7 +3,7 @@ import { parkText as pt } from '@/lib/park-locale';
 import { useParkLocale } from '@/contexts/park-locale';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { Ref } from 'react';
-import { addMonths, format, startOfMonth } from 'date-fns';
+import { addDays, addMonths, format, startOfMonth } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { CalendarDays, ChartGantt, Check, ClipboardList, Plus, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ export function ParkCalendarActions({ createRef, createDisabled, refreshDisabled
   </div>;
 }
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { bookingsOnDay, calendarBooking, calendarBookingWithAsset, calendarCars, calendarLogistics, calendarThumbnail } from '@/utils/park-calendar';
+import { bookingsOnDay, timetableCellBooking, calendarBooking, calendarBookingWithAsset, calendarCars, calendarLogistics, calendarThumbnail } from '@/utils/park-calendar';
 import { ParkManualBookingForm } from './ParkManualBookingForm';
 import { ParkCalendarPhoto } from './ParkCalendarPhoto';
 import { ParkRequestItem } from './ParkRequestsPanel';
@@ -53,12 +53,17 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
   const [assetId, setAssetId] = useState('');
   const [view, setView] = useState('timetable');
   const [selection, setSelection] = useState<{ bookingId?: string; day?: string } | null>(null);
-  const [draft, setDraft] = useState<{ day?: string; assetId?: string } | null>(null);
+  const [draft, setDraft] = useState<{ day?: string; endDay?: string; assetId?: string } | null>(null);
   const [success, setSuccess] = useState('');
   const [cancelTarget, setCancelTarget] = useState<ParkBooking | null>(null);
   const createButton = useRef<HTMLButtonElement>(null);
+  const draftTrigger = useRef<HTMLElement | null>(null);
   const wasDraft = useRef(false);
-  useEffect(() => { if (wasDraft.current && !draft) createButton.current?.focus(); wasDraft.current = !!draft; }, [draft]);
+  useEffect(() => { if (wasDraft.current && !draft) { const trigger = draftTrigger.current; (trigger?.isConnected ? trigger : createButton.current)?.focus({ preventScroll: true }); } wasDraft.current = !!draft; }, [draft]);
+  const openDraft = (value: { day?: string; endDay?: string; assetId?: string }) => {
+    draftTrigger.current = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : createButton.current;
+    setSelection(null); setSuccess(''); setDraft(value);
+  };
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -102,7 +107,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
   </li>)}</ul>;
   return <section aria-labelledby={`${id}-title`} aria-busy={loading || busy} className="min-w-0">
     <h2 id={`${id}-title`} className="sr-only">{pt('Календарь заявок парка')}</h2>
-    <ParkCalendarActions createRef={createButton} createDisabled={loading || busy || !!draft || !assets.length || !!error} refreshDisabled={loading || busy || !!draft} onCreate={() => { setSuccess(''); setDraft({ assetId }); }} onRefresh={() => setReload(value => value + 1)} />
+    <ParkCalendarActions createRef={createButton} createDisabled={loading || busy || !!draft || !assets.length || !!error} refreshDisabled={loading || busy || !!draft} onCreate={() => { createButton.current?.focus({ preventScroll: true }); openDraft({ assetId }); }} onRefresh={() => setReload(value => value + 1)} />
     <div className="mt-3 grid grid-cols-2 items-end gap-2 sm:max-w-lg">
       <div className="min-w-0"><label htmlFor={`${id}-month`} className="block text-sm font-medium">{pt("Месяц")}</label><ParkCalendarMonthSelect id={`${id}-month`} month={month} onChange={setMonth} /></div>
       <div className="min-w-0"><label htmlFor={`${id}-asset`} className="block text-sm font-medium">{pt("Транспорт")}</label><select id={`${id}-asset`} className="mt-2 h-11 w-full min-w-0 max-w-full rounded-md border border-slate-300 bg-white px-2 text-base" value={assetId} onChange={event => setAssetId(event.target.value)}><option value="">{pt("Весь транспорт")}</option>{cars.map(car => <option key={car.id} value={car.id}>{car.name}</option>)}</select></div>
@@ -110,7 +115,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
     {error && <p role="alert" className="mt-3 text-sm text-rose-800">{pt(error)}</p>}
     {!loading && !assets.length && !error && <p className="mt-3 text-sm text-slate-600">{pt("Чтобы создать запись, сначала добавьте машину в автопарк.")}</p>}
     {success && <p role="status" className="mt-3 text-sm text-emerald-800">{pt(success)}</p>}
-    {draft && <ParkManualBookingForm tenantId={tenantId} assets={assets} admin={admin} initialDay={draft.day} initialAssetId={draft.assetId} onClose={() => setDraft(null)} onSaved={booking => {
+    {draft && <ParkManualBookingForm tenantId={tenantId} assets={assets} admin={admin} initialDay={draft.day} initialEndDay={draft.endDay} initialAssetId={draft.assetId} onClose={() => setDraft(null)} onSaved={booking => {
       setBookings(items => [...items.filter(item => item.id !== booking.id), booking]); setMonth(booking.pricing.start_date.slice(0, 7)); setAssetId(booking.asset_id); setDraft(null);
       setSuccess(booking.entry_type === 'block' ? pt("Даты закрыты. Блокировка видна во всех видах календаря.") : booking.status === 'requested' ? pt("Предбронь создана. Даты заняты до подтверждения или отмены.") : pt("Подтверждённая бронь создана и видна во всех видах календаря."));
     }} />}
@@ -120,7 +125,16 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
         <ParkCalendarLegend view="timetable" />
         <section aria-labelledby={`${id}-gantt-title`} className="min-w-0">
           <h3 id={`${id}-gantt-title`} className="sr-only">{pt('Таймтейбл')}</h3>
-          <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly renderCarPhoto={car => <ParkCalendarPhoto key={`${tenantId}:${car.id}:${photos.get(car.id) || ''}`} tenantId={tenantId} reference={photos.get(car.id)} admin={admin} />} />
+          <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly
+            dayCellsDisabled={loading || busy || !!draft}
+            onDayCellClick={(carId, clickedDate) => {
+              if (loading || busy || draft) return;
+              const day = format(clickedDate, 'yyyy-MM-dd');
+              const existing = timetableCellBooking(active, carId, day);
+              if (existing) setSelection({ bookingId: existing.id });
+              else if (assets.some(asset => asset.id === carId)) openDraft({ day, endDay: format(addDays(clickedDate, 1), 'yyyy-MM-dd'), assetId: carId });
+            }}
+            renderCarPhoto={car => <ParkCalendarPhoto key={`${tenantId}:${car.id}:${photos.get(car.id) || ''}`} tenantId={tenantId} reference={photos.get(car.id)} admin={admin} />} />
         </section>
       </TabsContent>
       <TabsContent value="deliveries" className="mt-5 min-w-0">

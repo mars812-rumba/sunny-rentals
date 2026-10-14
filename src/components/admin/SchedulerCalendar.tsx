@@ -37,6 +37,8 @@ interface SchedulerCalendarProps {
   renderCarPhoto?: (car: Car) => React.ReactNode;
   initialScrollDate?: Date;
   scrollResetKey?: number;
+  onDayCellClick?: (carId: string, day: Date) => void;
+  dayCellsDisabled?: boolean;
 }
 
 const DAY_WIDTH = 24;
@@ -67,9 +69,13 @@ export function SchedulerCalendar({
   renderCarPhoto,
   initialScrollDate,
   scrollResetKey = 0,
+  onDayCellClick,
+  dayCellsDisabled = false,
 }: SchedulerCalendarProps) {
   const { pt, dateLocale } = useParkLocale();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const tap = useRef<{ x: number; y: number; left: number; top: number; moved: boolean } | null>(null);
+  const focusedDays = useRef(new Map<string, number>());
   const [hoveredBooking, setHoveredBooking] = useState<string | null>(null);
   const [selectedCarInfo, setSelectedCarInfo] = useState<{car: Car, owner: string | null} | null>(null);
   const [lastBookingTap, setLastBookingTap] = useState<{
@@ -159,6 +165,19 @@ export function SchedulerCalendar({
       tabIndex={readOnly ? 0 : undefined}
       role={readOnly ? 'region' : undefined}
       aria-label={readOnly ? pt("Гант занятости, прокрутка по датам") : undefined}
+      onPointerDownCapture={readOnly && onDayCellClick ? event => {
+        tap.current = { x: event.clientX, y: event.clientY, left: event.currentTarget.scrollLeft, top: event.currentTarget.scrollTop, moved: false };
+      } : undefined}
+      onPointerMoveCapture={readOnly && onDayCellClick ? event => {
+        if (tap.current && Math.hypot(event.clientX - tap.current.x, event.clientY - tap.current.y) > 8) tap.current.moved = true;
+      } : undefined}
+      onPointerCancelCapture={readOnly && onDayCellClick ? () => { if (tap.current) tap.current.moved = true; } : undefined}
+      onClickCapture={readOnly && onDayCellClick ? event => {
+        const gesture = tap.current;
+        if (event.detail !== 0 && gesture && (gesture.moved || Math.abs(event.currentTarget.scrollLeft - gesture.left) > 8 || Math.abs(event.currentTarget.scrollTop - gesture.top) > 8)) {
+          event.preventDefault(); event.stopPropagation();
+        }
+      } : undefined}
       onMouseUp={() => handleCellTouchEnd()}
       onMouseLeave={() => handleCellTouchEnd()}
     >
@@ -218,6 +237,9 @@ export function SchedulerCalendar({
         {cars.map((car) => {
           const carBookings = bookingsByCarId.get(car.id) || [];
           const ownerBadge = carOwnersMap[car.id];
+          const focusIndex = readOnly && onDayCellClick
+            ? focusedDays.current.get(car.id) ?? Math.max(0, dates.findIndex(day => isSameDay(day, initialScrollDate || startDate)))
+            : -1;
 
           return (
             <div
@@ -280,6 +302,29 @@ export function SchedulerCalendar({
                     const isSelected = isInSelection(car.id, i);
                     const isPhantomRangeInCell = phantomRange && car.id === phantomRange.carId && i >= phantomRange.start && i <= phantomRange.end;
                     const isHovered = !isSelected && !isPhantomRangeInCell && hoveredBooking === null && hoveredCell?.carId === car.id && hoveredCell?.dayIndex === i;
+
+                    if (readOnly && onDayCellClick) {
+                      const dayKey = format(date, 'yyyy-MM-dd');
+                      return <button key={dayKey} type="button" data-compact-event data-day-index={i}
+                        aria-label={pt('Ячейка календаря: {0}, {1}', [car.name, dateLabel(dayKey)])}
+                        disabled={dayCellsDisabled} tabIndex={i === focusIndex ? 0 : -1}
+                        className="shrink-0 cursor-pointer border-r border-gray-300/30 p-0 hover:brightness-95 active:brightness-90 focus-visible:relative focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700 disabled:cursor-default"
+                        style={{ width: DAY_WIDTH, height: '100%', backgroundColor: isToday ? '#dbeafe' : monthBg }}
+                        onFocus={event => {
+                          focusedDays.current.set(car.id, i);
+                          for (const sibling of event.currentTarget.parentElement?.children || []) {
+                            if (sibling instanceof HTMLButtonElement) sibling.tabIndex = sibling === event.currentTarget ? 0 : -1;
+                          }
+                        }}
+                        onKeyDown={event => {
+                          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                          event.preventDefault();
+                          const index = event.key === 'Home' ? 0 : event.key === 'End' ? dates.length - 1 : Math.max(0, Math.min(dates.length - 1, i + (event.key === 'ArrowLeft' ? -1 : 1)));
+                          const next = event.currentTarget.parentElement?.children[index];
+                          if (next instanceof HTMLButtonElement) next.focus();
+                        }}
+                        onClick={event => { event.currentTarget.focus({ preventScroll: true }); onDayCellClick(car.id, date); }} />;
+                    }
 
                     return (
                       <div

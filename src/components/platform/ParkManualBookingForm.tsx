@@ -18,7 +18,7 @@ import { ParkFormSheet, ParkFormSheetContent } from './ParkFormSheet';
 import { useParkFormSheetSaving } from './park-form-sheet-context';
 
 type ManualFormProps = {
-  tenantId: string; assets: PlatformAsset[]; admin: boolean; initialDay?: string; initialAssetId?: string;
+  tenantId: string; assets: PlatformAsset[]; admin: boolean; initialDay?: string; initialEndDay?: string; initialAssetId?: string;
   onSaved: (booking: ParkBooking) => void; onClose: () => void;
 };
 export function ParkManualBookingForm(props: ManualFormProps) {
@@ -26,7 +26,7 @@ export function ParkManualBookingForm(props: ManualFormProps) {
   return <ParkFormSheet open onOpenChange={open => { if (!open) props.onClose(); }}><ParkFormSheetContent header={<><DialogTitle>{pt('Добавить запись в календарь')}</DialogTitle><DialogDescription className="mt-2">{pt('Время местное, по часовому поясу парка.')}</DialogDescription></>}><ParkManualBookingFields {...props} /></ParkFormSheetContent></ParkFormSheet>;
 }
 
-export function ParkManualBookingFields({ tenantId, assets, admin, initialDay = '', initialAssetId = '', onSaved, onClose }: ManualFormProps) {
+export function ParkManualBookingFields({ tenantId, assets, admin, initialDay = '', initialEndDay = '', initialAssetId = '', onSaved, onClose }: ManualFormProps) {
   const { pt, intlLocale } = useParkLocale();
   const id = useId();
   const first = assets.find(asset => asset.id === initialAssetId) || assets[0];
@@ -34,7 +34,7 @@ export function ParkManualBookingFields({ tenantId, assets, admin, initialDay = 
   const [kind, setKind] = useState<'rental' | 'block'>('rental');
   const [bookingStatus, setBookingStatus] = useState<'confirmed' | 'requested'>('confirmed');
   const [start, setStart] = useState(initialDay);
-  const [end, setEnd] = useState('');
+  const [end, setEnd] = useState(initialEndDay);
   const [name, setName] = useState('');
   const [channel, setChannel] = useState<'phone' | 'whatsapp' | 'max'>('phone');
   const [contact, setContact] = useState('');

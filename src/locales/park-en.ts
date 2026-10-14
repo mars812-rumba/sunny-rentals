@@ -83,6 +83,7 @@ export const parkEnglish: Record<string, string> = {
   "Сегодня": "Today",
   "Техника": "Vehicles",
   "Весь парк": "All vehicles",
+  "Ячейка календаря: {0}, {1}": "Calendar cell: {0}, {1}",
   "Чтобы создать запись, сначала добавьте машину в автопарк.": "Add a vehicle to the fleet before creating a booking.",
   "Даты закрыты. Блокировка видна во всех видах календаря.": "Dates blocked. The block appears in both calendar views.",
   "Предбронь создана. Даты заняты до подтверждения или отмены.": "Pre-booking created. Dates are reserved until confirmation or cancellation.",
@@ -610,5 +611,7 @@ export const parkEnglish: Record<string, string> = {
   "Закрыть без сохранения?": "Close without saving?",
   "Введённые изменения не сохранены. Можно продолжить заполнение или отказаться от них.": "Your changes are not saved. You can keep editing or discard them.",
   "Продолжить заполнение": "Keep editing",
+  "Создать бронь": "Create booking",
+  "Обновить календарь": "Refresh calendar",
   "Опции видны клиентам. Год и цвет — в основном редакторе авто.": "Features are visible to customers. Edit year and colour in the main vehicle editor."
 };

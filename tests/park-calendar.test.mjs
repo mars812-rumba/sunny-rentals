@@ -605,6 +605,50 @@ test('manual form has labeled fields, inline validation hooks and date-only inpu
  assert.doesNotMatch(html, /datetime-local|chat_id|Bearer|secret|images_web/);
 });
 
+test('timetable cell routing includes occupied return days and ignores cancelled/other vehicles', () => {
+ const other = { ...booking, id: 'other-booking', asset_id: 'other-car' };
+ assert.equal(ui.timetableCellBooking([other, booking], booking.asset_id, booking.pricing.start_date)?.id, booking.id);
+ assert.equal(ui.timetableCellBooking([booking], booking.asset_id, booking.pricing.end_date)?.id, booking.id);
+ assert.equal(ui.timetableCellBooking([{ ...booking, status: 'cancelled' }], booking.asset_id, booking.pricing.start_date), undefined);
+ assert.equal(ui.timetableCellBooking([booking], booking.asset_id, '2026-08-05'), undefined);
+ assert.equal(ui.timetableCellBooking([other], booking.asset_id, booking.pricing.start_date), undefined);
+});
+
+test('park timetable cells are native keyboard-accessible controls; legacy grid stays unchanged', () => {
+ const car = ui.calendarCars([], [booking])[0];
+ const props = { cars: [car], bookings: [ui.calendarBooking(booking)], startDate: new Date('2026-08-01T00:00:00'), daysToShow: 97, onDateChange() {}, onBookingClick() {}, onCreateBooking() {}, readOnly: true };
+ const interactive = renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, onDayCellClick() {} }));
+ assert.equal((interactive.match(/data-day-index=/g) || []).length, 97);
+ assert.match(interactive, /type="button"[^>]*data-compact-event/);
+ assert.match(interactive, /Ячейка календаря:/);
+ assert.equal((interactive.match(/tabindex="0"/g) || []).length, 3); // region, one cell, existing bar
+ const readonly = renderToStaticMarkup(e(ui.SchedulerCalendar, props));
+ assert.doesNotMatch(readonly, /data-day-index=/);
+ const disabled = renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, onDayCellClick() {}, dayCellsDisabled: true }));
+ assert.equal((disabled.match(/disabled=""/g) || []).length, 97);
+ const source = readFileSync('src/components/admin/SchedulerCalendar.tsx', 'utf8');
+ assert.match(source, /onPointerCancelCapture=/);
+ assert.match(source, /event.detail !== 0/);
+ assert.match(source, /event.preventDefault\(\); event.stopPropagation\(\)/);
+ assert.match(source, /scrollLeft - gesture.left/);
+ assert.match(source, /ArrowLeft.*ArrowRight.*Home.*End/);
+});
+
+test('timetable draft carries vehicle/start/end and preserves the manual form defaults elsewhere', () => {
+ const assets = [{ id: 'asset-a', name: 'Other', pricing: { daily_rate: 800 }, deposit_policy: { amount: 5000 } },
+  { id: 'asset-b', name: 'Selected', pricing: { daily_rate: 900 }, deposit_policy: { amount: 6000 } }];
+ const html = renderToStaticMarkup(e(ui.ParkManualBookingForm, { tenantId: 'park-a', assets, admin: false, initialDay: '2026-10-31', initialEndDay: '2026-11-01', initialAssetId: 'asset-b', onSaved() {}, onClose() {} }));
+ assert.match(html, /value="asset-b" selected=""/);
+ assert.match(html, /value="2026-10-31"/);
+ assert.match(html, /value="2026-11-01"/);
+ const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ assert.match(source, /onDayCellClick=/);
+ assert.match(source, /if \(existing\) setSelection\(\{ bookingId: existing.id \}\)/);
+ assert.match(source, /endDay: format\(addDays\(clickedDate, 1\)/);
+ assert.match(source, /initialEndDay=\{draft.endDay\}/);
+ assert.match(source, /trigger\?\.isConnected/);
+});
+
 test('manual grid choice appears once and disables only the manual rate', () => {
  const rates = { price_1_6: 800, price_7_14: 700, price_15_29: 600, price_30: 500 };
  const html = renderToStaticMarkup(e(ui.ParkManualBookingForm, { tenantId: 'park-a', admin: false,
