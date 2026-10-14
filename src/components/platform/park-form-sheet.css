@@ -1,0 +1,41 @@
+.park-form-sheet {
+  inset: auto 0 var(--park-sheet-bottom, 0);
+  width: 100%;
+  max-width: none;
+  height: var(--park-sheet-height, 90dvh);
+  max-height: 90dvh;
+  border-radius: 1rem 1rem 0 0;
+}
+.park-form-sheet[data-state="open"] { animation: park-sheet-in 200ms ease-out; }
+.park-form-sheet[data-state="closed"] { animation: park-sheet-out 200ms ease-out; }
+.park-form-sheet-overlay[data-state="open"] { animation: park-sheet-fade-in 200ms ease-out; }
+.park-form-sheet-overlay[data-state="closed"] { animation: park-sheet-fade-out 200ms ease-out; }
+.park-form-sheet [data-park-sheet-body] { padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); }
+.park-form-sheet .park-sheet-actions {
+  position: sticky;
+  bottom: -1.25rem;
+  z-index: 10;
+  background: white;
+  padding-top: 1rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+@keyframes park-sheet-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes park-sheet-out { from { transform: translateY(0); } to { transform: translateY(100%); } }
+@keyframes park-sheet-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes park-sheet-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@media (min-width: 640px) {
+  .park-form-sheet {
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 3rem);
+    max-width: 48rem;
+    height: auto;
+    max-height: var(--park-sheet-height, 90dvh);
+    border-radius: 1rem;
+  }
+  .park-form-sheet[data-state="open"] { animation-name: park-sheet-fade-in; }
+  .park-form-sheet[data-state="closed"] { animation-name: park-sheet-fade-out; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .park-form-sheet[data-state], .park-form-sheet-overlay[data-state] { animation: none; }
+}

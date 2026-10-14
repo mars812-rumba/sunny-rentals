@@ -8,6 +8,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { build } from 'esbuild';
 
 const bundle = await build({ stdin: { contents: `export * from './src/lib/park-locale';
+ export * from './src/lib/vehicle-spec-options';
+ export { VehicleSpecsFields } from './src/components/platform/VehicleSpecsFields';
  export { ParkCatalogPrice } from './src/components/platform/ParkCatalogPrice';
  export { catalogRentalPrice } from './src/lib/catalog-rental-price';
  export * from './src/lib/season-date-input';
@@ -22,7 +24,7 @@ const bundle = await build({ stdin: { contents: `export * from './src/lib/park-l
  export { ParkRequestItem, ParkRequestsPanel } from './src/components/platform/ParkRequestsPanel';
  export { ParkCalendarMonthSelect } from './src/components/platform/ParkBookingCalendar';
  export { ParkDateField } from './src/components/platform/ParkDateField';
- export { ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';
+ export { ParkManualBookingFields as ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';
  export { openParkDatePicker } from './src/lib/park-date-picker';
  export { filterParkRequests } from './src/lib/park-request-filters';
  export { VehiclePricingFields, VehicleTariffTable, VehicleSpecSummary } from './src/components/platform/VehicleDetailsEditor';
@@ -106,7 +108,8 @@ test('storefront receipt preserves the actual booking number and pending meaning
  }
  const source = readFileSync('src/pages/ParkStorefrontPage.tsx', 'utf8');
  assert.match(source, /created \? <>/);
- assert.match(source, /dialogRef\.current\.scrollTop = 0/);
+ assert.match(source, /querySelector\('\[data-park-sheet-body\]'\)/);
+ assert.match(source, /body\.scrollTop = 0/);
  assert.match(source, /receiptTitle\.current\?\.focus\(\{ preventScroll: true \}\)/);
  assert.match(source, /onCreated=\{setCreated\}/);
  assert.match(readFileSync('src/components/platform/ParkBookingForm.tsx', 'utf8'), /onCreated\?\.\(result\)/);
@@ -199,6 +202,30 @@ test('pickup/return English copy and labels do not translate customer addresses 
  assert.match(summary, /One extra rental day/); assert.match(summary, /Отель клиента/); assert.match(summary, /City/);
  const ru = render(ui.ParkPickupFields, { id: 'journey', pickup, onChange() {} }, 'ru');
  assert.match(ru, /Время получения/); assert.match(ru, /Время возврата/);
+});
+
+test('vehicle specs editor groups native dropdowns and preserves exact and custom values in RU/EN', () => {
+ const props = { id: 'specs', specs: { fuel: 'Бензин', transmission: 'CVT', drive: 'Custom drive', body_type: 'Custom body', power: '109 л.с.', engine: '1.5L', seats: 12, doors: 6, mileage: 0, air_conditioning: false }, features: 'USB\nPrivate custom option', onChange() {}, onFeaturesChange() {} };
+ for (const language of ['ru', 'en']) {
+  const html = render(ui.VehicleSpecsFields, props, language);
+  assert.equal((html.match(/<select /g) || []).length, 7);
+  assert.doesNotMatch(html, /type="radio"|<textarea/);
+  for (const key of ['fuel', 'transmission', 'drive', 'body_type', 'seats', 'doors', 'ac']) assert.match(html, new RegExp(`for="specs-${key}"`));
+  assert.match(html, /value="12" selected=""/); assert.match(html, /value="6" selected=""/);
+  assert.match(html, /value="false" selected=""/);
+  assert.match(html, /value="Custom drive" selected=""/); assert.match(html, /value="Custom body" selected=""/);
+  assert.match(html, /type="number"[^>]*value="109"/); assert.match(html, /type="number"[^>]*value="1.5"/);
+  assert.match(html, /Private custom option/); assert.match(html, /type="checkbox"[^>]*checked=""/);
+  for (const icon of ['lucide-wrench', 'lucide-car-front', 'lucide-gauge', 'lucide-settings-2']) assert.ok(html.includes(icon));
+  if (language === 'en') assert.doesNotMatch(visible(html), /[А-Яа-яЁё]/);
+ }
+ assert.deepEqual(ui.vehicleSeatOptions, Array.from({ length: 20 }, (_, i) => i + 1));
+ assert.deepEqual(ui.vehicleDoorOptions, [1, 2, 3, 4, 5, 6, 7, 8]);
+ assert.deepEqual(ui.splitVehicleFeatures(' USB\nUSB\n custom \n'), ['USB', 'custom']);
+ assert.equal(ui.toggleVehicleFeature('USB\ncustom', 'USB', false), 'custom');
+ assert.equal(ui.toggleVehicleFeature('USB\ncustom', 'USB', true), 'USB\ncustom');
+ for (const [value, field, expected] of [['91 л.с.', 'power', '91'], ['1,5 л', 'engine', '1.5'], ['1496CC', 'engine', null], ['Custom power', 'power', null]]) assert.equal(ui.vehicleNumericSpec(value, field), expected);
+ assert.match(readFileSync('src/components/platform/VehicleDetailsEditor.tsx', 'utf8'), /<VehicleSpecsFields/);
 });
 
 test('rates and booking summary are English, calculations and private customer text remain unchanged', () => {

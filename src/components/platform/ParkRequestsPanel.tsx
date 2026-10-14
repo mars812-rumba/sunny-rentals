@@ -18,6 +18,9 @@ import { filterParkRequests } from '@/lib/park-request-filters';
 import { parkBookingColors } from '@/lib/park-booking-colors';
 import { ParkCalendarPhoto } from './ParkCalendarPhoto';
 import { ParkDateField } from './ParkDateField';
+import { DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ParkFormSheet, ParkFormSheetContent } from './ParkFormSheet';
+import { useInsideParkFormSheet, useParkFormSheetSaving } from './park-form-sheet-context';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждена', cancelled: 'Отменена', in_progress: 'В аренде', completed: 'Завершена' };
 const statusColors: Record<string, string> = {
@@ -65,6 +68,13 @@ function ParkRequestPrices({ booking, detailed }: { booking: ParkBooking; detail
 }
 
 function ParkBookingEditor({ booking, tenantId, admin, onClose }: { booking: ParkBooking; tenantId: string; admin: boolean; onClose: () => void }) {
+  const { pt } = useParkLocale();
+  const inside = useInsideParkFormSheet();
+  const fields = <ParkBookingEditorFields booking={booking} tenantId={tenantId} admin={admin} onClose={onClose} />;
+  return inside ? fields : <ParkFormSheet open onOpenChange={open => { if (!open) onClose(); }}><ParkFormSheetContent header={<><DialogTitle>{pt('Редактирование заявки')}</DialogTitle><DialogDescription className="mt-2">{booking.pricing.asset_name}</DialogDescription></>}>{fields}</ParkFormSheetContent></ParkFormSheet>;
+}
+
+function ParkBookingEditorFields({ booking, tenantId, admin, onClose }: { booking: ParkBooking; tenantId: string; admin: boolean; onClose: () => void }) {
   const { pt, intlLocale } = useParkLocale();
   const id = useId();
   const nameInput = useRef<HTMLInputElement>(null);
@@ -74,6 +84,7 @@ function ParkBookingEditor({ booking, tenantId, admin, onClose }: { booking: Par
   const [note, setNote] = useState(booking.operator_details?.note || '');
   const [version] = useState(booking.updated_at);
   const [busy, setBusy] = useState(false);
+  useParkFormSheetSaving(busy);
   const [error, setError] = useState('');
   useEffect(() => { nameInput.current?.focus(); }, []);
   async function save(event: FormEvent) {
@@ -96,7 +107,7 @@ function ParkBookingEditor({ booking, tenantId, admin, onClose }: { booking: Par
       <div><label htmlFor={`${id}-note`} className="block text-sm font-medium">{pt("Внутренняя пометка")}</label><Textarea id={`${id}-note`} maxLength={1000} value={note} onChange={event => setNote(event.target.value)} className="mt-2 text-base" /><p className="mt-2 text-sm text-slate-600">{pt("Видна только в кабинете парка.")}</p></div>
     </fieldset>
     {error && <p id={`${id}-error`} role="alert" className="text-sm text-red-700">{pt(error)}</p>}
-    <div className="flex flex-wrap gap-2"><Button type="submit" className="min-h-11 bg-emerald-700 text-white hover:bg-emerald-800" disabled={busy}>{busy ? pt("Сохраняем…") : pt("Сохранить изменения")}</Button><Button type="button" variant="outline" className="min-h-11" disabled={busy} onClick={onClose}>{pt("Не сохранять")}</Button></div>
+    <div className="park-sheet-actions flex flex-wrap gap-2"><Button type="submit" className="min-h-11 bg-emerald-700 text-white hover:bg-emerald-800" disabled={busy}>{busy ? pt("Сохраняем…") : pt("Сохранить изменения")}</Button><Button type="button" variant="outline" className="min-h-11" disabled={busy} onClick={onClose}>{pt("Не сохранять")}</Button></div>
   </form>;
 }
 

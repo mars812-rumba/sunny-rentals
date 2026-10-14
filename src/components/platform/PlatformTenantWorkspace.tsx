@@ -14,6 +14,8 @@ import { ParkRequestsPanel } from './ParkRequestsPanel';
 import { ParkTrialStatus } from './ParkTrialStatus';
 import { VehicleDetailsEditor, VehicleSpecSummary } from './VehicleDetailsEditor';
 import { ParkDateField } from './ParkDateField';
+import { DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ParkFormSheet, ParkFormSheetContent } from './ParkFormSheet';
 import { activeVehicleGrid, minimumVehicleRate, vehiclePricingMode } from '@/lib/vehicle-pricing';
 import { FleetCardActions, FleetPhotoActions } from './FleetCardActions';
 import { useFleetAvailability } from '@/hooks/useFleetAvailability';
@@ -278,8 +280,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
           </div>
         </>}
 
-        {editing && <section className="mt-6 rounded-2xl bg-white p-5 md:p-7" aria-labelledby="asset-editor-title">
-          <h2 id="asset-editor-title" className="break-words text-xl font-semibold">{editing === "new" ? pt("Новая техника") : pt("Редактирование: {0}", [editing.name])}</h2>
+        {editing && <ParkFormSheet open busy={busy} onOpenChange={open => { if (!open) setEditing(null); }}><ParkFormSheetContent header={<><DialogTitle className="break-words">{editing === "new" ? pt("Новая техника") : pt("Редактирование: {0}", [editing.name])}</DialogTitle><DialogDescription className="mt-2">{pt('Название для клиента')}</DialogDescription></>}><section>
           {editorError && <p role="alert" className="mt-3 text-sm text-rose-800">{pt(editorError)}</p>}
           <form onSubmit={save} className="mt-5">
             <fieldset disabled={busy} className="grid gap-5 sm:grid-cols-2">
@@ -290,7 +291,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
               <div className="sm:col-span-2"><label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={Boolean(form.public)} onChange={(event) => setForm({ ...form, public: event.target.checked })} className="h-4 w-4 accent-blue-700 focus-visible:outline focus-visible:outline-2" />{pt("Показывать на витрине")}</label><p className="mt-2 text-sm text-slate-600">{pt("После публикации парка машина, её цены и фотографии станут доступны по публичной ссылке.")}</p></div>
             </fieldset>
             <p className="mt-4 text-sm text-slate-600">{pt("Цены и депозит настраиваются только через «Действия → Цены» в карточке. После создания техники настройте тарифы перед приёмом заявок.")}</p>
-            <div className="mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className="min-h-11 rounded-lg bg-emerald-700 text-white hover:bg-emerald-800">{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />} {pt(" Сохранить технику")}</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}><X aria-hidden="true" />{pt("Закрыть редактор")}</Button></div>
+            <div className="park-sheet-actions mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className="min-h-11 rounded-lg bg-emerald-700 text-white hover:bg-emerald-800">{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />} {pt(" Сохранить технику")}</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}><X aria-hidden="true" />{pt("Закрыть редактор")}</Button></div>
           </form>
           {editing !== "new" && <div className="mt-7 border-t border-slate-200 pt-5">
             <Label htmlFor="asset-photos">{pt("Фотографии машины")}</Label><p id="photo-hint" className="mt-1 text-sm text-slate-600">{pt("Первая фотография станет главной. Можно выбрать несколько файлов; до 20 фото, каждое до 8 МБ.")}</p>
@@ -298,7 +299,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
             <p role="status" aria-live="polite" className="mt-2 text-sm text-slate-600">{pt(uploadProgress)}</p>
             <div className="mt-3 flex flex-wrap gap-3">{editing.photos.gallery?.map((reference, index) => <PrivateImage key={reference} owner={owner} tenantId={tenant.tenant_id} reference={reference} alt={pt("{0}, фото {1}", [editing.name, index + 1])} className="h-24 w-32 rounded-xl object-cover" />)}</div>
           </div>}
-        </section>}
+        </section></ParkFormSheetContent></ParkFormSheet>}
       </section>
         </TabsContent>
         {calendarVisited && <TabsContent value="calendar" forceMount hidden={section !== 'calendar'} className="mt-6 min-w-0 data-[state=inactive]:hidden">

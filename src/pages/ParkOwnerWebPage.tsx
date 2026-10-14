@@ -8,7 +8,8 @@ import { KeyRound, LogOut, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ParkFormSheet as Dialog, ParkFormSheetContent as DialogContent } from '@/components/platform/ParkFormSheet';
 import { PlatformTenantWorkspace, PrivateImage } from '@/components/platform/PlatformTenantWorkspace';
 import { fetchOwnerFleet } from '@/api/park-owner-fleet';
 import { ownerWebRequest } from '@/api/park-owner-web';
@@ -100,13 +101,13 @@ export default function ParkOwnerWebPage() {
       <div className="ml-auto">
       <ParkLanguageSwitcher compact />
       </div>
-      <Dialog open={passwordOpen} onOpenChange={open => { if (!busy) { setPasswordOpen(open); setPasswordError(''); } }}>
+      <Dialog open={passwordOpen} busy={busy} onOpenChange={open => { if (!busy) { setPasswordOpen(open); setPasswordError(''); } }}>
         <DialogTrigger asChild><Button variant="outline" title={pt("Поменять пароль")} className="min-h-11 min-w-11 shrink-0 px-2 sm:px-4"><KeyRound className="h-4 w-4" aria-hidden="true" /><span className="sr-only sm:not-sr-only">{pt("Поменять пароль")}</span></Button></DialogTrigger>
-        <DialogContent closeLabel={pt("Закрыть")} className="bg-white text-slate-900"><DialogHeader><DialogTitle>{pt("Поменять пароль")}</DialogTitle><DialogDescription>{pt("От 12 до 128 символов. После смены другие браузерные сессии завершатся.")}</DialogDescription></DialogHeader>
+        <DialogContent closeLabel={pt("Закрыть")} header={<DialogHeader className="text-left"><DialogTitle>{pt("Поменять пароль")}</DialogTitle><DialogDescription>{pt("От 12 до 128 символов. После смены другие браузерные сессии завершатся.")}</DialogDescription></DialogHeader>}>
           <form onSubmit={changePassword} className="space-y-4" aria-busy={busy}>
             {[['old_password', 'Текущий пароль', 'current-password'], ['new_password', 'Новый пароль', 'new-password'], ['confirm_password', 'Повторите новый пароль', 'new-password']].map(([name, label, autocomplete]) => <div className="space-y-2" key={name}><Label htmlFor={`owner-${name}`}>{pt(label)}</Label><Input id={`owner-${name}`} name={name} type="password" autoComplete={autocomplete} required minLength={name === 'old_password' ? 1 : 12} maxLength={128} aria-describedby={passwordError ? 'owner-password-error' : undefined} /></div>)}
             {passwordError && <p id="owner-password-error" role="alert" className="text-sm text-red-700">{pt(passwordError)}</p>}
-            <Button className={`${primary} w-full`} disabled={busy}>{busy ? pt("Сохраняем…") : pt("Сохранить пароль")}</Button>
+            <div className="park-sheet-actions"><Button className={`${primary} w-full`} disabled={busy}>{busy ? pt("Сохраняем…") : pt("Сохранить пароль")}</Button></div>
           </form>
         </DialogContent>
       </Dialog>

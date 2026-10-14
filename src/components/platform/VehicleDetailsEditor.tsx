@@ -6,12 +6,15 @@ import type { PlatformAsset, PricingMode, TariffGrid, VehicleDetailsInput, Vehic
 import { savePlatformAssetDetails } from '@/api/platform-admin';
 import { saveOwnerAssetDetails } from '@/api/park-owner-fleet';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ParkFormSheet as Dialog, ParkFormSheetContent as DialogContent } from './ParkFormSheet';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { rentalMoney, seasonDateLabel } from '@/lib/park-rental';
 import { vehiclePricingMode } from '@/lib/vehicle-pricing';
 import { seasonDateInputValue, seasonDateWireValue } from '@/lib/season-date-input';
+import { VehicleSpecsFields } from './VehicleSpecsFields';
+import { splitVehicleFeatures } from '@/lib/vehicle-spec-options';
 
 const tariffPeriods = [['price_1_6', '1–6 дней'], ['price_7_14', '7–14 дней'], ['price_15_29', '15–29 дней'], ['price_30', '30 дней и больше']] as const;
 type Section = VehicleDetailsInput['section'];
@@ -34,7 +37,7 @@ export function VehicleSpecSummary({ specs, detailed = false, photoCount }: { sp
     [Gauge, detailed && specs.mileage != null && pt('Пробег: {0} км', [specs.mileage.toLocaleString(intlLocale)]), 'bg-slate-100 text-slate-900', 'text-slate-600'],
     [Snowflake, detailed && specs.air_conditioning != null && pt('Кондиционер: {0}', [specs.air_conditioning ? pt('есть') : pt('нет')]), 'bg-slate-100 text-slate-900', 'text-slate-600'],
   ] as const;
-  return <><ul className="mt-3 grid min-w-0 grid-cols-2 gap-2 text-sm">{entries.filter(([, value]) => value).map(([Icon, value, tone, iconTone], index) => <li key={index} className={`flex min-w-0 items-start gap-2 rounded-md px-3 py-2 ${tone}`}><Icon aria-hidden="true" className={`mt-0.5 size-4 shrink-0 ${iconTone}`} /><span className="min-w-0 break-words font-medium leading-5">{value}</span></li>)}</ul>{detailed && !!specs.features?.length && <ul className="mt-2 grid min-w-0 grid-cols-2 gap-2 text-sm">{specs.features.map((value, index) => <li key={index} className="flex min-w-0 items-start gap-2 rounded-md bg-slate-100 px-3 py-2 text-slate-900"><CircleCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-slate-600" /><span className="min-w-0 break-words">{value}</span></li>)}</ul>}</>;
+  return <><ul className="mt-3 grid min-w-0 grid-cols-2 gap-2 text-sm">{entries.filter(([, value]) => value).map(([Icon, value, tone, iconTone], index) => <li key={index} className={`flex min-w-0 items-start gap-2 rounded-md px-3 py-2 ${tone}`}><Icon aria-hidden="true" className={`mt-0.5 size-4 shrink-0 ${iconTone}`} /><span className="min-w-0 break-words font-medium leading-5">{value}</span></li>)}</ul>{detailed && !!specs.features?.length && <ul className="mt-2 grid min-w-0 grid-cols-2 gap-2 text-sm">{specs.features.map((value, index) => <li key={index} className="flex min-w-0 items-start gap-2 rounded-md bg-slate-100 px-3 py-2 text-slate-900"><CircleCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-slate-600" /><span className="min-w-0 break-words">{pt(value)}</span></li>)}</ul>}</>;
 }
 
 export function VehicleTariffTable({ grid, currency }: { grid: TariffGrid; currency: string }) {
@@ -88,7 +91,7 @@ export function VehicleDetailsEditor({ asset, section, currency, owner, onSaved,
   const Icon = icons[section];
   const submit = async (event: FormEvent) => {
     event.preventDefault(); setError('');
-    const options = features.split('\n').map(value => value.trim()).filter(Boolean);
+    const options = splitVehicleFeatures(features);
     if (section === 'specs' && (options.length > 20 || options.some(value => value.length > 80))) { setError(pt("Укажите до 20 опций, каждая — до 80 символов.")); return; }
     const pricingGrid = mode === 'duration' ? { ...grid, high_season: Object.fromEntries(tariffPeriods.map(([key]) => [key, grid.high_season[key] || grid.low_season[key]])) as TariffGrid['high_season'] } : grid;
     const hasCompleteGrid = [...Object.values(grid.low_season), ...Object.values(grid.high_season)].every(rate => Number.isFinite(rate) && rate >= 0.01);
@@ -99,8 +102,8 @@ export function VehicleDetailsEditor({ asset, section, currency, owner, onSaved,
     catch (failure) { setError(failure instanceof Error ? failure.message : pt("Не удалось сохранить. Повторите попытку.")); }
     finally { setBusy(false); }
   };
-  return <Dialog open onOpenChange={open => { if (!open && !busy) onClose(); }}><DialogContent closeLabel={pt("Закрыть редактор автомобиля")} closeButtonClassName="right-2 top-2 flex size-11 items-center justify-center" onCloseAutoFocus={event => { if (onRestoreFocus) { event.preventDefault(); onRestoreFocus(); } }} onInteractOutside={event => event.preventDefault()} onEscapeKeyDown={event => { if (busy) event.preventDefault(); }} className="max-h-[90dvh] w-[calc(100%-2rem)] overflow-y-auto rounded-xl bg-white text-slate-900 sm:max-w-xl">
-    <DialogHeader className="pr-6 text-left"><DialogTitle className="flex items-center gap-2 text-balance"><Icon aria-hidden="true" className="size-5 shrink-0 text-blue-700" />{pt(titles[section])}</DialogTitle><DialogDescription className="break-words text-pretty text-slate-600">{asset.name}</DialogDescription></DialogHeader>
+  return <Dialog open busy={busy} onOpenChange={open => { if (!open && !busy) onClose(); }}><DialogContent closeLabel={pt("Закрыть редактор автомобиля")} onCloseAutoFocus={event => { if (onRestoreFocus) { event.preventDefault(); onRestoreFocus(); } }}
+    header={<DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 text-balance"><Icon aria-hidden="true" className="size-5 shrink-0 text-blue-700" />{pt(titles[section])}</DialogTitle><DialogDescription className="break-words text-pretty text-slate-600">{asset.name}</DialogDescription></DialogHeader>}>
     <form onSubmit={submit} aria-busy={busy} className="space-y-5">
       <fieldset disabled={busy} className="min-w-0 space-y-5">
         <legend className="sr-only">{pt(titles[section])} {pt(" автомобиля")}</legend>
@@ -109,18 +112,11 @@ export function VehicleDetailsEditor({ asset, section, currency, owner, onSaved,
           <div><label htmlFor={`${id}-deposit`} className="flex items-center gap-2 text-sm font-medium"><WalletCards aria-hidden="true" className="size-4" />{pt("Возвратный депозит, ")}{currency}</label><Input id={`${id}-deposit`} type="number" required min="0" max="100000000" step="0.01" value={deposit} onChange={event => setDeposit(event.target.value)} className="mt-2 min-h-11 text-base tabular-nums" /></div>
           <p className="text-sm text-slate-600">{pt('Новые цены — только для новых заявок.')}</p>
         </>}
-        {section === 'specs' && <>
-          {([['fuel', 'Топливо', ['', 'Бензин', 'Дизель', 'Электро', 'Гибрид']], ['transmission', 'Коробка передач', ['', 'Автомат', 'Механика', 'CVT', 'Робот']]] as const).map(([key, label, values]) => <fieldset key={key}><legend className="mb-2 font-medium">{pt(label)}</legend><div className="grid grid-cols-2 gap-2">{values.map(value => <label key={value} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm has-[:checked]:border-blue-700 has-[:checked]:bg-blue-50"><input type="radio" name={`${id}-${key}`} value={value} checked={specs[key] === value} onChange={() => setSpecs({ ...specs, [key]: value })} className="accent-blue-700" />{value || pt("Не указано")}</label>)}</div></fieldset>)}
-          <div className="grid gap-4 sm:grid-cols-2">{([['power', 'Мощность (л.с.)'], ['engine', 'Объём двигателя'], ['drive', 'Привод'], ['body_type', 'Кузов']] as const).map(([key, label]) => <div key={key}><label htmlFor={`${id}-${key}`} className="text-sm font-medium">{pt(label)}</label><Input id={`${id}-${key}`} maxLength={80} value={specs[key] || ''} onChange={event => setSpecs({ ...specs, [key]: event.target.value })} className="mt-2 min-h-11 text-base" /></div>)}
-            {([['seats', 'Количество мест', 1, 20], ['doors', 'Количество дверей', 1, 8], ['mileage', 'Пробег, км', 0, 5000000]] as const).map(([key, label, min, max]) => <div key={key}><label htmlFor={`${id}-${key}`} className="text-sm font-medium">{pt(label)}</label><Input id={`${id}-${key}`} type="number" min={min} max={max} step="1" value={specs[key] ?? ''} onChange={event => setSpecs({ ...specs, [key]: event.target.value ? Number(event.target.value) : null })} className="mt-2 min-h-11 text-base tabular-nums" /></div>)}
-            <div><label htmlFor={`${id}-ac`} className="text-sm font-medium">{pt("Кондиционер")}</label><select id={`${id}-ac`} value={specs.air_conditioning == null ? '' : String(specs.air_conditioning)} onChange={event => setSpecs({ ...specs, air_conditioning: event.target.value === '' ? null : event.target.value === 'true' })} className="mt-2 min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-base"><option value="">{pt("Не указано")}</option><option value="true">{pt("Есть")}</option><option value="false">{pt("Нет")}</option></select></div>
-          </div>
-          <div><label htmlFor={`${id}-features`} className="text-sm font-medium">{pt("Дополнительные опции")}</label><Textarea id={`${id}-features`} value={features} onChange={event => setFeatures(event.target.value)} maxLength={1620} aria-describedby={`${id}-features-hint`} className="mt-2 min-h-24 text-base" /><p id={`${id}-features-hint`} className="mt-2 text-sm text-slate-600">{pt("Одна опция на строку, до 20. Они видны клиентам. Год и цвет — в основном редакторе авто.")}</p></div>
-        </>}
+        {section === 'specs' && <VehicleSpecsFields id={id} specs={specs} onChange={setSpecs} features={features} onFeaturesChange={setFeatures} />}
         {section === 'description' && <div><label htmlFor={`${id}-description`} className="font-medium">{pt("Публичное описание автомобиля")}</label><Textarea id={`${id}-description`} maxLength={5000} rows={8} value={description} onChange={event => setDescription(event.target.value)} aria-describedby={`${id}-description-hint`} className="mt-2 text-base leading-6" /><p id={`${id}-description-hint`} className="mt-2 text-sm leading-6 text-slate-600">{pt("Особенности, комплектация, нестандартные условия. Этот текст увидят клиенты — не добавляйте внутренние заметки или чужие контакты. До 5000 символов.")}</p></div>}
       </fieldset>
       {error && <p role="alert" className="text-sm leading-6 text-red-800">{pt(error)}</p>}
-      <div className="flex flex-wrap justify-end gap-2 border-t border-slate-200 pt-4"><Button type="button" variant="outline" disabled={busy} onClick={onClose}>{pt("Отмена")}</Button><Button type="submit" disabled={busy} className="min-h-11 gap-2 bg-emerald-700 text-white hover:bg-emerald-800"><Save aria-hidden="true" className="size-4" />{busy ? pt("Сохраняем…") : pt("Сохранить")}</Button></div>
+      <div className="park-sheet-actions flex flex-wrap justify-end gap-2 border-t border-slate-200"><Button type="button" variant="outline" className="min-h-11" disabled={busy} onClick={onClose}>{pt("Отмена")}</Button><Button type="submit" disabled={busy} className="min-h-11 gap-2 bg-emerald-700 text-white hover:bg-emerald-800"><Save aria-hidden="true" className="size-4" />{busy ? pt("Сохраняем…") : pt("Сохранить")}</Button></div>
     </form>
   </DialogContent></Dialog>;
 }

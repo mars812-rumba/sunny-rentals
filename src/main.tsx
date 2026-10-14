@@ -2,6 +2,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import "./components/platform/park-form-sheet.css";
 import { LanguageProvider } from "./contexts/LanguageContext.tsx";
 import { StrictMode } from "react";
 import { HelmetProvider } from "react-helmet-async";

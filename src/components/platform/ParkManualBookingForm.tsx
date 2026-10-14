@@ -13,11 +13,20 @@ import { ParkDateField } from './ParkDateField';
 import { ParkPickupFields } from './ParkPickupFields';
 import { validParkPickup, validParkReturn, type ParkPickup } from '@/lib/park-pickup';
 import { activeVehicleGrid } from '@/lib/vehicle-pricing';
+import { DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ParkFormSheet, ParkFormSheetContent } from './ParkFormSheet';
+import { useParkFormSheetSaving } from './park-form-sheet-context';
 
-export function ParkManualBookingForm({ tenantId, assets, admin, initialDay = '', initialAssetId = '', onSaved, onClose }: {
+type ManualFormProps = {
   tenantId: string; assets: PlatformAsset[]; admin: boolean; initialDay?: string; initialAssetId?: string;
   onSaved: (booking: ParkBooking) => void; onClose: () => void;
-}) {
+};
+export function ParkManualBookingForm(props: ManualFormProps) {
+  const { pt } = useParkLocale();
+  return <ParkFormSheet open onOpenChange={open => { if (!open) props.onClose(); }}><ParkFormSheetContent header={<><DialogTitle>{pt('Добавить запись в календарь')}</DialogTitle><DialogDescription className="mt-2">{pt('Время местное, по часовому поясу парка.')}</DialogDescription></>}><ParkManualBookingFields {...props} /></ParkFormSheetContent></ParkFormSheet>;
+}
+
+export function ParkManualBookingFields({ tenantId, assets, admin, initialDay = '', initialAssetId = '', onSaved, onClose }: ManualFormProps) {
   const { pt, intlLocale } = useParkLocale();
   const id = useId();
   const first = assets.find(asset => asset.id === initialAssetId) || assets[0];
@@ -35,6 +44,7 @@ export function ParkManualBookingForm({ tenantId, assets, admin, initialDay = ''
   const [useTariffs, setUseTariffs] = useState(Boolean(first && activeVehicleGrid(first)));
   const [deposit, setDeposit] = useState(String(first?.deposit_policy.amount || 0));
   const [busy, setBusy] = useState(false);
+  useParkFormSheetSaving(busy);
   const [error, setError] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const heading = useRef<HTMLHeadingElement>(null);
@@ -74,8 +84,8 @@ export function ParkManualBookingForm({ tenantId, assets, admin, initialDay = ''
     } catch (failure) { if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : pt("Не удалось сохранить запись. Повторите попытку.")); }
     finally { active.current = null; if (!controller.signal.aborted) setBusy(false); }
   };
-  return <form onSubmit={event => void save(event)} noValidate aria-busy={busy} aria-labelledby={`${id}-title`} className="mt-5 rounded-xl bg-slate-50 p-4 sm:p-5">
-    <h3 id={`${id}-title`} tabIndex={-1} ref={heading} className="text-lg font-semibold focus:outline-none">{pt("Добавить запись в календарь")}</h3>
+  return <form onSubmit={event => void save(event)} noValidate aria-busy={busy} aria-labelledby={`${id}-title`} className="space-y-4">
+    <h3 id={`${id}-title`} tabIndex={-1} ref={heading} className="sr-only">{pt("Добавить запись в календарь")}</h3>
     <p id={`${id}-hint`} className="mt-2 text-sm leading-6 text-slate-600">{pt('Время местное, по часовому поясу парка.')}</p>
     <fieldset disabled={busy} className="mt-4 space-y-4">
       <legend className="sr-only">{pt("Параметры календарной записи")}</legend>
@@ -93,7 +103,7 @@ export function ParkManualBookingForm({ tenantId, assets, admin, initialDay = ''
         <dl className="space-y-2 text-sm tabular-nums"><div className="flex justify-between gap-3"><dt>{pt('Доставка')}</dt><dd>{rentalMoney(pickup.location === 'city' ? 500 : 0, asset?.pricing.currency || 'THB')}</dd></div><div className="flex justify-between gap-3"><dt>{pt('Возврат')}</dt><dd>{rentalMoney(pickup.return_location === 'city' ? 500 : 0, asset?.pricing.currency || 'THB')}</dd></div>{Number.isInteger(days) && days > 0 && days <= 365 && !useTariffs && Number(rate) > 0 && <div className="flex flex-wrap justify-between gap-2 border-t border-slate-200 pt-2 font-semibold text-emerald-800"><dt>{pt('Итого аренда и доставка')}</dt><dd>{rentalMoney((Number(rate) * days + (pickup.location === 'city' ? 500 : 0) + (pickup.return_location === 'city' ? 500 : 0)).toFixed(2), asset?.pricing.currency || 'THB')}</dd></div>}</dl>
       </>}
       <div><Label htmlFor={`${id}-note`}>{kind === 'block' ? pt("Причина блокировки") : pt("Внутренняя заметка (необязательно)")}</Label><Textarea id={`${id}-note`} required={kind === 'block'} maxLength={1000} value={note} onChange={event => setNote(event.target.value)} {...fieldError('note')} className="mt-2 text-base" />{errorText('note')}</div>
-      <div className="flex flex-wrap gap-3"><Button type="submit" className="min-h-11 gap-2 rounded-lg bg-emerald-700 text-white hover:bg-emerald-800" disabled={!assets.length}>{busy ? <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin motion-reduce:animate-none" /> : kind === 'block' ? <LockKeyhole aria-hidden="true" className="h-4 w-4" /> : bookingStatus === 'requested' ? <CalendarClock aria-hidden="true" className="h-4 w-4" /> : <CalendarCheck aria-hidden="true" className="h-4 w-4" />}{busy ? pt("Сохраняем…") : kind === 'block' ? pt("Закрыть даты") : bookingStatus === 'requested' ? pt("Создать предбронь") : pt("Создать подтверждённую бронь")}</Button><Button type="button" variant="outline" className="min-h-11 gap-2 rounded-lg" onClick={onClose}><X aria-hidden="true" className="h-4 w-4" />{pt("Отмена")}</Button></div>
+      <div className="park-sheet-actions flex flex-wrap gap-3"><Button type="submit" className="min-h-11 gap-2 rounded-lg bg-emerald-700 text-white hover:bg-emerald-800" disabled={!assets.length}>{busy ? <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin motion-reduce:animate-none" /> : kind === 'block' ? <LockKeyhole aria-hidden="true" className="h-4 w-4" /> : bookingStatus === 'requested' ? <CalendarClock aria-hidden="true" className="h-4 w-4" /> : <CalendarCheck aria-hidden="true" className="h-4 w-4" />}{busy ? pt("Сохраняем…") : kind === 'block' ? pt("Закрыть даты") : bookingStatus === 'requested' ? pt("Создать предбронь") : pt("Создать подтверждённую бронь")}</Button><Button type="button" variant="outline" className="min-h-11 gap-2 rounded-lg" onClick={onClose}><X aria-hidden="true" className="h-4 w-4" />{pt("Отмена")}</Button></div>
     </fieldset>
     {error && <div className="mt-3"><p role="alert" className="text-sm text-rose-800">{pt(error)}</p><p className="mt-2 text-sm text-slate-600">{pt("При потере ответа повторите без изменения полей — новая копия не создастся. Перед созданием другой записи сначала проверьте календарь.")}</p></div>}
     {busy && <p role="status" className="mt-3 text-sm">{pt("Проверяем даты и сохраняем запись…")}</p>}

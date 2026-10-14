@@ -13,7 +13,7 @@ const bundle = await build({ stdin: { contents: `export * from './src/utils/park
  export { SchedulerCalendar } from './src/components/admin/SchedulerCalendar';
  export { MonthCalendarView } from './src/components/admin/MonthCalendarView';
  export { ParkTrialStatus } from './src/components/platform/ParkTrialStatus';
- export { ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';
+ export { ParkManualBookingFields as ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
  export { ParkRequestItem } from './src/components/platform/ParkRequestsPanel';
  export { ParkCalendarPhoto } from './src/components/platform/ParkCalendarPhoto';
