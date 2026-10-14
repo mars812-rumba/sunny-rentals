@@ -223,6 +223,16 @@ class PlatformAdminApiTests(unittest.TestCase):
         self.assertEqual(published["tenant"]["status"], "trial")
         self.assertEqual(published["tenant"]["trial"]["days"], 7)
         self.assertIsNotNone(published["tenant"]["trial"]["ends_at"])
+        republished = self.route('POST', '/api/platform/tenants/{tenant_id}/publish').endpoint('second-rental', context)
+        self.assertFalse(republished['trial_started'])
+        self.assertEqual(republished['tenant']['trial'], published['tenant']['trial'])
+        removed = self.route('DELETE', '/api/platform/tenants/{tenant_id}').endpoint('second-rental', context)
+        self.assertTrue(removed['archived'])
+        self.assertEqual(self.route('GET', '/api/platform/tenants').endpoint(context)['tenants'], [])
+        self.assertTrue(self.route('DELETE', '/api/platform/tenants/{tenant_id}').endpoint('second-rental', context)['archived'])
+        with self.assertRaises(HTTPException) as missing:
+            self.route('POST', '/api/platform/tenants/{tenant_id}/publish').endpoint('second-rental', context)
+        self.assertEqual(missing.exception.status_code, 404)
 
     def test_duplicate_slug_returns_conflict(self):
         token = self.auth.issue_for_verified_actor("admin-1")

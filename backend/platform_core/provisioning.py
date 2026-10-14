@@ -211,20 +211,20 @@ class TenantProvisioner:
     def list_tenants(self, context: PlatformContext) -> List[Tenant]:
         context.require_platform_admin()
         with self._locked():
-            return list(self._load_state().tenants)
+            return [tenant for tenant in self._load_state().tenants if tenant.archived_at is None]
 
     def tenant_overviews(self, context: PlatformContext):
         context.require_platform_admin()
         with self._locked():
             state = self._load_state()
-            return [{**_jsonable(tenant), "trial": trial_summary(state, tenant.tenant_id)} for tenant in state.tenants]
+            return [{**_jsonable(tenant), "trial": trial_summary(state, tenant.tenant_id)} for tenant in state.tenants if tenant.archived_at is None]
 
     def get_tenant(self, context: PlatformContext, tenant_id: str) -> Tenant:
         context.require_platform_admin()
         tenant_id = validate_tenant_id(tenant_id)
         with self._locked():
             tenant = next(
-                (item for item in self._load_state().tenants if item.tenant_id == tenant_id),
+                (item for item in self._load_state().tenants if item.tenant_id == tenant_id and item.archived_at is None),
                 None,
             )
         if tenant is None:
@@ -363,7 +363,9 @@ class TenantProvisioner:
             )
             if tenant is None or subscription is None or not tenant_path.exists():
                 raise TenantNotFoundError(f"tenant is incomplete or missing: {tenant_id}")
-            if tenant.status == TenantStatus.TRIAL:
+            if tenant.archived_at is not None:
+                raise TenantNotFoundError(f"tenant archived: {tenant_id}")
+            if tenant.status in {TenantStatus.TRIAL, TenantStatus.ACTIVE}:
                 return tenant
             if tenant.status != TenantStatus.DRAFT:
                 raise ValueError(f"cannot publish tenant in status {tenant.status}")
@@ -398,5 +400,45 @@ class TenantProvisioner:
             except Exception:
                 _atomic_json_write(tenant_path, previous_tenant_document)
                 self._restore_state(previous_state_document)
+                raise
+            return tenant
+
+    def archive_tenant(self, context: PlatformContext, tenant_id: str, now: Optional[datetime] = None) -> Tenant:
+        """Recoverable removal: deny access, retain fleet/bookings/media and trial dates."""
+        context.require_platform_admin()
+        tenant_id = validate_tenant_id(tenant_id)
+        timestamp = now or _utc_now()
+        path = self.tenants_dir / tenant_id / "tenant.json"
+        with self._locked():
+            state = self._load_state()
+            tenant = next((item for item in state.tenants if item.tenant_id == tenant_id), None)
+            if tenant is None or not path.exists():
+                raise TenantNotFoundError(f"tenant missing: {tenant_id}")
+            if tenant.archived_at is not None:
+                return tenant
+            previous_state = json.loads(self.state_path.read_text()) if self.state_path.exists() else None
+            previous_tenant = json.loads(path.read_text())
+            tenant.status = TenantStatus.CANCELLED
+            tenant.archived_at = tenant.updated_at = timestamp
+            for member in state.memberships:
+                if member.tenant_id == tenant_id:
+                    member.active = False
+                    member.archived_at = member.updated_at = timestamp
+            for subscription in state.subscriptions:
+                if subscription.tenant_id == tenant_id:
+                    subscription.status = SubscriptionStatus.CANCELLED
+                    subscription.updated_at = timestamp
+            try:
+                _atomic_json_write(path, _jsonable(tenant))
+                self.fault_hook("tenant_archived")
+                self._save_state(state)
+                self.fault_hook("archive_saved")
+                with (path.parent / "audit.jsonl").open("a", encoding="utf-8") as audit:
+                    audit.write(json.dumps({"schema_version": 1, "tenant_id": tenant_id,
+                        "type": "tenant_archived", "actor_id": context.actor_id,
+                        "timestamp": timestamp.isoformat()}, ensure_ascii=False) + "\n")
+            except Exception:
+                _atomic_json_write(path, previous_tenant)
+                self._restore_state(previous_state)
                 raise
             return tenant

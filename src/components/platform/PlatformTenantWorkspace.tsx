@@ -12,6 +12,7 @@ import { PlatformParkWebAccessPanel } from './PlatformParkWebAccessPanel';
 import { ParkBookingCalendar } from './ParkBookingCalendar';
 import { ParkRequestsPanel } from './ParkRequestsPanel';
 import { ParkTrialStatus } from './ParkTrialStatus';
+import { PlatformTenantActions } from './PlatformTenantActions';
 import { VehicleDetailsEditor, VehicleSpecSummary } from './VehicleDetailsEditor';
 import { ParkDateField } from './ParkDateField';
 import { DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -67,8 +68,8 @@ export function PrivateImage({ tenantId, reference, alt, className, owner = fals
   return url ? <img src={url} alt={alt} className={className} /> : <div className={`${className} grid place-items-center bg-slate-100 text-xs text-slate-600`} role="img" aria-label={alt}>{failed ? pt("Фото недоступно") : <Loader2 className="animate-spin" aria-hidden="true" />}</div>;
 }
 
-export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner = false, onViewStorefront, hideHeaderLogo = false }: {
-  tenant: PlatformTenant; onBack: () => void; onTenantChanged: (tenant: PlatformTenant) => void; owner?: boolean; onViewStorefront?: () => void; hideHeaderLogo?: boolean;
+export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArchived, owner = false, onViewStorefront, hideHeaderLogo = false }: {
+  tenant: PlatformTenant; onBack: () => void; onTenantChanged: (tenant: PlatformTenant) => void; onArchived?: () => void; owner?: boolean; onViewStorefront?: () => void; hideHeaderLogo?: boolean;
 }) {
   const { pt, intlLocale } = useParkLocale();
   const [assets, setAssets] = useState<PlatformAsset[]>([]);
@@ -230,6 +231,8 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, owner
           <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700"><CheckCircle2 aria-hidden="true" className={`h-3.5 w-3.5 ${tenant.status === 'draft' ? 'text-slate-500' : 'text-emerald-700'}`} />{tenant.status === "draft" ? pt("Черновик · триал ещё не начался") : pt("Парк опубликован")}</p>
         </div>
       </header>
+
+      {!owner && onArchived && <div className="mt-4"><PlatformTenantActions tenant={tenant} onChanged={onTenantChanged} onArchived={onArchived} disabled={busy || previewBusy} /></div>}
 
       {!owner && <details className="mt-5"><summary className="min-h-11 cursor-pointer rounded-md py-3 font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700">{pt("Настройки подключения и оформления")}</summary>
       {!owner && <section className="mt-5 flex flex-wrap items-center gap-3" aria-label={pt("Витрина парка")}>

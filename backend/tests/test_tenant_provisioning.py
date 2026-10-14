@@ -13,6 +13,7 @@ from platform_core import (
     TenantAlreadyExistsError,
     TenantProvisionRequest,
     TenantProvisioner,
+    TenantNotFoundError,
 )
 
 
@@ -84,6 +85,76 @@ class TenantProvisioningTests(unittest.TestCase):
         provisioner = TenantProvisioner(self.root)
         with self.assertRaises(TenantAccessError):
             provisioner.create_tenant(viewer, self.request, self.now)
+
+    def test_archive_preserves_data_denies_access_and_does_not_touch_other_parks(self):
+        provisioner = TenantProvisioner(self.root)
+        tenant = provisioner.create_tenant(self.admin, self.request, self.now)
+        provisioner.publish_tenant(self.admin, tenant.tenant_id, self.now)
+        other = provisioner.create_tenant(self.admin, TenantProvisionRequest(name="Other", slug="other"), self.now)
+        other_before = (self.root / 'tenants' / other.tenant_id / 'tenant.json').read_bytes()
+        directory = self.root / 'tenants' / tenant.tenant_id
+        retained = {name: (directory / name).read_bytes() for name in ['assets.json', 'bookings.json', 'customers.json']}
+        state_before = provisioner._load_state()
+        archived = provisioner.archive_tenant(self.admin, tenant.tenant_id, self.now + timedelta(days=2))
+        self.assertEqual(archived.status.value, 'cancelled')
+        self.assertIsNotNone(archived.archived_at)
+        self.assertEqual([item.tenant_id for item in provisioner.list_tenants(self.admin)], [other.tenant_id])
+        self.assertEqual([item['tenant_id'] for item in provisioner.tenant_overviews(self.admin)], [other.tenant_id])
+        with self.assertRaises(TenantNotFoundError):
+            provisioner.get_tenant(self.admin, tenant.tenant_id)
+        with self.assertRaises(TenantNotFoundError):
+            provisioner.publish_tenant(self.admin, tenant.tenant_id)
+        from platform_core.partner_bot import PartnerBotService, PartnerBotError
+        from platform_storefront_api import StorefrontReader
+        from fastapi import HTTPException
+        with self.assertRaises(PartnerBotError):
+            PartnerBotService.tenant(provisioner._load_state(), tenant.tenant_id)
+        with self.assertRaises(HTTPException):
+            StorefrontReader(self.root, tenant.tenant_id, False)
+        state = provisioner._load_state()
+        member = next(item for item in state.memberships if item.tenant_id == tenant.tenant_id)
+        self.assertFalse(member.active)
+        self.assertEqual(state.subscriptions[0].trial_ends_at, state_before.subscriptions[0].trial_ends_at)
+        for name, content in retained.items():
+            self.assertEqual((directory / name).read_bytes(), content)
+        self.assertEqual((self.root / 'tenants' / other.tenant_id / 'tenant.json').read_bytes(), other_before)
+        before = provisioner.state_path.read_bytes()
+        provisioner.archive_tenant(self.admin, tenant.tenant_id)
+        self.assertEqual(provisioner.state_path.read_bytes(), before)
+
+    def test_archive_requires_admin_and_rolls_back_on_failure(self):
+        provisioner = TenantProvisioner(self.root)
+        tenant = provisioner.create_tenant(self.admin, self.request, self.now)
+        viewer = PlatformContext(actor_id="viewer", roles=frozenset({"viewer"}))
+        with self.assertRaises(TenantAccessError):
+            provisioner.archive_tenant(viewer, tenant.tenant_id)
+        state_before = provisioner.state_path.read_bytes()
+        path = self.root / 'tenants' / tenant.tenant_id / 'tenant.json'
+        tenant_before = path.read_bytes()
+        def fail(stage):
+            if stage == 'archive_saved':
+                raise RuntimeError('simulated failure')
+        with self.assertRaises(RuntimeError):
+            TenantProvisioner(self.root, fault_hook=fail).archive_tenant(self.admin, tenant.tenant_id)
+        self.assertEqual(provisioner.state_path.read_bytes(), state_before)
+        self.assertEqual(path.read_bytes(), tenant_before)
+
+    def test_republish_preserves_trial_and_supports_active_tenant(self):
+        provisioner = TenantProvisioner(self.root)
+        tenant = provisioner.create_tenant(self.admin, self.request, self.now)
+        provisioner.publish_tenant(self.admin, tenant.tenant_id, self.now)
+        before = provisioner.state_path.read_bytes()
+        provisioner.publish_tenant(self.admin, tenant.tenant_id, self.now + timedelta(days=5))
+        self.assertEqual(provisioner.state_path.read_bytes(), before)
+        from platform_core.models import TenantStatus
+        from platform_core.provisioning import _atomic_json_write, _jsonable
+        state = provisioner._load_state()
+        state.tenants[0].status = TenantStatus.ACTIVE
+        provisioner._save_state(state)
+        _atomic_json_write(self.root / 'tenants' / tenant.tenant_id / 'tenant.json', _jsonable(state.tenants[0]))
+        before = provisioner.state_path.read_bytes()
+        self.assertEqual(provisioner.publish_tenant(self.admin, tenant.tenant_id).status, TenantStatus.ACTIVE)
+        self.assertEqual(provisioner.state_path.read_bytes(), before)
 
     def test_duplicate_slug_is_rejected_without_changes(self):
         provisioner = TenantProvisioner(self.root)

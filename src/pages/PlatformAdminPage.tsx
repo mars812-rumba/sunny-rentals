@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PlatformTenantWorkspace } from "@/components/platform/PlatformTenantWorkspace";
+import { PlatformTenantActions } from "@/components/platform/PlatformTenantActions";
 import { PlatformBotConnection } from "@/components/platform/PlatformBotConnection";
 import {
   AssetType,
@@ -299,7 +300,7 @@ export default function PlatformAdminPage() {
     try {
       const published = await publishPlatformTenant(publishingTenant.tenant_id);
       setTenants((current) => current.map((tenant) => tenant.tenant_id === published.tenant_id ? published : tenant));
-      toast.success(`Триал ${published.name} начался`);
+      toast.success(publishingTenant.status === 'draft' ? `Триал ${published.name} начался` : `${published.name}: публикация подтверждена`);
       setPublishingTenant(null);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Не удалось опубликовать прокат");
@@ -319,7 +320,9 @@ export default function PlatformAdminPage() {
     );
   }
 
-  if (selectedTenant) return <PlatformTenantWorkspace key={selectedTenant.tenant_id} tenant={selectedTenant} onBack={() => setSelectedTenant(null)} onTenantChanged={(updated) => {
+  if (selectedTenant) return <PlatformTenantWorkspace key={selectedTenant.tenant_id} tenant={selectedTenant} onBack={() => setSelectedTenant(null)} onArchived={() => {
+    setTenants(current => current.filter(item => item.tenant_id !== selectedTenant.tenant_id)); setSelectedTenant(null);
+  }} onTenantChanged={(updated) => {
     setSelectedTenant(updated);
     setTenants((current) => current.map((item) => item.tenant_id === updated.tenant_id ? updated : item));
   }} />;
@@ -436,7 +439,7 @@ export default function PlatformAdminPage() {
                 </div>
                 <div className="divide-y divide-slate-100">
                   {filteredTenants.map((tenant) => (
-                    <TenantRow key={tenant.tenant_id} tenant={tenant} onOpen={() => setSelectedTenant(tenant)} onPublish={() => setPublishingTenant(tenant)} />
+                    <TenantRow key={tenant.tenant_id} tenant={tenant} onOpen={() => setSelectedTenant(tenant)} onPublish={() => setPublishingTenant(tenant)} onArchived={() => setTenants(current => current.filter(item => item.tenant_id !== tenant.tenant_id))} />
                   ))}
                 </div>
               </div>
@@ -450,16 +453,16 @@ export default function PlatformAdminPage() {
       <AlertDialog open={Boolean(publishingTenant)} onOpenChange={(open) => !open && !isPublishing && setPublishingTenant(null)}>
         <AlertDialogContent className="max-w-md rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Опубликовать {publishingTenant?.name}?</AlertDialogTitle>
+            <AlertDialogTitle>{publishingTenant?.status === 'draft' ? 'Опубликовать' : 'Опубликовать заново'} {publishingTenant?.name}?</AlertDialogTitle>
             <AlertDialogDescription className="leading-6">
-              Парк перейдёт из черновика в триал. Семь дней полного доступа начнутся сразу после подтверждения.
+              {publishingTenant?.status === 'draft' ? 'Парк перейдёт из черновика в триал. Начнётся настроенный пробный период.' : 'Статус публикации будет проверен. Триал не начнётся заново, машины и брони сохранятся. Это действие не изменяет серверные маршруты.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPublishing}>Оставить черновиком</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPublishing}>Отмена</AlertDialogCancel>
             <AlertDialogAction onClick={(event) => { event.preventDefault(); void handlePublish(); }} disabled={isPublishing} className="bg-[#0d1b2a] hover:bg-[#17324a]">
               {isPublishing ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Rocket aria-hidden="true" />}
-              {isPublishing ? "Публикуем…" : "Начать триал"}
+              {isPublishing ? "Публикуем…" : publishingTenant?.status === 'draft' ? "Начать триал" : "Опубликовать заново"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -477,7 +480,7 @@ function SummaryItem({ label, value, icon, border = false }: { label: string; va
   );
 }
 
-function TenantRow({ tenant, onPublish, onOpen }: { tenant: PlatformTenant; onPublish: () => void; onOpen: () => void }) {
+function TenantRow({ tenant, onPublish, onOpen, onArchived }: { tenant: PlatformTenant; onPublish: () => void; onOpen: () => void; onArchived: () => void }) {
   return (
     <article className="grid gap-4 px-5 py-5 transition-colors hover:bg-slate-50/70 xl:grid-cols-[minmax(220px,1.8fr)_1fr_0.8fr_0.8fr_auto] xl:items-center">
       <div className="min-w-0">
@@ -489,13 +492,14 @@ function TenantRow({ tenant, onPublish, onOpen }: { tenant: PlatformTenant; onPu
       <div className="text-sm tabular-nums text-slate-600"><span className="mr-2 text-xs text-slate-400 xl:hidden">Создан</span>{formatDate(tenant.created_at)}</div>
       <div className="flex flex-wrap justify-end gap-2">
         <Button variant="outline" size="sm" onClick={onOpen}>Открыть парк</Button>
-        {tenant.status === "draft" ? (
+        {['draft', 'trial', 'active'].includes(tenant.status) ? (
           <Button variant="outline" size="sm" onClick={onPublish} className="w-full border-slate-300 bg-white hover:bg-slate-100 sm:w-auto">
-            Опубликовать <ArrowRight aria-hidden="true" />
+            {tenant.status === 'draft' ? 'Опубликовать' : 'Опубликовать заново'} <ArrowRight aria-hidden="true" />
           </Button>
         ) : (
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700"><Check className="h-4 w-4" aria-hidden="true" /> Опубликован</span>
         )}
+        <PlatformTenantActions tenant={tenant} hidePublish onArchived={onArchived} />
       </div>
     </article>
   );

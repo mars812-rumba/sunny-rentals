@@ -125,7 +125,7 @@ export async function consumePlatformBrowserHandoff(code: string): Promise<Platf
   return session;
 }
 
-async function platformFetch<T>(path: string, init?: RequestInit): Promise<T> {
+export async function platformFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const session = getStoredPlatformSession();
   if (!session?.access_token) throw new PlatformApiError("Нет активной сессии суперадминистратора", 401);
   const response = await fetch(`${PLATFORM_API_BASE}${path}`, {
@@ -162,6 +162,10 @@ export async function publishPlatformTenant(tenantId: string): Promise<PlatformT
     { method: "POST" },
   );
   return response.tenant;
+}
+
+export async function archivePlatformTenant(tenantId: string): Promise<void> {
+  await platformFetch(`/tenants/${encodeURIComponent(tenantId)}`, { method: 'DELETE' });
 }
 
 export interface PlatformAsset {

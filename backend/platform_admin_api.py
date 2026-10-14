@@ -4,7 +4,10 @@ import os
 from pathlib import Path
 from typing import Mapping, Optional
 
-from fastapi import APIRouter, Depends, FastAPI, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, FastAPI, File, HTTPException, UploadFile, Response, status
+from platform_core.owner_web_auth import OwnerWebAuth
+from platform_core.partner_bot import PartnerBotError
+from platform_owner_api import create_owner_web_router
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.concurrency import run_in_threadpool
@@ -35,6 +38,13 @@ class TelegramSessionRequest(BaseModel):
 
 class BrowserHandoffRequest(BaseModel):
     code: constr(min_length=32, max_length=128)
+
+
+class OwnerAccessRequest(BaseModel):
+    reset: bool = False
+
+    class Config:
+        extra = 'forbid'
 
 
 def create_platform_admin_router(
@@ -153,13 +163,14 @@ def create_platform_admin_router(
         context: PlatformContext = Depends(require_admin),
     ):
         try:
+            was_draft = provisioner.get_tenant(context, tenant_id).status.value == 'draft'
             tenant = provisioner.publish_tenant(context, tenant_id)
         except TenantNotFoundError as error:
             raise HTTPException(status_code=404, detail=str(error))
         except ValueError as error:
             raise HTTPException(status_code=409, detail=str(error))
         overview = next(item for item in provisioner.tenant_overviews(context) if item['tenant_id'] == tenant_id)
-        return {"tenant": overview, "trial_started": True}
+        return {"tenant": overview, "trial_started": was_draft}
 
     @router.post("/tenants/{tenant_id}/storefront-preview")
     def storefront_preview(tenant_id: str, context: PlatformContext = Depends(require_admin)):
@@ -169,6 +180,14 @@ def create_platform_admin_router(
             raise HTTPException(404, "Tenant not found")
         previews = StorefrontPreview(auth)
         return {"token": previews.issue(tenant.tenant_id, context.actor_id), "expires_in": previews.TTL}
+
+    @router.delete("/tenants/{tenant_id}")
+    def archive_tenant(tenant_id: str, context: PlatformContext = Depends(require_admin)):
+        try:
+            provisioner.archive_tenant(context, tenant_id)
+        except (TenantNotFoundError, ValueError) as error:
+            raise HTTPException(status_code=404, detail=str(error))
+        return {"archived": True}
 
     def asset_service(tenant_id: str, context: PlatformContext) -> TenantAssetAdmin:
         try:
@@ -239,6 +258,27 @@ def create_platform_admin_router(
         path = execute_asset(lambda: service.media_path(reference))
         return FileResponse(path, media_type="image/webp", headers={"Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"})
 
+    owner_auth = OwnerWebAuth(storage_root)
+
+    @router.get('/tenants/{tenant_id}/owner-web')
+    def owner_web_metadata(tenant_id: str, response: Response, context: PlatformContext = Depends(require_admin)):
+        response.headers['Cache-Control'] = 'private, no-store'
+        try:
+            return owner_auth.metadata(context, tenant_id)
+        except (PartnerBotError, ValueError):
+            raise HTTPException(404, 'Парк недоступен') from None
+
+    @router.post('/tenants/{tenant_id}/owner-web')
+    def issue_owner_web(tenant_id: str, request: OwnerAccessRequest, response: Response, context: PlatformContext = Depends(require_admin)):
+        response.headers['Cache-Control'] = 'private, no-store'
+        response.headers['Referrer-Policy'] = 'no-referrer'
+        try:
+            return owner_auth.issue(context, tenant_id, request.reset)
+        except PartnerBotError:
+            raise HTTPException(404, 'Парк недоступен') from None
+        except ValueError as error:
+            raise HTTPException(409, str(error)) from None
+
     return router
 
 
@@ -268,5 +308,6 @@ def mount_platform_admin_api(
             browser_session_ttl_seconds=browser_ttl_seconds,
         )
     )
-    app.include_router(create_storefront_router(storage_root, auth, booking_enabled=values.get('PLATFORM_PARTNERS_BOT_ENABLED', 'false').strip().lower() == 'true'))
+    app.include_router(create_storefront_router(storage_root, auth, booking_enabled=True))
+    app.include_router(create_owner_web_router(storage_root, bot_id=values.get('PLATFORM_PARTNERS_BOT_TOKEN', '').split(':', 1)[0]))
     return True
