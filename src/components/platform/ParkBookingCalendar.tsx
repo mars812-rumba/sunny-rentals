@@ -116,7 +116,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
     {!loading && !assets.length && !error && <p className="mt-3 text-sm text-slate-600">{pt("Чтобы создать запись, сначала добавьте машину в автопарк.")}</p>}
     {success && <p role="status" className="mt-3 text-sm text-emerald-800">{pt(success)}</p>}
     {draft && <ParkManualBookingForm tenantId={tenantId} assets={assets} admin={admin} initialDay={draft.day} initialEndDay={draft.endDay} initialAssetId={draft.assetId} onClose={() => setDraft(null)} onSaved={booking => {
-      setBookings(items => [...items.filter(item => item.id !== booking.id), booking]); setMonth(booking.pricing.start_date.slice(0, 7)); setAssetId(booking.asset_id); setDraft(null);
+      setBookings(items => [...items.filter(item => item.id !== booking.id), booking]); setMonth(booking.pricing.start_date.slice(0, 7)); setDraft(null);
       setSuccess(booking.entry_type === 'block' ? pt("Даты закрыты. Блокировка видна во всех видах календаря.") : booking.status === 'requested' ? pt("Предбронь создана. Даты заняты до подтверждения или отмены.") : pt("Подтверждённая бронь создана и видна во всех видах календаря."));
     }} />}
     {loading ? <p role="status" className="mt-4">{pt("Загружаем заявки…")}</p> : !error && <Tabs value={view} onValueChange={setView} className="mt-3">

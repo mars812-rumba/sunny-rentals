@@ -590,6 +590,18 @@ test('rental request sheet omits technical copy and keeps its accessible title',
  assert.doesNotMatch(sheet, /<DialogHeader[^>]*sticky/);
 });
 
+test('calendar vehicle filter changes only through the user-controlled select, never on booking save', () => {
+ const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ assert.match(source, /const \[assetId, setAssetId\] = useState\(''\)/);
+ assert.equal((source.match(/setAssetId\(/g) || []).length, 1);
+ assert.match(source, /onChange=\{event => setAssetId\(event.target.value\)\}/);
+ const saved = source.match(/onSaved=\{booking => \{([^]*?)\}\} \/>/)?.[1];
+ assert.ok(saved);
+ assert.doesNotMatch(saved, /setAssetId/);
+ assert.match(saved, /setBookings\(items =>/);
+ assert.match(saved, /setDraft\(null\)/);
+});
+
 test('manual form has labeled fields, inline validation hooks and date-only inputs', () => {
  const html = renderToStaticMarkup(e(ui.ParkManualBookingForm, { tenantId: 'park-a', admin: false,
    assets: [{ id: 'asset-a', name: 'Toyota', pricing: { daily_rate: 800, currency: 'THB' }, deposit_policy: { amount: 5000 } }],
