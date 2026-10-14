@@ -34,6 +34,7 @@ interface MonthCalendarViewProps {
   onCreateBooking?: (dateRange: { start: Date; end: Date }) => void;
   showOccupancy?: boolean;
   hideConfirmedOccupancy?: boolean;
+  handoversOnly?: boolean;
 }
 
 const getMonthLetters = (date: Date, dateLocale: typeof ru) => {
@@ -48,7 +49,8 @@ const MonthGrid = memo(({
   onDayClick,
   onBadgeClick,
   showOccupancy = false,
-  hideConfirmedOccupancy = false
+  hideConfirmedOccupancy = false,
+  handoversOnly = false
 }: { 
   date: Date, 
   eventsByDay: Map<string, DayEvent[]>,
@@ -56,6 +58,7 @@ const MonthGrid = memo(({
   onBadgeClick: (event: DayEvent, e: React.MouseEvent) => void,
   showOccupancy?: boolean
   hideConfirmedOccupancy?: boolean
+  handoversOnly?: boolean
 }) => {
   const { pt, dateLocale } = useParkLocale();
   const days = useMemo(() => {
@@ -103,7 +106,7 @@ const MonthGrid = memo(({
                 : events;
               const isCurrentMonth = isSameMonth(day, date);
               const dayIsToday = isToday(day);
-              const { slots, overflow } = showOccupancy
+              const { slots, overflow } = showOccupancy && !handoversOnly
                 ? calendarDaySlots(visibleEvents, laneLayout.lanes, Math.min(4, laneLayout.laneCount))
                 : { slots: visibleEvents.slice(0, 4), overflow: visibleEvents.slice(4) };
 
@@ -132,7 +135,9 @@ const MonthGrid = memo(({
                       if (!ev) return <div key={`empty-${idx}`} data-calendar-lane={idx} aria-hidden="true" className="h-5" />;
                       // Цвет в зависимости от статуса брони
                       const isPreBooking = ev.booking?.status === 'pre_booking';
-                      const bgClass = showOccupancy
+                      const bgClass = handoversOnly
+                        ? ev.type === 'pickup' ? parkBookingColors.pickup.badge : 'bg-orange-300 text-orange-950'
+                        : showOccupancy
                         ? ev.type === 'rental'
                           ? ev.booking?.status === 'blocked' ? parkBookingColors.blocked.badge : isPreBooking ? parkBookingColors.pending.text : parkBookingColors.confirmed.text
                           : ev.booking?.status === 'blocked' ? parkBookingColors.blocked.badge : isPreBooking ? parkBookingColors.pending.badge : ev.type === 'pickup' ? parkBookingColors.pickup.badge : parkBookingColors.return.badge
@@ -153,7 +158,7 @@ const MonthGrid = memo(({
                             showOccupancy ? "flex h-5 min-h-5 w-full items-center justify-center overflow-hidden px-0.5 py-0.5 text-[9px] leading-4 font-medium rounded hover:ring-1 hover:ring-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700" : "w-full h-[13px] px-1 text-[6px] font-medium cursor-pointer hover:ring-1 hover:ring-blue-400 transition-all rounded-[2px] flex items-center justify-center",
                             bgClass
                           )}
-                          aria-label={`${ev.booking?.status === 'blocked' ? pt("Блокировка") : ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}${showOccupancy && isPreBooking ? `, ${pt('Ожидает подтверждения')}` : ''}`}
+                          aria-label={`${ev.booking?.status === 'blocked' ? pt("Блокировка") : ev.type === 'pickup' ? pt("Выдача") : ev.type === 'return' ? pt("Возврат") : pt("Занято")}: ${ev.carName}${showOccupancy && !handoversOnly && isPreBooking ? `, ${pt('Ожидает подтверждения')}` : ''}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             onBadgeClick(ev, e);
@@ -200,6 +205,7 @@ export function MonthCalendarView({
   onCreateBooking,
   showOccupancy = false,
   hideConfirmedOccupancy = false,
+  handoversOnly = false,
 }: MonthCalendarViewProps) {
   const { pt, dateLocale } = useParkLocale();
   
@@ -225,6 +231,7 @@ export function MonthCalendarView({
 
       // Фильтруем отмененные и отклоненные брони
       if (fullBooking.status === 'cancelled' || fullBooking.status === 'rejected') return;
+      if (handoversOnly && fullBooking.status === 'blocked') return;
 
       const baseEvent = {
         carName: item.car_name,
@@ -251,7 +258,7 @@ export function MonthCalendarView({
         if (!map.has(rKey)) map.set(rKey, []);
         map.get(rKey)!.push({ ...baseEvent, location: item.return_location || baseEvent.location, type: 'return', time: format(rDate, 'HH:mm') });
       }
-      if (showOccupancy && pDate && rDate && !isNaN(pDate.getTime()) && !isNaN(rDate.getTime())) {
+      if (showOccupancy && !handoversOnly && pDate && rDate && !isNaN(pDate.getTime()) && !isNaN(rDate.getTime())) {
         // Return day is not occupied; retain a separate return event on that day.
         for (let day = addDays(pDate, 1), count = 0; day < rDate && count < 365; day = addDays(day, 1), count++) {
           const key = format(day, 'yyyy-MM-dd');
@@ -262,7 +269,7 @@ export function MonthCalendarView({
     });
 
     return map;
-  }, [logisticsData, bookings, showOccupancy, pt]);
+  }, [logisticsData, bookings, showOccupancy, handoversOnly, pt]);
 
   const handleInnerDayClick = useCallback((date: Date, events: DayEvent[], isOverflowClick = false) => {
     // Click on empty space - create booking immediately (только если не overflow click)
@@ -325,9 +332,9 @@ export function MonthCalendarView({
 
       <div className="overflow-hidden flex-1 cursor-grab active:cursor-grabbing w-full" ref={emblaRef}>
         <div className="flex h-full">
-          <MonthGrid date={addMonths(currentDate, -1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} hideConfirmedOccupancy={hideConfirmedOccupancy} />
-          <MonthGrid date={currentDate} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} hideConfirmedOccupancy={hideConfirmedOccupancy} />
-          <MonthGrid date={addMonths(currentDate, 1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} hideConfirmedOccupancy={hideConfirmedOccupancy} />
+          <MonthGrid date={addMonths(currentDate, -1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} hideConfirmedOccupancy={hideConfirmedOccupancy} handoversOnly={handoversOnly} />
+          <MonthGrid date={currentDate} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} hideConfirmedOccupancy={hideConfirmedOccupancy} handoversOnly={handoversOnly} />
+          <MonthGrid date={addMonths(currentDate, 1)} eventsByDay={eventsByDay} onDayClick={handleInnerDayClick} onBadgeClick={handleBadgeClick} showOccupancy={showOccupancy} hideConfirmedOccupancy={hideConfirmedOccupancy} handoversOnly={handoversOnly} />
         </div>
       </div>
 

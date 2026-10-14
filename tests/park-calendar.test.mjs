@@ -562,10 +562,30 @@ test('timetable legend describes booking bars; delivery legend keeps pickup and 
  assert.doesNotMatch(timetable, /Выдача|Возврат|bg-yellow/);
  assert.match(timetable, /flex-wrap/);
  const deliveries = renderToStaticMarkup(e(ui.ParkCalendarLegend, { view: 'deliveries' }));
- assert.equal((deliveries.match(/<li /g) || []).length, 4);
+ assert.equal((deliveries.match(/<li /g) || []).length, 2);
  assert.match(deliveries, /Выдача/); assert.match(deliveries, /Возврат/);
- assert.match(deliveries, /bg-green-500/); assert.match(deliveries, /bg-yellow-400/);
- assert.doesNotMatch(deliveries, /Подтверждено/);
+ assert.match(deliveries, /bg-green-500/); assert.match(deliveries, /bg-orange-400/);
+ assert.doesNotMatch(deliveries, /Подтверждено|Ожидает подтверждения|Блокировка/);
+});
+
+test('delivery-only calendar renders handovers in green and orange without blocks or middle days', () => {
+ const items = [
+  { ...booking, status: 'confirmed' },
+  { ...booking, id: 'pending', pricing: { ...booking.pricing, asset_name: 'Pending car' } },
+  { ...booking, id: 'blocked', entry_type: 'block', status: 'confirmed', pricing: { ...booking.pricing, asset_name: 'Blocked car' } },
+  { ...booking, id: 'cancelled', status: 'cancelled', pricing: { ...booking.pricing, asset_name: 'Cancelled car' } },
+ ];
+ const html = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2026-08-01T00:00:00'), bookings: items.map(ui.calendarBooking), logisticsData: items.map(ui.calendarLogistics), showOccupancy: true, handoversOnly: true, onDateChange() {}, onBookingClick() {}, onDayClick() {} }));
+ assert.match(html, /bg-green-400 text-green-950/);
+ assert.match(html, /bg-orange-300 text-orange-950/);
+ assert.doesNotMatch(html, /Blocked car|Cancelled car|data-plain-occupancy|bg-purple-300|Ожидает подтверждения/);
+ const day = html.match(/data-calendar-day="2026-08-03"[\s\S]*?(?=data-calendar-day="2026-08-04")/)?.[0];
+ assert.ok(day);
+ assert.doesNotMatch(day, /data-calendar-booking|Toyota|Pending car/);
+ assert.match(day, /событий: 0/);
+ const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ assert.match(source, /showOccupancy handoversOnly/);
+ assert.match(source, /item\.entry_type !== 'block' && \(item\.pricing\.start_date === selection\.day \|\| item\.pricing\.end_date === selection\.day\)/);
 });
 
 test('month and transport occupy two columns without a separate today row', () => {
