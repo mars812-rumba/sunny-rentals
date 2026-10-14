@@ -17,7 +17,7 @@ const bundle = await build({ stdin: { contents: `export * from './src/utils/park
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
  export { ParkRequestItem } from './src/components/platform/ParkRequestsPanel';
  export { ParkCalendarPhoto } from './src/components/platform/ParkCalendarPhoto';
- export { ParkCalendarViewButtons } from './src/components/platform/ParkBookingCalendar';
+ export { ParkCalendarViewButtons, ParkCalendarActions } from './src/components/platform/ParkBookingCalendar';
  export { Tabs, TabsContent } from './src/components/ui/tabs';
  export { schedulerInitialOffset, timetableFocusDay } from './src/lib/scheduler-scroll';
  export { parkToday } from './src/lib/park-rental';
@@ -34,6 +34,29 @@ const ui = compiled.exports;
 const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', start_at: '2026-08-01T17:00:00Z', end_at: '2026-08-03T17:00:00Z', currency: 'THB',
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
+
+test('manual booking footer keeps submit and cancel together, wrapping only the submit label', () => {
+ const source = readFileSync('src/components/platform/ParkManualBookingForm.tsx', 'utf8');
+ assert.match(source, /park-sheet-actions flex items-stretch gap-2/);
+ assert.match(source, /h-auto min-h-11 min-w-0 flex-1 gap-2 whitespace-normal/);
+ assert.match(source, /<span className="min-w-0 break-words">\{busy/);
+ assert.match(source, /h-auto min-h-11 shrink-0 gap-2 rounded-lg px-3 text-sm/);
+ assert.doesNotMatch(source, /park-sheet-actions flex flex-wrap/);
+});
+
+test('calendar actions stay in one row with named icon-only refresh and no technical introduction', () => {
+ const html = renderToStaticMarkup(e(ui.ParkCalendarActions, { createDisabled: false, refreshDisabled: false, onCreate() {}, onRefresh() {} }));
+ assert.match(html, /class="flex w-full items-center gap-2"/);
+ assert.equal((html.match(/<button/g) || []).length, 2);
+ assert.match(html, /Создать бронь/);
+ assert.match(html, /aria-label="Обновить календарь"/);
+ assert.match(html, /title="Обновить календарь"/);
+ assert.doesNotMatch(html, />Обновить</);
+ const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ assert.doesNotMatch(source, /Заявки из бота и витрины — в одном календаре|Занятость по автомобилям: прокрутите/);
+ assert.match(source, /className="sr-only">\{pt\('Таймтейбл'\)/);
+ assert.match(source, /useState\('timetable'\)/);
+});
 
 test('calendar events and timetable bars omit shadows and clock icons, preserving fixed rows and clipped shapes', () => {
  const scheduler = readFileSync(resolve('src/components/admin/SchedulerCalendar.tsx'), 'utf8');

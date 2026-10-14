@@ -8,6 +8,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { build } from 'esbuild';
 
 const bundle = await build({ stdin: { contents: `export * from './src/lib/park-locale';
+ export { ParkCalendarActions } from './src/components/platform/ParkBookingCalendar';
  export * from './src/lib/vehicle-spec-options';
  export { VehicleSpecsFields } from './src/components/platform/VehicleSpecsFields';
  export { ParkCatalogPrice } from './src/components/platform/ParkCatalogPrice';
@@ -204,6 +205,14 @@ test('pickup/return English copy and labels do not translate customer addresses 
  assert.match(ru, /Время получения/); assert.match(ru, /Время возврата/);
 });
 
+test('compact calendar create and icon refresh actions are localized in RU/EN', () => {
+ for (const language of ['ru', 'en']) {
+  const html = render(ui.ParkCalendarActions, { createDisabled: false, refreshDisabled: false, onCreate() {}, onRefresh() {} }, language);
+  assert.match(html, language === 'ru' ? /Создать бронь/ : /Create booking/);
+  assert.match(html, language === 'ru' ? /aria-label="Обновить календарь"/ : /aria-label="Refresh calendar"/);
+ }
+});
+
 test('vehicle specs editor groups native dropdowns and preserves exact and custom values in RU/EN', () => {
  const props = { id: 'specs', specs: { fuel: 'Бензин', transmission: 'CVT', drive: 'Custom drive', body_type: 'Custom body', power: '109 л.с.', engine: '1.5L', seats: 12, doors: 6, mileage: 0, air_conditioning: false }, features: 'USB\nPrivate custom option', onChange() {}, onFeaturesChange() {} };
  for (const language of ['ru', 'en']) {
@@ -380,7 +389,7 @@ test('shared manual form has compact grouped dates/prices, contact and return lo
   assert.equal((html.match(/type="date"/g) || []).length, 2);
   assert.equal((html.match(/type="time"/g) || []).length, 2);
   assert.match(html, /type="tel"/);
-  assert.match(html, /bg-emerald-700 text-white hover:bg-emerald-800/);
+  assert.match(html, /bg-emerald-700[^"<>]*text-white[^"<>]*hover:bg-emerald-800/);
   assert.match(html, language === 'en' ? /Return location/ : /Место возврата/);
   assert.match(html, /value="whatsapp"/);
   if (language === 'en') assert.doesNotMatch(visible(html), /[А-Яа-яЁё]/);
