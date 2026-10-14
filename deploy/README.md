@@ -17,6 +17,33 @@ for rollback. No files under `/etc` are changed.
 
 Run deployment only through the Telegram bot `/deploy` or `/ship` command.
 
+## New park routes (AR Rentals and future parks)
+
+Application publication and tenant publication do not install nginx rules.
+The generic `try_files $uri $uri/ /index.html` serves the marketing homepage
+for parks created after the release, because they have no per-tenant HTML yet.
+
+The minimal fix is `deploy/nginx.park-routes.conf`. An authorized server
+administrator should add this fragment **inside the existing HTTPS server**
+for `sunny-rentals.online`, leaving all other locations and virtual hosts alone:
+
+```nginx
+include /home/sunny-rentals/deploy/nginx.park-routes.conf;
+```
+
+Do not also add it if that server already has `/p/` and `/owner/` locations;
+update the existing locations instead. Do not replace the whole enabled config
+with the larger proposed marketing configuration to fix this particular bug.
+Back up the enabled config, validate it with `nginx -t`, and only then apply a
+separately authorized reload. The Telegram coding task must not perform these
+production operations.
+
+Before activation, verify `dist/p/index.html` and `dist/owner/index.html` exist.
+After activation, check `/p/ar-rentals`, `/owner/ar-rentals`, the existing park
+routes, the homepage and static assets. A nonexistent tenant should still open
+the park application and display its own not-found state, never the Sunny
+marketing homepage. Future parks must not require another frontend release.
+
 ## Search isolation (pending server configuration)
 
 Only Sunny Rentals public content should be indexed. The checked-in nginx
