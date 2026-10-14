@@ -22,7 +22,7 @@ test('park forms share a responsive 90dvh sheet with transform/opacity-only moti
 });
 
 test('sheets protect unsaved data and saving, adjust to keyboard and restore accessible closing', () => {
- assert.match(sheet, /if \(!open && \(busy \|\| saving\)\) return/);
+ assert.match(sheet, /if \(!open && \(busy \|\| saving\)\) return false/);
  assert.match(sheet, /if \(!open && dirty\)/);
  assert.match(sheet, /<AlertDialog open=\{confirm\}/);
  assert.match(sheet, /<AlertDialogCancel>/);

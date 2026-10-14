@@ -6,9 +6,11 @@ import { useParkLocale } from '@/contexts/park-locale';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 import { ParkFormSheetContext as SheetContext } from './park-form-sheet-context';
+import { attachParkSheetDrag } from '@/lib/park-sheet-drag';
 
 export function ParkFormSheet({ children, busy = false, ...props }: React.ComponentProps<typeof DialogPrimitive.Root> & { busy?: boolean }) {
   const { pt } = useParkLocale();
+  const notifyOpenChange = props.onOpenChange;
   const [dirty, setDirty] = React.useState(false);
   const [saving, setSavingState] = React.useState(false);
   const activeSaves = React.useRef(new Set<string>());
@@ -19,12 +21,14 @@ export function ParkFormSheet({ children, busy = false, ...props }: React.Compon
   const [confirm, setConfirm] = React.useState(false);
   const markDirty = React.useCallback(() => setDirty(true), []);
   const markSaved = React.useCallback(() => setDirty(false), []);
-  const context = React.useMemo(() => ({ markDirty, markSaved, setSaving, busy: busy || saving }), [markDirty, markSaved, setSaving, busy, saving]);
-  const onOpenChange = (open: boolean) => {
-    if (!open && (busy || saving)) return;
-    if (!open && dirty) { setConfirm(true); return; }
-    setDirty(false); props.onOpenChange?.(open);
-  };
+  const onOpenChange = React.useCallback((open: boolean) => {
+    if (!open && (busy || saving)) return false;
+    if (!open && dirty) { setConfirm(true); return false; }
+    setDirty(false); notifyOpenChange?.(open);
+    return true;
+  }, [busy, saving, dirty, notifyOpenChange]);
+  const requestClose = React.useCallback(() => onOpenChange(false), [onOpenChange]);
+  const context = React.useMemo(() => ({ markDirty, markSaved, setSaving, requestClose, busy: busy || saving }), [markDirty, markSaved, setSaving, requestClose, busy, saving]);
   return <SheetContext.Provider value={context}>
     <DialogPrimitive.Root {...props} onOpenChange={onOpenChange}>{children}</DialogPrimitive.Root>
     <AlertDialog open={confirm} onOpenChange={setConfirm}><AlertDialogContent>
@@ -42,9 +46,17 @@ export const ParkFormSheetContent = React.forwardRef<React.ElementRef<typeof Dia
   ({ children, header, className, closeLabel, closeButtonClassName, onChangeCapture, ...props }, forwardedRef) => {
     const { pt } = useParkLocale();
     const context = React.useContext(SheetContext);
+    const requestClose = context?.requestClose;
+    const gestureBusy = context?.busy;
     const returnFocus = React.useRef<HTMLElement | null>(null);
+    const closeButton = React.useRef<HTMLButtonElement>(null);
     const [node, setNode] = React.useState<HTMLDivElement | null>(null);
     const mergeRef = React.useCallback((element: HTMLDivElement | null) => { setNode(element); if (typeof forwardedRef === 'function') forwardedRef(element); else if (forwardedRef) forwardedRef.current = element; }, [forwardedRef]);
+    React.useEffect(() => {
+      const handle = node?.querySelector<HTMLButtonElement>('[data-park-sheet-handle]');
+      if (!node || !handle || gestureBusy) return;
+      return attachParkSheetDrag(node, handle, () => requestClose?.() ?? false);
+    }, [node, gestureBusy, requestClose]);
     React.useEffect(() => {
       const viewport = window.visualViewport;
       if (!viewport || !node) return;
@@ -70,9 +82,10 @@ export const ParkFormSheetContent = React.forwardRef<React.ElementRef<typeof Dia
         onCloseAutoFocus={event => { props.onCloseAutoFocus?.(event); if (!event.defaultPrevented && returnFocus.current?.isConnected) { event.preventDefault(); returnFocus.current.focus({ preventScroll: true }); } }}
         data-park-form-sheet="true" className={cn('park-form-sheet fixed z-50 flex flex-col overflow-hidden bg-white text-slate-900', className)}
         onChangeCapture={event => { if (!(event.target instanceof HTMLInputElement && event.target.type === 'file')) context?.markDirty(); onChangeCapture?.(event); }}>
-        {header && <div className="shrink-0 border-b border-slate-200 px-4 py-5 pr-14 sm:px-6 sm:pr-14">{header}</div>}
+        <button type="button" data-park-sheet-handle disabled={context?.busy} aria-label={closeLabel || pt('Закрыть')} onClick={() => closeButton.current?.click()} className="flex min-h-11 w-full shrink-0 touch-none items-center justify-center rounded-t-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700 disabled:opacity-50 sm:hidden"><span aria-hidden="true" className="h-1 w-10 rounded-full bg-slate-400" /></button>
+        {header && <div className="shrink-0 border-b border-slate-200 px-4 pb-5 pt-1 sm:px-6 sm:py-5 sm:pr-14">{header}</div>}
         <div data-park-sheet-body className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-4 py-5 sm:px-6">{children}</div>
-        <DialogPrimitive.Close disabled={context?.busy} className={cn('absolute right-2 top-2 flex size-11 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700 disabled:opacity-50', closeButtonClassName)} aria-label={closeLabel || pt('Закрыть')}><X aria-hidden="true" className="size-5" /></DialogPrimitive.Close>
+        <DialogPrimitive.Close ref={closeButton} disabled={context?.busy} className={cn('absolute right-2 top-2 size-11 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700 disabled:opacity-50', closeButtonClassName, 'hidden sm:flex')} aria-label={closeLabel || pt('Закрыть')}><X aria-hidden="true" className="size-5" /></DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>;
   }
