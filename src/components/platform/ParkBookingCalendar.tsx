@@ -117,6 +117,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
     {loading ? <p role="status" className="mt-4">{pt("Загружаем заявки…")}</p> : !error && <Tabs value={view} onValueChange={setView} className="mt-3">
       <ParkCalendarViewButtons />
       <TabsContent value="timetable" className="mt-3 min-w-0">
+        <ParkCalendarLegend view="timetable" />
         <section aria-labelledby={`${id}-gantt-title`} className="min-w-0">
           <h3 id={`${id}-gantt-title`} className="sr-only">{pt('Таймтейбл')}</h3>
           <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly renderCarPhoto={car => <ParkCalendarPhoto key={`${tenantId}:${car.id}:${photos.get(car.id) || ''}`} tenantId={tenantId} reference={photos.get(car.id)} admin={admin} />} />
@@ -125,13 +126,27 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
       <TabsContent value="deliveries" className="mt-5 min-w-0">
         <h3 className="mb-2 text-lg font-semibold">{pt("Календарь доставок")}</h3>
         <p className="mb-3 text-sm leading-6 text-slate-600">{format(date, 'LLLL yyyy', { locale: dateLocale })} {pt(" · Нажмите день или заявку.")}</p>
-        <div className="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-700">{[[parkBookingColors.pickup.dot, 'Выдача'], [parkBookingColors.return.dot, 'Возврат'], [parkBookingColors.pending.dot, 'Ожидает подтверждения'], [parkBookingColors.blocked.dot, 'Блокировка']].map(([color, label]) => <span key={pt(label)} className="inline-flex items-center gap-2"><span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${color}`} />{pt(label)}</span>)}</div>
+        <ParkCalendarLegend view="deliveries" />
         <MonthCalendarView currentDate={date} bookings={monthBookings} logisticsData={active.map(calendarLogistics)} onDateChange={value => setMonth(format(value, 'yyyy-MM'))} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onDayClick={value => setSelection({ day: format(value, 'yyyy-MM-dd') })} showOccupancy />
       </TabsContent>
     </Tabs>}
 <Dialog open={!!selection} onOpenChange={open => { if (!open) setSelection(null); }}><DialogContent aria-describedby={undefined} closeLabel={pt("Закрыть заявку")} closeButtonClassName="right-2 top-2 flex size-11 items-center justify-center" onCloseAutoFocus={event => { if (draft) event.preventDefault(); }} ><DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 text-balance"><ClipboardList aria-hidden="true" className="size-5 shrink-0 text-blue-700" />{selection?.day ? pt("События {0}", [dateLabel(selection.day)]) : pt("Заявка парка")}</DialogTitle></DialogHeader>{selected.length ? details(selected) : <p>{pt("На этот день событий нет.")}</p>}{selection?.day && <Button disabled={!!draft || loading || busy || !assets.length} onClick={() => { setDraft({ day: selection.day, assetId }); setSelection(null); setSuccess(''); }}><Plus aria-hidden="true" />{pt("Добавить запись на этот день")}</Button>}{error && <p role="alert" className="text-sm text-rose-800">{pt(error)}</p>}</DialogContent></Dialog>
     <AlertDialog open={!!cancelTarget} onOpenChange={open => { if (!open && !busy) setCancelTarget(null); }}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{cancelTarget?.entry_type === 'block' ? pt("Снять блокировку?") : pt("Отменить заявку?")}</AlertDialogTitle><AlertDialogDescription>{pt("Период на ")}{cancelTarget?.pricing.asset_name} {pt(" освободится для других клиентов. Автоматическое сообщение клиенту не отправляется.")}</AlertDialogDescription></AlertDialogHeader>{error && <p role="alert" className="text-sm text-rose-800">{pt(error)}</p>}<AlertDialogFooter><AlertDialogCancel disabled={busy}>{pt("Оставить без изменений")}</AlertDialogCancel><AlertDialogAction disabled={busy} className="bg-red-700 text-white hover:bg-red-800" onClick={event => { event.preventDefault(); if (cancelTarget) void action(cancelTarget, 'cancelled').then(ok => { if (ok) setCancelTarget(null); }); }}>{busy ? pt("Отменяем…") : pt("Подтвердить отмену")}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </section>;
+}
+
+export function ParkCalendarLegend({ view }: { view: 'timetable' | 'deliveries' }) {
+  const { pt } = useParkLocale();
+  const entries = [
+    ...(view === 'timetable'
+      ? [[parkBookingColors.confirmed.dot, 'Подтверждено']]
+      : [[parkBookingColors.pickup.dot, 'Выдача'], [parkBookingColors.return.dot, 'Возврат']]),
+    [parkBookingColors.pending.dot, 'Ожидает подтверждения'],
+    [parkBookingColors.blocked.dot, 'Блокировка'],
+  ];
+  return <ul className="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-700">
+    {entries.map(([color, label]) => <li key={label} className="inline-flex items-center gap-2"><span aria-hidden="true" className={`size-2.5 shrink-0 rounded-full ${color}`} />{pt(label)}</li>)}
+  </ul>;
 }
 
 export function ParkCalendarViewButtons() {

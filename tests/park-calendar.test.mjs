@@ -17,7 +17,7 @@ const bundle = await build({ stdin: { contents: `export * from './src/utils/park
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
  export { ParkRequestItem } from './src/components/platform/ParkRequestsPanel';
  export { ParkCalendarPhoto } from './src/components/platform/ParkCalendarPhoto';
- export { ParkCalendarViewButtons, ParkCalendarActions } from './src/components/platform/ParkBookingCalendar';
+ export { ParkCalendarViewButtons, ParkCalendarActions, ParkCalendarLegend } from './src/components/platform/ParkBookingCalendar';
  export { Tabs, TabsContent } from './src/components/ui/tabs';
  export { schedulerInitialOffset, timetableFocusDay } from './src/lib/scheduler-scroll';
  export { parkToday } from './src/lib/park-rental';
@@ -541,11 +541,31 @@ test('timetable and deliveries keep shared month and asset filter in separate pa
  const deliveries = source.match(/<TabsContent value="deliveries"[\s\S]*?<\/TabsContent>/)?.[0];
  assert.ok(timetable); assert.ok(deliveries);
  assert.match(timetable, /<SchedulerCalendar/); assert.doesNotMatch(timetable, /<MonthCalendarView/);
+ assert.match(timetable, /<ParkCalendarLegend view="timetable"/);
  assert.match(deliveries, /<MonthCalendarView/); assert.doesNotMatch(deliveries, /<SchedulerCalendar/);
+ assert.match(deliveries, /<ParkCalendarLegend view="deliveries"/);
  assert.match(deliveries, /currentDate=\{date\}/);
  assert.match(timetable, /startDate=\{date\}/);
  assert.match(timetable, /cars=\{cars\.filter\(car => !assetId \|\| car\.id === assetId\)\}/);
  assert.match(source, /timetableFocusDay\(month, today\)/);
+});
+
+test('timetable legend describes booking bars; delivery legend keeps pickup and return', () => {
+ const timetable = renderToStaticMarkup(e(ui.ParkCalendarLegend, { view: 'timetable' }));
+ assert.match(timetable, /Подтверждено/);
+ assert.match(timetable, /Ожидает подтверждения/);
+ assert.match(timetable, /Блокировка/);
+ assert.match(timetable, /bg-emerald-500/);
+ assert.match(timetable, /bg-purple-500/);
+ assert.match(timetable, /bg-slate-400/);
+ assert.equal((timetable.match(/<li /g) || []).length, 3);
+ assert.doesNotMatch(timetable, /Выдача|Возврат|bg-yellow/);
+ assert.match(timetable, /flex-wrap/);
+ const deliveries = renderToStaticMarkup(e(ui.ParkCalendarLegend, { view: 'deliveries' }));
+ assert.equal((deliveries.match(/<li /g) || []).length, 4);
+ assert.match(deliveries, /Выдача/); assert.match(deliveries, /Возврат/);
+ assert.match(deliveries, /bg-green-500/); assert.match(deliveries, /bg-yellow-400/);
+ assert.doesNotMatch(deliveries, /Подтверждено/);
 });
 
 test('month and transport occupy two columns without a separate today row', () => {
