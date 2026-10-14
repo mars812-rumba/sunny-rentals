@@ -548,6 +548,27 @@ test('timetable and deliveries keep shared month and asset filter in separate pa
  assert.match(source, /setScrollResetKey\(value => value \+ 1\)/);
 });
 
+test('today belongs to a single date navigation row, before month and arrows', () => {
+ const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ const navigation = source.match(/<div className="mt-3 grid grid-cols-\[auto_minmax\(0,1fr\)_44px_44px\][\s\S]*?(?=    <div className="mt-3 min-w-0 max-w-full")/)?.[0];
+ assert.ok(navigation);
+ assert.ok(navigation.indexOf('aria-label={pt("Сегодня")}') < navigation.indexOf('<ParkCalendarMonthSelect'));
+ assert.ok(navigation.indexOf('<ParkCalendarMonthSelect') < navigation.indexOf('Предыдущий месяц'));
+ assert.match(navigation, /setMonth\(today\.slice\(0, 7\)\); setScrollResetKey\(value => value \+ 1\)/);
+ assert.match(navigation, /sr-only min-\[400px\]:not-sr-only/);
+ assert.doesNotMatch(navigation, /-asset|Техника|flex-wrap/);
+});
+
+test('rental request sheet omits technical copy and keeps its accessible title', () => {
+ const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ const sheet = source.match(/<Dialog open=\{!!selection\}[\s\S]*?<\/Dialog>/)?.[0];
+ assert.ok(sheet);
+ assert.doesNotMatch(sheet, /Даты указаны по часовому|Автоматические сообщения клиентам|<DialogDescription|<Info/);
+ assert.match(sheet, /aria-describedby=\{undefined\}/);
+ assert.match(sheet, /<DialogTitle/);
+ assert.match(sheet, /details\(selected\)/);
+});
+
 test('manual form has labeled fields, inline validation hooks and date-only inputs', () => {
  const html = renderToStaticMarkup(e(ui.ParkManualBookingForm, { tenantId: 'park-a', admin: false,
    assets: [{ id: 'asset-a', name: 'Toyota', pricing: { daily_rate: 800, currency: 'THB' }, deposit_policy: { amount: 5000 } }],
