@@ -322,6 +322,24 @@ test('request period intersects park civil dates, combines status and excludes b
  assert.match(source, /onClick=\{\(\) => \{ setStartDate\(''\); setEndDate\(''\); \}\}/);
 });
 
+test('cancelled requests are visible only in archive, with dates and historical details preserved', () => {
+ const make = (id, status, start = '2026-11-10', end = '2026-11-15') => ({ id, status, entry_type: 'rental', start_at: start, pricing: { start_date: start, end_date: end }, customer: { name: 'Saved customer' } });
+ const bookings = [make('pending', 'requested'), make('confirmed', 'confirmed'), make('cancelled', 'cancelled'), make('completed', 'completed'), make('old-cancelled', 'cancelled', '2026-10-01', '2026-10-05')];
+ const before = JSON.stringify(bookings);
+ assert.deepEqual(ui.filterParkRequests(bookings, 'all').map(item => item.id), ['pending', 'confirmed', 'completed']);
+ assert.deepEqual(ui.filterParkRequests(bookings, 'archive').map(item => item.id), ['old-cancelled', 'cancelled']);
+ assert.deepEqual(ui.filterParkRequests(bookings, 'archive', '2026-11-15', '2026-11-20').map(item => item.id), ['cancelled']);
+ assert.deepEqual(ui.filterParkRequests(bookings, 'cancelled').map(item => item.id), ['old-cancelled', 'cancelled']);
+ assert.equal(ui.filterParkRequests(bookings, 'archive')[0].customer.name, 'Saved customer');
+ assert.equal(JSON.stringify(bookings), before);
+ for (const language of ['ru', 'en']) {
+  const html = render(ui.ParkRequestsPanel, { tenantId: 'park-a', admin: false }, language);
+  assert.match(html, /value="archive"/);
+  assert.match(html, language === 'en' ? /Archive \(cancelled\)/ : /Архив \(отменённые\)/);
+  assert.doesNotMatch(html, /value="cancelled"/);
+ }
+});
+
 test('month selector follows app language rather than browser month-input locale, and reset stays beside dates', () => {
  const en = render(ui.ParkCalendarMonthSelect, { id: 'month', month: '2026-10', onChange() {} });
  assert.match(en, /value="2026-10" selected="">October 2026/);
