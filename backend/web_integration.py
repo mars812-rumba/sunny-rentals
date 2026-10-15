@@ -41,6 +41,7 @@ from booking_notifications import build_booking_claude_context, select_active_bo
 from customer_bookings import require_bot_token, customer_bookings, cancel_customer_booking, customer_crm_status
 from chat_messages import deduplicate_chat_entries
 from jsonl_tail import read_jsonl_tail
+from crm_time import crm_datetime, crm_sort_time
 from customer_outreach_campaign import (
     CAMPAIGN_ID as OUTREACH_CAMPAIGN_ID,
     GREETING as OUTREACH_GREETING,
@@ -58,6 +59,7 @@ from claude_dialog import (
     requests_manager_handoff,
 )
 from platform_admin_api import mount_platform_admin_api
+from platform_partner_api import mount_platform_partner_api
 
 # Claude AI imports
 try:
@@ -261,6 +263,10 @@ app.add_middleware(
 
 app.mount("/images_web", StaticFiles(directory=IMAGES), name="images")
 PLATFORM_ADMIN_API_MOUNTED = mount_platform_admin_api(
+    app,
+    Path(__file__).resolve().parent / "data-v2",
+)
+PLATFORM_PARTNERS_BOT_MOUNTED = mount_platform_partner_api(
     app,
     Path(__file__).resolve().parent / "data-v2",
 )
@@ -2830,6 +2836,7 @@ def get_fast_dialog_map():
     Это в 100 раз быстрее, чем читать файл для каждого юзера отдельно.
     """
     statuses = {}
+    last_read = {}
     
     def process_file(path, is_chat=False):
         if not path.exists(): return
@@ -2862,11 +2869,18 @@ def get_fast_dialog_map():
                     elif action == "claude_stopped":
                         entry["claude_status"] = "stopped"
                     elif action == "messages_marked_read":
-                        entry["has_new_messages"] = False
+                        # An older read marker must not hide a later incoming message.
+                        stamp = crm_datetime(ev.get("timestamp"))
+                        if stamp and (uid not in last_read or stamp > last_read[uid]):
+                            last_read[uid] = stamp
             except: continue
 
     process_file(CHAT_LOGS_JSONL, is_chat=True)
     process_file(DATA / "crm_history.jsonl", is_chat=False)
+    for uid, stamp in last_read.items():
+        latest_message = crm_datetime(statuses[uid].get("last_message_at"))
+        if latest_message is not None and stamp >= latest_message:
+            statuses[uid]["has_new_messages"] = False
     return statuses
 
 @app.get(API_PREFIX + "/crm/users")
@@ -2881,7 +2895,7 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
         # Получаем карту состояний ОДИН раз
         fast_map = get_fast_dialog_map()
 
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         delta = {"today": 1, "week": 7, "month": 30}.get(period, 9999)
         start_date = now - timedelta(days=delta)
 
@@ -2914,7 +2928,9 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
 
             if not u_at: continue
 
-            u_date = datetime.fromisoformat(u_at.replace('Z', ''))
+            u_date = crm_datetime(u_at)
+            if u_date is None:
+                continue
 
             if u_date >= start_date and not u.get("archived"):
                 user_copy = u.copy()
@@ -2933,7 +2949,7 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
 
                 filtered.append(user_copy)
 
-        filtered.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
+        filtered.sort(key=lambda x: crm_sort_time(x.get("updated_at") or x.get("created_at")), reverse=True)
         return {"status": "ok", "users": filtered}
     except Exception as e:
         print(f"🔴 CRM Users Error: {e}")
@@ -2943,7 +2959,7 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
 def get_crm_stats(period: str = Query("all")):
     try:
         users_data = load_json(USER_DATA_JSON)
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         
         # Определяем точку отсчета для фильтра
         if period == "today":
@@ -2955,7 +2971,7 @@ def get_crm_stats(period: str = Query("all")):
         elif period == "month":
             start_date = now - timedelta(days=30)
         else: # "all"
-            start_date = datetime(2000, 1, 1)
+            start_date = datetime(2000, 1, 1, tzinfo=UTC)
 
         # Инициализируем счетчики (согласно новой воронке)
         stats = {
@@ -3016,8 +3032,8 @@ def get_crm_stats(period: str = Query("all")):
             user_status = user.get("status")
 
             # Проверяем, попадает ли юзер в период
-            user_date = datetime.fromisoformat(user_date_str.replace('Z', ''))
-            if user_date < start_date:
+            user_date = crm_datetime(user_date_str)
+            if user_date is None or user_date < start_date:
                 continue
 
             # Пропускаем web_session для счётчиков (кроме pre_booking)
@@ -3159,7 +3175,7 @@ def get_archive_users(period: str = Query("all", alias="period")):
         # Фильтр по периоду (по archived_at)
         if period != 'all':
             from datetime import timedelta
-            now = datetime.utcnow()
+            now = datetime.now(UTC)
             
             if period == 'week':
                 cutoff = now - timedelta(days=7)
@@ -3172,15 +3188,15 @@ def get_archive_users(period: str = Query("all", alias="period")):
             for user in users_data:
                 archived_at = user.get('archived_at', user.get('timestamp', ''))
                 try:
-                    user_time = datetime.fromisoformat(archived_at.replace('Z', '+00:00'))
-                    if user_time >= cutoff:
+                    user_time = crm_datetime(archived_at)
+                    if user_time is not None and user_time >= cutoff:
                         filtered.append(user)
                 except:
                     continue
             
             users_data = filtered
 
-        users_data.sort(key=lambda x: x.get('archived_at', x.get('timestamp', '')), reverse=True)
+        users_data.sort(key=lambda x: crm_sort_time(x.get('archived_at') or x.get('timestamp')), reverse=True)
 
         return {
             "status": "ok",

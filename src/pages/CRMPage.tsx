@@ -26,6 +26,8 @@ import { MarkerType } from '@/types/crm';
 import { BookingFormDialog } from '@/components/admin/BookingFormDialog';
 import { CRMTutorialSheet } from '@/components/admin/CRMTutorialSheet';
 import logo from '@/assets/logo.png.webp';
+import { CRMStatusButton } from '@/components/admin/CRMStatusButton';
+import { adjacentCrmStatus, attachCrmStatusSwipes, clearCrmLeadUnread, crmUnreadByStatus, normalizeCrmLead } from '@/lib/crm-status-navigation';
 
 // TypeScript интерфейсы для работы с диалогами
 interface DialogEvent {
@@ -50,6 +52,8 @@ interface User {
   user_id: number;
   username: string;
   dialog_status?: DialogStatus; // Получаем из API
+  dialog?: DialogStatus;
+  has_new_messages?: boolean;
   // ... остальные поля из существующего интерфейса
   status?: string;
   
@@ -130,6 +134,14 @@ const CRMPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [activeStatus, setActiveStatus] = useState('new');
+  const leadListRef = useRef<HTMLElement>(null);
+  const mainController = useRef<AbortController | null>(null);
+  const unreadRevision = useRef(0);
+  const unreadCounts = crmUnreadByStatus(allUsers);
+  useEffect(() => {
+    if (!leadListRef.current) return;
+    return attachCrmStatusSwipes(leadListRef.current, direction => setActiveStatus(current => adjacentCrmStatus(current, direction)));
+  }, []);
   const [period, setPeriod] = useState('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [chats, setChats] = useState<any[]>([]);
@@ -339,19 +351,19 @@ const CRMPage: React.FC = () => {
   };
 
   const loadMainData = useCallback(async () => {
+    mainController.current?.abort();
+    const controller = new AbortController();
+    mainController.current = controller;
     setLoading(true);
     setLoadError('');
     try {
       // Загружаем всех пользователей для подсчёта непрочитанных во вкладках
-      const allUsersRes = await fetch(`/api/crm/users?period=${period}`);
+      const allUsersRes = await fetch(`/api/crm/users?period=${period}`, { signal: controller.signal });
       const allUsersData = await allUsersRes.json();
+      if (controller.signal.aborted) return;
       if (allUsersData.status === 'ok') {
         // Преобразуем dialog в dialog_status для совместимости
-        const processedAllUsers = allUsersData.users.map((user: any) => ({
-          ...user,
-          dialog_status: user.dialog_status || user.dialog || null,
-          dialog: user.dialog || user.dialog_status || null
-        }));
+        const processedAllUsers = allUsersData.users.map(normalizeCrmLead);
         setAllUsers(processedAllUsers); // Все пользователи для индикаторов
       }
       
@@ -361,29 +373,26 @@ const CRMPage: React.FC = () => {
       const queryParams = [statusParam, `period=${period}`].filter(Boolean).join('&');
 
       const [uRes, sRes] = await Promise.all([
-        fetch(`/api/crm/users?${queryParams}`),
-        fetch(`/api/crm/stats?period=${period}`)
+        fetch(`/api/crm/users?${queryParams}`, { signal: controller.signal }),
+        fetch(`/api/crm/stats?period=${period}`, { signal: controller.signal })
       ]);
       const uData = await uRes.json();
       const sData = await sRes.json();
+      if (controller.signal.aborted) return;
       if (uRes.ok && uData.status === 'ok') {
         // Преобразуем dialog в dialog_status для совместимости
-        const processedUsers = uData.users.map((user: any) => ({
-          ...user,
-          dialog_status: user.dialog_status || user.dialog || null,
-          dialog: user.dialog || user.dialog_status || null
-        }));
+        const processedUsers = uData.users.map(normalizeCrmLead);
         setUsers(processedUsers);
-        setTimeout(() => refreshAllDialogStatuses(), 1000);
       } else {
         throw new Error(uData.message || uData.detail || 'Сервер не вернул список лидов');
       }
       if (sData.status === 'ok') setStats(sData.stats);
     } catch (e) {
+      if (controller.signal.aborted) return;
       console.error("Ошибка загрузки:", e);
       setLoadError(e instanceof Error ? e.message : 'Не удалось загрузить список лидов');
     }
-    finally { setLoading(false); }
+    finally { if (!controller.signal.aborted) setLoading(false); }
   }, [activeStatus, period]);
 
 const fetchChatHistory = async (userId: number | string, silent: boolean = false) => {
@@ -455,6 +464,7 @@ const loadUserDetails = async (user: any) => {
   };
 
   const markDialogAsRead = async (userId: number | string) => {
+    unreadRevision.current++;
     try {
       const response = await fetch(`/api/crm/dialog/${String(userId)}/mark-read`, {
         method: 'POST',
@@ -464,12 +474,10 @@ const loadUserDetails = async (user: any) => {
       });
 
       if (response.ok) {
+        unreadRevision.current++;
         // Обновляем локальное состояние
-        setUsers(prev => prev.map(user =>
-          compareUserIds(user.user_id, userId) && user.dialog_status
-            ? { ...user, dialog_status: { ...user.dialog_status, has_new_messages: false } }
-            : user
-        ));
+        setUsers(prev => prev.map(user => clearCrmLeadUnread(user, userId)));
+        setAllUsers(prev => prev.map(user => clearCrmLeadUnread(user, userId)));
       }
     } catch (e) {
       console.error('Ошибка сброса флага новых сообщений:', e);
@@ -496,26 +504,18 @@ const loadUserDetails = async (user: any) => {
   };
 
   const refreshAllDialogStatuses = async () => {
+    const scope = mainController.current;
+    const revision = unreadRevision.current;
     try {
-      const promises = users.map(async (user) => {
-        try {
-          const dialogStatus = await fetchDialogStatus(user.user_id);
-          return { userId: user.user_id, dialogStatus };
-        } catch (error) {
-          console.error(`Failed to load dialog status for user ${user.user_id}:`, error);
-          return { userId: user.user_id, dialogStatus: null };
-        }
-      });
-      const results = await Promise.allSettled(promises);
-      setUsers(prev => prev.map(user => {
-        const result = results.find(r => r.status === 'fulfilled' && String(r.value.userId) === String(user.user_id));
-        if (result && result.status === 'fulfilled' && result.value.dialogStatus) {
-          return { ...user, dialog_status: result.value.dialogStatus };
-        }
-        return user;
-      }));
-    } catch (e) {
-      console.error('Ошибка обновления статусов диалогов:', e);
+      // One bulk request updates every tab, including an empty currently selected tab.
+      const response = await fetch(`/api/crm/users?period=${period}`);
+      const data = await response.json();
+      if (!response.ok || data.status !== 'ok' || scope !== mainController.current || scope?.signal.aborted || revision !== unreadRevision.current) return;
+      const fresh: User[] = data.users.map(normalizeCrmLead);
+      setAllUsers(fresh);
+      setUsers(fresh.filter(user => user.status === activeStatus));
+    } catch (error) {
+      console.error('Ошибка обновления статусов диалогов:', error);
     }
   };
 
@@ -929,6 +929,7 @@ const handleBookingSuccess = async () => {
   };
 
   const handleStatusChange = async (userId: number, newStatus: string, stayOnTab = false) => {
+    unreadRevision.current++;
     // Optimistic update — сначала UI, потом API
     const previousUsers = users;
     const previousTab = activeStatus;
@@ -954,6 +955,8 @@ const handleBookingSuccess = async () => {
 
       if (response.ok) {
         console.log(`Статус ${userId} → ${newStatus}`);
+        unreadRevision.current++;
+        setAllUsers(prev => prev.map(user => compareUserIds(user.user_id, userId) ? { ...user, status: newStatus } : user));
         // Если нужно — переключить вкладку (для workflow кнопок)
         if (!stayOnTab) {
           setActiveStatus(newStatus);
@@ -1218,7 +1221,7 @@ const handleUpdateNote = async () => {
     }
   };
 
-  useEffect(() => { loadMainData(); }, [loadMainData]);
+  useEffect(() => { void loadMainData(); return () => mainController.current?.abort(); }, [loadMainData]);
 
   // Auto-refresh chat when user is selected
   useEffect(() => {
@@ -1243,14 +1246,12 @@ const handleUpdateNote = async () => {
 
   // Auto-refresh dialog statuses every 30 seconds
   useEffect(() => {
-    if (users.length === 0) return;
-
     const interval = setInterval(() => {
       refreshAllDialogStatuses();
     }, 3000); // 5 seconds
 
     return () => clearInterval(interval);
-  }, [users.length]);
+  }, [activeStatus, period]);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-hidden">
@@ -1279,13 +1280,7 @@ const handleUpdateNote = async () => {
             {MAIN_STATUSES.map(key => {
               const count = stats?.[key] || 0;
               return (
-                <Card key={key} onClick={() => setActiveStatus(key)}
-                  className={`cursor-pointer border-none transition-all duration-300 ${activeStatus === key ? 'ring-2 ring-blue-500 shadow-md' : 'hover:bg-white/50 opacity-80'}`}>
-                  <CardContent className="p-1.5 flex flex-col items-center justify-center gap-0.5">
-                    <span className="text-[7px] font-bold uppercase tracking-tighter text-slate-400">{STATUS_CONFIG[key].label}</span>
-                    <span className="text-sm font-black text-slate-800 leading-none">{count}</span>
-                  </CardContent>
-                </Card>
+                <CRMStatusButton key={key} label={STATUS_CONFIG[key].label} count={count} unread={unreadCounts[key] || 0} active={activeStatus === key} onSelect={() => setActiveStatus(key)} />
               );
             })}
           </div>
@@ -1369,7 +1364,7 @@ const handleUpdateNote = async () => {
       </div>
 
       {/* Main Content - with top padding to account for fixed header */}
-      <main className="p-4 max-w-[1600px] mx-auto w-full pt-[160px]">
+      <main ref={leadListRef} style={{ touchAction: 'pan-y pinch-zoom' }} aria-label={`Лиды ${STATUS_CONFIG[activeStatus].label}`} className="p-4 max-w-[1600px] mx-auto w-full pt-[160px]">
   {loading ? (
     <div className="h-96 flex flex-col items-center justify-center text-slate-300">
        <RefreshCcw className="w-10 h-10 animate-spin mb-4 text-blue-100" />
