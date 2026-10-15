@@ -134,13 +134,13 @@ const CRMPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [activeStatus, setActiveStatus] = useState('new');
-  const leadListRef = useRef<HTMLElement>(null);
+  const crmSwipeRef = useRef<HTMLDivElement>(null);
   const mainController = useRef<AbortController | null>(null);
   const unreadRevision = useRef(0);
   const unreadCounts = crmUnreadByStatus(allUsers);
   useEffect(() => {
-    if (!leadListRef.current) return;
-    return attachCrmStatusSwipes(leadListRef.current, direction => setActiveStatus(current => adjacentCrmStatus(current, direction)));
+    if (!crmSwipeRef.current) return;
+    return attachCrmStatusSwipes(crmSwipeRef.current, direction => setActiveStatus(current => adjacentCrmStatus(current, direction)));
   }, []);
   const [period, setPeriod] = useState('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -1254,7 +1254,7 @@ const handleUpdateNote = async () => {
   }, [activeStatus, period]);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-hidden">
+    <div ref={crmSwipeRef} style={{ touchAction: 'pan-y pinch-zoom' }} data-crm-swipe-surface className="min-h-screen min-h-[100dvh] bg-slate-50 flex flex-col font-sans overflow-x-hidden">
       {/* Combined Fixed Header: Nav + Stats + Filters */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
         
@@ -1364,7 +1364,7 @@ const handleUpdateNote = async () => {
       </div>
 
       {/* Main Content - with top padding to account for fixed header */}
-      <main ref={leadListRef} style={{ touchAction: 'pan-y pinch-zoom' }} aria-label={`Лиды ${STATUS_CONFIG[activeStatus].label}`} className="p-4 max-w-[1600px] mx-auto w-full pt-[160px]">
+      <main aria-label={`Лиды ${STATUS_CONFIG[activeStatus].label}`} className="flex-1 p-4 max-w-[1600px] mx-auto w-full pt-[160px]">
   {loading ? (
     <div className="h-96 flex flex-col items-center justify-center text-slate-300">
        <RefreshCcw className="w-10 h-10 animate-spin mb-4 text-blue-100" />

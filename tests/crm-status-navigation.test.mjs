@@ -60,16 +60,16 @@ test('status buttons remain keyboard accessible; unread is distinct from total a
  assert.match(many, /99\+/); assert.match(many, /непрочитанными 101/);
 });
 
-function gestureFixture({ blocked = false, nested = false } = {}) {
+function gestureFixture({ blocked = false, nested = false, blankSurface = false } = {}) {
  globalThis.window = { innerWidth: 400 };
  globalThis.getComputedStyle = () => ({ overflowX: 'auto' });
  class ElementMock { closest() { return blocked ? this : null; } }
  globalThis.Element = ElementMock;
- const target = new ElementMock();
- target.scrollWidth = nested ? 200 : 0; target.clientWidth = 100;
  const handlers = new Map(), directions = [];
- const node = { addEventListener: (key, fn) => handlers.set(key, fn), removeEventListener: key => handlers.delete(key) };
- target.parentElement = node;
+ const node = Object.assign(new ElementMock(), { addEventListener: (key, fn) => handlers.set(key, fn), removeEventListener: key => handlers.delete(key) });
+ const target = blankSurface ? node : new ElementMock();
+ target.scrollWidth = nested ? 200 : 0; target.clientWidth = 100;
+ if (!blankSurface) target.parentElement = node;
  const cleanup = ui.attachCrmStatusSwipes(node, value => directions.push(value));
  const send = (type, x, y = 100, time = 100, extra = {}) => handlers.get(type)?.({ target, pointerId: 1, pointerType: 'touch', isPrimary: true, clientX: x, clientY: y, timeStamp: time, ...extra });
  return { handlers, directions, send, cleanup };
@@ -85,6 +85,22 @@ test('intentional horizontal touch switches; a swipe never also activates a lead
  f.send('pointerdown', 100, 100, 200); f.send('pointerup', 220, 100, 350);
  assert.deepEqual(f.directions, ['next', 'previous']);
  f.cleanup(); assert.equal(f.handlers.size, 0);
+});
+
+test('swipes also start directly on the empty full-screen CRM surface without any lead card', () => {
+ const f = gestureFixture({ blankSurface: true });
+ f.send('pointerdown', 220, 700, 0);
+ f.send('pointermove', 100, 705, 100);
+ f.send('pointerup', 100, 705, 150);
+ assert.deepEqual(f.directions, ['next']);
+ f.send('pointerdown', 100, 700, 200);
+ f.send('pointerup', 220, 700, 350);
+ assert.deepEqual(f.directions, ['next', 'previous']);
+ f.cleanup();
+ const source = readFileSync('src/pages/CRMPage.tsx', 'utf8');
+ assert.match(source, /<div ref=\{crmSwipeRef\}[^>]*data-crm-swipe-surface[^>]*min-h-\[100dvh\]/);
+ assert.match(source, /<main[^>]*className="flex-1/);
+ assert.doesNotMatch(source, /<main[^>]*ref=|leadListRef/);
 });
 
 test('scrolls, small taps, canceled/long gestures, controls, browser edges and nested scrollers do not switch', () => {
