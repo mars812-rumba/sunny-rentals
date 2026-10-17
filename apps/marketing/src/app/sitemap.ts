@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 
 import { marketingCars } from "@/content/cars";
 import { contentPages } from "@/content/content-pages";
+import { articlesUpdatedAt } from "@/content/articles";
+import { contentUpdatedAt } from "@/content/rental-policy";
 import { vehicleModelGroups } from "@/content/model-groups";
 import {
   absoluteLanguageUrls,
@@ -12,7 +14,7 @@ import { absoluteUrl } from "@/lib/site";
 
 export const dynamic = "force-static";
 
-const editorialUpdatedAt = "2026-08-03";
+const editorialUpdatedAt = contentUpdatedAt;
 
 const contentDate = (value: string) => value.slice(0, 10);
 
@@ -29,6 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPaths = [
     { path: "/", lastModified: fleetUpdatedAt, changeFrequency: "weekly" as const, priority: 1 },
     { path: "/cars", lastModified: fleetUpdatedAt, changeFrequency: "daily" as const, priority: 0.9 },
+    { path: "/articles", lastModified: articlesUpdatedAt, changeFrequency: "weekly" as const, priority: 0.7 },
   ];
 
   const staticPages: MetadataRoute.Sitemap = staticPaths.flatMap((page) =>
@@ -47,7 +50,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     const path = `/cars/${group.slug}`;
     return languages.map((locale) => ({
       url: absoluteUrl(localePath(locale, path)),
-      lastModified: contentDate(group.updatedAt),
+      lastModified: newestDate([editorialUpdatedAt, contentDate(group.updatedAt)]),
       changeFrequency: "weekly" as const,
       priority: 0.8,
       alternates: {

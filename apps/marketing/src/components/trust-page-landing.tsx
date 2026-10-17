@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 import { CarCard } from "@/components/car-card";
 import { RentalDatesProvider } from "@/components/rental-dates-context";
@@ -9,27 +10,34 @@ import { contentPages } from "@/content/content-pages";
 import { trustPages, type TrustPageContent } from "@/content/trust-pages";
 import { languageAlternates, localePath, type Locale } from "@/lib/i18n";
 import { absoluteUrl, siteConfig } from "@/lib/site";
+import { ContextLinks, relatedTopics } from "@/components/context-links";
+import "./monthly-rental.css";
 
 export function createTrustPageMetadata(page: TrustPageContent, locale: Locale): Metadata {
   const path = `/${page.slug}`;
+  const isMonthly = page.slug === "long-term-car-rental-phuket";
+  const socialImage = absoluteUrl(isMonthly ? getCarsByCategory("compact")[0]?.image ?? "/logo.png.webp" : "/logo.png.webp");
   return {
     title: page.title,
     description: page.description,
     alternates: languageAlternates(locale, path),
     other: { "content-language": locale },
+    twitter: { card: isMonthly ? "summary_large_image" : "summary", title: page.title, description: page.description, images: [socialImage] },
     openGraph: {
       type: "article",
       locale: locale === "ru" ? "ru_RU" : "en_US",
       alternateLocale: [locale === "ru" ? "en_US" : "ru_RU"],
       title: page.title,
       description: page.description,
-      url: localePath(locale, path),
+      url: absoluteUrl(localePath(locale, path)),
       modifiedTime: page.updatedAt,
+      images: isMonthly ? [{ url: socialImage, alt: page.title }] : [{ url: socialImage, width: 192, height: 192 }],
     },
   };
 }
 
 export function TrustPageLanding({ page, locale }: { page: TrustPageContent; locale: Locale }) {
+  const isMonthly = page.slug === "long-term-car-rental-phuket";
   const path = `/${page.slug}`;
   const pageUrl = absoluteUrl(localePath(locale, path));
   const labels = locale === "ru"
@@ -53,13 +61,35 @@ export function TrustPageLanding({ page, locale }: { page: TrustPageContent; loc
     { length: Math.min(6, localizedPages.length - 1) },
     (_, index) => localizedPages[(currentPageIndex + index + 1) % localizedPages.length],
   );
-  const featuredCars = page.vehicleCategories
+  const candidates = page.vehicleCategories
     ? page.vehicleCategories.length === 1
       ? getCarsByCategory(page.vehicleCategories[0]).slice(0, 4)
       : page.vehicleCategories
           .flatMap((category) => getCarsByCategory(category).slice(0, 1))
           .slice(0, 4)
     : [];
+  const featuredCars = page.requiresChildSeat
+    ? page.vehicleCategories?.flatMap((category) => getCarsByCategory(category))
+        .filter((car) => car.verifiedDetails?.childSeatCompatible === true).slice(0, 4) ?? []
+    : candidates;
+  const vehicleSection = featuredCars.length ? (
+    <section className="content-vehicles" id="rental-vehicles" aria-labelledby="content-vehicles-title">
+      <div className="shell">
+        <div className="section-heading">
+          <div>
+            {!isMonthly ? <p className="eyebrow eyebrow--dark">Sunny Rentals · Phuket</p> : null}
+            <h2 id="content-vehicles-title">{labels.matching}</h2>
+          </div>
+          <p>{labels.matchingIntro}</p>
+        </div>
+        <RentalDatesProvider>
+          <div className="content-vehicles__grid">
+            {featuredCars.map((car) => <CarCard car={car} locale={locale} key={car.slug} />)}
+          </div>
+        </RentalDatesProvider>
+      </div>
+    </section>
+  ) : null;
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -98,60 +128,96 @@ export function TrustPageLanding({ page, locale }: { page: TrustPageContent; loc
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
       />
 
-      <article className="trust-page">
+      <article className={`trust-page${isMonthly ? " monthly-rental" : ""}`}>
         <header className="trust-page__hero">
           <div className="shell">
-            <nav className="trust-page__breadcrumbs" aria-label="Breadcrumbs">
+            <nav className="trust-page__breadcrumbs" aria-label={locale === "ru" ? "Путь к странице" : "Breadcrumbs"}>
               <Link href={localePath(locale)}>{labels.home}</Link>
               <span aria-hidden="true">/</span>
-              <span>{labels.guides}</span>
+              {isMonthly ? <Link href={localePath(locale, "/articles")}>{locale === "ru" ? "Статьи" : "Articles"}</Link> : <span>{labels.guides}</span>}
             </nav>
-            <p className="eyebrow">{page.eyebrow}</p>
-            <h1>{page.title}</h1>
-            <p>{page.intro}</p>
-            <small>{labels.updated}: {page.updatedAt}</small>
+            {isMonthly ? (
+              <div className="monthly-rental__opening">
+                <div className="monthly-rental__copy">
+                  <h1>{page.title}</h1>
+                  <p>{page.intro}</p>
+                  <nav className="monthly-rental__actions" aria-label={locale === "ru" ? "На этой странице" : "On this page"}>
+                    <a href="#rental-vehicles">{locale === "ru" ? "Посмотреть автомобили" : "Explore cars"}</a>
+                    <a href="#section-2">{locale === "ru" ? "Как посчитать стоимость" : "Understand the cost"}</a>
+                  </nav>
+                  <small>{labels.updated}: <time dateTime={page.updatedAt}>{page.updatedAt}</time></small>
+                </div>
+                {featuredCars[0] ? (
+                  <figure className="monthly-rental__photo">
+                    <Image src={featuredCars[0].image} alt={`${featuredCars[0].brand} ${featuredCars[0].model}`} width={720} height={480} priority />
+                    <figcaption>{locale === "ru" ? "Фото автомобиля из каталога Sunny Rentals. Наличие проверяем на ваши даты." : "A car from the Sunny Rentals catalogue. Availability is checked for your dates."}</figcaption>
+                  </figure>
+                ) : null}
+              </div>
+            ) : <>
+              <p className="eyebrow">{page.eyebrow}</p>
+              <h1>{page.title}</h1>
+              <p>{page.intro}</p>
+              <small>{labels.updated}: {page.updatedAt}</small>
+            </>}
           </div>
         </header>
+
+        {!isMonthly ? vehicleSection : null}
+
+        {page.requiresChildSeat && !featuredCars.length ? (
+          <section className="content-vehicles"><div className="shell">
+            <h2>{locale === "ru" ? "Подберём автомобиль и кресло вместе" : "Choose the car and child seat together"}</h2>
+            <p>{locale === "ru"
+              ? "Сообщите параметры ребёнка и состав семьи. Подходящее кресло, крепление и наличие подтвердим для выбранной машины до бронирования."
+              : "Share the child's measurements and your group details. The seat type, fitting method and availability are confirmed for the selected car before booking."}</p>
+            <Link className="text-link" href={localePath(locale, "/cars")}>{labels.fleet}</Link>
+          </div></section>
+        ) : null}
 
         <div className="shell trust-page__body">
           <div className="trust-page__sections">
             {page.sections.map((section, index) => (
               <section key={section.title} id={`section-${index + 1}`}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
+                {!isMonthly ? <span>{String(index + 1).padStart(2, "0")}</span> : null}
                 <h2>{section.title}</h2>
                 {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
                 {section.items ? (
                   <ul>{section.items.map((item) => <li key={item}>{item}</li>)}</ul>
+                ) : null}
+                {section.table ? (
+                  <div className="rental-comparison" role="region" aria-label={section.table.caption} tabIndex={0}>
+                    <table>
+                      <caption>{section.table.caption}</caption>
+                      <thead><tr>{section.table.headers.map((header) => <th scope="col" key={header}>{header}</th>)}</tr></thead>
+                      <tbody>{section.table.rows.map((row) => <tr key={row[0]}>
+                        {row.map((cell, cellIndex) => cellIndex === 0
+                          ? <th scope="row" key={cellIndex}>{cell}</th>
+                          : <td key={cellIndex}>{cell}</td>)}
+                      </tr>)}</tbody>
+                    </table>
+                  </div>
                 ) : null}
               </section>
             ))}
           </div>
 
           <aside className="trust-page__aside">
+            {isMonthly ? <nav className="monthly-rental__contents" aria-label={locale === "ru" ? "Содержание" : "Contents"}>
+              {page.sections.map((section, index) => <a key={section.title} href={`#section-${index + 1}`}>{section.title}</a>)}
+            </nav> : null}
             <strong>{labels.fleet}</strong>
             <p>{locale === "ru" ? "Сравните реальные машины, цены и депозиты." : "Compare real vehicles, rates and deposits."}</p>
             <Link href={localePath(locale, "/cars")}>{labels.fleet}<span aria-hidden="true">→</span></Link>
+            {["rental-terms", "scooter-rental-phuket"].includes(page.slug) ? (
+              <p><a href="https://thailand.prd.go.th/en/content/category/detail/id/2874/iid/341038" target="_blank" rel="noopener noreferrer">
+                {locale === "ru" ? "Официальная информация Таиланда о водительских документах" : "Thailand’s official driving-document guidance"}
+              </a></p>
+            ) : null}
           </aside>
         </div>
 
-        {featuredCars.length ? (
-          <section className="content-vehicles" aria-labelledby="content-vehicles-title">
-            <div className="shell">
-              <div className="section-heading">
-                <div>
-                  <p className="eyebrow eyebrow--dark">Sunny Rentals · Phuket</p>
-                  <h2 id="content-vehicles-title">{labels.matching}</h2>
-                </div>
-                <p>{labels.matchingIntro}</p>
-              </div>
-              <RentalDatesProvider>
-                <div className="content-vehicles__grid">
-                  {featuredCars.map((car) => <CarCard car={car} locale={locale} key={car.slug} />)}
-                </div>
-              </RentalDatesProvider>
-            </div>
-          </section>
-        ) : null}
+        {isMonthly ? vehicleSection : null}
 
         <section className="trust-page__faq" aria-labelledby="trust-faq-title">
           <div className="shell trust-page__faq-layout">
@@ -166,6 +232,7 @@ export function TrustPageLanding({ page, locale }: { page: TrustPageContent; loc
                   <p>{item.answer}</p>
                 </details>
               ))}
+              <ContextLinks locale={locale} paths={relatedTopics[page.slug] ?? ["rental-terms"]} />
             </div>
           </div>
         </section>

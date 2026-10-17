@@ -88,6 +88,7 @@ export function SiteHeader({
 
         <nav className="site-nav" aria-label={copy.nav.aria}>
           <Link href={localePath(locale, "/cars")}>{copy.nav.fleet}</Link>
+          <Link href={localePath(locale, "/articles")} aria-current={currentPath === "/articles" ? "page" : undefined}>{copy.nav.articles}</Link>
           <a className="site-nav__telegram" href={siteConfig.telegramBotUrl}>Telegram</a>
           <span className="language-switch" aria-label="Language">
             <Link
@@ -183,6 +184,9 @@ export function SiteHeader({
               </Link>
               <Link href={`${localePath(locale)}#faq`} onClick={closeMenu}>
                 <span>05</span>{copy.nav.faq}
+              </Link>
+              <Link href={localePath(locale, "/articles")} onClick={closeMenu} aria-current={currentPath === "/articles" ? "page" : undefined}>
+                <span>06</span>{copy.nav.articles}
               </Link>
             </nav>
 

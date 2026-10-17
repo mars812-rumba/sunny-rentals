@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { getMessages, localePath, type Locale } from "@/lib/i18n";
 import { siteConfig } from "@/lib/site";
+import { getPageFaq } from "@/content/audit-faq";
+import { ContextLinks } from "@/components/context-links";
 
 export function TrustContent({ locale }: { locale: Locale }) {
   const copy = getMessages(locale);
@@ -66,6 +68,26 @@ export function TrustContent({ locale }: { locale: Locale }) {
         </div>
       </section>
 
+      <section className="rental-guide">
+        <div className="shell">
+          <h2>{locale === "ru" ? "От заявки до выдачи" : "From request to handover"}</h2>
+          <ol className="rental-steps">
+            {(locale === "ru" ? [
+              ["Выберите транспорт", "Сверьте фото, даты, пассажиров и багаж."],
+              ["Отправьте заявку", "Проверьте выбранную машину, время и обе точки передачи."],
+              ["Получите подтверждение", "Дождитесь проверки наличия и согласуйте стоимость и условия до оплаты."],
+              ["Осмотрите при получении", "Сверьте договор, снимите состояние и сохраните контакт помощи."],
+            ] : [
+              ["Choose a vehicle", "Check photos, dates, passengers and luggage."],
+              ["Send the request", "Check your selected vehicle, times and both meeting points."],
+              ["Obtain confirmation", "Wait for availability checks and agree the cost and terms before payment."],
+              ["Inspect at handover", "Check the agreement, record the condition and save the assistance contact."],
+            ]).map(([title, text]) => <li key={title}><h3>{title}</h3><p>{text}</p></li>)}
+          </ol>
+          <ContextLinks locale={locale} paths={["rental-terms", "deposit", "insurance", "delivery"]} />
+        </div>
+      </section>
+
       <section className="faq-section" id="faq">
         <div className="shell faq-section__layout">
           <div>
@@ -78,7 +100,7 @@ export function TrustContent({ locale }: { locale: Locale }) {
           </div>
 
           <div className="faq-list">
-            {copy.trust.questions.map(([question, answer]) => (
+            {getPageFaq("home", locale).map(({ question, answer }) => (
               <details key={question}>
                 <summary>{question}<span aria-hidden="true">+</span></summary>
                 <p>{answer}</p>
@@ -124,6 +146,7 @@ export function TrustContent({ locale }: { locale: Locale }) {
           </address>
           <nav aria-label={copy.nav.footerAria}>
             <Link href={localePath(locale, "/cars")}>{copy.nav.fleet}</Link>
+            <Link href={localePath(locale, "/articles")}>{copy.nav.articles}</Link>
             <Link href={localePath(locale, "/rental-terms")}>{locale === "ru" ? "Условия" : "Terms"}</Link>
             <Link href={localePath(locale, "/insurance")}>{locale === "ru" ? "Страховка" : "Insurance"}</Link>
             <Link href={localePath(locale, "/deposit")}>{locale === "ru" ? "Депозит" : "Deposit"}</Link>
