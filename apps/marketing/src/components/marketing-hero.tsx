@@ -1,5 +1,4 @@
 import { BookingSearch } from "@/components/booking-search";
-import { HeroPreloader } from "@/components/hero-preloader";
 import {
   HeroVehicleCarousel,
   type HeroCarouselVehicle,
@@ -17,11 +16,21 @@ export function MarketingHero({
 }) {
   const copy = getMessages(locale).hero;
   const messages = getMessages(locale);
-  const [featuredVehicle] = vehicles;
 
   return (
     <>
-      <HeroPreloader label={copy.loading} vehicleImage={featuredVehicle.image} />
+      <link rel="preload" as="image" href="/images/atmosphere/kata-sunset.webp" media="(min-width: 701px)" />
+      <link rel="preload" as="image" href="/images/atmosphere/kata-sunset-mobile.webp" media="(max-width: 700px)" />
+      {vehicles[0] ? (
+        <link
+          rel="preload"
+          as="image"
+          href={vehicles[0].image}
+          imageSrcSet={vehicles[0].imageSrcSet}
+          imageSizes="(max-width: 700px) calc(100vw - 2rem), (max-width: 1180px) 52vw, 640px"
+          fetchPriority="high"
+        />
+      ) : null}
       <section className="marketing-hero">
       <div className="marketing-hero__backdrop" aria-hidden="true" />
       <div className="shell marketing-hero__content">

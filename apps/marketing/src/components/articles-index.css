@@ -1,8 +1,8 @@
 .articles-index { min-height: 100dvh; background: var(--sand-50); }
-.articles-index__hero { padding: 9rem 0 3.5rem; color: white; background: var(--ocean-950); }
+.articles-index__hero { padding: 9rem 0 3.5rem; color: white; background: var(--sunny-waves-background); }
 .articles-index__hero a { display: inline-flex; align-items: center; min-height: 44px; color: var(--sun-300); text-underline-offset: 0.2em; }
 .articles-index__hero h1 { margin-top: 1.5rem; max-width: 18ch; font-size: clamp(2.5rem, 5vw, 4.5rem); text-wrap: balance; }
-.articles-index__hero p { max-width: 65ch; margin-top: 1.5rem; color: #d0e3ed; line-height: 1.75; }
+.articles-index__hero p { max-width: 65ch; margin-top: 1.5rem; color: white; line-height: 1.75; }
 .articles-index__list { padding-top: 3rem; padding-bottom: 5rem; }
 .articles-index__entry { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: center; gap: clamp(1.5rem, 4vw, 4rem); padding: 2rem 0; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ocean-950); }
 .articles-index__entry img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 1rem; }
