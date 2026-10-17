@@ -109,6 +109,29 @@ test('mobile menu has a localized articles link that closes the menu', () => {
   assert.match(css, /:focus-visible/);
 });
 
+test('monthly contents stays a labelled list of text links, separate from the fleet CTA', () => {
+  const globals = readFileSync(resolve(app, 'src/app/globals.css'), 'utf8');
+  assert.doesNotMatch(globals, /\.trust-page__aside\s+a\s*\{/);
+  assert.match(globals, /\.trust-page__aside\s*>\s*\.trust-page__fleet-link\s*\{/);
+  const css = readFileSync(resolve(app, 'src/components/monthly-rental.css'), 'utf8');
+  const linkRule = css.match(/\.monthly-rental__contents a\s*\{([^}]+)\}/)?.[1];
+  assert.ok(linkRule);
+  assert.doesNotMatch(linkRule, /background:|border-radius:/);
+  assert.match(linkRule, /min-height: 44px/);
+  assert.match(linkRule, /overflow-wrap: anywhere/);
+  assert.match(linkRule, /text-decoration: underline/);
+  for (const locale of ['ru', 'en']) {
+    const page = ui.getContentPage(slug, locale);
+    const html = renderToStaticMarkup(React.createElement(ui.TrustPageLanding, { page, locale }));
+    const nav = html.match(/<nav class="monthly-rental__contents"[\s\S]*?<\/nav>/)?.[0];
+    assert.match(nav, /aria-labelledby="monthly-contents-title"/);
+    assert.match(nav, new RegExp(`<strong id="monthly-contents-title">${locale === 'ru' ? 'Содержание статьи' : 'In this article'}</strong>`));
+    assert.equal((nav.match(/<a /g) || []).length, page.sections.length);
+    assert.doesNotMatch(nav, /trust-page__fleet-link/);
+    assert.equal((html.match(/class="trust-page__fleet-link"/g) || []).length, 1);
+  }
+});
+
 test('ordinary pages keep the existing layout and no monthly elements', () => {
   const page = ui.getContentPage('short-term-car-rental-phuket', 'ru');
   const html = renderToStaticMarkup(React.createElement(ui.TrustPageLanding, { page, locale: 'ru' }));

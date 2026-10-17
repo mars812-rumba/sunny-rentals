@@ -3862,7 +3862,7 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   line-height: 1.6;
 }
 
-.trust-page__aside a {
+.trust-page__aside > .trust-page__fleet-link {
   display: flex;
   align-items: center;
   justify-content: space-between;

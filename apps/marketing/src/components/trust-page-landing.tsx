@@ -203,12 +203,13 @@ export function TrustPageLanding({ page, locale }: { page: TrustPageContent; loc
           </div>
 
           <aside className="trust-page__aside">
-            {isMonthly ? <nav className="monthly-rental__contents" aria-label={locale === "ru" ? "Содержание" : "Contents"}>
+            {isMonthly ? <nav className="monthly-rental__contents" aria-labelledby="monthly-contents-title">
+              <strong id="monthly-contents-title">{locale === "ru" ? "Содержание статьи" : "In this article"}</strong>
               {page.sections.map((section, index) => <a key={section.title} href={`#section-${index + 1}`}>{section.title}</a>)}
             </nav> : null}
             <strong>{labels.fleet}</strong>
             <p>{locale === "ru" ? "Сравните реальные машины, цены и депозиты." : "Compare real vehicles, rates and deposits."}</p>
-            <Link href={localePath(locale, "/cars")}>{labels.fleet}<span aria-hidden="true">→</span></Link>
+            <Link className="trust-page__fleet-link" href={localePath(locale, "/cars")}>{labels.fleet}<span aria-hidden="true">→</span></Link>
             {["rental-terms", "scooter-rental-phuket"].includes(page.slug) ? (
               <p><a href="https://thailand.prd.go.th/en/content/category/detail/id/2874/iid/341038" target="_blank" rel="noopener noreferrer">
                 {locale === "ru" ? "Официальная информация Таиланда о водительских документах" : "Thailand’s official driving-document guidance"}

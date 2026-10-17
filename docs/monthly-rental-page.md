@@ -47,3 +47,7 @@ Owner-confirmed Sunny policies remain in `rental-policy.ts`; catalogue rates and
 - The monthly page's breadcrumb links back to Articles. Both index routes have locale-specific canonical/social metadata, language alternates and sitemap entries.
 - The index inherits the existing Sunny palette, typography, shell and footer. Its image/text row stacks below 700px and has an explicit keyboard focus ring; no new assets or design-system rewrite.
 - Expanded the SSR test suite to cover the index, menu wiring, existing article target, language versions and sitemap uniqueness. Browser capture remains unavailable; no visual approval is claimed.
+
+## Contents contrast correction
+
+The owner's mobile screenshot showed article contents rendered as dark text on blue pills. This was not FAQ: the broad `.trust-page__aside a` CTA selector also matched the nested contents anchors, while the monthly stylesheet assigned them a dark text colour. The CTA styling now targets only the explicit direct-child `.trust-page__fleet-link`, avoiding stylesheet-order dependence. Contents has a visible RU/EN label, underlined text links, wrapping and 44px minimum targets. The fleet action remains a separate button-style link. No `!important`, global button recolouring or overflow clipping was introduced. SSR/source regression tests cover this separation in both languages.

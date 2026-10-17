@@ -59,8 +59,19 @@
   font-weight: 700;
 }
 .monthly-rental__actions a:hover { text-decoration: underline; }
-.monthly-rental__contents { display: grid; margin-bottom: 1.5rem; gap: 0.25rem; }
-.monthly-rental__contents a { padding: 0.6rem 0; line-height: 1.5; color: var(--ocean-900); text-underline-offset: 0.2em; }
+.monthly-rental__contents { display: grid; min-width: 0; margin-bottom: 1.5rem; gap: 0.25rem; }
+.monthly-rental__contents > strong { margin-bottom: 0.5rem; }
+.monthly-rental__contents a {
+  display: block;
+  min-height: 44px;
+  padding: 0.6rem 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--ocean-900);
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
 .monthly-rental__contents a:hover { text-decoration: underline; }
 .monthly-rental .trust-page__sections section,
 .monthly-rental #rental-vehicles { scroll-margin-top: 7rem; }
