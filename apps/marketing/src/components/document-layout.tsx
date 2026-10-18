@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { siteConfig } from "@/lib/site";
 
-import "./globals.css";
+import "@/app/globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -45,9 +45,9 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default function DocumentLayout({ children, locale }: Readonly<{ children: ReactNode; locale: "ru" | "en" }>) {
   return (
-    <html lang="ru">
+    <html lang={locale}>
       <head>
         {/* Discover fonts from HTML, rather than waiting for the main CSS. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

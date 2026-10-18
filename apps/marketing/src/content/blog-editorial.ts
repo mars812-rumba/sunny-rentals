@@ -19,6 +19,7 @@ export const blogEditorial: Record<string, BlogEditorial> = {
   "choose-car-rental-phuket-reviews": {
     image: "/images/articles/choosing-a-rental-phuket.webp",
     ru: {
+      description: "Как читать свежие отзывы о прокате на Пхукете, оценивать ответы компании и заранее уточнять депозит, страховку и условия возврата машины.",
       imageAlt: "Ключ от автомобиля и блокнот для планирования поездки на фоне побережья Пхукета",
       imageCaption: "Тематическая иллюстрация, созданная с помощью ИИ; не фотография нашей выдачи автомобиля.",
     },

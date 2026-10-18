@@ -15,6 +15,7 @@ const bundle = await build({
     export { getCarsByCategory } from './src/content/cars';
     export { ArticlesIndex, createArticlesMetadata } from './src/components/articles-index';
     export { getArticles } from './src/content/articles';
+    export { loadPublishedBlogPosts } from './src/content/published-blog';
     export { default as sitemap } from './src/app/sitemap';`, resolveDir: app, loader: 'tsx' },
   tsconfig: resolve(app, 'tsconfig.json'), bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic',
   external: ['react', 'react/jsx-runtime', 'react-dom', 'next/link'],
@@ -77,12 +78,12 @@ for (const locale of ['ru', 'en']) {
 for (const locale of ['ru', 'en']) {
   test(`articles index: ${locale} routes, menu, curated article and metadata`, () => {
     const path = locale === 'ru' ? '/articles/' : '/en/articles/';
-    const pageFile = locale === 'ru' ? 'src/app/articles/page.tsx' : 'src/app/en/articles/page.tsx';
+    const pageFile = locale === 'ru' ? 'src/app/(ru)/articles/page.tsx' : 'src/app/en/articles/page.tsx';
     assert.ok(existsSync(resolve(app, pageFile)));
     assert.deepEqual(ui.getArticles(locale).map(article => article.slug), [slug]);
     const html = renderToStaticMarkup(React.createElement(ui.ArticlesIndex, { locale }));
     assert.equal((html.match(/<h1\b/g) || []).length, 1);
-    assert.equal((html.match(/class="articles-index__entry"/g) || []).length, 1);
+    assert.equal((html.match(/class="articles-index__entry"/g) || []).length, 1 + ui.loadPublishedBlogPosts(locale).length);
     // Standalone Next Link SSR does not inherit next.config's trailingSlash flag.
     assert.match(html, new RegExp(`href="${locale === 'ru' ? '' : '/en'}/${slug}/?"`));
     assert.ok([...html.matchAll(/<a\b[^>]*>/g)].some(([tag]) => tag.includes('aria-current="page"') && new RegExp(`href="${path.slice(0, -1)}/?"`).test(tag)));
@@ -92,7 +93,7 @@ for (const locale of ['ru', 'en']) {
     assert.equal(meta.alternates.languages.en, '/en/articles/');
     assert.equal(meta.alternates.languages.ru, '/articles/');
     assert.equal(ui.sitemap().filter(entry => entry.url === meta.openGraph.url).length, 1);
-    if (locale === 'en') assert.doesNotMatch(html.replace(/<[^>]*>/g, ''), /[а-яё]/i);
+    if (locale === 'en') assert.doesNotMatch(html.replace(/<section class="articles-index__other-language"[\s\S]*?<\/section>/g, '').replace(/<[^>]*>/g, ''), /[а-яё]/i);
     const article = renderToStaticMarkup(React.createElement(ui.TrustPageLanding, { page: ui.getContentPage(slug, locale), locale }));
     assert.match(article, new RegExp(`<a href="${path.slice(0, -1)}/?">${locale === 'ru' ? 'Статьи' : 'Articles'}</a>`));
   });
@@ -129,6 +130,32 @@ test('monthly contents stays a labelled list of text links, separate from the fl
     assert.equal((nav.match(/<a /g) || []).length, page.sections.length);
     assert.doesNotMatch(nav, /trust-page__fleet-link/);
     assert.equal((html.match(/class="trust-page__fleet-link"/g) || []).length, 1);
+  }
+});
+
+test('mobile comparisons preserve every localized field and cannot expand the article grid', () => {
+  const css = readFileSync(resolve(app, 'src/components/monthly-rental.css'), 'utf8');
+  assert.match(css, /\.monthly-rental \.trust-page__sections\s*\{[^}]*grid-template-columns: minmax\(0, 1fr\)/);
+  assert.match(css, /\.monthly-rental \.trust-page__sections > section\s*\{[^}]*min-width: 0[^}]*max-width: 100%/);
+  assert.match(css, /\.rental-comparison\s*\{[^}]*max-width: 100%[^}]*overflow-x: auto/);
+  assert.match(css, /\.rental-comparison-mobile\s*\{ display: none; \}/);
+  const mobile = css.slice(css.indexOf('@media (max-width: 600px)'));
+  assert.match(mobile, /\.rental-comparison\s*\{ display: none; \}/);
+  assert.match(mobile, /\.rental-comparison-mobile\s*\{ display: block;/);
+  assert.match(mobile, /\.rental-comparison-mobile dl\s*\{[^}]*grid-template-columns: minmax\(0, 1fr\)/);
+  assert.doesNotMatch(css, /overflow(?:-x)?: hidden|word-break: break-all/);
+  const encoded = (value) => renderToStaticMarkup(React.createElement('span', null, value)).replace(/^<span>|<\/span>$/g, '');
+  for (const locale of ['ru', 'en']) {
+    const page = ui.getContentPage(slug, locale);
+    const tables = page.sections.flatMap(section => section.table ? [section.table] : []);
+    const html = renderToStaticMarkup(React.createElement(ui.TrustPageLanding, { page, locale }));
+    assert.equal((html.match(/class="rental-comparison-mobile"/g) || []).length, tables.length);
+    assert.equal((html.match(/<dl>/g) || []).length, tables.reduce((sum, table) => sum + table.rows.length, 0));
+    const articleBody = html.slice(0, html.indexOf('id="rental-vehicles"'));
+    const values = [...articleBody.matchAll(/<dd>([\s\S]*?)<\/dd>/g)].map(match => match[1]);
+    assert.deepEqual(values, tables.flatMap(table => table.rows.flat()).map(encoded));
+    const labels = [...articleBody.matchAll(/<dt>([\s\S]*?)<\/dt>/g)].map(match => match[1]);
+    assert.deepEqual(labels, tables.flatMap(table => table.rows.flatMap(() => table.headers)).map(encoded));
   }
 });
 

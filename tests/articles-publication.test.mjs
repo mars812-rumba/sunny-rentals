@@ -121,7 +121,7 @@ test('generated image has bounded size and exact provenance in both public roots
 });
 
 test('compatibility routes are preserved and release assembly cannot replace Next article HTML', () => {
-  for (const route of ['articles/[slug]', 'en/articles/[slug]', 'blog/[slug]']) assert.ok(existsSync(resolve(app, `src/app/${route}/page.tsx`)));
+  for (const route of ['(ru)/articles/[slug]', 'en/articles/[slug]', '(ru)/blog/[slug]']) assert.ok(existsSync(resolve(app, `src/app/${route}/page.tsx`)));
   const deploy = readFileSync('deploy.sh', 'utf8');
   assert.match(deploy, /if \[\[ ! -f "\$\{MARKETING_APP\}\/out\/blog\/\$\{slug\}\/index\.html" \]\]; then/);
   const css = readFileSync(resolve(app, 'src/components/article-reading.css'), 'utf8');

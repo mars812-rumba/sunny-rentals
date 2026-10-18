@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     alternateLocale: ["en_US"],
     title: "Автопарк Sunny Rentals на Пхукете",
     description: "Выберите автомобиль или байк и продолжите бронирование в Telegram.",
-    url: "/cars",
+    url: "/cars/",
   },
 };
 

@@ -66,7 +66,15 @@ for (const entry of entries) {
     en: `${origin}/en${languagePath}`,
     "x-default": `${origin}${languagePath}`,
   };
-  for (const language of ["ru", "en", "x-default"]) {
+  // Published articles may be RU-only. Require EN when it actually exists,
+  // instead of forcing an invented translation. The established bilingual
+  // marketing routes retain the full RU/EN contract.
+  const requiredLanguages = languagePath.startsWith("/articles/")
+    && !existsSync(htmlPathForUrl(expectedAlternates.en)) ? ["ru", "x-default"] : ["ru", "en", "x-default"];
+  for (const [language, target] of Object.entries(alternates)) {
+    if (!existsSync(htmlPathForUrl(target))) errors.push(`${loc}: ${language} alternate points to missing HTML`);
+  }
+  for (const language of requiredLanguages) {
     if (!alternates[language]) errors.push(`${loc}: missing ${language} sitemap alternate`);
     else if (alternates[language] !== expectedAlternates[language]) {
       errors.push(`${loc}: incorrect ${language} sitemap alternate`);
@@ -83,7 +91,22 @@ for (const entry of entries) {
   }
 
   const html = readFileSync(htmlPath, "utf8");
+  const expectedDocumentLanguage = pathname.startsWith("/en/") ? "en" : "ru";
+  if (getMatch(html, /<html\b[^>]*\blang="([^"]+)"/) !== expectedDocumentLanguage) {
+    errors.push(`${loc}: incorrect server-rendered document language`);
+  }
   if (pathname === "/" || pathname === "/en/") {
+    if (!/<meta property="og:type" content="website"/.test(html)
+      || !/<meta property="og:image" content="https:\/\/sunny-rentals\.online\//.test(html)) {
+      errors.push(`${loc}: homepage Open Graph type/image missing`);
+    }
+    const twitterTitle = getMatch(html, /<meta name="twitter:title" content="([^"]+)"/);
+    const ogTitle = getMatch(html, /<meta property="og:title" content="([^"]+)"/);
+    const twitterDescription = getMatch(html, /<meta name="twitter:description" content="([^"]+)"/);
+    const ogDescription = getMatch(html, /<meta property="og:description" content="([^"]+)"/);
+    if (twitterTitle !== ogTitle || twitterDescription !== ogDescription) {
+      errors.push(`${loc}: homepage Twitter locale/copy disagrees with Open Graph`);
+    }
     const logo = html.match(/<img\b[^>]*class="brand__logo"[^>]*>/)?.[0] ?? "";
     if (!/fetchpriority="high"/i.test(logo) || !/width="192"/.test(logo) || !/height="192"/.test(logo)) {
       errors.push(`${loc}: logo is missing priority or intrinsic dimensions`);
@@ -113,7 +136,7 @@ for (const entry of entries) {
     [...html.matchAll(/<link rel="alternate" hrefLang="([^"]+)" href="([^"]+)"/g)]
       .map((match) => [match[1], match[2]]),
   );
-  for (const language of ["ru", "en", "x-default"]) {
+  for (const language of requiredLanguages) {
     if (!htmlAlternates[language]) errors.push(`${loc}: missing ${language} HTML alternate`);
     else if (htmlAlternates[language] !== expectedAlternates[language]) {
       errors.push(`${loc}: incorrect ${language} HTML alternate`);
@@ -159,8 +182,8 @@ for (const entry of entries) {
       if (products.some((item) => !item.color)) {
         errors.push(`${loc}: Product JSON-LD is missing color`);
       }
-      if (products.some((item) => item.offers?.availability !== "https://schema.org/LimitedAvailability")) {
-        errors.push(`${loc}: Product Offer JSON-LD is missing truthful rental availability`);
+      if (products.some((item) => item.offers?.availability)) {
+        errors.push(`${loc}: Product Offer must not claim stock without a real-time availability source`);
       }
       if (products.some((item) => item.isVariantOf && item.isVariantOf["@type"] !== "ProductGroup")) {
         errors.push(`${loc}: Product JSON-LD has an invalid isVariantOf reference`);

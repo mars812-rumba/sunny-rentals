@@ -17,6 +17,33 @@ for rollback. No files under `/etc` are changed.
 
 Run deployment only through the Telegram bot `/deploy` or `/ship` command.
 
+## Public 404 handling — prepared SEO fix, 18 October 2026
+
+`deploy/nginx.public-static-routes.conf` is the minimal static-release routing
+proposal for the currently enabled main-domain configuration. Replace its generic
+`location /` homepage fallback with this fragment inside the existing HTTPS
+server. Keep API, media and unrelated application locations unchanged. If park,
+owner or legacy locations already exist, merge them rather than adding duplicates.
+Do not replace the active static server with the older full proposed configuration
+that proxies marketing pages to port 3100.
+
+Unknown public/article/car/blog/offer-collection slugs must return real HTTP 404.
+Only explicit client-side application namespaces retain SPA fallback. Confirm
+`dist/404.html`, `/app/index.html`, `/p/index.html` and `/owner/index.html` exist
+before activation. The root 404 page is Russian; this fix does not promise a
+localized English server error page. Never use `error_page 404 =200 ...`.
+
+Application deployment does **not** apply this configuration. An authorized
+administrator must separately back up/merge the enabled config, run `nginx -t`
+and perform an approved reload. No such production action is performed here.
+An isolated nginx fixture regression is available as
+`node --test tests/seo-routing.test.mjs`.
+
+The Next export now has separate RU/EN root layouts sharing the same document
+shell. URLs remain unchanged; crossing languages uses a full document navigation
+so the server-rendered and hydrated `html lang` agree. `verify-seo.mjs` checks
+language for every sitemap URL and homepage OG/Twitter metadata to prevent recurrence.
+
 ## New park routes (AR Rentals and future parks)
 
 Application publication and tenant publication do not install nginx rules.

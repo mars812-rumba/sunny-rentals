@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   other: { "content-language": "ru" },
   alternates: languageAlternates("ru"),
   openGraph: {
+    type: "website",
+    siteName: siteConfig.name,
+    images: [{ url: "/og-image.jpg.webp", width: 1200, height: 630, alt: "Sunny Rentals — аренда транспорта на Пхукете" }],
     locale: "ru_RU",
     alternateLocale: ["en_US"],
     url: "/",
