@@ -1,0 +1,19 @@
+{
+  "url": "https://sunny-rentals.online/",
+  "final_url": "https://sunny-rentals.online/",
+  "chain": [
+    {
+      "step": 1,
+      "url": "https://sunny-rentals.online/",
+      "status": 200,
+      "time_ms": 46,
+      "final": true
+    }
+  ],
+  "total_hops": 0,
+  "total_time_ms": 46,
+  "has_loop": false,
+  "has_mixed_protocol": false,
+  "issues": [],
+  "error": null
+}

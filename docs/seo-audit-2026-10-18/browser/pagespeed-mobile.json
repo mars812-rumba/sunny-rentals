@@ -1,0 +1,10 @@
+{
+  "url": "https://sunny-rentals.online/",
+  "strategy": "mobile",
+  "performance_score": null,
+  "metrics": {},
+  "opportunities": [],
+  "diagnostics": [],
+  "field_data_available": false,
+  "error": "API error: HTTP 400"
+}

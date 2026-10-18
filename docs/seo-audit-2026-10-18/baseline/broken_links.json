@@ -1,0 +1,18 @@
+{
+  "page_url": "https://sunny-rentals.online/",
+  "total_links": 60,
+  "checked": 60,
+  "broken": [],
+  "redirected": [],
+  "timeout": [],
+  "healthy": 60,
+  "summary": {
+    "total": 60,
+    "healthy": 60,
+    "broken": 0,
+    "redirected": 0,
+    "timeout": 0
+  },
+  "issues": [],
+  "error": null
+}

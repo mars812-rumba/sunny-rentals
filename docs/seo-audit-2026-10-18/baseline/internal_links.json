@@ -1,0 +1,295 @@
+{
+  "start_url": "https://sunny-rentals.online/",
+  "domain": "sunny-rentals.online",
+  "pages_crawled": 21,
+  "total_internal_links": 330,
+  "unique_pages_found": 101,
+  "max_depth_reached": 1,
+  "pages": {
+    "https://sunny-rentals.online/en": {
+      "outgoing_links": 27,
+      "incoming_links": 2
+    },
+    "https://sunny-rentals.online/rental-terms": {
+      "outgoing_links": 11,
+      "incoming_links": 4
+    },
+    "https://sunny-rentals.online/deposit": {
+      "outgoing_links": 12,
+      "incoming_links": 18
+    },
+    "https://sunny-rentals.online/cars/nmax155-2024-keyless-topbox": {
+      "outgoing_links": 13,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/honda-civic-2024-white": {
+      "outgoing_links": 12,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/honda-civic": {
+      "outgoing_links": 12,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/pcx160-2023-keyless": {
+      "outgoing_links": 11,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/toyota-veloz": {
+      "outgoing_links": 12,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/": {
+      "outgoing_links": 27,
+      "incoming_links": 21
+    },
+    "https://sunny-rentals.online/cars/honda-hrv-2025-blackv": {
+      "outgoing_links": 12,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/nmax155-2019-black": {
+      "outgoing_links": 13,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/mitsubishi-xpander": {
+      "outgoing_links": 12,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/toyota-yaris": {
+      "outgoing_links": 12,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/mazda-cx3-2023-bege": {
+      "outgoing_links": 11,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/toyota-veloz-2024-white": {
+      "outgoing_links": 12,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/articles": {
+      "outgoing_links": 8,
+      "incoming_links": 20
+    },
+    "https://sunny-rentals.online/cars": {
+      "outgoing_links": 65,
+      "incoming_links": 20
+    },
+    "https://sunny-rentals.online/cars/toyota-yaris-2022-white": {
+      "outgoing_links": 12,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/mazda-mazda2-2024-white": {
+      "outgoing_links": 13,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/ford-raptor-2024-gray": {
+      "outgoing_links": 11,
+      "incoming_links": 5
+    },
+    "https://sunny-rentals.online/cars/toyota-yaris-2022-black": {
+      "outgoing_links": 12,
+      "incoming_links": 5
+    }
+  },
+  "anchor_texts": {
+    "SUNNY RENTALSPHUKET RENT CAR": 21,
+    "\u00d0\u0090\u00d0\u00b2\u00d1\u0082\u00d0\u00be\u00d0\u00bf\u00d0\u00b0\u00d1\u0080\u00d0\u00ba": 20,
+    "\u00d0\u00a1\u00d1\u0082\u00d0\u00b0\u00d1\u0082\u00d1\u008c\u00d0\u00b8": 20,
+    "\u00f0\u009f\u0087\u00ac\u00f0\u009f\u0087\u00a7": 20,
+    "\u00d0\u00a1\u00d1\u0082\u00d1\u0080\u00d0\u00b0\u00d1\u0085\u00d0\u00be\u00d0\u00b2\u00d0\u00ba\u00d0\u00b0 \u00d0\u00b8 \u00d1\u0084\u00d1\u0080\u00d0\u00b0\u00d0\u00bd\u00d1\u0088\u00d0\u00b8\u00d0\u00b7\u00d0\u00b0": 18,
+    "\u00f0\u009f\u0087\u00b7\u00f0\u009f\u0087\u00ba": 18,
+    "\u00d0\u0094\u00d0\u00b5\u00d0\u00bf\u00d0\u00be\u00d0\u00b7\u00d0\u00b8\u00d1\u0082": 17,
+    "\u00d0\u0094\u00d0\u00be\u00d1\u0081\u00d1\u0082\u00d0\u00b0\u00d0\u00b2\u00d0\u00ba\u00d0\u00b0 \u00d0\u00b8 \u00d0\u00b2\u00d0\u00be\u00d0\u00b7\u00d0\u00b2\u00d1\u0080\u00d0\u00b0\u00d1\u0082": 17,
+    "\u00d0\u009f\u00d0\u00be\u00d0\u00bb\u00d0\u00bd\u00d1\u008b\u00d0\u00b9 \u00d0\u00b1\u00d0\u00b0\u00d0\u00ba\u00d0\u00a6\u00d0\u00b5\u00d0\u00bd\u00d0\u00b0 \u00d0\u00bf\u00d0\u00be \u00d1\u0081\u00d1\u0080\u00d0\u00be\u00d0\u00ba\u00d1\u00832024": 7,
+    "\u00d0\u0090\u00d1\u008d\u00d1\u0080\u00d0\u00be\u00d0\u00bf\u00d0\u00be\u00d1\u0080\u00d1\u0082 0 \u00e0\u00b8\u00bf\u00d0\u00a0\u00d0\u00b5\u00d0\u00b0\u00d0\u00bb\u00d1\u008c\u00d0\u00bd\u00d1\u008b\u00d0\u00b5 \u00d1\u0084\u00d0\u00be\u00d1\u0082\u00d0\u00be\u00d0\u009f\u00d0\u00be\u00d0\u00bb\u00d0\u00bd\u00d1\u008b\u00d0\u00b9 \u00d0\u00b1\u00d0\u00b0\u00d0\u00ba2024": 6,
+    "\u00d0\u0090\u00d1\u008d\u00d1\u0080\u00d0\u00be\u00d0\u00bf\u00d0\u00be\u00d1\u0080\u00d1\u0082 0 \u00e0\u00b8\u00bf\u00d0\u00a0\u00d0\u00b5\u00d0\u00b0\u00d0\u00bb\u00d1\u008c\u00d0\u00bd\u00d1\u008b\u00d0\u00b5 \u00d1\u0084\u00d0\u00be\u00d1\u0082\u00d0\u00be\u00d0\u00a1\u00d1\u0082\u00d1\u0080\u00d0\u00b0\u00d1\u0085\u00d0\u00be\u00d0\u00b2\u00d0\u00ba\u00d0\u00b0 \u00d0\u00ba\u00d0\u00bb\u00d0\u00b0\u00d1\u0081\u00d1\u0081 120": 6,
+    "61\u00d1\u0082\u00d1\u0080\u00d0\u00b0\u00d0\u00bd\u00d1\u0081\u00d0\u00bf\u00d0\u00be\u00d1\u0080\u00d1\u0082\u00d0\u00bd\u00d1\u008b\u00d1\u0085 \u00d1\u0081\u00d1\u0080\u00d0\u00b5\u00d0\u00b4\u00d1\u0081\u00d1\u0082\u00d0\u00b2\u00d0\u00a4\u00d0\u00be\u00d1\u0082\u00d0\u00be \u00d0\u00ba\u00d0\u00be\u00d0\u00bd\u00d0\u00ba\u00d1\u0080\u00d0\u00b5\u00d1\u0082\u00d0\u00bd\u00d0\u00be\u00d0\u00b3\u00d0\u00be \u00d1\u0082\u00d1\u0080\u00d0\u00b0\u00d0": 5,
+    "\u00d0\u00a1\u00d1\u0082\u00d1\u0080\u00d0\u00b0\u00d1\u0085\u00d0\u00be\u00d0\u00b2\u00d0\u00ba\u00d0\u00b0 \u00d0\u00ba\u00d0\u00bb\u00d0\u00b0\u00d1\u0081\u00d1\u0081 1\u00d0\u0090\u00d1\u008d\u00d1\u0080\u00d0\u00be\u00d0\u00bf\u00d0\u00be\u00d1\u0080\u00d1\u0082 0 \u00e0\u00b8\u00bf\u00d0\u00a7\u00d0\u00b8\u00d1\u0081\u00d1\u0082\u00d0\u00b0\u00d1\u008f \u00d0\u00bc\u00d0\u00b0\u00d1\u0088\u00d0\u00b8\u00d0\u00bd\u00d0\u00b020": 5,
+    "\u00d0\u00a0\u00d0\u00b5\u00d0\u00b0\u00d0\u00bb\u00d1\u008c\u00d0\u00bd\u00d1\u008b\u00d0\u00b5 \u00d1\u0084\u00d0\u00be\u00d1\u0082\u00d0\u00be\u00d0\u00a6\u00d0\u00b5\u00d0\u00bd\u00d0\u00b0 \u00d0\u00bf\u00d0\u00be \u00d1\u0081\u00d1\u0080\u00d0\u00be\u00d0\u00ba\u00d1\u0083\u00d0\u00a1\u00d1\u0082\u00d1\u0080\u00d0\u00b0\u00d1\u0085\u00d0\u00be\u00d0\u00b2\u00d0\u00ba\u00d0\u00b0 \u00d0\u00ba\u00d0\u00bb\u00d0\u00b0\u00d1\u0081\u00d1\u0081 1": 5,
+    "\u00d0\u0090\u00d1\u008d\u00d1\u0080\u00d0\u00be\u00d0\u00bf\u00d0\u00be\u00d1\u0080\u00d1\u0082 0 \u00e0\u00b8\u00bf\u00d0\u009f\u00d0\u00be\u00d0\u00bb\u00d0\u00bd\u00d1\u008b\u00d0\u00b9 \u00d0\u00b1\u00d0\u00b0\u00d0\u00ba\u00d0\u00a0\u00d0\u00b5\u00d0\u00b0\u00d0\u00bb\u00d1\u008c\u00d0\u00bd\u00d1\u008b\u00d0\u00b5 \u00d1\u0084\u00d0\u00be\u00d1\u0082\u00d0\u00be2023": 5,
+    "\u00d0\u009f\u00d0\u00be\u00d0\u00bb\u00d0\u00bd\u00d1\u008b\u00d0\u00b9 \u00d0\u00b1\u00d0\u00b0\u00d0\u00ba\u00d0\u00a6\u00d0\u00b5\u00d0\u00bd\u00d0\u00b0 \u00d0\u00bf\u00d0\u00be \u00d1\u0081\u00d1\u0080\u00d0\u00be\u00d0\u00ba\u00d1\u00832019": 5,
+    "\u00d0\u00a0\u00d0\u00b5\u00d0\u00b0\u00d0\u00bb\u00d1\u008c\u00d0\u00bd\u00d1\u008b\u00d0\u00b5 \u00d1\u0084\u00d0\u00be\u00d1\u0082\u00d0\u00be\u00d0\u00a6\u00d0\u00b5\u00d0\u00bd\u00d0\u00b0 \u00d0\u00bf\u00d0\u00be \u00d1\u0081\u00d1\u0080\u00d0\u00be\u00d0\u00ba\u00d1\u00832025": 5,
+    "\u00d0\u0090\u00d1\u008d\u00d1\u0080\u00d0\u00be\u00d0\u00bf\u00d0\u00be\u00d1\u0080\u00d1\u0082 0 \u00e0\u00b8\u00bf\u00d0\u00a1\u00d1\u0082\u00d1\u0080\u00d0\u00b0\u00d1\u0085\u00d0\u00be\u00d0\u00b2\u00d0\u00ba\u00d0\u00b0 \u00d0\u00ba\u00d0\u00bb\u00d0\u00b0\u00d1\u0081\u00d1\u0081 1\u00d0\u00a7\u00d0\u00b8\u00d1\u0081\u00d1\u0082\u00d0\u00b0\u00d1\u008f \u00d0\u00bc\u00d0\u00b0\u00d1\u0088\u00d0\u00b8\u00d0\u00bd\u00d0\u00b020": 4,
+    "\u00d0\u00a6\u00d0\u00b5\u00d0\u00bd\u00d0\u00b0 \u00d0\u00bf\u00d0\u00be \u00d1\u0081\u00d1\u0080\u00d0\u00be\u00d0\u00ba\u00d1\u0083\u00d0\u00a1\u00d1\u0082\u00d1\u0080\u00d0\u00b0\u00d1\u0085\u00d0\u00be\u00d0\u00b2\u00d0\u00ba\u00d0\u00b0 \u00d0\u00ba\u00d0\u00bb\u00d0\u00b0\u00d1\u0081\u00d1\u0081 12025": 4,
+    "\u00d0\u00a7\u00d0\u00b8\u00d1\u0081\u00d1\u0082\u00d0\u00b0\u00d1\u008f \u00d0\u00bc\u00d0\u00b0\u00d1\u0088\u00d0\u00b8\u00d0\u00bd\u00d0\u00b0\u00d0\u0094\u00d0\u00b5\u00d1\u0082\u00d1\u0081\u00d0\u00ba\u00d0\u00be\u00d0\u00b5 \u00d0\u00ba\u00d1\u0080\u00d0\u00b5\u00d1\u0081\u00d0\u00bb\u00d0\u00be 0 \u00e0\u00b8\u00bf\u00d0\u00a1\u00d1\u0082\u00d1\u0080\u00d0\u00b0\u00d1\u0085\u00d0\u00be\u00d0\u00b2\u00d0\u00ba\u00d0\u00b0 \u00d0\u00ba\u00d0": 4
+  },
+  "link_distribution": {
+    "min": 8,
+    "max": 65,
+    "avg": 15.7
+  },
+  "orphan_candidates": [
+    {
+      "url": "https://sunny-rentals.online/car-rental-with-child-seat-phuket",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/toyota-vios",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/suzuki-swift",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/namo-city-sedan-white-2018",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/nm-city-white-2022",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/honda-jazz",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/toyota-camry",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/mg-mg5-2024-yellow",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/honda-city-2023-gray",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/toyota-altis-2023-gray",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/mg-mg5-2024-red",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/mg-mg5-2024-green",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/fern-ativ-gray-lt-2023",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/namo-bmw220-white-2024",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/nm-byd-seal-2024",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/honda-city",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/mazda-cx30-2023-bege",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/toyota-fortuner-2023-gray",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/toyota-corolla-2024-white",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/mitsubishi-xforce-2025-white",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/volvo-v60-2020-white",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/isuzu-mux-2020-gray",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/toyota-corolla-cross",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/namo-legender-2024",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/toyota-yaris-cross",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/ar-yaris-cross-white-2024",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/toyota-alphard",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/h1-12-seats",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/honda-forza-350",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/bb-adv-2023",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/bb-cbr500r-2023",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/honda-adv-350",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/yamaha-tmax",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/en/insurance",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/en/delivery",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/en/faq",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/en/phuket-airport-car-rental",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/en/long-term-car-rental-phuket",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/en/car-rental-with-child-seat-phuket",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/articles/choose-car-rental-phuket-reviews",
+      "incoming_links": 1
+    },
+    {
+      "url": "https://sunny-rentals.online/articles/7-luchshih-mest-dlya-zimovschikov-na-phukete",
+      "incoming_links": 1
+    }
+  ],
+  "nofollow_links": [],
+  "issues": [
+    "\u26a0\ufe0f 41 potential orphan page(s) (\u22641 internal link pointing to them)"
+  ],
+  "recommendations": [
+    "Add internal links pointing to orphan pages from related content"
+  ],
+  "error": null
+}

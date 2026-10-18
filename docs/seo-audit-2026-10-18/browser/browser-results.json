@@ -1,0 +1,2115 @@
+[
+  {
+    "url": "https://sunny-rentals.online/",
+    "title": "Аренда авто и байков на Пхукете",
+    "h1": [
+      "Аренда авто и байков на Пхукете."
+    ],
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "images": [
+      {
+        "src": "https://sunny-rentals.online/logo.png.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "eager",
+        "width": "192",
+        "height": "192",
+        "rect": {
+          "x": 130,
+          "y": 17.59375,
+          "width": 41.59375,
+          "height": 41.59375,
+          "top": 17.59375,
+          "right": 171.59375,
+          "bottom": 59.1875,
+          "left": 130
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/compact/ar_yaris_premium_gray_2024/1.jpg.webp.960.webp",
+        "alt": "Toyota YARIS — аренда на Пхукете",
+        "loaded": true,
+        "loading": "eager",
+        "width": "1200",
+        "height": "900",
+        "rect": {
+          "x": 3.265625,
+          "y": 156.703125,
+          "width": 651.734375,
+          "height": 358.453125,
+          "top": 156.703125,
+          "right": 655,
+          "bottom": 515.15625,
+          "left": 3.265625
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/suv/ar_fortuner_white_2019/1.jpg.webp.960.webp",
+        "alt": "Toyota FORTUNER — аренда на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "900",
+        "rect": {
+          "x": 657,
+          "y": 156.703125,
+          "width": 651.734375,
+          "height": 358.453125,
+          "top": 156.703125,
+          "right": 1308.734375,
+          "bottom": 515.15625,
+          "left": 657
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/sedan/nm_byd_seal_2024/1.jpg.webp.960.webp",
+        "alt": "BYD Seal — аренда на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "900",
+        "rect": {
+          "x": 1310.734375,
+          "y": 156.703125,
+          "width": 651.734375,
+          "height": 358.453125,
+          "top": 156.703125,
+          "right": 1962.46875,
+          "bottom": 515.15625,
+          "left": 1310.734375
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/7s/namo_veloz_white_2024/1.jpg.webp.960.webp",
+        "alt": "Toyota VELOZ — аренда на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "900",
+        "rect": {
+          "x": 1964.46875,
+          "y": 156.703125,
+          "width": 651.734375,
+          "height": 358.453125,
+          "top": 156.703125,
+          "right": 2616.203125,
+          "bottom": 515.15625,
+          "left": 1964.46875
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/bikes/adv350_2025_new/1.jpg.webp.960.webp",
+        "alt": "Honda ADV 350 — аренда на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "900",
+        "rect": {
+          "x": 2618.203125,
+          "y": 156.703125,
+          "width": 651.734375,
+          "height": 358.453125,
+          "top": 156.703125,
+          "right": 3269.9375,
+          "bottom": 515.15625,
+          "left": 2618.203125
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/compact/namo_yaris_sedan_black_2022/1.jpg.webp.480.webp",
+        "alt": "Toyota YARIS 2022 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 131,
+          "y": 1396.921875,
+          "width": 379.59375,
+          "height": 225.375,
+          "top": 1396.921875,
+          "right": 510.59375,
+          "bottom": 1622.296875,
+          "left": 131
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/compact/namo_yaris_sedan_white_2022/1.jpg.webp.480.webp",
+        "alt": "Toyota YARIS 2022 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 530.1875,
+          "y": 1396.921875,
+          "width": 379.609375,
+          "height": 225.390625,
+          "top": 1396.921875,
+          "right": 909.796875,
+          "bottom": 1622.3125,
+          "left": 530.1875
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/compact/ar_yaris_premium_gray_2024/1.jpg.webp.960.webp",
+        "alt": "Toyota YARIS 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 929.390625,
+          "y": 1396.921875,
+          "width": 379.59375,
+          "height": 225.375,
+          "top": 1396.921875,
+          "right": 1308.984375,
+          "bottom": 1622.296875,
+          "left": 929.390625
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/sedan/ar_civic_rs_black_2024/1.jpg.webp.960.webp",
+        "alt": "Honda CIVIC RS 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 131,
+          "y": 2273.796875,
+          "width": 379.59375,
+          "height": 225.375,
+          "top": 2273.796875,
+          "right": 510.59375,
+          "bottom": 2499.171875,
+          "left": 131
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/sedan/ar_civic_turbo_white_2024/1.jpg.webp.480.webp",
+        "alt": "Honda CIVIC 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 530.1875,
+          "y": 2273.796875,
+          "width": 379.609375,
+          "height": 225.390625,
+          "top": 2273.796875,
+          "right": 909.796875,
+          "bottom": 2499.1875,
+          "left": 530.1875
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/sedan/ar_mazda2_white_2024/1.jpg.webp.480.webp",
+        "alt": "Mazda MAZDA2 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 929.390625,
+          "y": 2273.796875,
+          "width": 379.59375,
+          "height": 225.375,
+          "top": 2273.796875,
+          "right": 1308.984375,
+          "bottom": 2499.171875,
+          "left": 929.390625
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/suv/namo_raptor_gray_2024/1.jpg.webp.960.webp",
+        "alt": "Ford RAPTOR 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 131,
+          "y": 3150.671875,
+          "width": 379.59375,
+          "height": 225.375,
+          "top": 3150.671875,
+          "right": 510.59375,
+          "bottom": 3376.046875,
+          "left": 131
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/suv/ar_cx3_bege_2023/1.jpg.webp.480.webp",
+        "alt": "Mazda CX3 2023 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 530.1875,
+          "y": 3150.671875,
+          "width": 379.609375,
+          "height": 225.390625,
+          "top": 3150.671875,
+          "right": 909.796875,
+          "bottom": 3376.0625,
+          "left": 530.1875
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/suv/ar_hrv_he_blackv_2025/1.jpg.webp.480.webp",
+        "alt": "Honda HRV 2025 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 929.390625,
+          "y": 3150.671875,
+          "width": 379.59375,
+          "height": 225.375,
+          "top": 3150.671875,
+          "right": 1308.984375,
+          "bottom": 3376.046875,
+          "left": 929.390625
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/7s/namo_xpander_white_2023/1.jpg.webp.960.webp",
+        "alt": "Mitsubishi XPANDER 2023 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 131,
+          "y": 4027.546875,
+          "width": 379.59375,
+          "height": 225.375,
+          "top": 4027.546875,
+          "right": 510.59375,
+          "bottom": 4252.921875,
+          "left": 131
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/7s/namo_veloz_gray_2024/1.jpg.webp.480.webp",
+        "alt": "Toyota VELOZ 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 530.1875,
+          "y": 4027.546875,
+          "width": 379.609375,
+          "height": 225.390625,
+          "top": 4027.546875,
+          "right": 909.796875,
+          "bottom": 4252.9375,
+          "left": 530.1875
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/7s/namo_veloz_white_2024/1.jpg.webp.960.webp",
+        "alt": "Toyota VELOZ 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 929.390625,
+          "y": 4027.546875,
+          "width": 379.59375,
+          "height": 225.375,
+          "top": 4027.546875,
+          "right": 1308.984375,
+          "bottom": 4252.921875,
+          "left": 929.390625
+        }
+      },
+      {
+        "src": "",
+        "alt": "Yamaha NMAX 155 2019 в аренду на Пхукете",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 131,
+          "y": 4904.421875,
+          "width": 379.59375,
+          "height": 225.375,
+          "top": 4904.421875,
+          "right": 510.59375,
+          "bottom": 5129.796875,
+          "left": 131
+        }
+      },
+      {
+        "src": "",
+        "alt": "Honda PCX 160 2023 в аренду на Пхукете",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 530.1875,
+          "y": 4904.421875,
+          "width": 379.609375,
+          "height": 225.390625,
+          "top": 4904.421875,
+          "right": 909.796875,
+          "bottom": 5129.8125,
+          "left": 530.1875
+        }
+      },
+      {
+        "src": "",
+        "alt": "Yamaha NMAX 155 2024 в аренду на Пхукете",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 929.390625,
+          "y": 4904.421875,
+          "width": 379.59375,
+          "height": 225.375,
+          "top": 4904.421875,
+          "right": 1308.984375,
+          "bottom": 5129.796875,
+          "left": 929.390625
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/logo.png.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "auto",
+        "width": null,
+        "height": null,
+        "rect": {
+          "x": 130,
+          "y": 9877.03125,
+          "width": 41.59375,
+          "height": 41.59375,
+          "top": 9877.03125,
+          "right": 171.59375,
+          "bottom": 9918.625,
+          "left": 130
+        }
+      }
+    ],
+    "overflow": [
+      {
+        "tag": "A",
+        "cls": "hero-vehicle",
+        "text": "61 транспортных средств\nФото конкретного транспорта\nИЗ РЕАЛЬНОГО АВТОПАРКА\nBYD S",
+        "right": 1963.46875
+      },
+      {
+        "tag": "DIV",
+        "cls": "hero-vehicle__photo",
+        "text": "61 транспортных средств\nФото конкретного транспорта",
+        "right": 1962.46875
+      },
+      {
+        "tag": "IMG",
+        "cls": "",
+        "text": "",
+        "right": 1962.46875
+      },
+      {
+        "tag": "DIV",
+        "cls": "hero-proof hero-vehicle__proof",
+        "text": "61 транспортных средств\nФото конкретного транспорта",
+        "right": 1647.15625
+      },
+      {
+        "tag": "SPAN",
+        "cls": "hero-proof__fleet",
+        "text": "61 транспортных средств",
+        "right": 1468.546875
+      },
+      {
+        "tag": "SPAN",
+        "cls": "hero-proof__real",
+        "text": "Фото конкретного транспорта",
+        "right": 1647.15625
+      },
+      {
+        "tag": "DIV",
+        "cls": "hero-vehicle__caption",
+        "text": "ИЗ РЕАЛЬНОГО АВТОПАРКА\nBYD Seal · 2024\nСТАВКА ОТ\n1 893 ฿\nза сутки",
+        "right": 1962.46875
+      },
+      {
+        "tag": "SPAN",
+        "cls": "",
+        "text": "ИЗ РЕАЛЬНОГО АВТОПАРКА\nBYD Seal · 2024",
+        "right": 1478.390625
+      },
+      {
+        "tag": "SMALL",
+        "cls": "",
+        "text": "ИЗ РЕАЛЬНОГО АВТОПАРКА",
+        "right": 1478.390625
+      },
+      {
+        "tag": "STRONG",
+        "cls": "",
+        "text": "BYD Seal · 2024",
+        "right": 1478.390625
+      },
+      {
+        "tag": "SPAN",
+        "cls": "hero-vehicle__price",
+        "text": "СТАВКА ОТ\n1 893 ฿\nза сутки",
+        "right": 1946.46875
+      },
+      {
+        "tag": "SMALL",
+        "cls": "",
+        "text": "СТАВКА ОТ",
+        "right": 1946.46875
+      },
+      {
+        "tag": "STRONG",
+        "cls": "",
+        "text": "1 893 ฿",
+        "right": 1946.46875
+      },
+      {
+        "tag": "EM",
+        "cls": "",
+        "text": "за сутки",
+        "right": 1946.46875
+      },
+      {
+        "tag": "P",
+        "cls": "",
+        "text": "Депозит: 5 000 ฿ · не входит в стоимость аренды",
+        "right": 1962.46875
+      }
+    ],
+    "languageLinks": [],
+    "toc": [],
+    "metrics": {
+      "lcp": [
+        {
+          "time": 712,
+          "url": "https://sunny-rentals.online/logo.png.webp",
+          "size": 11514
+        },
+        {
+          "time": 1120,
+          "url": "https://sunny-rentals.online/images_web/compact/ar_yaris_premium_gray_2024/1.jpg.webp.960.webp",
+          "size": 233320
+        },
+        {
+          "time": 2892,
+          "url": "https://sunny-rentals.online/images/atmosphere/phuket-palms.webp",
+          "size": 452160
+        }
+      ],
+      "cls": 0.003974425199532215
+    },
+    "navigation": [
+      {
+        "ttfb": 40,
+        "domContentLoaded": 746.5,
+        "load": 915.3999999761581
+      }
+    ],
+    "resources": [
+      {
+        "name": "https://sunny-rentals.online/images_web/bikes/adv350_2025_new/1.jpg.webp.960.webp",
+        "transferSize": 314664,
+        "duration": 30.300000071525574
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/1vr_xlldelmhn.js",
+        "transferSize": 227608,
+        "duration": 54.09999990463257
+      },
+      {
+        "name": "https://sunny-rentals.online/cars/__next.cars.__PAGE__.txt?_rsc=vFp8-ftLNow-gnDE",
+        "transferSize": 202405,
+        "duration": 15.100000023841858
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/0ebj0ou8dbjoa.js",
+        "transferSize": 197459,
+        "duration": 3.700000047683716
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/phuket-palms.webp",
+        "transferSize": 179970,
+        "duration": 5.5
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/kata-sunset.webp",
+        "transferSize": 158364,
+        "duration": 69.80000007152557
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/40ic2jle3w32c.js",
+        "transferSize": 150298,
+        "duration": 53.89999997615814
+      },
+      {
+        "name": "https://sunny-rentals.online/images_web/7s/namo_xpander_white_2023/1.jpg.webp.960.webp",
+        "transferSize": 117202,
+        "duration": 69.10000002384186
+      },
+      {
+        "name": "https://sunny-rentals.online/images_web/compact/ar_yaris_premium_gray_2024/1.jpg.webp.960.webp",
+        "transferSize": 113286,
+        "duration": 45.10000002384186
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/phuket-palms-mobile.webp",
+        "transferSize": 112912,
+        "duration": 3.299999952316284
+      }
+    ],
+    "name": "home",
+    "device": "desktop",
+    "status": 200,
+    "errors": [],
+    "failed": [
+      {
+        "url": "https://sunny-rentals.online/en/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/cars/toyota-yaris/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/cars/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/articles/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/cars/nm-byd-seal-2024/",
+        "failure": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "url": "https://sunny-rentals.online/",
+    "title": "Аренда авто и байков на Пхукете",
+    "h1": [
+      "Аренда авто и байков на Пхукете."
+    ],
+    "viewport": 390,
+    "scrollWidth": 390,
+    "images": [
+      {
+        "src": "https://sunny-rentals.online/logo.png.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "eager",
+        "width": "192",
+        "height": "192",
+        "rect": {
+          "x": 10,
+          "y": 16.796875,
+          "width": 36,
+          "height": 36,
+          "top": 16.796875,
+          "right": 46,
+          "bottom": 52.796875,
+          "left": 10
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/compact/ar_yaris_premium_gray_2024/1.jpg.webp.480.webp",
+        "alt": "Toyota YARIS — аренда на Пхукете",
+        "loaded": true,
+        "loading": "eager",
+        "width": "1200",
+        "height": "900",
+        "rect": {
+          "x": 11,
+          "y": 315.828125,
+          "width": 368,
+          "height": 207,
+          "top": 315.828125,
+          "right": 379,
+          "bottom": 522.828125,
+          "left": 11
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/bikes/Nmax_2024_blue_topbox/1.jpg.webp.480.webp",
+        "alt": "Yamaha NMAX 155 — аренда на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "900",
+        "rect": {
+          "x": 381,
+          "y": 315.828125,
+          "width": 368,
+          "height": 207,
+          "top": 315.828125,
+          "right": 749,
+          "bottom": 522.828125,
+          "left": 381
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/7s/namo_veloz_white_2024/1.jpg.webp.480.webp",
+        "alt": "Toyota VELOZ — аренда на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "900",
+        "rect": {
+          "x": 751,
+          "y": 315.828125,
+          "width": 368,
+          "height": 207,
+          "top": 315.828125,
+          "right": 1119,
+          "bottom": 522.828125,
+          "left": 751
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/suv/ar_corolla_cross_white_2024/1.jpg.webp.480.webp",
+        "alt": "Toyota COROLLA — аренда на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "900",
+        "rect": {
+          "x": 1121,
+          "y": 315.828125,
+          "width": 368,
+          "height": 207,
+          "top": 315.828125,
+          "right": 1489,
+          "bottom": 522.828125,
+          "left": 1121
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/sedan/ar_ativ_dark_gray_2024/1.jpg.webp.480.webp",
+        "alt": "Toyota ATIV — аренда на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "900",
+        "rect": {
+          "x": 1491,
+          "y": 315.828125,
+          "width": 368,
+          "height": 207,
+          "top": 315.828125,
+          "right": 1859,
+          "bottom": 522.828125,
+          "left": 1491
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/compact/namo_yaris_sedan_black_2022/1.jpg.webp.480.webp",
+        "alt": "Toyota YARIS 2022 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 11,
+          "y": 1601.3125,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 1601.3125,
+          "right": 356.59375,
+          "bottom": 1806.5,
+          "left": 11
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/compact/namo_yaris_sedan_white_2022/1.jpg.webp.480.webp",
+        "alt": "Toyota YARIS 2022 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 376.1875,
+          "y": 1601.3125,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 1601.3125,
+          "right": 721.78125,
+          "bottom": 1806.5,
+          "left": 376.1875
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/compact/ar_yaris_premium_gray_2024/1.jpg.webp.480.webp",
+        "alt": "Toyota YARIS 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 741.375,
+          "y": 1601.3125,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 1601.3125,
+          "right": 1086.96875,
+          "bottom": 1806.5,
+          "left": 741.375
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/sedan/ar_civic_rs_black_2024/1.jpg.webp.480.webp",
+        "alt": "Honda CIVIC RS 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 11,
+          "y": 2492.609375,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 2492.609375,
+          "right": 356.59375,
+          "bottom": 2697.796875,
+          "left": 11
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/sedan/ar_civic_turbo_white_2024/1.jpg.webp.480.webp",
+        "alt": "Honda CIVIC 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 376.1875,
+          "y": 2492.609375,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 2492.609375,
+          "right": 721.78125,
+          "bottom": 2697.796875,
+          "left": 376.1875
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/sedan/ar_mazda2_white_2024/1.jpg.webp.480.webp",
+        "alt": "Mazda MAZDA2 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 741.375,
+          "y": 2492.609375,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 2492.609375,
+          "right": 1086.96875,
+          "bottom": 2697.796875,
+          "left": 741.375
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/suv/namo_raptor_gray_2024/1.jpg.webp.480.webp",
+        "alt": "Ford RAPTOR 2024 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 11,
+          "y": 3383.90625,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 3383.90625,
+          "right": 356.59375,
+          "bottom": 3589.09375,
+          "left": 11
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/suv/ar_cx3_bege_2023/1.jpg.webp.480.webp",
+        "alt": "Mazda CX3 2023 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 376.1875,
+          "y": 3383.90625,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 3383.90625,
+          "right": 721.78125,
+          "bottom": 3589.09375,
+          "left": 376.1875
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/suv/ar_hrv_he_blackv_2025/1.jpg.webp.480.webp",
+        "alt": "Honda HRV 2025 в аренду на Пхукете",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 741.375,
+          "y": 3383.90625,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 3383.90625,
+          "right": 1086.96875,
+          "bottom": 3589.09375,
+          "left": 741.375
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/7s/namo_xpander_white_2023/1.jpg.webp.480.webp",
+        "alt": "Mitsubishi XPANDER 2023 в аренду на Пхукете",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 11,
+          "y": 4275.203125,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 4275.203125,
+          "right": 356.59375,
+          "bottom": 4480.390625,
+          "left": 11
+        }
+      },
+      {
+        "src": "",
+        "alt": "Toyota VELOZ 2024 в аренду на Пхукете",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 376.1875,
+          "y": 4275.203125,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 4275.203125,
+          "right": 721.78125,
+          "bottom": 4480.390625,
+          "left": 376.1875
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/7s/namo_veloz_white_2024/1.jpg.webp.480.webp",
+        "alt": "Toyota VELOZ 2024 в аренду на Пхукете",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 741.375,
+          "y": 4275.203125,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 4275.203125,
+          "right": 1086.96875,
+          "bottom": 4480.390625,
+          "left": 741.375
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/bikes/nmax155_2019_black/1.jpg.webp.480.webp",
+        "alt": "Yamaha NMAX 155 2019 в аренду на Пхукете",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 11,
+          "y": 5166.5,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 5166.5,
+          "right": 356.59375,
+          "bottom": 5371.6875,
+          "left": 11
+        }
+      },
+      {
+        "src": "",
+        "alt": "Honda PCX 160 2023 в аренду на Пхукете",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 376.1875,
+          "y": 5166.5,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 5166.5,
+          "right": 721.78125,
+          "bottom": 5371.6875,
+          "left": 376.1875
+        }
+      },
+      {
+        "src": "",
+        "alt": "Yamaha NMAX 155 2024 в аренду на Пхукете",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "960",
+        "height": "720",
+        "rect": {
+          "x": 741.375,
+          "y": 5166.5,
+          "width": 345.59375,
+          "height": 205.1875,
+          "top": 5166.5,
+          "right": 1086.96875,
+          "bottom": 5371.6875,
+          "left": 741.375
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/logo.png.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "auto",
+        "width": null,
+        "height": null,
+        "rect": {
+          "x": 118.734375,
+          "y": 11685.265625,
+          "width": 36,
+          "height": 36,
+          "top": 11685.265625,
+          "right": 154.734375,
+          "bottom": 11721.265625,
+          "left": 118.734375
+        }
+      }
+    ],
+    "overflow": [
+      {
+        "tag": "A",
+        "cls": "hero-vehicle",
+        "text": "61 транспортных средств\nФото конкретного транспорта\nИЗ РЕАЛЬНОГО АВТОПАРКА\nYamah",
+        "right": 750
+      },
+      {
+        "tag": "DIV",
+        "cls": "hero-vehicle__photo",
+        "text": "61 транспортных средств\nФото конкретного транспорта",
+        "right": 749
+      },
+      {
+        "tag": "IMG",
+        "cls": "",
+        "text": "",
+        "right": 749
+      },
+      {
+        "tag": "DIV",
+        "cls": "hero-proof hero-vehicle__proof",
+        "text": "61 транспортных средств\nФото конкретного транспорта",
+        "right": 711.015625
+      },
+      {
+        "tag": "SPAN",
+        "cls": "hero-proof__fleet",
+        "text": "61 транспортных средств",
+        "right": 535.609375
+      },
+      {
+        "tag": "STRONG",
+        "cls": "",
+        "text": "61",
+        "right": 410.703125
+      },
+      {
+        "tag": "SPAN",
+        "cls": "hero-proof__real",
+        "text": "Фото конкретного транспорта",
+        "right": 711.015625
+      },
+      {
+        "tag": "DIV",
+        "cls": "hero-vehicle__caption",
+        "text": "ИЗ РЕАЛЬНОГО АВТОПАРКА\nYamaha NMAX 155 · 2024\nСТАВКА ОТ\n304 ฿\nза сутки",
+        "right": 749
+      },
+      {
+        "tag": "SPAN",
+        "cls": "",
+        "text": "ИЗ РЕАЛЬНОГО АВТОПАРКА\nYamaha NMAX 155 · 2024",
+        "right": 554.796875
+      },
+      {
+        "tag": "SMALL",
+        "cls": "",
+        "text": "ИЗ РЕАЛЬНОГО АВТОПАРКА",
+        "right": 554.796875
+      },
+      {
+        "tag": "STRONG",
+        "cls": "",
+        "text": "Yamaha NMAX 155 · 2024",
+        "right": 554.796875
+      },
+      {
+        "tag": "SPAN",
+        "cls": "hero-vehicle__price",
+        "text": "СТАВКА ОТ\n304 ฿\nза сутки",
+        "right": 736.203125
+      },
+      {
+        "tag": "SMALL",
+        "cls": "",
+        "text": "СТАВКА ОТ",
+        "right": 736.203125
+      },
+      {
+        "tag": "STRONG",
+        "cls": "",
+        "text": "304 ฿",
+        "right": 736.203125
+      },
+      {
+        "tag": "EM",
+        "cls": "",
+        "text": "за сутки",
+        "right": 736.203125
+      }
+    ],
+    "languageLinks": [],
+    "toc": [],
+    "metrics": {
+      "lcp": [
+        {
+          "time": 504,
+          "url": "https://sunny-rentals.online/logo.png.webp",
+          "size": 7790
+        },
+        {
+          "time": 860,
+          "url": "https://sunny-rentals.online/images_web/compact/ar_yaris_premium_gray_2024/1.jpg.webp.480.webp",
+          "size": 76112
+        },
+        {
+          "time": 2664,
+          "url": "https://sunny-rentals.online/images/atmosphere/phuket-palms-mobile.webp",
+          "size": 169650
+        }
+      ],
+      "cls": 0.007669528494979897
+    },
+    "navigation": [
+      {
+        "ttfb": 10.799999952316284,
+        "domContentLoaded": 511.1999999284744,
+        "load": 794.8999999761581
+      }
+    ],
+    "resources": [
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/1vr_xlldelmhn.js",
+        "transferSize": 227608,
+        "duration": 41.60000002384186
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/40ic2jle3w32c.js",
+        "transferSize": 150298,
+        "duration": 45.800000071525574
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/phuket-palms-mobile.webp",
+        "transferSize": 112912,
+        "duration": 2.1999999284744263
+      },
+      {
+        "name": "https://sunny-rentals.online/__next.__PAGE__.txt?_rsc=8nTjltbQWvg6NcbE",
+        "transferSize": 108553,
+        "duration": 5.799999952316284
+      },
+      {
+        "name": "https://sunny-rentals.online/images_web/bikes/Nmax_2024_blue_topbox/1.jpg.webp.480.webp",
+        "transferSize": 102688,
+        "duration": 34
+      },
+      {
+        "name": "https://sunny-rentals.online/en/__next.en.__PAGE__.txt?_rsc=RBh_0f1QDb6IxaT6",
+        "transferSize": 99959,
+        "duration": 3.799999952316284
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/3igd1n7cmu99x.css",
+        "transferSize": 71130,
+        "duration": 33.89999997615814
+      },
+      {
+        "name": "https://sunny-rentals.online/images_web/bikes/nmax155_2019_black/1.jpg.webp.480.webp",
+        "transferSize": 69712,
+        "duration": 26.700000047683716
+      },
+      {
+        "name": "https://sunny-rentals.online/images_web/sedan/ar_ativ_dark_gray_2024/1.jpg.webp.480.webp",
+        "transferSize": 69008,
+        "duration": 33.59999990463257
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/kata-sunset-mobile.webp",
+        "transferSize": 63650,
+        "duration": 47.89999997615814
+      }
+    ],
+    "name": "home",
+    "device": "mobile",
+    "status": 200,
+    "errors": [],
+    "failed": [
+      {
+        "url": "https://sunny-rentals.online/cars/toyota-yaris/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/en/",
+        "failure": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "url": "https://sunny-rentals.online/en/articles/",
+    "title": "Articles about car rental in Phuket | Sunny Rentals",
+    "h1": [
+      "Articles about car rental in Phuket"
+    ],
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "images": [
+      {
+        "src": "https://sunny-rentals.online/logo.png.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "eager",
+        "width": "192",
+        "height": "192",
+        "rect": {
+          "x": 130,
+          "y": 17.59375,
+          "width": 41.59375,
+          "height": 41.59375,
+          "top": 17.59375,
+          "right": 171.59375,
+          "bottom": 59.1875,
+          "left": 130
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images/articles/choosing-a-rental-phuket.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "720",
+        "height": "480",
+        "rect": {
+          "x": 130,
+          "y": 611.5,
+          "width": 510.171875,
+          "height": 340.109375,
+          "top": 611.5,
+          "right": 640.171875,
+          "bottom": 951.609375,
+          "left": 130
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images/articles/winter-coast.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "720",
+        "height": "480",
+        "rect": {
+          "x": 130,
+          "y": 1075.1875,
+          "width": 510.171875,
+          "height": 340.109375,
+          "top": 1075.1875,
+          "right": 640.171875,
+          "bottom": 1415.296875,
+          "left": 130
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/compact/namo_yaris_sedan_black_2022/1.jpg.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "720",
+        "height": "480",
+        "rect": {
+          "x": 130,
+          "y": 1509.59375,
+          "width": 510.171875,
+          "height": 340.109375,
+          "top": 1509.59375,
+          "right": 640.171875,
+          "bottom": 1849.703125,
+          "left": 130
+        }
+      }
+    ],
+    "overflow": [],
+    "languageLinks": [],
+    "toc": [],
+    "metrics": {
+      "lcp": [
+        {
+          "time": 408,
+          "url": "",
+          "size": 100215
+        },
+        {
+          "time": 500,
+          "url": "https://sunny-rentals.online/images/atmosphere/phuket-waves.webp",
+          "size": 722880
+        }
+      ],
+      "cls": 0.006460387731481481
+    },
+    "navigation": [
+      {
+        "ttfb": 10.399999976158142,
+        "domContentLoaded": 380.1999999284744,
+        "load": 666.8999999761581
+      }
+    ],
+    "resources": [
+      {
+        "name": "https://sunny-rentals.online/images/articles/winter-coast.webp",
+        "transferSize": 240648,
+        "duration": 14
+      },
+      {
+        "name": "https://sunny-rentals.online/images_web/compact/namo_yaris_sedan_black_2022/1.jpg.webp",
+        "transferSize": 234484,
+        "duration": 15.5
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/1vr_xlldelmhn.js",
+        "transferSize": 227608,
+        "duration": 22.399999976158142
+      },
+      {
+        "name": "https://sunny-rentals.online/en/cars/__next.en.cars.__PAGE__.txt?_rsc=w5f7B7nLtAn4_o3M",
+        "transferSize": 202261,
+        "duration": 12.899999976158142
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/0ebj0ou8dbjoa.js",
+        "transferSize": 197459,
+        "duration": 7.300000071525574
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/phuket-waves.webp",
+        "transferSize": 172066,
+        "duration": 5.800000071525574
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/kata-sunset.webp",
+        "transferSize": 158364,
+        "duration": 13.5
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/40ic2jle3w32c.js",
+        "transferSize": 150298,
+        "duration": 22.100000023841858
+      },
+      {
+        "name": "https://sunny-rentals.online/images/articles/choosing-a-rental-phuket.webp",
+        "transferSize": 141760,
+        "duration": 13.700000047683716
+      },
+      {
+        "name": "https://sunny-rentals.online/images_web/compact/ar_yaris_premium_gray_2024/1.jpg.webp.960.webp",
+        "transferSize": 113286,
+        "duration": 20.200000047683716
+      }
+    ],
+    "name": "en-articles",
+    "device": "desktop",
+    "status": 200,
+    "errors": [],
+    "failed": [
+      {
+        "url": "https://sunny-rentals.online/en/articles/7-luchshih-mest-dlya-zimovschikov-na-phukete/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/en/articles/choose-car-rental-phuket-reviews/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/en/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/articles/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/en/cars/",
+        "failure": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "url": "https://sunny-rentals.online/en/articles/",
+    "title": "Articles about car rental in Phuket | Sunny Rentals",
+    "h1": [
+      "Articles about car rental in Phuket"
+    ],
+    "viewport": 390,
+    "scrollWidth": 390,
+    "images": [
+      {
+        "src": "https://sunny-rentals.online/logo.png.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "eager",
+        "width": "192",
+        "height": "192",
+        "rect": {
+          "x": 10,
+          "y": 16.796875,
+          "width": 36,
+          "height": 36,
+          "top": 16.796875,
+          "right": 46,
+          "bottom": 52.796875,
+          "left": 10
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images/articles/choosing-a-rental-phuket.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "720",
+        "height": "480",
+        "rect": {
+          "x": 10,
+          "y": 516.78125,
+          "width": 370,
+          "height": 246.65625,
+          "top": 516.78125,
+          "right": 380,
+          "bottom": 763.4375,
+          "left": 10
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images/articles/winter-coast.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "720",
+        "height": "480",
+        "rect": {
+          "x": 10,
+          "y": 1198.21875,
+          "width": 370,
+          "height": 246.65625,
+          "top": 1198.21875,
+          "right": 380,
+          "bottom": 1444.875,
+          "left": 10
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images_web/compact/namo_yaris_sedan_black_2022/1.jpg.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "720",
+        "height": "480",
+        "rect": {
+          "x": 10,
+          "y": 1907.65625,
+          "width": 370,
+          "height": 246.65625,
+          "top": 1907.65625,
+          "right": 380,
+          "bottom": 2154.3125,
+          "left": 10
+        }
+      }
+    ],
+    "overflow": [],
+    "languageLinks": [],
+    "toc": [],
+    "metrics": {
+      "lcp": [
+        {
+          "time": 360,
+          "url": "",
+          "size": 30576
+        },
+        {
+          "time": 384,
+          "url": "https://sunny-rentals.online/images/atmosphere/phuket-waves-mobile.webp",
+          "size": 170430
+        }
+      ],
+      "cls": 0.0006526018548434936
+    },
+    "navigation": [
+      {
+        "ttfb": 9.299999952316284,
+        "domContentLoaded": 346.2999999523163,
+        "load": 657.6000000238419
+      }
+    ],
+    "resources": [
+      {
+        "name": "https://sunny-rentals.online/images/articles/winter-coast.webp",
+        "transferSize": 240648,
+        "duration": 9.099999904632568
+      },
+      {
+        "name": "https://sunny-rentals.online/images_web/compact/namo_yaris_sedan_black_2022/1.jpg.webp",
+        "transferSize": 234484,
+        "duration": 12.399999976158142
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/1vr_xlldelmhn.js",
+        "transferSize": 227608,
+        "duration": 27.90000009536743
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/40ic2jle3w32c.js",
+        "transferSize": 150298,
+        "duration": 37.200000047683716
+      },
+      {
+        "name": "https://sunny-rentals.online/images/articles/choosing-a-rental-phuket.webp",
+        "transferSize": 141760,
+        "duration": 6.699999928474426
+      },
+      {
+        "name": "https://sunny-rentals.online/en/__next.en.__PAGE__.txt?_rsc=Gil1fv39MGTdd8PK",
+        "transferSize": 99959,
+        "duration": 4.599999904632568
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/phuket-waves-mobile.webp",
+        "transferSize": 91014,
+        "duration": 2.399999976158142
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/3igd1n7cmu99x.css",
+        "transferSize": 71130,
+        "duration": 19.90000009536743
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/kata-sunset-mobile.webp",
+        "transferSize": 63650,
+        "duration": 2.200000047683716
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/08h1sfmhuglo1.js",
+        "transferSize": 54937,
+        "duration": 35.799999952316284
+      }
+    ],
+    "name": "en-articles",
+    "device": "mobile",
+    "status": 200,
+    "errors": [],
+    "failed": [
+      {
+        "url": "https://sunny-rentals.online/en/articles/choose-car-rental-phuket-reviews/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/en/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/articles/",
+        "failure": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "url": "https://sunny-rentals.online/en/articles/7-luchshih-mest-dlya-zimovschikov-na-phukete/",
+    "title": "Where to stay in Phuket for the winter: 7 areas to compare | Sunny Rentals",
+    "h1": [
+      "Where to stay in Phuket for the winter: 7 areas to compare"
+    ],
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "images": [
+      {
+        "src": "https://sunny-rentals.online/logo.png.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "eager",
+        "width": "192",
+        "height": "192",
+        "rect": {
+          "x": 130,
+          "y": 17.59375,
+          "width": 41.59375,
+          "height": 41.59375,
+          "top": 17.59375,
+          "right": 171.59375,
+          "bottom": 59.1875,
+          "left": 130
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images/articles/winter-coast.webp",
+        "alt": "An illustrative tropical Phuket bay with a sandy shore and green hills",
+        "loaded": true,
+        "loading": "auto",
+        "width": "1600",
+        "height": "900",
+        "rect": {
+          "x": 130,
+          "y": 505.96875,
+          "width": 1180,
+          "height": 663.75,
+          "top": 505.96875,
+          "right": 1310,
+          "bottom": 1169.71875,
+          "left": 130
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images/articles/winter-inland.webp",
+        "alt": "An illustrative leafy residential lane in inland Phuket",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "675",
+        "rect": {
+          "x": 487.921875,
+          "y": 2900.1875,
+          "width": 792,
+          "height": 445.5,
+          "top": 2900.1875,
+          "right": 1279.921875,
+          "bottom": 3345.6875,
+          "left": 487.921875
+        }
+      },
+      {
+        "src": "",
+        "alt": "An illustrative southern Phuket waterfront with moored boats",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "675",
+        "rect": {
+          "x": 487.921875,
+          "y": 4136.40625,
+          "width": 792,
+          "height": 445.5,
+          "top": 4136.40625,
+          "right": 1279.921875,
+          "bottom": 4581.90625,
+          "left": 487.921875
+        }
+      }
+    ],
+    "overflow": [],
+    "languageLinks": [],
+    "toc": [
+      {
+        "text": "A quick way to narrow your search",
+        "href": "#article-section-1",
+        "target": true
+      },
+      {
+        "text": "Patong: for restaurants and evenings out",
+        "href": "#article-section-2",
+        "target": true
+      },
+      {
+        "text": "Kathu: when the beach need not be on your doorstep",
+        "href": "#article-section-3",
+        "target": true
+      },
+      {
+        "text": "Rawai: for a base in the south",
+        "href": "#article-section-4",
+        "target": true
+      },
+      {
+        "text": "Chalong: for specific daily destinations in the south",
+        "href": "#article-section-5",
+        "target": true
+      },
+      {
+        "text": "Kamala: for a west-coast beach routine",
+        "href": "#article-section-6",
+        "target": true
+      },
+      {
+        "text": "Surin: when this part of the coast appeals to you",
+        "href": "#article-section-7",
+        "target": true
+      },
+      {
+        "text": "Bang Tao: for a base by a long beach",
+        "href": "#article-section-8",
+        "target": true
+      },
+      {
+        "text": "Check the neighbourhood before committing to a long stay",
+        "href": "#article-section-9",
+        "target": true
+      },
+      {
+        "text": "Will you need a car for your winter stay?",
+        "href": "#article-section-10",
+        "target": true
+      },
+      {
+        "text": "Planning sources",
+        "href": "#article-section-11",
+        "target": true
+      }
+    ],
+    "metrics": {
+      "lcp": [
+        {
+          "time": 480,
+          "url": "https://sunny-rentals.online/images/articles/winter-coast.webp",
+          "size": 493240
+        }
+      ],
+      "cls": 0.03163672051323785
+    },
+    "navigation": [
+      {
+        "ttfb": 12.299999952316284,
+        "domContentLoaded": 473.2999999523163,
+        "load": 757.7999999523163
+      }
+    ],
+    "resources": [
+      {
+        "name": "https://sunny-rentals.online/images/articles/winter-inland.webp",
+        "transferSize": 242616,
+        "duration": 9.699999928474426
+      },
+      {
+        "name": "https://sunny-rentals.online/images/articles/winter-coast.webp",
+        "transferSize": 240648,
+        "duration": 21.799999952316284
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/1vr_xlldelmhn.js",
+        "transferSize": 227608,
+        "duration": 32.59999990463257
+      },
+      {
+        "name": "https://sunny-rentals.online/en/cars/__next.en.cars.__PAGE__.txt?_rsc=2Ljg4LQS_Ol-oY6T",
+        "transferSize": 202261,
+        "duration": 5.100000023841858
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/0ebj0ou8dbjoa.js",
+        "transferSize": 197459,
+        "duration": 8.799999952316284
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/kata-sunset.webp",
+        "transferSize": 158364,
+        "duration": 4.400000095367432
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/40ic2jle3w32c.js",
+        "transferSize": 150298,
+        "duration": 40.700000047683716
+      },
+      {
+        "name": "https://sunny-rentals.online/images_web/compact/ar_yaris_premium_gray_2024/1.jpg.webp.960.webp",
+        "transferSize": 113286,
+        "duration": 9.200000047683716
+      },
+      {
+        "name": "https://sunny-rentals.online/en/__next.en.__PAGE__.txt?_rsc=bJyrBQxmpsfSxEVU",
+        "transferSize": 99959,
+        "duration": 5.200000047683716
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/3igd1n7cmu99x.css",
+        "transferSize": 71130,
+        "duration": 16.700000047683716
+      }
+    ],
+    "name": "en-winter",
+    "device": "desktop",
+    "status": 200,
+    "errors": [],
+    "failed": [
+      {
+        "url": "https://sunny-rentals.online/en/articles/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/articles/7-luchshih-mest-dlya-zimovschikov-na-phukete/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/en/cars/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/en/",
+        "failure": "net::ERR_ABORTED"
+      }
+    ],
+    "tocClick": {
+      "hash": "#article-section-1",
+      "scrollY": 1399
+    }
+  },
+  {
+    "url": "https://sunny-rentals.online/en/articles/7-luchshih-mest-dlya-zimovschikov-na-phukete/",
+    "title": "Where to stay in Phuket for the winter: 7 areas to compare | Sunny Rentals",
+    "h1": [
+      "Where to stay in Phuket for the winter: 7 areas to compare"
+    ],
+    "viewport": 390,
+    "scrollWidth": 390,
+    "images": [
+      {
+        "src": "https://sunny-rentals.online/logo.png.webp",
+        "alt": "",
+        "loaded": true,
+        "loading": "eager",
+        "width": "192",
+        "height": "192",
+        "rect": {
+          "x": 10,
+          "y": 16.796875,
+          "width": 36,
+          "height": 36,
+          "top": 16.796875,
+          "right": 46,
+          "bottom": 52.796875,
+          "left": 10
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images/articles/winter-coast.webp",
+        "alt": "An illustrative tropical Phuket bay with a sandy shore and green hills",
+        "loaded": true,
+        "loading": "auto",
+        "width": "1600",
+        "height": "900",
+        "rect": {
+          "x": 10,
+          "y": 451.3125,
+          "width": 370,
+          "height": 208.125,
+          "top": 451.3125,
+          "right": 380,
+          "bottom": 659.4375,
+          "left": 10
+        }
+      },
+      {
+        "src": "https://sunny-rentals.online/images/articles/winter-inland.webp",
+        "alt": "An illustrative leafy residential lane in inland Phuket",
+        "loaded": true,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "675",
+        "rect": {
+          "x": 10,
+          "y": 3628.21875,
+          "width": 370,
+          "height": 208.125,
+          "top": 3628.21875,
+          "right": 380,
+          "bottom": 3836.34375,
+          "left": 10
+        }
+      },
+      {
+        "src": "",
+        "alt": "An illustrative southern Phuket waterfront with moored boats",
+        "loaded": false,
+        "loading": "lazy",
+        "width": "1200",
+        "height": "675",
+        "rect": {
+          "x": 10,
+          "y": 4956.9375,
+          "width": 370,
+          "height": 208.125,
+          "top": 4956.9375,
+          "right": 380,
+          "bottom": 5165.0625,
+          "left": 10
+        }
+      }
+    ],
+    "overflow": [
+      {
+        "tag": "TABLE",
+        "cls": "",
+        "text": "What matters most\tAreas to consider\tCheck before booking accommodation\nRestauran",
+        "right": 530
+      },
+      {
+        "tag": "THEAD",
+        "cls": "",
+        "text": "What matters most\tAreas to consider\tCheck before booking accommodation\n",
+        "right": 530
+      },
+      {
+        "tag": "TR",
+        "cls": "",
+        "text": "What matters most\tAreas to consider\tCheck before booking accommodation",
+        "right": 530
+      },
+      {
+        "tag": "TH",
+        "cls": "",
+        "text": "Check before booking accommodation",
+        "right": 530
+      },
+      {
+        "tag": "TBODY",
+        "cls": "",
+        "text": "Restaurants and evenings out nearby\tPatong\tNoise at the actual property and park",
+        "right": 530
+      },
+      {
+        "tag": "TR",
+        "cls": "",
+        "text": "Restaurants and evenings out nearby\tPatong\tNoise at the actual property and park",
+        "right": 530
+      },
+      {
+        "tag": "TD",
+        "cls": "",
+        "text": "Noise at the actual property and parking",
+        "right": 530
+      },
+      {
+        "tag": "TR",
+        "cls": "",
+        "text": "Everyday errands rather than a beach at the door\tKathu, Chalong\tJourneys to work",
+        "right": 530
+      },
+      {
+        "tag": "TD",
+        "cls": "",
+        "text": "Journeys to work, activities and your chosen beaches",
+        "right": 530
+      },
+      {
+        "tag": "TR",
+        "cls": "",
+        "text": "A longer stay in the south\tRawai\tAccess to your preferred swimming beach and dai",
+        "right": 530
+      },
+      {
+        "tag": "TD",
+        "cls": "",
+        "text": "Access to your preferred swimming beach and daily errands",
+        "right": 530
+      },
+      {
+        "tag": "TR",
+        "cls": "",
+        "text": "A west-coast beach routine\tKamala, Surin, Bang Tao\tThe actual walk to the sea, s",
+        "right": 530
+      },
+      {
+        "tag": "TD",
+        "cls": "",
+        "text": "The actual walk to the sea, shops and cafes",
+        "right": 530
+      }
+    ],
+    "languageLinks": [],
+    "toc": [
+      {
+        "text": "A quick way to narrow your search",
+        "href": "#article-section-1",
+        "target": true
+      },
+      {
+        "text": "Patong: for restaurants and evenings out",
+        "href": "#article-section-2",
+        "target": true
+      },
+      {
+        "text": "Kathu: when the beach need not be on your doorstep",
+        "href": "#article-section-3",
+        "target": true
+      },
+      {
+        "text": "Rawai: for a base in the south",
+        "href": "#article-section-4",
+        "target": true
+      },
+      {
+        "text": "Chalong: for specific daily destinations in the south",
+        "href": "#article-section-5",
+        "target": true
+      },
+      {
+        "text": "Kamala: for a west-coast beach routine",
+        "href": "#article-section-6",
+        "target": true
+      },
+      {
+        "text": "Surin: when this part of the coast appeals to you",
+        "href": "#article-section-7",
+        "target": true
+      },
+      {
+        "text": "Bang Tao: for a base by a long beach",
+        "href": "#article-section-8",
+        "target": true
+      },
+      {
+        "text": "Check the neighbourhood before committing to a long stay",
+        "href": "#article-section-9",
+        "target": true
+      },
+      {
+        "text": "Will you need a car for your winter stay?",
+        "href": "#article-section-10",
+        "target": true
+      },
+      {
+        "text": "Planning sources",
+        "href": "#article-section-11",
+        "target": true
+      }
+    ],
+    "metrics": {
+      "lcp": [
+        {
+          "time": 384,
+          "url": "https://sunny-rentals.online/images/articles/winter-coast.webp",
+          "size": 76936
+        }
+      ],
+      "cls": 0.05792912513483985
+    },
+    "navigation": [
+      {
+        "ttfb": 11.200000047683716,
+        "domContentLoaded": 361.8000000715256,
+        "load": 670.3000000715256
+      }
+    ],
+    "resources": [
+      {
+        "name": "https://sunny-rentals.online/images/articles/winter-inland.webp",
+        "transferSize": 242616,
+        "duration": 8
+      },
+      {
+        "name": "https://sunny-rentals.online/images/articles/winter-coast.webp",
+        "transferSize": 240648,
+        "duration": 22
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/1vr_xlldelmhn.js",
+        "transferSize": 227608,
+        "duration": 38.10000002384186
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/40ic2jle3w32c.js",
+        "transferSize": 150298,
+        "duration": 37.700000047683716
+      },
+      {
+        "name": "https://sunny-rentals.online/en/__next.en.__PAGE__.txt?_rsc=bJyrBQxmpsfSxEVU",
+        "transferSize": 99959,
+        "duration": 6.099999904632568
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/3igd1n7cmu99x.css",
+        "transferSize": 71130,
+        "duration": 16.600000023841858
+      },
+      {
+        "name": "https://sunny-rentals.online/images/atmosphere/kata-sunset-mobile.webp",
+        "transferSize": 63650,
+        "duration": 24.700000047683716
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/08h1sfmhuglo1.js",
+        "transferSize": 54937,
+        "duration": 35.299999952316284
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/1jyuc44y14mmt.js",
+        "transferSize": 53477,
+        "duration": 37
+      },
+      {
+        "name": "https://sunny-rentals.online/_next/static/chunks/11tdqamvdjuoz.js",
+        "transferSize": 51005,
+        "duration": 20.09999990463257
+      }
+    ],
+    "name": "en-winter",
+    "device": "mobile",
+    "status": 200,
+    "errors": [],
+    "failed": [
+      {
+        "url": "https://sunny-rentals.online/en/articles/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/articles/7-luchshih-mest-dlya-zimovschikov-na-phukete/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sunny-rentals.online/en/",
+        "failure": "net::ERR_ABORTED"
+      }
+    ],
+    "tocClick": {
+      "hash": "#article-section-1",
+      "scrollY": 1712
+    }
+  }
+]

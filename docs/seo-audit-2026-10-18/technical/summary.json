@@ -1,0 +1,421 @@
+{
+  "sitemap_count": 110,
+  "unique_sitemap_urls": 110,
+  "lastmods": {
+    "2026-10-16": 6,
+    "2026-10-18": 4,
+    "2026-10-06": 94,
+    "2026-10-17": 2,
+    "2026-10-11": 2,
+    "2026-10-18T16:47:36.006678+00:00": 2
+  },
+  "statuses": {
+    "200": 110
+  },
+  "issues": [],
+  "duplicates": {
+    "title": [],
+    "description": []
+  },
+  "extra_pages": [
+    {
+      "url": "https://sunny-rentals.online/seo-audit-missing-page-20261018/",
+      "status": 200,
+      "final_url": "https://sunny-rentals.online/seo-audit-missing-page-20261018/",
+      "redirects": [],
+      "headers": {
+        "Server": "nginx/1.24.0 (Ubuntu)",
+        "Date": "Sun, 18 Oct 2026 18:01:20 GMT",
+        "Content-Type": "text/html",
+        "Last-Modified": "Sun, 18 Oct 2026 17:56:54 GMT",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "ETag": "W/\"6ad50866-34a39\"",
+        "Content-Encoding": "gzip"
+      },
+      "html_file": "/tmp/sunny-seo-technical/d649213de206.html",
+      "title": "Аренда авто и байков на Пхукете",
+      "h1": [
+        "Аренда авто и байков на Пхукете."
+      ],
+      "canonical": [
+        "https://sunny-rentals.online/"
+      ],
+      "description": [
+        "Автомобили и байки в аренду на Пхукете: фотографии, сезонные тарифы и бронирование через Telegram."
+      ],
+      "robots": [],
+      "hreflang": {
+        "ru": "https://sunny-rentals.online/",
+        "en": "https://sunny-rentals.online/en/",
+        "x-default": "https://sunny-rentals.online/"
+      },
+      "lang": "ru",
+      "links": [
+        "https://sunny-rentals.online/",
+        "https://sunny-rentals.online/?car=ford_raptor_2024_gray",
+        "https://sunny-rentals.online/?car=honda_civic_2024_black",
+        "https://sunny-rentals.online/?car=honda_civic_2024_white",
+        "https://sunny-rentals.online/?car=honda_hrv_2025_blackv",
+        "https://sunny-rentals.online/?car=mazda_cx3_2023_bege",
+        "https://sunny-rentals.online/?car=mazda_mazda2_2024_white",
+        "https://sunny-rentals.online/?car=mitsubishi_xpander_2023_white",
+        "https://sunny-rentals.online/?car=nmax155_2019_black",
+        "https://sunny-rentals.online/?car=nmax155_2024_keyless_topbox",
+        "https://sunny-rentals.online/?car=pcx160_2023_keyless",
+        "https://sunny-rentals.online/?car=toyota_veloz_2024_gray",
+        "https://sunny-rentals.online/?car=toyota_veloz_2024_white",
+        "https://sunny-rentals.online/?car=toyota_yaris_2022_black",
+        "https://sunny-rentals.online/?car=toyota_yaris_2022_white",
+        "https://sunny-rentals.online/?car=toyota_yaris_2024_gray",
+        "https://sunny-rentals.online/articles/",
+        "https://sunny-rentals.online/car-rental-with-child-seat-phuket/",
+        "https://sunny-rentals.online/cars/",
+        "https://sunny-rentals.online/cars/ford-raptor-2024-gray/",
+        "https://sunny-rentals.online/cars/honda-civic-2024-white/",
+        "https://sunny-rentals.online/cars/honda-civic/",
+        "https://sunny-rentals.online/cars/honda-hrv-2025-blackv/",
+        "https://sunny-rentals.online/cars/mazda-cx3-2023-bege/",
+        "https://sunny-rentals.online/cars/mazda-mazda2-2024-white/",
+        "https://sunny-rentals.online/cars/mitsubishi-xpander/",
+        "https://sunny-rentals.online/cars/nmax155-2019-black/",
+        "https://sunny-rentals.online/cars/nmax155-2024-keyless-topbox/",
+        "https://sunny-rentals.online/cars/pcx160-2023-keyless/",
+        "https://sunny-rentals.online/cars/toyota-veloz-2024-white/",
+        "https://sunny-rentals.online/cars/toyota-veloz/",
+        "https://sunny-rentals.online/cars/toyota-yaris-2022-black/",
+        "https://sunny-rentals.online/cars/toyota-yaris-2022-white/",
+        "https://sunny-rentals.online/cars/toyota-yaris/",
+        "https://sunny-rentals.online/delivery/",
+        "https://sunny-rentals.online/deposit/",
+        "https://sunny-rentals.online/en/",
+        "https://sunny-rentals.online/faq/",
+        "https://sunny-rentals.online/insurance/",
+        "https://sunny-rentals.online/long-term-car-rental-phuket/",
+        "https://sunny-rentals.online/phuket-airport-car-rental/",
+        "https://sunny-rentals.online/rental-terms/",
+        "https://t.me/marseloid",
+        "https://t.me/webapp_rent_bot",
+        "https://t.me/webapp_rent_bot?start=sr2_7_mitsubishi_xpander_2023_white",
+        "https://t.me/webapp_rent_bot?start=sr2_7_toyota_veloz_2024_gray",
+        "https://t.me/webapp_rent_bot?start=sr2_7_toyota_veloz_2024_white",
+        "https://t.me/webapp_rent_bot?start=sr2_b_nmax155_2019_black",
+        "https://t.me/webapp_rent_bot?start=sr2_b_nmax155_2024_keyless_topbox",
+        "https://t.me/webapp_rent_bot?start=sr2_b_pcx160_2023_keyless",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2022_black",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2022_white",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2024_gray",
+        "https://t.me/webapp_rent_bot?start=sr2_d_honda_civic_2024_black",
+        "https://t.me/webapp_rent_bot?start=sr2_d_honda_civic_2024_white",
+        "https://t.me/webapp_rent_bot?start=sr2_d_mazda_mazda2_2024_white",
+        "https://t.me/webapp_rent_bot?start=sr2_s_ford_raptor_2024_gray",
+        "https://t.me/webapp_rent_bot?start=sr2_s_honda_hrv_2025_blackv",
+        "https://t.me/webapp_rent_bot?start=sr2_s_mazda_cx3_2023_bege"
+      ],
+      "body_words": 2054
+    },
+    {
+      "url": "https://sunny-rentals.online/en/seo-audit-missing-page-20261018/",
+      "status": 200,
+      "final_url": "https://sunny-rentals.online/en/seo-audit-missing-page-20261018/",
+      "redirects": [],
+      "headers": {
+        "Server": "nginx/1.24.0 (Ubuntu)",
+        "Date": "Sun, 18 Oct 2026 18:01:20 GMT",
+        "Content-Type": "text/html",
+        "Last-Modified": "Sun, 18 Oct 2026 17:56:54 GMT",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "ETag": "W/\"6ad50866-34a39\"",
+        "Content-Encoding": "gzip"
+      },
+      "html_file": "/tmp/sunny-seo-technical/048b81dde841.html",
+      "title": "Аренда авто и байков на Пхукете",
+      "h1": [
+        "Аренда авто и байков на Пхукете."
+      ],
+      "canonical": [
+        "https://sunny-rentals.online/"
+      ],
+      "description": [
+        "Автомобили и байки в аренду на Пхукете: фотографии, сезонные тарифы и бронирование через Telegram."
+      ],
+      "robots": [],
+      "hreflang": {
+        "ru": "https://sunny-rentals.online/",
+        "en": "https://sunny-rentals.online/en/",
+        "x-default": "https://sunny-rentals.online/"
+      },
+      "lang": "ru",
+      "links": [
+        "https://sunny-rentals.online/",
+        "https://sunny-rentals.online/?car=ford_raptor_2024_gray",
+        "https://sunny-rentals.online/?car=honda_civic_2024_black",
+        "https://sunny-rentals.online/?car=honda_civic_2024_white",
+        "https://sunny-rentals.online/?car=honda_hrv_2025_blackv",
+        "https://sunny-rentals.online/?car=mazda_cx3_2023_bege",
+        "https://sunny-rentals.online/?car=mazda_mazda2_2024_white",
+        "https://sunny-rentals.online/?car=mitsubishi_xpander_2023_white",
+        "https://sunny-rentals.online/?car=nmax155_2019_black",
+        "https://sunny-rentals.online/?car=nmax155_2024_keyless_topbox",
+        "https://sunny-rentals.online/?car=pcx160_2023_keyless",
+        "https://sunny-rentals.online/?car=toyota_veloz_2024_gray",
+        "https://sunny-rentals.online/?car=toyota_veloz_2024_white",
+        "https://sunny-rentals.online/?car=toyota_yaris_2022_black",
+        "https://sunny-rentals.online/?car=toyota_yaris_2022_white",
+        "https://sunny-rentals.online/?car=toyota_yaris_2024_gray",
+        "https://sunny-rentals.online/articles/",
+        "https://sunny-rentals.online/car-rental-with-child-seat-phuket/",
+        "https://sunny-rentals.online/cars/",
+        "https://sunny-rentals.online/cars/ford-raptor-2024-gray/",
+        "https://sunny-rentals.online/cars/honda-civic-2024-white/",
+        "https://sunny-rentals.online/cars/honda-civic/",
+        "https://sunny-rentals.online/cars/honda-hrv-2025-blackv/",
+        "https://sunny-rentals.online/cars/mazda-cx3-2023-bege/",
+        "https://sunny-rentals.online/cars/mazda-mazda2-2024-white/",
+        "https://sunny-rentals.online/cars/mitsubishi-xpander/",
+        "https://sunny-rentals.online/cars/nmax155-2019-black/",
+        "https://sunny-rentals.online/cars/nmax155-2024-keyless-topbox/",
+        "https://sunny-rentals.online/cars/pcx160-2023-keyless/",
+        "https://sunny-rentals.online/cars/toyota-veloz-2024-white/",
+        "https://sunny-rentals.online/cars/toyota-veloz/",
+        "https://sunny-rentals.online/cars/toyota-yaris-2022-black/",
+        "https://sunny-rentals.online/cars/toyota-yaris-2022-white/",
+        "https://sunny-rentals.online/cars/toyota-yaris/",
+        "https://sunny-rentals.online/delivery/",
+        "https://sunny-rentals.online/deposit/",
+        "https://sunny-rentals.online/en/",
+        "https://sunny-rentals.online/faq/",
+        "https://sunny-rentals.online/insurance/",
+        "https://sunny-rentals.online/long-term-car-rental-phuket/",
+        "https://sunny-rentals.online/phuket-airport-car-rental/",
+        "https://sunny-rentals.online/rental-terms/",
+        "https://t.me/marseloid",
+        "https://t.me/webapp_rent_bot",
+        "https://t.me/webapp_rent_bot?start=sr2_7_mitsubishi_xpander_2023_white",
+        "https://t.me/webapp_rent_bot?start=sr2_7_toyota_veloz_2024_gray",
+        "https://t.me/webapp_rent_bot?start=sr2_7_toyota_veloz_2024_white",
+        "https://t.me/webapp_rent_bot?start=sr2_b_nmax155_2019_black",
+        "https://t.me/webapp_rent_bot?start=sr2_b_nmax155_2024_keyless_topbox",
+        "https://t.me/webapp_rent_bot?start=sr2_b_pcx160_2023_keyless",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2022_black",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2022_white",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2024_gray",
+        "https://t.me/webapp_rent_bot?start=sr2_d_honda_civic_2024_black",
+        "https://t.me/webapp_rent_bot?start=sr2_d_honda_civic_2024_white",
+        "https://t.me/webapp_rent_bot?start=sr2_d_mazda_mazda2_2024_white",
+        "https://t.me/webapp_rent_bot?start=sr2_s_ford_raptor_2024_gray",
+        "https://t.me/webapp_rent_bot?start=sr2_s_honda_hrv_2025_blackv",
+        "https://t.me/webapp_rent_bot?start=sr2_s_mazda_cx3_2023_bege"
+      ],
+      "body_words": 2054
+    },
+    {
+      "url": "https://sunny-rentals.online/blog/choose-car-rental-phuket-reviews/",
+      "status": 200,
+      "final_url": "https://sunny-rentals.online/blog/choose-car-rental-phuket-reviews/",
+      "redirects": [],
+      "headers": {
+        "Server": "nginx/1.24.0 (Ubuntu)",
+        "Date": "Sun, 18 Oct 2026 18:01:20 GMT",
+        "Content-Type": "text/html",
+        "Last-Modified": "Sun, 18 Oct 2026 17:56:55 GMT",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "ETag": "W/\"6ad50867-c1f4\"",
+        "Content-Encoding": "gzip"
+      },
+      "html_file": "/tmp/sunny-seo-technical/e3ef44221238.html",
+      "title": "Как выбрать прокатчика на Пхукете по отзывам | Sunny Rentals",
+      "h1": [
+        "Как выбрать прокатчика на Пхукете по отзывам"
+      ],
+      "canonical": [
+        "https://sunny-rentals.online/articles/choose-car-rental-phuket-reviews/"
+      ],
+      "description": [
+        "Как выбрать прокатчика на Пхукете по отзывам"
+      ],
+      "robots": [],
+      "hreflang": {
+        "x-default": "https://sunny-rentals.online/articles/choose-car-rental-phuket-reviews/",
+        "ru": "https://sunny-rentals.online/articles/choose-car-rental-phuket-reviews/",
+        "en": "https://sunny-rentals.online/en/articles/choose-car-rental-phuket-reviews/"
+      },
+      "lang": "ru",
+      "links": [
+        "https://sunny-rentals.online/",
+        "https://sunny-rentals.online/articles/",
+        "https://sunny-rentals.online/articles/choose-car-rental-phuket-reviews/",
+        "https://sunny-rentals.online/blog/choose-car-rental-phuket-reviews/",
+        "https://sunny-rentals.online/cars/",
+        "https://sunny-rentals.online/deposit/",
+        "https://sunny-rentals.online/en/articles/choose-car-rental-phuket-reviews/",
+        "https://sunny-rentals.online/rental-terms/",
+        "https://t.me/webapp_rent_bot"
+      ],
+      "body_words": 918
+    },
+    {
+      "url": "https://sunny-rentals.online/cars/toyota-yaris-2022-black/",
+      "status": 200,
+      "final_url": "https://sunny-rentals.online/cars/toyota-yaris-2022-black/",
+      "redirects": [],
+      "headers": {
+        "Server": "nginx/1.24.0 (Ubuntu)",
+        "Date": "Sun, 18 Oct 2026 18:01:20 GMT",
+        "Content-Type": "text/html",
+        "Last-Modified": "Sun, 18 Oct 2026 17:56:54 GMT",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "ETag": "W/\"6ad50866-17248\"",
+        "Content-Encoding": "gzip"
+      },
+      "html_file": "/tmp/sunny-seo-technical/7a57e55b5174.html",
+      "title": "Аренда Toyota YARIS 2022, Чёрный, на Пхукете | Sunny Rentals",
+      "h1": [
+        "Toyota YARIS 2022 · Чёрный"
+      ],
+      "canonical": [
+        "https://sunny-rentals.online/cars/toyota-yaris/"
+      ],
+      "description": [
+        "Toyota YARIS 2022, Чёрный, в аренду на Пхукете от 585 ฿ в день. Реальные фото, сезонные цены, депозит и условия доставки."
+      ],
+      "robots": [
+        "index, follow"
+      ],
+      "hreflang": {
+        "ru": "https://sunny-rentals.online/cars/toyota-yaris/",
+        "en": "https://sunny-rentals.online/en/cars/toyota-yaris/",
+        "x-default": "https://sunny-rentals.online/cars/toyota-yaris/"
+      },
+      "lang": "ru",
+      "links": [
+        "https://sunny-rentals.online/",
+        "https://sunny-rentals.online/?car=toyota_yaris_2022_white",
+        "https://sunny-rentals.online/?car=toyota_yaris_2024_gray",
+        "https://sunny-rentals.online/?car=toyota_yaris_white_sedan",
+        "https://sunny-rentals.online/articles/",
+        "https://sunny-rentals.online/cars/",
+        "https://sunny-rentals.online/cars/toyota-yaris-2022-black/",
+        "https://sunny-rentals.online/cars/toyota-yaris-2022-white/",
+        "https://sunny-rentals.online/cars/toyota-yaris-2023-blue/",
+        "https://sunny-rentals.online/cars/toyota-yaris-white-sedan/",
+        "https://sunny-rentals.online/cars/toyota-yaris/",
+        "https://sunny-rentals.online/delivery/",
+        "https://sunny-rentals.online/deposit/",
+        "https://sunny-rentals.online/en/cars/toyota-yaris-2022-black/",
+        "https://sunny-rentals.online/insurance/",
+        "https://t.me/webapp_rent_bot",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2022_black",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2022_white",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2024_gray",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_white_sedan"
+      ],
+      "body_words": 838
+    },
+    {
+      "url": "http://sunny-rentals.online/",
+      "status": 200,
+      "final_url": "https://sunny-rentals.online/",
+      "redirects": [
+        {
+          "url": "http://sunny-rentals.online/",
+          "status": 301,
+          "location": "https://sunny-rentals.online/"
+        }
+      ],
+      "headers": {
+        "Server": "nginx/1.24.0 (Ubuntu)",
+        "Date": "Sun, 18 Oct 2026 18:01:21 GMT",
+        "Content-Type": "text/html",
+        "Last-Modified": "Sun, 18 Oct 2026 17:56:54 GMT",
+        "Transfer-Encoding": "chunked",
+        "Connection": "keep-alive",
+        "ETag": "W/\"6ad50866-34a39\"",
+        "Content-Encoding": "gzip"
+      },
+      "html_file": "/tmp/sunny-seo-technical/98b984fc6853.html",
+      "title": "Аренда авто и байков на Пхукете",
+      "h1": [
+        "Аренда авто и байков на Пхукете."
+      ],
+      "canonical": [
+        "https://sunny-rentals.online/"
+      ],
+      "description": [
+        "Автомобили и байки в аренду на Пхукете: фотографии, сезонные тарифы и бронирование через Telegram."
+      ],
+      "robots": [],
+      "hreflang": {
+        "ru": "https://sunny-rentals.online/",
+        "en": "https://sunny-rentals.online/en/",
+        "x-default": "https://sunny-rentals.online/"
+      },
+      "lang": "ru",
+      "links": [
+        "https://sunny-rentals.online/",
+        "https://sunny-rentals.online/?car=ford_raptor_2024_gray",
+        "https://sunny-rentals.online/?car=honda_civic_2024_black",
+        "https://sunny-rentals.online/?car=honda_civic_2024_white",
+        "https://sunny-rentals.online/?car=honda_hrv_2025_blackv",
+        "https://sunny-rentals.online/?car=mazda_cx3_2023_bege",
+        "https://sunny-rentals.online/?car=mazda_mazda2_2024_white",
+        "https://sunny-rentals.online/?car=mitsubishi_xpander_2023_white",
+        "https://sunny-rentals.online/?car=nmax155_2019_black",
+        "https://sunny-rentals.online/?car=nmax155_2024_keyless_topbox",
+        "https://sunny-rentals.online/?car=pcx160_2023_keyless",
+        "https://sunny-rentals.online/?car=toyota_veloz_2024_gray",
+        "https://sunny-rentals.online/?car=toyota_veloz_2024_white",
+        "https://sunny-rentals.online/?car=toyota_yaris_2022_black",
+        "https://sunny-rentals.online/?car=toyota_yaris_2022_white",
+        "https://sunny-rentals.online/?car=toyota_yaris_2024_gray",
+        "https://sunny-rentals.online/articles/",
+        "https://sunny-rentals.online/car-rental-with-child-seat-phuket/",
+        "https://sunny-rentals.online/cars/",
+        "https://sunny-rentals.online/cars/ford-raptor-2024-gray/",
+        "https://sunny-rentals.online/cars/honda-civic-2024-white/",
+        "https://sunny-rentals.online/cars/honda-civic/",
+        "https://sunny-rentals.online/cars/honda-hrv-2025-blackv/",
+        "https://sunny-rentals.online/cars/mazda-cx3-2023-bege/",
+        "https://sunny-rentals.online/cars/mazda-mazda2-2024-white/",
+        "https://sunny-rentals.online/cars/mitsubishi-xpander/",
+        "https://sunny-rentals.online/cars/nmax155-2019-black/",
+        "https://sunny-rentals.online/cars/nmax155-2024-keyless-topbox/",
+        "https://sunny-rentals.online/cars/pcx160-2023-keyless/",
+        "https://sunny-rentals.online/cars/toyota-veloz-2024-white/",
+        "https://sunny-rentals.online/cars/toyota-veloz/",
+        "https://sunny-rentals.online/cars/toyota-yaris-2022-black/",
+        "https://sunny-rentals.online/cars/toyota-yaris-2022-white/",
+        "https://sunny-rentals.online/cars/toyota-yaris/",
+        "https://sunny-rentals.online/delivery/",
+        "https://sunny-rentals.online/deposit/",
+        "https://sunny-rentals.online/en/",
+        "https://sunny-rentals.online/faq/",
+        "https://sunny-rentals.online/insurance/",
+        "https://sunny-rentals.online/long-term-car-rental-phuket/",
+        "https://sunny-rentals.online/phuket-airport-car-rental/",
+        "https://sunny-rentals.online/rental-terms/",
+        "https://t.me/marseloid",
+        "https://t.me/webapp_rent_bot",
+        "https://t.me/webapp_rent_bot?start=sr2_7_mitsubishi_xpander_2023_white",
+        "https://t.me/webapp_rent_bot?start=sr2_7_toyota_veloz_2024_gray",
+        "https://t.me/webapp_rent_bot?start=sr2_7_toyota_veloz_2024_white",
+        "https://t.me/webapp_rent_bot?start=sr2_b_nmax155_2019_black",
+        "https://t.me/webapp_rent_bot?start=sr2_b_nmax155_2024_keyless_topbox",
+        "https://t.me/webapp_rent_bot?start=sr2_b_pcx160_2023_keyless",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2022_black",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2022_white",
+        "https://t.me/webapp_rent_bot?start=sr2_c_toyota_yaris_2024_gray",
+        "https://t.me/webapp_rent_bot?start=sr2_d_honda_civic_2024_black",
+        "https://t.me/webapp_rent_bot?start=sr2_d_honda_civic_2024_white",
+        "https://t.me/webapp_rent_bot?start=sr2_d_mazda_mazda2_2024_white",
+        "https://t.me/webapp_rent_bot?start=sr2_s_ford_raptor_2024_gray",
+        "https://t.me/webapp_rent_bot?start=sr2_s_honda_hrv_2025_blackv",
+        "https://t.me/webapp_rent_bot?start=sr2_s_mazda_cx3_2023_bege"
+      ],
+      "body_words": 2054
+    }
+  ]
+}

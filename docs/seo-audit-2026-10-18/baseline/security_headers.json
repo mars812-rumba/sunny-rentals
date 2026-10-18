@@ -1,0 +1,27 @@
+{
+  "url": "https://sunny-rentals.online/",
+  "score": 25,
+  "https": true,
+  "headers_present": {},
+  "headers_missing": {
+    "HSTS (Strict-Transport-Security)": "Forces browsers to use HTTPS. Prevents downgrade attacks.",
+    "Content-Security-Policy (CSP)": "Prevents XSS, clickjacking, and code injection.",
+    "X-Frame-Options": "Prevents clickjacking by controlling iframe embedding.",
+    "X-Content-Type-Options": "Prevents MIME-type sniffing.",
+    "Referrer-Policy": "Controls how much referrer info is shared.",
+    "Permissions-Policy": "Controls browser feature access (camera, microphone, geolocation)."
+  },
+  "header_values": {},
+  "issues": [
+    "\ud83d\udd34 6 security headers missing \u2014 poor security posture"
+  ],
+  "recommendations": [
+    "HSTS (Strict-Transport-Security): Add header: Strict-Transport-Security: max-age=31536000; includeSubDomains",
+    "Content-Security-Policy (CSP): Add a Content-Security-Policy header restricting script/style sources.",
+    "X-Frame-Options: Add header: X-Frame-Options: SAMEORIGIN",
+    "X-Content-Type-Options: Add header: X-Content-Type-Options: nosniff",
+    "Referrer-Policy: Add header: Referrer-Policy: strict-origin-when-cross-origin",
+    "Permissions-Policy: Add header: Permissions-Policy: camera=(), microphone=(), geolocation=()"
+  ],
+  "error": null
+}

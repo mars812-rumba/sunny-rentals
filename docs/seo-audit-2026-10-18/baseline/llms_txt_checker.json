@@ -1,0 +1,116 @@
+{
+  "url": "https://sunny-rentals.online/llms.txt",
+  "full_url": "https://sunny-rentals.online/llms-full.txt",
+  "exists": true,
+  "full_exists": true,
+  "status": 200,
+  "full_status": 200,
+  "parsed": {
+    "title": "Sunny Rentals",
+    "description": "Bilingual catalogue and booking service for real cars and scooters in Phuket. Sunny Rentals acts as an aggregator; a manager confirms the selected vehicle and dates before booking.",
+    "sections": [
+      {
+        "name": "Main pages",
+        "links": [
+          {
+            "title": "Russian home",
+            "url": "https://sunny-rentals.online/",
+            "description": "Rental service overview, verified terms and booking entry point."
+          },
+          {
+            "title": "English home",
+            "url": "https://sunny-rentals.online/en/",
+            "description": "English version of the rental service."
+          },
+          {
+            "title": "Russian vehicle catalogue",
+            "url": "https://sunny-rentals.online/cars/",
+            "description": "Real cars and scooters with photos, seasonal rates and deposits."
+          },
+          {
+            "title": "English vehicle catalogue",
+            "url": "https://sunny-rentals.online/en/cars/",
+            "description": "English vehicle catalogue."
+          },
+          {
+            "title": "Rental terms",
+            "url": "https://sunny-rentals.online/rental-terms/",
+            "description": "Documents, deposit, insurance and handover terms."
+          },
+          {
+            "title": "Insurance guide",
+            "url": "https://sunny-rentals.online/insurance/",
+            "description": "Class 1 car insurance and exclusions; scooters are supplied without insurance."
+          },
+          {
+            "title": "Airport delivery",
+            "url": "https://sunny-rentals.online/phuket-airport-car-rental/",
+            "description": "Phuket Airport delivery information."
+          }
+        ]
+      },
+      {
+        "name": "Verified service facts",
+        "links": []
+      },
+      {
+        "name": "Booking",
+        "links": [
+          {
+            "title": "Sunny Rentals Telegram bot",
+            "url": "https://t.me/webapp_rent_bot",
+            "description": "Send selected vehicle and dates to a manager."
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "title": "Russian home",
+        "url": "https://sunny-rentals.online/",
+        "description": "Rental service overview, verified terms and booking entry point."
+      },
+      {
+        "title": "English home",
+        "url": "https://sunny-rentals.online/en/",
+        "description": "English version of the rental service."
+      },
+      {
+        "title": "Russian vehicle catalogue",
+        "url": "https://sunny-rentals.online/cars/",
+        "description": "Real cars and scooters with photos, seasonal rates and deposits."
+      },
+      {
+        "title": "English vehicle catalogue",
+        "url": "https://sunny-rentals.online/en/cars/",
+        "description": "English vehicle catalogue."
+      },
+      {
+        "title": "Rental terms",
+        "url": "https://sunny-rentals.online/rental-terms/",
+        "description": "Documents, deposit, insurance and handover terms."
+      },
+      {
+        "title": "Insurance guide",
+        "url": "https://sunny-rentals.online/insurance/",
+        "description": "Class 1 car insurance and exclusions; scooters are supplied without insurance."
+      },
+      {
+        "title": "Airport delivery",
+        "url": "https://sunny-rentals.online/phuket-airport-car-rental/",
+        "description": "Phuket Airport delivery information."
+      },
+      {
+        "title": "Sunny Rentals Telegram bot",
+        "url": "https://t.me/webapp_rent_bot",
+        "description": "Send selected vehicle and dates to a manager."
+      }
+    ]
+  },
+  "quality": {
+    "score": 95,
+    "issues": [],
+    "suggestions": []
+  },
+  "error": null
+}
