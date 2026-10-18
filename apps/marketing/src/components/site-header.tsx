@@ -9,9 +9,11 @@ import { siteConfig } from "@/lib/site";
 export function SiteHeader({
   locale,
   currentPath = "/",
+  alternatePaths,
 }: {
   locale: Locale;
   currentPath?: string;
+  alternatePaths?: Partial<Record<Locale, string>>;
 }) {
   const copy = getMessages(locale);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -78,7 +80,7 @@ export function SiteHeader({
             width={192}
             height={192}
             loading="eager"
-            fetchPriority="high"
+            fetchPriority="auto"
           />
           <span>
             <strong>SUNNY RENTALS</strong>
@@ -93,7 +95,7 @@ export function SiteHeader({
           <span className="language-switch" aria-label="Language">
             <Link
               aria-label={copy.nav.russian}
-              href={localePath("ru", currentPath)}
+              href={alternatePaths?.ru ?? localePath("ru", currentPath)}
               hrefLang="ru"
               aria-current={locale === "ru" ? "page" : undefined}
             >
@@ -101,7 +103,7 @@ export function SiteHeader({
             </Link>
             <Link
               aria-label={copy.nav.english}
-              href={localePath("en", currentPath)}
+              href={alternatePaths?.en ?? localePath("en", currentPath)}
               hrefLang="en"
               aria-current={locale === "en" ? "page" : undefined}
             >

@@ -27,7 +27,8 @@ for (const locale of ['ru', 'en']) test(`home hero ${locale}: offer and booking 
   assert.match(hero, /type="date"/);
   assert.doesNotMatch(hero, /hero-vehicle|carousel|aria-roledescription|\/images_web\//);
   const backgrounds = [...hero.matchAll(/<link rel="preload"[^>]+href="([^"]+)"/g)].map(match => match[1]);
-  assert.deepEqual(backgrounds.sort(), ['/images/atmosphere/kata-sunset-mobile.webp', '/images/atmosphere/kata-sunset.webp']);
+  assert.deepEqual(backgrounds.sort(), ['/images/atmosphere/kata-sunset-hero-mobile.webp', '/images/atmosphere/kata-sunset-hero.webp']);
+  assert.equal((hero.match(/fetch[Pp]riority="high"/g) || []).length, 2);
   const home = renderToStaticMarkup(React.createElement(compiled.exports.MarketingHomePage, { locale }));
   assert.match(home, /id="fleet"/);
   assert.match(home, /id="category-compact"/);

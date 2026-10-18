@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
 import { siteConfig } from "@/lib/site";
+import { SiteFooter } from "@/components/site-footer";
 
 import "@/app/globals.css";
 
@@ -49,16 +50,10 @@ export default function DocumentLayout({ children, locale }: Readonly<{ children
   return (
     <html lang={locale}>
       <head>
-        {/* Discover fonts from HTML, rather than waiting for the main CSS. */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap"
-        />
-        <link rel="preload" as="image" href="/logo.png.webp" fetchPriority="high" />
+        <link rel="preload" as="font" href="/fonts/manrope-v20-latin.woff2" type="font/woff2" crossOrigin="anonymous" />
+        {locale === "ru" && <link rel="preload" as="font" href="/fonts/manrope-v20-cyrillic.woff2" type="font/woff2" crossOrigin="anonymous" />}
       </head>
-      <body>{children}</body>
+      <body>{children}<SiteFooter locale={locale} /></body>
     </html>
   );
 }

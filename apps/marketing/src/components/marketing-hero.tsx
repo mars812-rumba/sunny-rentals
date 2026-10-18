@@ -6,8 +6,8 @@ export function MarketingHero({ locale }: { locale: Locale }) {
 
   return (
     <>
-      <link rel="preload" as="image" href="/images/atmosphere/kata-sunset.webp" media="(min-width: 701px)" />
-      <link rel="preload" as="image" href="/images/atmosphere/kata-sunset-mobile.webp" media="(max-width: 700px)" />
+      <link rel="preload" as="image" href="/images/atmosphere/kata-sunset-hero.webp" media="(min-width: 701px)" fetchPriority="high" />
+      <link rel="preload" as="image" href="/images/atmosphere/kata-sunset-hero-mobile.webp" media="(max-width: 700px)" fetchPriority="high" />
       <section className="marketing-hero marketing-hero--simple">
         <div className="marketing-hero__backdrop" aria-hidden="true" />
         <div className="shell marketing-hero__content">
