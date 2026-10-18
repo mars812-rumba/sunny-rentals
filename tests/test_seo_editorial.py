@@ -80,6 +80,27 @@ class EditorialTests(unittest.TestCase):
         self.assertIn("Не выдумывай имя сотрудника", prompt)
         self.assertIn("research_notes и sources", prompt)
 
+    def test_inventory_context_is_public_and_does_not_invent_image_or_card_urls(self):
+        root = Path(self.tmp.name)
+        inventory = root / "backend/data/web_cars.json"
+        inventory.parent.mkdir(parents=True)
+        image = root / "public/images_web/compact/photo.jpg"
+        image.parent.mkdir(parents=True)
+        image.touch()
+        row = {"name": "Test compact", "class": "compact", "supplier": "PRIVATE",
+               "contact": "PRIVATE", "available": True,
+               "photos": {"main": "compact/photo.jpg"},
+               "pricing": {"low_season": {"price_7_14": 100, "internal": 999},
+                           "high_season": {"price_7_14": 200}, "deposit": 5000}}
+        inventory.write_text(json.dumps({"cars": {"one": row, "two": {**row, "photos": {"main": "../secret.jpg"}}}}))
+        context = seo.public_inventory_context(root)
+        self.assertEqual(context["offers"][0]["photo_url"], "/images_web/compact/photo.jpg")
+        self.assertIsNone(context["offers"][1]["photo_url"])
+        self.assertEqual(context["offers"][0]["daily_rates"]["low_season"], {"price_7_14": 100})
+        self.assertNotIn("PRIVATE", json.dumps(context))
+        self.assertNotIn("available", context["offers"][0])
+        self.assertNotIn("slug", context["offers"][0])
+
     def test_48_hours_month_boundary_and_no_repeats(self):
         now = datetime(2026, 10, 31, 3, tzinfo=timezone.utc)
         self.assertEqual(self.run_job(now), "pending_review")
@@ -130,6 +151,12 @@ class EditorialTests(unittest.TestCase):
     def test_generator_requires_completed_search_and_never_passes_telegram_secret(self):
         topic = self.config["topics"][0]
         def fake_cli(command, **kwargs):
+            for relative in (
+                "skills/article-editor/SKILL.md",
+                "config/article-project-profile.md",
+                "config/article-editorial-memory.md",
+            ):
+                self.assertIn((ROOT / relative).read_text(), kwargs["input"])
             self.assertIn("read-only", command)
             self.assertIn('web_search="live"', command)
             self.assertNotIn("SUNNY_SEO_TELEGRAM_BOT_TOKEN", kwargs["env"])
