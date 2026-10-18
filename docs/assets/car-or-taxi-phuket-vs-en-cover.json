@@ -1,0 +1,9 @@
+{
+  "slug": "car-or-taxi-phuket-vs-en",
+  "tool": "built-in image_gen",
+  "illustrative": true,
+  "generated_at": "2026-10-18",
+  "source_image": "public/images/articles/car-or-taxi-phuket-vs.webp",
+  "original": "/root/.codex/generated_images/01a11c50-09b1-7f61-98c1-2e4aa619918e/exec-6287ab67-439d-4865-86cd-6968e04d77ac.png",
+  "prompt": "Use case: text-localization. Edit target: supplied Sunny Rentals taxi-versus-rental article cover. Change only the Cyrillic text: replace left heading with exact English \"TAXI\", right heading with exact English \"RENTAL\". Preserve the centered \"VS\". Keep the same bold white typography, positions and visual hierarchy, the split composition, yellow-green taxi, silver rental sedan, hand with key, tropical Phuket backgrounds, lighting, colors and 16:9 framing. No additional text, logos or watermark. This is an illustrative editorial scene, not fleet inventory photography."
+}

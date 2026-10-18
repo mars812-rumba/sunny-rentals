@@ -1,6 +1,8 @@
 import { winterGuideEditorial, winterGuideSlug } from "@/content/winter-guide";
+import { carOrTaxiEnglish } from "@/content/car-or-taxi-guide";
 
 interface EditorialTranslation {
+  image?: string;
   title: string;
   description: string;
   content: string;
@@ -15,6 +17,13 @@ interface BlogEditorial {
 }
 
 export const blogEditorial: Record<string, BlogEditorial> = {
+  "car-or-taxi-phuket": {
+    image: "/images/articles/car-or-taxi-phuket-vs.webp",
+    ru: {
+      imageAlt: "Сравнение такси и самостоятельной аренды автомобиля на Пхукете",
+    },
+    en: carOrTaxiEnglish,
+  },
   [winterGuideSlug]: winterGuideEditorial,
   "choose-car-rental-phuket-reviews": {
     image: "/images/articles/choosing-a-rental-phuket.webp",

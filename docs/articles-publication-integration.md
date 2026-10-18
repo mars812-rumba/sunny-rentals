@@ -99,6 +99,33 @@ freshness. No design-system drift repair is included. New public RU JSON entries
 join the collection on the next release; complete English translations and newly
 generated covers remain explicit editorial work rather than automated output.
 
+## Taxi versus rental: approved-Russian English adaptation — 18 October 2026
+
+`car-or-taxi-guide.ts` adds a complete English adaptation of the approved/published
+Russian revision `e345db122ace`, not an unfinished parallel draft. Source body
+SHA-256: `4b470a30d1eefdc61254fbaa130fcfb392e67c48ad5e8be0ddfdd953476bc20c`.
+The Russian public JSON is untouched. All eight sections, the four vehicle-class
+rows, delivery/deposit/prepayment distinctions, source date, low-season caveat,
+7–14-day and 30+-day rate distinctions and arithmetic are retained. Internal links
+are localized; wording and humor are adapted rather than translated mechanically.
+
+The existing editorial overlay makes `/en/articles/car-or-taxi-phuket/` discoverable
+in the English index and sitemap, with genuine reciprocal language links and
+per-language canonical/social/BlogPosting metadata. Localized cover selection is
+supported by the loader without changing the bot's public JSON contract.
+The built-in image generation tool localized the comparison headings to TAXI and
+RENTAL; prompt/source provenance is in `docs/assets/car-or-taxi-phuket-vs-en-cover.json`
+and image EXIF. Matching 1600/800/480 WebP copies ship in both public roots, at
+162,626 / 67,572 / 31,720 bytes. Russian imagery remains unchanged.
+
+Verification: 26 publication/monthly tests, 5 pipeline and 12 editorial Python
+tests, scoped ESLint, isolated Next export of 171 routes, 112 canonical URL checks
+and checks of all published article exports and existing content pages. Private
+SSR and local production-export browser evidence is under
+`.local/seo-editorial/car-or-taxi-en-review/` and `car-or-taxi-en-export/`.
+Live publication and live social-preview validation remain pending owner release;
+no deployment, commit, push, scheduler edit or service restart was performed.
+
 ## Shared public footer — 18 October 2026
 
 `SiteFooter` is now mounted once in `DocumentLayout` for both Russian and English

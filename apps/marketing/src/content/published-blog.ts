@@ -2,6 +2,7 @@ import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { resolve, sep } from "node:path";
 import { blogEditorial } from "@/content/blog-editorial";
 import type { Locale } from "@/lib/i18n";
+import { leadingArticleCover } from "@/content/article-cover";
 
 export interface PublishedBlogPost {
   slug: string;
@@ -51,15 +52,18 @@ export function loadPublishedBlogPosts(locale: Locale, directory = defaultDirect
     const editorial = blogEditorial[slug];
     const translation = editorial?.[locale];
     if (locale === "en" && !editorial?.en) return null;
+    const body = translation?.content ?? data.content;
+    const candidate = leadingArticleCover(body);
+    const cover = candidate && existingPublicImage(candidate.image) ? candidate : undefined;
     return {
       slug, title: translation?.title ?? data.title,
       description: translation?.description ?? data.meta_description ?? data.title,
-      content: translation?.content ?? data.content,
+      content: cover?.content ?? body,
       author: data.author || "Sunny Rentals", publishedAt: data.generated_at,
       updatedAt: editorial?.updatedAt,
-      image: existingPublicImage(editorial?.image ?? data.image_url),
-      imageAlt: editorial?.[locale]?.imageAlt ?? data.title,
-      imageCaption: editorial?.[locale]?.imageCaption,
+      image: existingPublicImage(translation?.image ?? editorial?.image ?? data.image_url ?? cover?.image),
+      imageAlt: editorial?.[locale]?.imageAlt ?? cover?.alt ?? data.title,
+      imageCaption: editorial?.[locale]?.imageCaption ?? cover?.caption,
       locale, availableLocales: editorial?.en ? ["ru", "en"] : ["ru"],
     };
   }).filter((post): post is PublishedBlogPost => post !== null)

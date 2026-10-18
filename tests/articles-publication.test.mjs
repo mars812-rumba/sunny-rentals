@@ -11,7 +11,7 @@ const requireApp = createRequire(resolve(app, 'package.json'));
 const React = requireApp('react');
 const { renderToStaticMarkup } = requireApp('react-dom/server');
 const bundled = await build({
-  stdin: { contents: `export * from './src/content/published-blog'; export * from './src/components/article-reading'; export { ArticlesIndex } from './src/components/articles-index'; export { default as sitemap } from './src/app/sitemap';`, resolveDir: app, loader: 'tsx' },
+  stdin: { contents: `export * from './src/content/published-blog'; export * from './src/components/article-reading'; export { SiteFooter } from './src/components/site-footer'; export { default as DocumentLayout } from './src/components/document-layout'; export { ArticlesIndex } from './src/components/articles-index'; export { default as sitemap } from './src/app/sitemap';`, resolveDir: app, loader: 'tsx' },
   tsconfig: resolve(app, 'tsconfig.json'), bundle: true, write: false, platform: 'node', format: 'cjs', jsx: 'automatic',
   external: ['react', 'react/jsx-runtime', 'react-dom', 'next/link'], loader: { '.css': 'empty' },
 });
@@ -23,6 +23,22 @@ const ui = compiled.exports;
 const slug = 'choose-car-rental-phuket-reviews';
 
 for (const locale of ['ru', 'en']) {
+  test(`shared public footer ${locale}: one layout footer with localized vertical navigation`, () => {
+    const post = ui.getPublishedBlogPost(slug, locale);
+    for (const child of [React.createElement(ui.ArticleReading, { post }), React.createElement(ui.ArticlesIndex, { locale }), React.createElement('main', null, 'Short page')]) {
+      const html = renderToStaticMarkup(React.createElement(ui.DocumentLayout, { locale }, child));
+      assert.equal((html.match(/<footer\b/g) || []).length, 1);
+      assert.match(html, /<footer class="site-footer">/);
+      const footer = html.slice(html.indexOf('<footer'));
+      for (const path of ['cars', 'articles', 'rental-terms', 'insurance', 'deposit', 'delivery', 'faq']) {
+        assert.match(footer, new RegExp(`href="${locale === 'en' ? '/en' : ''}/${path}/?"`));
+      }
+      assert.match(footer, /<ul class="site-footer__links"><li>/);
+      assert.doesNotMatch(footer, /href="\/blog/);
+      if (locale === 'en') assert.doesNotMatch(footer, /[а-яё]/i);
+    }
+  });
+
   test(`published article ${locale}: real body, photo, checklist, contents and next action`, () => {
     const post = ui.getPublishedBlogPost(slug, locale);
     assert.ok(post);
@@ -34,6 +50,9 @@ for (const locale of ['ru', 'en']) {
     assert.match(html, new RegExp(`href="${locale === 'en' ? '/en' : ''}/cars/?"`));
     for (const [, anchor] of html.matchAll(/href="#([^"]+)"/g)) assert.ok(html.includes(`id="${anchor}"`));
     assert.match(html, /article-section-7/);
+    const caption = html.match(/<figcaption>([\s\S]*?)<\/figcaption>/)?.[1] ?? '';
+    assert.ok(caption.includes(post.title));
+    assert.doesNotMatch(caption, /ИИ|AI-generated|generated with|с помощью/i);
     if (locale === 'en') assert.doesNotMatch(html.replace(/<script\b[\s\S]*?<\/script>/g, '').replace(/<[^>]*>/g, ''), /[а-яё]/i);
     const data = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
     assert.equal(data['@type'], 'BlogPosting');
@@ -71,6 +90,80 @@ test('only public indexed articles enter the collection; untranslated articles a
   assert.equal(ui.loadPublishedBlogPosts('en', directory).length, 0);
   writeFileSync(join(directory, 'index.json'), JSON.stringify(['../private-state']));
   assert.throws(() => ui.loadPublishedBlogPosts('ru', directory), /Invalid published article slug/);
+});
+
+test('bot leading cover becomes one hero and collection image without changing public JSON format', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'sunny-leading-cover-test-'));
+  const image = '/images/articles/car-or-taxi-phuket.webp';
+  writeFileSync(join(directory, 'index.json'), JSON.stringify(['leading-cover-fixture']));
+  writeFileSync(join(directory, 'leading-cover-fixture.json'), JSON.stringify({
+    slug: 'leading-cover-fixture', title: 'Русский черновик', generated_at: '2026-10-18T00:00:00Z',
+    content: `![Карта и ключ](${image})\n\n*ИИ-иллюстрация, не реальная выдача*\n\n## Выбор транспорта\n\nПолезный текст.`,
+  }));
+  const post = ui.loadPublishedBlogPosts('ru', directory)[0];
+  assert.equal(post.image, image);
+  assert.equal(post.imageCaption, 'ИИ-иллюстрация, не реальная выдача');
+  assert.ok(post.content.startsWith('## Выбор транспорта'));
+  const html = renderToStaticMarkup(React.createElement(ui.ArticleReading, { post }));
+  assert.equal((html.match(/<img\b[^>]*alt="Карта и ключ"/g) || []).length, 1);
+});
+
+test('car-vs-taxi cover is distinct and published seasonal copy is preserved', async () => {
+  const post = ui.getPublishedBlogPost('car-or-taxi-phuket', 'ru');
+  assert.ok(post);
+  assert.equal(post.image, '/images/articles/car-or-taxi-phuket-vs.webp');
+  assert.notEqual(post.image, ui.getPublishedBlogPost(slug, 'ru').image);
+  assert.match(post.content, /низк[а-яё]* сезон[а-яё]*/i);
+  const source = JSON.parse(readFileSync('public/content/blog/car-or-taxi-phuket.json', 'utf8'));
+  assert.ok(source.content.endsWith(post.content));
+  const photo = readFileSync('public' + post.image);
+  assert.deepEqual(photo, readFileSync(resolve(app, 'public' + post.image)));
+  const sharp = requireApp('sharp');
+  const info = await sharp(photo).metadata();
+  assert.equal(info.width, 1600);
+  assert.equal(info.height, 900);
+  assert.ok(photo.length < 250 * 1024);
+  assert.ok(info.exif.toString().includes('photographic diptych'));
+});
+
+test('approved taxi-vs-rental guide has a complete English adaptation and genuine alternates', () => {
+  const taxiSlug = 'car-or-taxi-phuket';
+  const post = ui.getPublishedBlogPost(taxiSlug, 'en');
+  assert.ok(post);
+  assert.deepEqual(post.availableLocales, ['ru', 'en']);
+  assert.doesNotMatch(post.content, /[а-яё]/i);
+  assert.equal((post.content.match(/^## /gm) || []).length, 8);
+  assert.match(post.content, /low season/i);
+  assert.match(post.content, /high-season travel/i);
+  assert.match(post.content, /18 October 2026/);
+  assert.match(post.content, /7–14 days/);
+  assert.match(post.content, /30\+ days in the low season/);
+  for (const row of ['748 | 5 236 | 6 236 | 5 000', '954 | 6 678 | 7 678 | 5 000', '1 237 | 8 659 | 9 659 | 8 000', '1 045 | 7 315 | 8 315 | 10 000']) assert.ok(post.content.includes(row));
+  assert.match(post.content, /517 baht per day/);
+  assert.match(post.content, /500 baht each way/);
+  assert.match(post.content, /6 236 ÷ 7 ≈ 891/);
+  for (const [, path] of post.content.matchAll(/\]\((\/[^)]+)\)/g)) assert.ok(path.startsWith('/en/'));
+  const html = renderToStaticMarkup(React.createElement(ui.ArticleReading, { post }));
+  assert.match(html, /href="\/articles\/car-or-taxi-phuket\/?"/);
+  assert.match(html, /href="\/en\/articles\/car-or-taxi-phuket\/?"/);
+  assert.match(html, /car-or-taxi-phuket-vs-en\.webp/);
+  assert.ok(renderToStaticMarkup(React.createElement(ui.ArticlesIndex, { locale: 'en' })).includes(post.title));
+  const meta = ui.articleMetadata(post);
+  assert.equal(meta.alternates.canonical, '/en/articles/car-or-taxi-phuket/');
+  assert.equal(meta.alternates.languages.ru, '/articles/car-or-taxi-phuket/');
+  assert.equal(meta.openGraph.url, 'https://sunny-rentals.online/en/articles/car-or-taxi-phuket/');
+  assert.equal(ui.sitemap().filter(entry => entry.url === meta.openGraph.url).length, 1);
+});
+
+test('English comparison cover has localized provenance and matching public copies', async () => {
+  const post = ui.getPublishedBlogPost('car-or-taxi-phuket', 'en');
+  const photo = readFileSync('public' + post.image);
+  assert.deepEqual(photo, readFileSync(resolve(app, 'public' + post.image)));
+  const info = await requireApp('sharp')(photo).metadata();
+  assert.equal(info.width, 1600);
+  assert.equal(info.height, 900);
+  assert.ok(photo.length < 250 * 1024);
+  assert.ok(info.exif.toString().includes('text-localization'));
 });
 
 for (const locale of ['ru', 'en']) {
