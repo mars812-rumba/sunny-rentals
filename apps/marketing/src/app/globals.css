@@ -2660,6 +2660,37 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   line-height: 0.98;
 }
 
+/* No viewport-height placeholder after removal of the duplicate vehicle rail. */
+.marketing-hero.marketing-hero--simple {
+  min-height: 0;
+}
+
+.marketing-hero--simple .marketing-hero__content {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  padding-block: 7rem 2rem;
+}
+
+.marketing-hero--simple .marketing-hero__copy {
+  max-width: 52rem;
+  animation: none;
+}
+
+.marketing-hero--simple .marketing-hero__copy h1 {
+  max-width: 52rem;
+}
+
+.marketing-hero--simple .booking-search--hero {
+  margin-top: 0;
+  animation: none;
+}
+
+@media (max-width: 700px) {
+  .marketing-hero--simple .marketing-hero__content { padding-block: 5.5rem 1.5rem; }
+}
+
 .hero-promise {
   display: block;
   margin-top: 0.5rem;
