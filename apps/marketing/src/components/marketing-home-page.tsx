@@ -4,9 +4,11 @@ import { RentalDatesProvider } from "@/components/rental-dates-context";
 import { SiteHeader } from "@/components/site-header";
 import { StickyContactMenu } from "@/components/sticky-contact-menu";
 import { TrustContent } from "@/components/trust-content";
+import { CustomerReviews } from "@/components/customer-reviews";
 import { getCarBySlug, getLocalizedCar, marketingCars } from "@/content/cars";
 import { getMessages, localePath, type Locale } from "@/lib/i18n";
 import { absoluteUrl, siteConfig } from "@/lib/site";
+import { vehicleImageSrcSet } from "@/lib/responsive-image";
 
 export function MarketingHomePage({ locale }: { locale: Locale }) {
   const copy = getMessages(locale);
@@ -20,6 +22,7 @@ export function MarketingHomePage({ locale }: { locale: Locale }) {
     return {
       name: `${localizedCar.brand} ${localizedCar.model}`,
       image: localizedCar.image,
+      imageSrcSet: vehicleImageSrcSet(localizedCar.image),
       href: localePath(locale, `/cars/${localizedCar.slug}`),
       category: localizedCar.category,
       year: localizedCar.year,
@@ -34,7 +37,6 @@ export function MarketingHomePage({ locale }: { locale: Locale }) {
     url: absoluteUrl(localePath(locale)),
     description: copy.hero.subtitle,
     inLanguage: copy.htmlLang,
-    telephone: "+66842039140",
     priceRange: "฿฿",
     areaServed: {
       "@type": "AdministrativeArea",
@@ -45,7 +47,7 @@ export function MarketingHomePage({ locale }: { locale: Locale }) {
       addressLocality: "Phuket",
       addressCountry: "TH",
     },
-    sameAs: [siteConfig.telegramBotUrl, siteConfig.whatsappUrl],
+    sameAs: [siteConfig.telegramBotUrl, siteConfig.managerTelegramUrl],
   };
 
   return (
@@ -65,6 +67,7 @@ export function MarketingHomePage({ locale }: { locale: Locale }) {
         />
         <FleetSection locale={locale} previewLimit={3} />
       </RentalDatesProvider>
+      <CustomerReviews locale={locale} />
       <TrustContent locale={locale} />
       <StickyContactMenu locale={locale} />
     </main>

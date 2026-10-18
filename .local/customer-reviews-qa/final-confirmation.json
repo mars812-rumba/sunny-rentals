@@ -1,0 +1,6 @@
+{
+  "mode": "local final production export, Chromium, 390px English homepage",
+  "playback": "passed",
+  "source_error_fallback": "passed",
+  "note": "Recorded after browser assertions completed; the initial report save used a missing relative directory in the isolated build. No production mutation."
+}
