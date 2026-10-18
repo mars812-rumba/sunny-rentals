@@ -99,6 +99,54 @@ freshness. No design-system drift repair is included. New public RU JSON entries
 join the collection on the next release; complete English translations and newly
 generated covers remain explicit editorial work rather than automated output.
 
+## Shared public footer — 18 October 2026
+
+`SiteFooter` is now mounted once in `DocumentLayout` for both Russian and English
+marketing routes, including articles, collections, catalogue/detail, trust pages
+and homepages. Four page-specific footer fragments have been removed, preventing
+missing or duplicate navigation. The existing forest/sand brand palette remains;
+menu items are semantic vertical lists at all widths, with 32px minimum link
+targets and visible keyboard focus. Desktop has brand/navigation/contact columns;
+mobile stacks them. The footer stays in document flow, not fixed over content.
+The legacy public Footer keeps its existing vertical lists and now links to the
+current `/articles/` collection and real rental-policy pages, not broken local
+section anchors. Operational/admin/tenant screens are intentionally untouched.
+
+Owner's density refinement: links are 14px without underlines, with 32px rows and
+no inter-item gap; footer padding is 32px, mobile group gaps 24px. Contact headings
+are 16px. Keyboard focus and hover color remain visible, and the lists stay vertical.
+
+The private editorial preview also renders the shared footer, matching the new
+layout composition. Verification: 24 publication/monthly tests, scoped ESLint
+with no errors, isolated TypeScript check and real local Next/Chromium checks at
+390px and 1440px for representative public RU/EN routes. Reports and screenshots
+are under `.local/footer-qa/`; this is local verification, not a deployed change.
+
+## Article visual refresh — 18 October 2026
+
+Owner feedback supersedes the earlier visible AI-caption policy below: article
+covers now use a short localized reference to the article title. Exact generation
+prompts and origin remain in technical provenance and image EXIF, not repeated
+under every cover. The car-versus-taxi guide has a distinct comparison cover,
+with taxi and rental sides rather than the reviews guide's cafe/key composition.
+Its prompt is in `docs/assets/car-or-taxi-phuket-vs-cover.json`; 1600, 800 and
+480-pixel WebP copies ship in both public roots (174,808 / 69,280 / 32,764 bytes).
+
+Impeccable-informed reading fixes keep the existing Sunny visual identity:
+14px table text, smaller cell padding, normal word wrapping, unbroken numeric
+amounts and keyboard-accessible local horizontal scrolling. The visible scroll
+hint is localized. The published article's prose, humor, prices and low-season
+caveat are unchanged. The editorial profile and memory record these preferences;
+the pipeline can safely replace a recognized leading cover without changing prose.
+
+Verification: 22 Node publication/monthly tests; 5 pipeline and 12 editorial Python
+tests; isolated Next export and checks for 111 canonical URLs, three RU guides,
+real English translations, 150 content/detail pages and both homepages. Chromium
+private SSR checks at 390px and 1440px passed: images load, no page-wide overflow,
+table font is 14px, and all 16 numeric pricing cells occupy one line. This is a
+private preview, not production hydration validation. No deployment or service
+restart was performed.
+
 ## Winter guide revision — 18 October 2026
 
 The screenshot identified `7-luchshih-mest-dlya-zimovschikov-na-phukete`,
