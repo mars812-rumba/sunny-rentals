@@ -1,7 +1,10 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
-const outputDirectory = new URL("../out/", import.meta.url);
+const outputDirectory = process.argv[2]
+  ? pathToFileURL(`${resolve(process.argv[2])}/`)
+  : new URL("../out/", import.meta.url);
 const origin = "https://sunny-rentals.online";
 const errors = [];
 
@@ -108,15 +111,23 @@ for (const entry of entries) {
       errors.push(`${loc}: homepage Twitter locale/copy disagrees with Open Graph`);
     }
     const logo = html.match(/<img\b[^>]*class="brand__logo"[^>]*>/)?.[0] ?? "";
-    if (!/fetchpriority="high"/i.test(logo) || !/width="192"/.test(logo) || !/height="192"/.test(logo)) {
-      errors.push(`${loc}: logo is missing priority or intrinsic dimensions`);
+    if (!/loading="eager"/.test(logo) || !/width="192"/.test(logo) || !/height="192"/.test(logo)) {
+      errors.push(`${loc}: logo is missing eager loading or intrinsic dimensions`);
     }
-    const preload = [...html.matchAll(/<link\b[^>]*>/g)].some(([tag]) =>
-      /rel="preload"/.test(tag) && /href="\/logo\.png\.webp"/.test(tag) && /fetchpriority="high"/i.test(tag),
-    );
-    if (!preload) errors.push(`${loc}: logo preload is missing`);
-    if (!html.includes('rel="preconnect" href="https://fonts.gstatic.com"')) {
-      errors.push(`${loc}: font preconnect is missing`);
+    const links = [...html.matchAll(/<link\b[^>]*>/g)].map(([tag]) => tag);
+    for (const [name, media] of [["kata-sunset-hero.webp", "(min-width: 701px)"], ["kata-sunset-hero-mobile.webp", "(max-width: 700px)"]]) {
+      if (!links.some(tag => /rel="preload"/.test(tag) && /as="image"/.test(tag)
+        && tag.includes(`href="/images/atmosphere/${name}"`) && tag.includes(`media="${media}"`)
+        && /fetchpriority="high"/i.test(tag))) errors.push(`${loc}: responsive high-priority hero preload is missing (${name})`);
+    }
+    for (const subset of pathname === "/" ? ["latin", "cyrillic"] : ["latin"]) {
+      const path = `/fonts/manrope-v20-${subset}.woff2`;
+      if (!links.some(tag => /rel="preload"/.test(tag) && /as="font"/.test(tag)
+        && /crossorigin="anonymous"/i.test(tag) && tag.includes(`href="${path}"`))
+        || !existsSync(new URL(`.${path}`, outputDirectory))) errors.push(`${loc}: local ${subset} font/preload is missing`);
+    }
+    if (/https:\/\/fonts\.(?:googleapis|gstatic)\.com/.test(html)) {
+      errors.push(`${loc}: external Google Fonts request returned`);
     }
     for (const [, path] of html.matchAll(/href="([^"?]+\.css)(?:\?[^" ]*)?"/g)) {
       if (!path.startsWith("/")) continue;

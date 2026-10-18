@@ -2709,11 +2709,17 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
 
 .marketing-hero--simple .booking-search--hero {
   margin-top: 0;
+  /* Generic mobile booking sections add 3.5rem padding later in this file.
+     The inline hero form must not inherit that separate-section spacing. */
+  padding-block: 0;
   animation: none;
 }
 
 @media (max-width: 700px) {
-  .marketing-hero--simple .marketing-hero__content { padding-block: 5.5rem 1.5rem; }
+  .marketing-hero--simple .marketing-hero__content {
+    padding-block: 5.5rem 1.5rem;
+    gap: 1rem;
+  }
 }
 
 .hero-promise {
