@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import { marketingCars } from "@/content/cars";
 import { contentPages } from "@/content/content-pages";
 import { articlesUpdatedAt } from "@/content/articles";
+import { loadPublishedBlogPosts, publishedBlogPath } from "@/content/published-blog";
 import { contentUpdatedAt } from "@/content/rental-policy";
 import { vehicleModelGroups } from "@/content/model-groups";
 import {
@@ -73,5 +74,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  return [...staticPages, ...contentPageEntries, ...carPages];
+  const articlePages: MetadataRoute.Sitemap = languages.flatMap((locale) => loadPublishedBlogPosts(locale).map((post) => ({
+    url: absoluteUrl(publishedBlogPath(post.slug, locale)), lastModified: post.updatedAt ?? post.publishedAt,
+    changeFrequency: "monthly" as const, priority: 0.7,
+    alternates: { languages: { "x-default": absoluteUrl(publishedBlogPath(post.slug, "ru")), ...Object.fromEntries(post.availableLocales.map((language) => [language, absoluteUrl(publishedBlogPath(post.slug, language))])) } },
+  })));
+  return [...staticPages, ...contentPageEntries, ...carPages, ...articlePages];
 }

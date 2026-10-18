@@ -1,0 +1,23 @@
+[
+  {
+    "key": "winter-coast",
+    "prompt": "Use case: photorealistic-natural. Asset type: wide editorial cover for a guide to choosing a Phuket neighbourhood for a winter-long stay. Scene: a broad tropical bay on Phuket's west coast, Andaman Sea, long sandy beach, palms, green hills and low-rise buildings in the distance. Natural clear morning light, realistic water and sand textures, warm but restrained travel editorial photography, horizontal 16:9 composition that reads on mobile. No people, no cars, no resort branding, no logos, no text or rating badges. This is an illustrative imagined Phuket coastal scene, not a documentary photograph of a particular named beach or accommodation.",
+    "origin": "AI-generated editorial illustration, not documentary or property photography",
+    "tool": "built-in image_gen",
+    "file": "winter-coast.webp"
+  },
+  {
+    "key": "winter-harbour",
+    "prompt": "Use case: photorealistic-natural. Asset type: wide in-article editorial image for a Phuket long-stay neighbourhood guide. Scene: a quiet southern Phuket waterfront reminiscent of Rawai, traditional Thai longtail boats moored on calm shallow sea, green island silhouettes on the horizon, a simple shaded promenade in the foreground. Realistic daylight, natural textures, unpolished travel photography, horizontal 16:9, no people, no cars, no visible names, logos or readable text. No fake businesses, no staged customer transactions. Illustration inspired by the area, not a documentary image or guarantee of exact local conditions.",
+    "origin": "AI-generated editorial illustration, not documentary or property photography",
+    "tool": "built-in image_gen",
+    "file": "winter-harbour.webp"
+  },
+  {
+    "key": "winter-inland",
+    "prompt": "Use case: photorealistic-natural. Asset type: wide in-article editorial photograph illustrating everyday inland life in Phuket for a long-stay guide. Scene: a quiet shaded lane in a green inland Phuket neighbourhood, small modest low-rise homes behind tropical planting, lush hills in the background, humid soft morning light, natural lived-in material textures, realistic travel editorial photography. Wide horizontal 16:9. No people, cars, schools or named businesses, no text or logos, no fictional Sunny premises. Illustrative imagined scene, not a photograph of a specific street or rental property.",
+    "origin": "AI-generated editorial illustration, not documentary or property photography",
+    "tool": "built-in image_gen",
+    "file": "winter-inland.webp"
+  }
+]

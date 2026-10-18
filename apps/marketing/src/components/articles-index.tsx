@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { getArticles } from "@/content/articles";
+import { loadPublishedBlogPosts, publishedBlogPath } from "@/content/published-blog";
 import { getCarsByCategory } from "@/content/cars";
 import { getMessages, languageAlternates, localePath, type Locale } from "@/lib/i18n";
 import { absoluteUrl } from "@/lib/site";
@@ -44,6 +45,8 @@ export function ArticlesIndex({ locale }: { locale: Locale }) {
   const text = copy[locale];
   const nav = getMessages(locale).nav;
   const articles = getArticles(locale);
+  const posts = loadPublishedBlogPosts(locale);
+  const russianOnly = locale === "en" ? loadPublishedBlogPosts("ru").filter((post) => !post.availableLocales.includes("en")) : [];
   const photo = getCarsByCategory("compact")[0];
   return (
     <main className="articles-index" lang={locale}>
@@ -56,6 +59,12 @@ export function ArticlesIndex({ locale }: { locale: Locale }) {
         </div>
       </header>
       <div className="shell articles-index__list">
+        {posts.map((post) => <article key={post.slug}>
+          <Link className="articles-index__entry" href={publishedBlogPath(post.slug, locale)}>
+            {post.image ? <Image src={post.image} alt="" width={720} height={480} sizes="(max-width: 700px) 100vw, 520px" /> : null}
+            <div><h2>{post.title}</h2><p>{post.description}</p><small>{text.updated}: <time dateTime={post.updatedAt ?? post.publishedAt}>{(post.updatedAt ?? post.publishedAt).slice(0, 10)}</time></small><span className="articles-index__read">{text.read}</span></div>
+          </Link>
+        </article>)}
         {articles.map((article) => (
           <article key={article.slug}>
             <Link className="articles-index__entry" href={localePath(locale, `/${article.slug}`)}>
@@ -69,6 +78,7 @@ export function ArticlesIndex({ locale }: { locale: Locale }) {
             </Link>
           </article>
         ))}
+        {russianOnly.length ? <section className="articles-index__other-language" aria-labelledby="russian-articles"><h2 id="russian-articles">More articles in Russian</h2><p>These guides are available in Russian; an English translation has not been published.</p><ul>{russianOnly.map((post) => <li key={post.slug}><Link href={publishedBlogPath(post.slug, "ru")} hrefLang="ru" lang="ru">{post.title}</Link></li>)}</ul></section> : null}
       </div>
       <footer className="content-footer">
         <div className="shell">
