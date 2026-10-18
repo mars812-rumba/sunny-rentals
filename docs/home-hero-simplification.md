@@ -13,9 +13,18 @@ no product photographs or catalogue components were deleted.
 
 Impeccable-guided simplification preserves the existing visual identity, form,
 copy, categories, article/review sections and footer. A scoped simple-hero modifier
-removes viewport-height placeholders and the empty second-column layout. The copy
+removes the empty second-column layout and keeps the inner copy/form grid content-sized. The copy
 and form no longer wait for entrance animations. Existing background preloads
 remain media-qualified, with one applicable background per screen size.
+
+Follow-up owner requests: mobile form spacing is 16px after the copy, with no
+inherited 3.5rem booking-section padding. The outer hero now has `min-height:
+100svh` (100vh fallback) so its backdrop reaches the bottom of the first screen.
+Only the outer section stretches: extra height stays below the form, not between
+the heading and form. Content can still grow beyond a short viewport. The header
+is fixed, so no separately guessed header-height subtraction is needed. No new
+imagery or JavaScript was added. Browser gate checks backdrop/hero bounds and the
+unchanged 16px mobile / 24px desktop form gap in RU/EN.
 
 Local production-export comparison (same dependencies, not a live speed test):
 

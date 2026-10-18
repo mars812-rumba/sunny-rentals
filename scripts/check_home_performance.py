@@ -59,12 +59,18 @@ def check(export, output):
                           fleetFollowsHero: document.querySelector('.marketing-hero').nextElementSibling.id === 'fleet',
                           heroImages: document.querySelectorAll('.marketing-hero img').length,
                           formGap: document.querySelector('.booking-search--hero .booking-search__panel').getBoundingClientRect().top - document.querySelector('.marketing-hero__copy').getBoundingClientRect().bottom,
-                          formPadding: getComputedStyle(document.querySelector('.booking-search--hero')).paddingBlock
+                          formPadding: getComputedStyle(document.querySelector('.booking-search--hero')).paddingBlock,
+                          heroBottom: document.querySelector('.marketing-hero').getBoundingClientRect().bottom,
+                          backdropBottom: document.querySelector('.marketing-hero__backdrop').getBoundingClientRect().bottom,
+                          viewportHeight: innerHeight
                         })""")
                         assert checks["h1"] == 1 and not checks["overflow"], checks
                         assert checks["fleetFollowsHero"] and checks["heroImages"] == 0, checks
                         assert checks["formPadding"] == "0px", checks
                         assert 0 <= checks["formGap"] <= (20 if width <= 700 else 28), checks
+                        assert checks["heroBottom"] >= checks["viewportHeight"] - 1, checks
+                        assert checks["backdropBottom"] >= checks["viewportHeight"] - 1, checks
+                        assert abs(checks["heroBottom"] - checks["backdropBottom"]) <= 1, checks
                         assert checks["latinLoaded"] and (locale != "ru" or checks["cyrillicLoaded"]), checks
                         expected = "kata-sunset-hero-mobile.webp" if width <= 700 else "kata-sunset-hero.webp"
                         other = "kata-sunset-hero.webp" if width <= 700 else "kata-sunset-hero-mobile.webp"

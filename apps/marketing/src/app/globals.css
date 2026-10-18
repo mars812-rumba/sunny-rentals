@@ -2685,9 +2685,10 @@ body:has(.vehicle-page) .language-switch a[aria-current="page"] {
   line-height: 0.98;
 }
 
-/* No viewport-height placeholder after removal of the duplicate vehicle rail. */
+/* Fill the first screen with the backdrop, without stretching the copy/form grid. */
 .marketing-hero.marketing-hero--simple {
-  min-height: 0;
+  min-height: 100vh;
+  min-height: 100svh;
 }
 
 .marketing-hero--simple .marketing-hero__content {
