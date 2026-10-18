@@ -38,7 +38,7 @@ export function CustomerReviews({ locale }: { locale: Locale }) {
           <div id="customer-review-quotes" className="customer-reviews__quotes">
             {customerReviews.map((review, position) => <figure key={review.id} hidden={position !== index}>
               <blockquote><p>{review[locale]}</p></blockquote>
-              <figcaption><span>{text.customer}</span>{text.translated ? <small>{text.translated}</small> : null}<a href={`https://t.me/carbook_in_phuket/${review.id}`} target="_blank" rel="noopener noreferrer">{text.original}<span aria-hidden="true"> ↗</span></a></figcaption>
+              <figcaption><span className="customer-reviews__byline"><img className="customer-reviews__social-icon" src="/media/reviews/telegram-transparent.webp" alt="" width={32} height={32} loading="lazy" />{text.customer}</span>{text.translated ? <small>{text.translated}</small> : null}<a href={`https://t.me/carbook_in_phuket/${review.id}`} target="_blank" rel="noopener noreferrer">{text.original}<span aria-hidden="true"> ↗</span></a></figcaption>
             </figure>)}
           </div>
           <div className="customer-reviews__controls">
@@ -46,7 +46,7 @@ export function CustomerReviews({ locale }: { locale: Locale }) {
             <span aria-live="polite" aria-atomic="true">{index + 1} {text.of} {customerReviews.length}</span>
             <button type="button" aria-label={text.next} aria-controls="customer-review-quotes" onClick={() => setIndex((index + 1) % customerReviews.length)}><ChevronRight aria-hidden="true" size={22} /></button>
           </div>
-          <a className="customer-reviews__instagram" href={customerReviewVideo.instagram} target="_blank" rel="noopener noreferrer">{text.instagram}<span aria-hidden="true"> ↗</span></a>
+          <a className="customer-reviews__instagram" href={customerReviewVideo.instagram} target="_blank" rel="noopener noreferrer"><img className="customer-reviews__social-icon" src="/media/reviews/instagram-transparent.webp" alt="" width={28} height={28} loading="lazy" />{text.instagram}<span aria-hidden="true"> ↗</span></a>
         </div>
         <figure className="customer-reviews__film">
           <div className="customer-reviews__player">

@@ -42,12 +42,34 @@ for (const locale of ['ru', 'en']) test(`reviews ${locale}: server-visible quote
   assert.match(html, /aria-live="polite"/);
   assert.match(html, /<button[^>]+aria-label=/);
   assert.match(html, /loading="lazy"/);
+  assert.equal((html.match(/src="\/media\/reviews\/telegram-transparent.webp"/g) || []).length, 7);
+  assert.match(html, /src="\/media\/reviews\/instagram-transparent.webp"/);
   assert.doesNotMatch(html, /<video|<iframe|\.mp4/);
   assert.ok(html.includes(customerReviewVideo.instagram));
   if (locale === 'en') {
     assert.match(html, /Translated from Russian/);
     assert.match(html, /Video in Russian/);
     assert.doesNotMatch(html, /[а-яё]/i);
+  }
+});
+
+test('review social icons have real transparency and preserve opaque white logo marks', async () => {
+  const sharp = requireApp('sharp');
+  for (const name of ['telegram', 'instagram']) {
+    const path = `/media/reviews/${name}-transparent.webp`;
+    const file = readFileSync('public' + path);
+    assert.deepEqual(file, readFileSync('apps/marketing/public' + path));
+    const meta = await sharp(file).metadata();
+    assert.equal(meta.width, 128);
+    assert.equal(meta.height, 128);
+    assert.equal(meta.hasAlpha, true);
+    assert.ok(file.length < 20000);
+    const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    const alpha = (x, y) => data[(y * info.width + x) * 4 + 3];
+    for (const [x, y] of [[0, 0], [127, 0], [0, 127], [127, 127]]) assert.equal(alpha(x, y), 0);
+    let opaqueWhite = 0;
+    for (let offset = 0; offset < data.length; offset += 4) if (data[offset] > 230 && data[offset + 1] > 230 && data[offset + 2] > 230 && data[offset + 3] > 245) opaqueWhite++;
+    assert.ok(opaqueWhite > 300, `${name}: internal white mark was lost`);
   }
 });
 

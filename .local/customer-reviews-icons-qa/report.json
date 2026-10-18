@@ -1,0 +1,89 @@
+{
+  "mode": "local production export, Chromium viewport emulation",
+  "viewports": [
+    {
+      "locale": "ru",
+      "width": 320,
+      "status": "passed",
+      "appearance": {
+        "background": "rgb(237, 245, 246)",
+        "card": "rgb(255, 253, 247)",
+        "shadow": "rgba(8, 47, 73, 0.08) 0px 12px 40px 0px"
+      },
+      "quotes": 7,
+      "video_before_action": 0,
+      "video_playback": false,
+      "pageerrors": []
+    },
+    {
+      "locale": "en",
+      "width": 320,
+      "status": "passed",
+      "appearance": {
+        "background": "rgb(237, 245, 246)",
+        "card": "rgb(255, 253, 247)",
+        "shadow": "rgba(8, 47, 73, 0.08) 0px 12px 40px 0px"
+      },
+      "quotes": 7,
+      "video_before_action": 0,
+      "video_playback": false,
+      "pageerrors": []
+    },
+    {
+      "locale": "ru",
+      "width": 390,
+      "status": "passed",
+      "appearance": {
+        "background": "rgb(237, 245, 246)",
+        "card": "rgb(255, 253, 247)",
+        "shadow": "rgba(8, 47, 73, 0.08) 0px 12px 40px 0px"
+      },
+      "quotes": 7,
+      "video_before_action": 0,
+      "video_playback": true,
+      "pageerrors": []
+    },
+    {
+      "locale": "en",
+      "width": 390,
+      "status": "passed",
+      "appearance": {
+        "background": "rgb(237, 245, 246)",
+        "card": "rgb(255, 253, 247)",
+        "shadow": "rgba(8, 47, 73, 0.08) 0px 12px 40px 0px"
+      },
+      "quotes": 7,
+      "video_before_action": 0,
+      "video_playback": true,
+      "pageerrors": []
+    },
+    {
+      "locale": "ru",
+      "width": 1440,
+      "status": "passed",
+      "appearance": {
+        "background": "rgb(237, 245, 246)",
+        "card": "rgb(255, 253, 247)",
+        "shadow": "rgba(8, 47, 73, 0.08) 0px 12px 40px 0px"
+      },
+      "quotes": 7,
+      "video_before_action": 0,
+      "video_playback": true,
+      "pageerrors": []
+    },
+    {
+      "locale": "en",
+      "width": 1440,
+      "status": "passed",
+      "appearance": {
+        "background": "rgb(237, 245, 246)",
+        "card": "rgb(255, 253, 247)",
+        "shadow": "rgba(8, 47, 73, 0.08) 0px 12px 40px 0px"
+      },
+      "quotes": 7,
+      "video_before_action": 0,
+      "video_playback": true,
+      "pageerrors": []
+    }
+  ]
+}

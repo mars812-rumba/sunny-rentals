@@ -1,0 +1,19 @@
+{
+  "tool": "built-in image_gen",
+  "task": "background-extraction of owner-supplied review source icons",
+  "date": "2026-10-18",
+  "icons": [
+    {
+      "name": "telegram",
+      "original": "/root/.codex/generated_images/01a11c50-09b1-7f61-98c1-2e4aa619918e/exec-81c5531b-0056-4755-bfbe-05a94d89366e.png",
+      "reference": ".codex-telegram/uploads/374897465/screens-1792355167-6f64782b-03.jpg",
+      "prompt": "Use case: background-extraction. Single targeted correction for the supplied Telegram logo. Return a clean flat Telegram icon: a perfectly solid cyan-blue circular disc containing exactly the white paper-plane silhouette from the reference. The ENTIRE circular disc must be fully opaque, uniform cyan-blue, with NO holes, dark patches, texture, lighting, shadows, noise or artifacts. Make ONLY pixels outside the outer circle transparent alpha. Preserve the reference white airplane shape and orientation. Do not redesign, add dimension, alter geometry or add any text. Antialiased clean circular edge, all four outer corners fully transparent. This is a tiny UI logo, not a painting."
+    },
+    {
+      "name": "instagram",
+      "original": "/root/.codex/generated_images/01a11c50-09b1-7f61-98c1-2e4aa619918e/exec-737cff6e-1669-46f7-b866-82b604a441e0.png",
+      "reference": ".codex-telegram/uploads/374897465/screens-1792355168-440d0ac8-04.jpg",
+      "prompt": "Use case: background-extraction. Edit target: the supplied Instagram logo image. Remove ONLY the exterior white canvas around the rounded gradient-square logo and make that exterior truly transparent (alpha). Preserve the exact rounded gradient square in purple, magenta, red, orange and yellow, and preserve ALL white camera outline, white ring and white dot inside the logo. Do not make the internal white camera marks transparent. Keep the logo shape, proportions and colors unchanged; center the full logo with a narrow transparent margin, no crop. No shadow, no checkerboard painted into the image, no text or additional details. Output one clean square transparent-background UI icon."
+    }
+  ]
+}

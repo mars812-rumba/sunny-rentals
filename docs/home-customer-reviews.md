@@ -10,7 +10,7 @@ The testimonial about a replacement remains a customer's account, not a company
 guarantee; the section says individual booking arrangements must be agreed.
 
 `CustomerReviews` is mounted after the fleet on both homepages. Impeccable-guided
-adaptation preserves the site's sand/ocean palette, uses a simple quote/video
+adaptation preserves the site's sand/ocean palette, uses a simple quote-card/video
 composition and stacks it on mobile. Seven server-rendered figures retain source
 links; only the active quote is visible. Native labelled 44px previous/next buttons
 wrap around, retain keyboard focus and announce the position. No auto-advance or
@@ -35,3 +35,29 @@ also checked the unavailable-source error and direct-file fallback. Evidence is 
 `.local/customer-reviews-qa/`. These are emulated browser viewports, not physical
 iOS/Android tests or a deployed-site verification. No publication, commit, push,
 production restart or scheduler changes were performed.
+
+## Owner visual refinement: section emphasis and transparent icons
+
+The reviews now have a pale blue section surface and one sand-colored review
+card with a restrained soft shadow and 16px corners. The card encloses the active
+quote, navigation and Instagram source link; video remains adjacent on desktop
+and stacks below on mobile. Card padding and quote space adapt to the narrower
+reading measure. Neither the seven original quotes nor video was changed.
+
+Telegram is displayed beside the customer/source label; Instagram accompanies
+the highlights link. Both images are decorative next to explicit text labels.
+The owner's uploaded logo images were processed with built-in image_gen in
+background-extraction mode. Transparent exterior corners and opaque white marks
+are checked against decoded pixel data, not inferred from appearance. The
+selected Telegram result excludes an earlier rejected output with a damaged disc.
+Prompt and selected source provenance: `docs/assets/customer-review-icons.json`.
+`prepare-review-icons.mjs` packages 128px lossless WebP files, preserving alpha
+and embedding provenance. Matching files exist in both public roots:
+`/media/reviews/telegram-transparent.webp` (12,686 bytes) and
+`/media/reviews/instagram-transparent.webp` (15,756 bytes). Original uploads and
+legacy icons were not overwritten.
+
+Verification for this refinement: 31 Node tests and isolated production export,
+plus existing SEO/content/article checks. Browser evidence is under
+`.local/customer-reviews-icons-qa/`, covering RU/EN at 320, 390 and 1440px;
+mobile/desktop playback is checked after explicit action. No live release.
