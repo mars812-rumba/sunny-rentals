@@ -13,6 +13,7 @@ PREVIOUS_RELEASE=""
 PREVIOUS_DIST=""
 SWITCHED=0
 DEPLOY_NPM_CACHE="/tmp/sunny-rentals-npm-cache"
+ROLLBACK_RELEASES_TO_KEEP=3
 
 if [[ "${EUID}" -ne 0 ]]; then
   echo "Deploy must run through the privileged production release command."
@@ -56,6 +57,27 @@ rollback() {
 
 trap rollback EXIT
 
+prune_old_releases() {
+  local active_dist active_current release retained=0
+  active_dist="$(readlink -f "${DIST_PATH}" 2>/dev/null || true)"
+  active_dist="${active_dist%/site}"
+  active_current="$(readlink -f "${PROJECT_ROOT}/current" 2>/dev/null || true)"
+
+  while IFS= read -r release; do
+    [[ -d "${release}" ]] || continue
+    if [[ "${release}" == "${active_dist}" || "${release}" == "${active_current}" ]]; then
+      continue
+    fi
+    if ((retained < ROLLBACK_RELEASES_TO_KEEP)); then
+      ((retained += 1))
+      continue
+    fi
+    rm -rf -- "${release}"
+  done < <(
+    find "${RELEASES_ROOT}" -mindepth 1 -maxdepth 1 -type d -printf '%p\n' | sort -r
+  )
+}
+
 mkdir -p "${RELEASE_DIR}/legacy" "${RELEASE_DIR}/site"
 
 echo "Installing Vite dependencies..."
@@ -95,6 +117,7 @@ LEGACY_ROUTES=(
   "offers"
   "platform-admin"
   "p"
+  "owner"
 )
 
 for route in "${LEGACY_ROUTES[@]}"; do
@@ -112,6 +135,8 @@ if [[ -d "${PROJECT_ROOT}/backend/data-v2/tenants" ]]; then
         mkdir -p "${RELEASE_DIR}/site/p/${tenant_id}${park_suffix}"
         cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/p/${tenant_id}${park_suffix}/index.html"
       done
+      mkdir -p "${RELEASE_DIR}/site/owner/${tenant_id}"
+      cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/owner/${tenant_id}/index.html"
     fi
   done < <(find "${PROJECT_ROOT}/backend/data-v2/tenants" -mindepth 1 -maxdepth 1 -type d)
 fi
@@ -119,7 +144,10 @@ fi
 while IFS= read -r content_file; do
   slug="$(basename "${content_file}" .json)"
   mkdir -p "${RELEASE_DIR}/site/blog/${slug}"
-  cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/blog/${slug}/index.html"
+  # Do not overwrite server-rendered articles with the legacy empty SPA shell.
+  if [[ ! -f "${MARKETING_APP}/out/blog/${slug}/index.html" ]]; then
+    cp "${RELEASE_DIR}/legacy/index.html" "${RELEASE_DIR}/site/blog/${slug}/index.html"
+  fi
 done < <(find "${PROJECT_ROOT}/public/content/blog" -maxdepth 1 -type f -name '*.json' ! -name 'index.json')
 
 while IFS= read -r content_file; do
@@ -168,7 +196,18 @@ curl --fail --silent --show-error \
 curl --fail --silent --show-error \
   https://sunny-rentals.online/platform-admin/ >/dev/null
 
+# Article-only Telegram publication calls this release script too. Check the
+# actual canonical pages against this exact export, not a stale local preview.
+# Keep this within the existing release health gate/rollback boundary.
+echo "Checking live articles with Chromium (mobile and desktop)..."
+EDITORIAL_QA_DIR="${PROJECT_ROOT}/.local/seo-editorial/live-${RELEASE_ID}"
+timeout 600 /home/agentic-seo-venv/bin/python \
+  "${PROJECT_ROOT}/scripts/editorial_live_check.py" \
+  --root "${PROJECT_ROOT}" --export "${MARKETING_APP}/out" \
+  --output "${EDITORIAL_QA_DIR}"
+
 trap - EXIT
+prune_old_releases
 
 echo "Sunny Rentals static Next.js release ${RELEASE_ID} is active."
 echo "Previous release: ${PREVIOUS_RELEASE:-none}"

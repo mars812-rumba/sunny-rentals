@@ -37,7 +37,13 @@ whole price amounts especially. Repeat after text, cover or style changes. A
 passing private SSR preview is not proof of production hydration or live delivery.
 After separately authorized publication, perform a read-only check of the actual
 canonical page and record separate evidence; until then live verification remains
-pending. This rule does not install a post-publication scheduler or enable publishing.
+pending. `deploy.sh` now invokes `scripts/editorial_live_check.py` after switching
+the release and before completing its existing health/rollback gate. It compares
+every indexed article and exported English translation against that release's HTML,
+at both widths, with a 600-second overall timeout. Reports/screenshots are private
+under `.local/seo-editorial/live-<release>/`. This is a release hook, not a new cron
+or permission to publish. Activating these source changes requires the owner's
+ordinary release; no service restart is needed for this script-based hook.
 
 Public canonical paths: `/articles/<slug>/`; `/blog/<slug>/` is compatibility only.
 English: `/en/articles/<slug>/` only with translation. Output must match
