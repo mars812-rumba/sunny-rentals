@@ -4,6 +4,15 @@ Scope: Phuket car rental for tourists. Scheduled drafts are Russian; English pag
 require a real translation and localized links. Speak as our team: «мы», «у нас»,
 «наш прокат»; address the reader as «вы». Do not repeat the brand in every paragraph.
 
+Language approval order: prepare and revise Russian first. Start an English
+adaptation only after the owner approves the specific Russian revision; a draft
+in review, silence or scheduled generation is not approval. Translate the approved
+revision, preserving facts, prices, seasonal caveats and meaning while adapting
+phrasing and humor naturally. If Russian changes afterward, recheck the English
+against the newly approved revision. Russian approval permits English preparation,
+not English publication; retain the existing owner-review and browser QA gates.
+This is an editorial rule, not an automatic translation/publishing hook.
+
 Confirmed company terms: `apps/marketing/src/content/rental-policy.ts`. Actual
 photos and seasonal rates: supplied public inventory. A file read is not confirmation
 of availability, freshness from the supplier or the final price for specific dates.

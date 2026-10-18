@@ -16,3 +16,12 @@ project preferences and portable editorial lessons.
   switching preserves the article when a translation exists.
 - General: avoid walls of text; use short sections and purposeful visuals. Real
   inventory photos and generated illustrative scenes are not interchangeable.
+- Project: use distinct, topic-led covers rather than repeating a cafe/key still
+  life. The car-vs-taxi article should visually compare those choices. Public
+  captions refer briefly to the article title; technical provenance stays recorded.
+- Project: compact article tables must preserve whole words and amounts on phones;
+  use local horizontal scrolling instead of crushing columns or splitting digits.
+- Project: Russian approval comes before English preparation. Adapt only the
+  owner's approved Russian revision, never a parallel unfinished draft. Preserve
+  prices and low-season caveats, localize wording/humor and links, then run the
+  English review/browser checks. Approval of Russian is not publication permission.
