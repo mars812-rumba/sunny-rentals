@@ -19,10 +19,25 @@ and the existing `/long-term-car-rental-phuket/`. Verify model URLs before linki
 Keep district comparisons together rather than generating near-duplicate pages.
 
 Visuals: preserve Sunny's existing reading style. Real fleet photos represent cars;
-AI destination scenes must be labelled illustrative. Choose tables, checklists or
+Generated scenes must not be presented as documentary evidence. Public image
+captions should briefly refer to the article title, without repeated AI notices;
+preserve exact prompts, tools and origin in private/technical provenance. Choose tables, checklists or
 diagrams when they explain the topic. Do not invent asset URLs. The current JSON-only
-generator cannot execute shell commands, generate image files, run Python SEO scripts
-or browser tests. Those need a separate permitted stage, not claims in research_notes.
+writer cannot execute shell commands, generate image files, run Python SEO scripts
+or browser tests. After writing, the host generator runs the separate private
+asset/SSR/Chromium gate. `config/seo-visuals.json` selects prepared assets, with an
+explicit shared travel-planning fallback. Fresh unattended API image generation is
+not enabled. Never claim that a shared illustration was newly generated per article.
+
+Every article and revision requires the article-editor browser readability gate.
+The existing host gate uses `scripts/editorial_browser.py` at 390px and 1440px,
+saving private screenshots and `browser-report.json`; an editor must also inspect
+those screenshots before calling the layout visually approved. Check tables and
+whole price amounts especially. Repeat after text, cover or style changes. A
+passing private SSR preview is not proof of production hydration or live delivery.
+After separately authorized publication, perform a read-only check of the actual
+canonical page and record separate evidence; until then live verification remains
+pending. This rule does not install a post-publication scheduler or enable publishing.
 
 Public canonical paths: `/articles/<slug>/`; `/blog/<slug>/` is compatibility only.
 English: `/en/articles/<slug>/` only with translation. Output must match
