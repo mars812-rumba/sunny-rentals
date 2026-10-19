@@ -141,28 +141,27 @@ test('owner workspace does not render platform management controls', () => {
   assert.match(html, /Свободная техника на даты/);
   assert.match(html, /Дата начала/);
   assert.match(html, /Дата окончания/);
-  // Both mounted panels have their own period filter: requests and fleet.
-  assert.equal((html.match(/type="date"/g) || []).length, 4);
-  assert.match(html, /Сбросить даты/);
+  // Requests are lazy-mounted; only the fleet period filter exists initially.
+  assert.equal((html.match(/type="date"/g) || []).length, 2);
   assert.match(html, /Сбросить/);
   assert.doesNotMatch(html, /id="asset-rate"|id="asset-deposit"/);
   assert.match(html, /role="tablist"[^>]+aria-label="Управление парком"/);
   assert.equal((html.match(/role="tab"/g) || []).length, 3);
   assert.match(html, /aria-selected="false"[^>]*>[\s\S]*?Автопарк<\/button>/);
-  assert.match(html, /aria-selected="false"[^>]*>[\s\S]*?Календарь<\/button>/);
+  assert.match(html, /aria-selected="true"[^>]*>[\s\S]*?Календарь<\/button>/);
   assert.match(html, /data-\[state=active\]:bg-blue-700/);
   assert.match(html, /lucide-car-front/);
   assert.match(html, /lucide-calendar-days/);
   assert.match(html, /lucide-clipboard-list/);
-  assert.match(html, /aria-selected="true"[^>]*>[\s\S]*?Заявки<\/button>/);
+  assert.match(html, /aria-selected="false"[^>]*>[\s\S]*?Заявки<\/button>/);
   const tablist = html.match(/role="tablist"[\s\S]*?<\/div>/)[0];
-  assert.ok(tablist.indexOf('Заявки') < tablist.indexOf('Календарь'));
-  assert.ok(tablist.indexOf('Календарь') < tablist.indexOf('Автопарк'));
+  assert.ok(tablist.indexOf('Календарь') < tablist.indexOf('Заявки'));
+  assert.ok(tablist.indexOf('Заявки') < tablist.indexOf('Автопарк'));
   assert.match(tablist, /mx-auto/);
   assert.match(tablist, /max-w-xl/);
   assert.match(html, /Загружаем заявки/);
   assert.match(html, /role="tabpanel"/);
-  assert.doesNotMatch(html, /Загружаем календарь|Добавить бронь \/ блокировку/);
+  assert.doesNotMatch(html, /Добавить бронь \/ блокировку/);
   assert.doesNotMatch(html, /Все прокаты|Подготовить превью|Логотип проката|Webhook|<h1/);
 });
 
@@ -186,9 +185,9 @@ test('superadmin uses the same three working tabs with separate collapsed park s
   }));
   assert.equal((html.match(/role="tab"/g) || []).length, 3);
   const tablist = html.match(/role="tablist"[\s\S]*?<\/div>/)[0];
-  assert.ok(tablist.indexOf('Заявки') < tablist.indexOf('Календарь'));
-  assert.ok(tablist.indexOf('Календарь') < tablist.indexOf('Автопарк'));
-  assert.match(html, /aria-selected="true"[^>]*>[\s\S]*?Заявки<\/button>/);
+  assert.ok(tablist.indexOf('Календарь') < tablist.indexOf('Заявки'));
+  assert.ok(tablist.indexOf('Заявки') < tablist.indexOf('Автопарк'));
+  assert.match(html, /aria-selected="true"[^>]*>[\s\S]*?Календарь<\/button>/);
   assert.match(html, /Настройки подключения и оформления<\/summary>/);
   assert.match(html, /<details class="mt-5">/);
   assert.match(html, /Подготовить превью витрины/);

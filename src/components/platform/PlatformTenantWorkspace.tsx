@@ -13,7 +13,7 @@ import { ParkBookingCalendar } from './ParkBookingCalendar';
 import { ParkRequestsPanel } from './ParkRequestsPanel';
 import { ParkTrialStatus } from './ParkTrialStatus';
 import { PlatformTenantActions } from './PlatformTenantActions';
-import { VehicleDetailsEditor, VehicleSpecSummary } from './VehicleDetailsEditor';
+import { VehicleDetailsEditor, VehicleSpecSummary, VehicleLicensePlateField } from './VehicleDetailsEditor';
 import { ParkDateField } from './ParkDateField';
 import { DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ParkFormSheet, ParkFormSheetContent } from './ParkFormSheet';
@@ -37,7 +37,7 @@ const TYPES: Record<AssetType, string> = {
   car: "Автомобиль", scooter: "Электросамокат", motorcycle: "Мотоцикл / скутер",
   bicycle: "Велосипед", snowmobile: "Снегоход", other: "Другая техника",
 };
-const blank = (type: AssetType): PlatformAssetInput => ({ name: "", asset_type: type, brand: "", model: "", year: null, color: "", daily_rate: 0, deposit: 0, public: false });
+const blank = (type: AssetType): PlatformAssetInput => ({ name: "", asset_type: type, brand: "", model: "", year: null, color: "", license_plate: "", daily_rate: 0, deposit: 0, public: false });
 const minimumRate = minimumVehicleRate;
 const message = (error: unknown) => error instanceof Error ? error.message : pt("Не удалось сохранить. Повторите попытку.");
 const primaryButton = "min-h-11 rounded-lg bg-blue-700 text-white hover:bg-blue-800";
@@ -73,9 +73,9 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
 }) {
   const { pt, intlLocale } = useParkLocale();
   const [assets, setAssets] = useState<PlatformAsset[]>([]);
-  const [section, setSection] = useState('requests');
-  const [calendarVisited, setCalendarVisited] = useState(false);
-  const [requestsVisited, setRequestsVisited] = useState(true);
+  const [section, setSection] = useState('calendar');
+  const [calendarVisited, setCalendarVisited] = useState(true);
+  const [requestsVisited, setRequestsVisited] = useState(false);
   const [calendarRevision, setCalendarRevision] = useState(0);
   const filterId = useId();
   const [fleetPeriod, setFleetPeriod] = useState({ start: '', end: '' });
@@ -140,7 +140,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
     setForm(asset === "new" ? blank(tenant.primary_asset_type) : {
       name: asset.name, asset_type: asset.asset_type, brand: asset.specs.brand || "", model: asset.specs.model || "",
       year: asset.specs.year || null, color: asset.specs.color || "", daily_rate: asset.pricing.daily_rate || 0, deposit: asset.deposit_policy.amount || 0,
-      public: asset.public,
+      public: asset.public, license_plate: asset.license_plate || '',
     });
     if (editingId === (asset === "new" ? "new" : asset.id)) nameInput.current?.focus();
   };
@@ -255,8 +255,8 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
 
       <Tabs value={section} onValueChange={(value) => { setSection(value); if (value === 'calendar') setCalendarVisited(true); if (value === 'requests') setRequestsVisited(true); setCalendarRevision(current => current + 1); }} activationMode="manual" className="mt-6 min-w-0">
         <TabsList aria-label={pt("Управление парком")} className="mx-auto grid h-auto w-full max-w-xl grid-cols-3 gap-1 rounded-xl bg-slate-200/70 p-1">
-          <TabsTrigger value="requests" className={workspaceTab}><ClipboardList aria-hidden="true" className="h-4 w-4" />{pt("Заявки")}</TabsTrigger>
           <TabsTrigger value="calendar" className={workspaceTab}><CalendarDays aria-hidden="true" className="h-4 w-4" />{pt("Календарь")}</TabsTrigger>
+          <TabsTrigger value="requests" className={workspaceTab}><ClipboardList aria-hidden="true" className="h-4 w-4" />{pt("Заявки")}</TabsTrigger>
           <TabsTrigger value="fleet" className={workspaceTab}><CarFront aria-hidden="true" className="h-4 w-4" />{pt("Автопарк")}</TabsTrigger>
         </TabsList>
         <TabsContent value="fleet" forceMount hidden={section !== 'fleet'} className="mt-6 data-[state=inactive]:hidden">
@@ -275,7 +275,8 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
             {filteredAssets.map((asset) => <VehicleCardFrame key={asset.id} assetId={asset.id} media={<div className="relative">{asset.photos.main ? <PrivateImage owner={owner} tenantId={tenant.tenant_id} reference={asset.photos.main} alt={asset.name} className="aspect-[16/10] w-full object-cover" /> : <div className="grid aspect-[16/10] place-items-center bg-slate-100"><CarFront className="text-slate-500" aria-hidden="true" /></div>}<FleetPhotoActions name={asset.name} busy={busy} onEdit={() => edit(asset)} onArchive={() => { setArchiveError(''); setArchiveTarget(asset); }} /></div>}>
               <CardContent className="flex flex-1 flex-col gap-4 p-4">
               <div className="min-w-0 flex-1"><h3 className="break-words text-lg font-semibold leading-snug">{asset.name}</h3><p className="mt-2 flex items-center gap-2 text-sm text-slate-600"><CarFront aria-hidden="true" className="h-4 w-4 shrink-0" />{pt(TYPES[asset.asset_type])}</p><p className="mt-3 flex items-center gap-2 text-base font-semibold tabular-nums text-blue-700"><Banknote aria-hidden="true" className="h-4 w-4 shrink-0" />{activeVehicleGrid(asset) ? pt("от ") : ''}{minimumRate(asset).toLocaleString(intlLocale)} {tenant.currency}{pt("/день")}</p><p className="mt-2 flex items-center gap-2 text-sm tabular-nums text-slate-600"><WalletCards aria-hidden="true" className="h-4 w-4 shrink-0" />{pt("Депозит: ")}{asset.deposit_policy.amount || 0} {tenant.currency}</p></div>
-              <VehicleSpecSummary specs={asset.specs} photoCount={asset.photos.gallery?.length || 0} licensePlate={asset.license_plate} />
+              {asset.license_plate && <p className="break-words text-sm font-medium text-slate-700">{pt('Госномер: {0}', [asset.license_plate])}</p>}
+              <VehicleSpecSummary specs={asset.specs} photoCount={asset.photos.gallery?.length || 0} />
               {activeVehicleGrid(asset) && <p className="text-sm text-slate-600">{vehiclePricingMode(asset) === 'duration' ? pt("Тарифы по сроку") : pt("Сезонная сетка")} {pt(" · 4 диапазона аренды")}</p>}
               <FleetCardActions name={asset.name} visible={asset.public} busy={busy} onDetails={(section, trigger) => { detailTrigger.current = trigger; setDetailEditor({ asset, section }); }} onVisibility={() => void visibility(asset)} />
               <p className={`flex items-center gap-2 text-sm ${asset.public ? 'text-emerald-700' : 'text-slate-600'}`}>{asset.public ? <Eye aria-hidden="true" className="h-4 w-4 shrink-0" /> : <EyeOff aria-hidden="true" className="h-4 w-4 shrink-0" />}{asset.public ? pt("Показывается клиентам") : pt("Скрыто с витрины")}</p>
@@ -291,6 +292,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
               <div><Label htmlFor="asset-kind">{pt("Тип транспорта")}</Label><select id="asset-kind" className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm focus:outline-cyan-600" value={form.asset_type} onChange={(e) => setForm({ ...form, asset_type: e.target.value as AssetType })}>{Object.entries(TYPES).map(([value, label]) => <option key={value} value={value}>{pt(label)}</option>)}</select></div>
               <div><Label htmlFor="asset-year">{pt("Год выпуска")}</Label><Input id="asset-year" type="number" min={1950} max={2100} value={form.year ?? ""} onChange={(e) => setForm({ ...form, year: e.target.value ? Number(e.target.value) : null })} className="mt-2" /></div>
               {([ ["brand", "Марка"], ["model", "Модель"], ["color", "Цвет"] ] as const).map(([field, label]) => <div key={field}><Label htmlFor={`asset-${field}`}>{pt(label)}</Label><Input id={`asset-${field}`} maxLength={80} value={form[field]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} className="mt-2" /></div>)}
+              <VehicleLicensePlateField id="asset" value={form.license_plate || ''} onChange={license_plate => setForm({ ...form, license_plate })} />
               <div className="sm:col-span-2"><label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={Boolean(form.public)} onChange={(event) => setForm({ ...form, public: event.target.checked })} className="h-4 w-4 accent-blue-700 focus-visible:outline focus-visible:outline-2" />{pt("Показывать на витрине")}</label><p className="mt-2 text-sm text-slate-600">{pt("После публикации парка машина, её цены и фотографии станут доступны по публичной ссылке.")}</p></div>
             </fieldset>
             <p className="mt-4 text-sm text-slate-600">{pt("Цены и депозит настраиваются только через «Действия → Цены» в карточке. После создания техники настройте тарифы перед приёмом заявок.")}</p>
