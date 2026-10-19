@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from replace_ar_booking_schedule import SOURCE, merged_periods, plan, run, sha
+from replace_ar_booking_schedule import SOURCE, confirm_imported_rentals, correct_xpander_year, merged_periods, plan, run, sha
 from platform_core.models import RentalAsset, Booking
 from platform_core.provisioning import PlatformContext, TenantProvisioner, TenantProvisionRequest, _atomic_json_write
 
@@ -76,6 +76,33 @@ class ARScheduleReplacementTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'hashes'):
             run(self.root, self.source_path, True, now=self.now)
 
+    def test_owner_year_correction_preserves_other_records_and_is_idempotent(self):
+        self.apply(run(self.root, self.source_path, now=self.now))
+        report = confirm_imported_rentals(self.root, expected_count=2, now=self.now)
+        confirm_imported_rentals(self.root, True, report['bookings_sha256'], expected_count=2, now=self.now)
+        original = self.bookings_path.read_bytes()
+        before = json.loads(original)['items']
+        report = correct_xpander_year(self.root, now=self.now)
+        self.assertEqual(self.bookings_path.read_bytes(), original)
+        with self.assertRaisesRegex(ValueError, 'hash'):
+            correct_xpander_year(self.root, True, 'stale', now=self.now)
+        with patch('replace_ar_booking_schedule.JsonlEventRepository.append', side_effect=RuntimeError('audit failed')):
+            with self.assertRaisesRegex(RuntimeError, 'audit failed'):
+                correct_xpander_year(self.root, True, report['bookings_sha256'], now=self.now)
+        self.assertEqual(json.loads(self.bookings_path.read_text())['items'], before)
+        report = correct_xpander_year(self.root, now=self.now)
+        result = correct_xpander_year(self.root, True, report['bookings_sha256'], now=self.now)
+        after = json.loads(self.bookings_path.read_text())['items']
+        self.assertEqual((Path(result['backup']) / 'bookings.json').read_bytes(), original)
+        self.assertEqual(after[1], before[1])
+        for key in ['id', 'booking_number', 'asset_id', 'status', 'deposit', 'entry_type', 'customer_id']:
+            self.assertEqual(after[0][key], before[0][key])
+        self.assertEqual(after[0]['pricing']['start_date'], '2027-01-31')
+        self.assertEqual(after[0]['pricing']['end_date'], '2027-02-22')
+        self.assertEqual(after[0]['pricing']['days'], 22)
+        self.assertEqual(Booking.parse_obj(after[0]).start_at.hour, 2)
+        self.assertTrue(correct_xpander_year(self.root, True, now=self.now)['already_corrected'])
+
     def test_ambiguous_match_invalid_dates_and_audit_failure_leave_old_schedule(self):
         before = self.bookings_path.read_bytes()
         ambiguous = {**self.source, 'vehicles': self.source['vehicles'] + [self.source['vehicles'][0]]}
@@ -95,3 +122,28 @@ class ARScheduleReplacementTests(unittest.TestCase):
         self.assertEqual(str(groups[0][0]), '2026-09-04')
         self.assertEqual(str(groups[0][1]), '2027-09-13')
         self.assertEqual(len(groups[0][2]), 2)
+
+    def test_conversion_preserves_dates_ids_amounts_and_retries_without_changes(self):
+        self.apply(run(self.root, self.source_path, now=self.now))
+        before = json.loads(self.bookings_path.read_text())
+        report = confirm_imported_rentals(self.root, expected_count=2)
+        self.assertEqual(report['converted'], 2)
+        self.assertEqual(json.loads(self.bookings_path.read_text()), before)
+        with self.assertRaisesRegex(ValueError, 'hash'):
+            confirm_imported_rentals(self.root, True, 'wrong', expected_count=2)
+        with patch('replace_ar_booking_schedule.JsonlEventRepository.append', side_effect=OSError('audit')):
+            with self.assertRaises(OSError):
+                confirm_imported_rentals(self.root, True, report['bookings_sha256'], expected_count=2)
+        self.assertEqual(json.loads(self.bookings_path.read_text()), before)
+        result = confirm_imported_rentals(self.root, True, report['bookings_sha256'], expected_count=2)
+        self.assertEqual(result['converted'], 2)
+        after = json.loads(self.bookings_path.read_text())
+        for old, new in zip(before['items'], after['items']):
+            self.assertEqual(new['entry_type'], 'rental')
+            for field in ['status', 'id', 'booking_number', 'asset_id', 'start_at', 'end_at', 'customer_id', 'deposit']:
+                self.assertEqual(new[field], old[field])
+            self.assertEqual(new['pricing']['total_rental'], old['pricing']['total_rental'])
+            self.assertEqual(new['pricing']['pickup']['time'], '09:00')
+        raw = self.bookings_path.read_bytes()
+        self.assertEqual(confirm_imported_rentals(self.root, True, expected_count=2)['converted'], 0)
+        self.assertEqual(self.bookings_path.read_bytes(), raw)

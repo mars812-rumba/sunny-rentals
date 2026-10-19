@@ -166,6 +166,138 @@ def run(root, source_path, apply=False, expected_bookings=None, expected_assets=
         return report
 
 
+def confirm_imported_rentals(root, apply=False, expected_bookings=None, expected_count=48, now=None):
+    """Change the imported entry type only; never invent clients, charges or payments."""
+    root = Path(root).resolve()
+    context = TenantContext.for_actor(TENANT, 'AR-schedule-replacement', {'platform_admin'})
+    provisioner = TenantProvisioner(root)
+    repo = JsonCollectionRepository(root, context, 'bookings.json', Booking)
+    timestamp = now or utc_now()
+    with provisioner._locked(), repo.storage.exclusive(repo.path):
+        tenant = next((item for item in provisioner._load_state().tenants if item.tenant_id == TENANT and item.archived_at is None), None)
+        if tenant is None:
+            raise ValueError('AR tenant unavailable')
+        original = repo.path.read_bytes()
+        previous = repo._read_document()
+        document = json.loads(json.dumps(previous))
+        targets = [item for item in document['items'] if item.get('legacy', {}).get('schedule_replacement') == SOURCE]
+        if len(targets) != expected_count:
+            raise ValueError('Unexpected imported record count; stop')
+        changed = []
+        for item in targets:
+            context.require_record_tenant(item.get('tenant_id'))
+            if item['entry_type'] == 'rental':
+                continue
+            if item['entry_type'] != 'block' or item['status'] != 'confirmed' or item.get('archived_at'):
+                raise ValueError('Imported record was changed; stop instead of resurrecting it')
+            item['entry_type'] = 'rental'
+            item['legacy'].update(converted_to_rental=True, customer_not_provided=not bool(item.get('customer_id')),
+                                  agreed_price_not_provided=True)
+            item['pricing'].setdefault('pickup', {'time': '09:00', 'return_time': '09:00', 'address': '', 'return_address': ''})
+            note = item['operator_details'].get('note', '')
+            item['operator_details']['note'] = note.replace(
+                'Occupancy only; customer and rental price were not provided.',
+                'Confirmed rental. Customer and agreed rental price were not provided; zero amounts are placeholders, not a recorded payment.')
+            item['updated_at'] = timestamp.isoformat()
+            Booking.parse_obj(item)
+            changed.append(item['id'])
+        report = {'applied': False, 'converted': len(changed), 'bookings_sha256': sha(original)}
+        if not apply or not changed:
+            return report
+        if expected_bookings != sha(original):
+            raise ValueError('Approval hash missing or schedule changed; repeat dry run')
+        backup_parent = root / 'backups' / TENANT
+        if not backup_parent.resolve().is_relative_to(root):
+            raise ValueError('Invalid backup path')
+        backup_parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        backup = Path(tempfile.mkdtemp(prefix='confirmed-rentals-', dir=backup_parent))
+        (backup / 'bookings.json').write_bytes(original)
+        audit = repo.path.parent / 'audit.jsonl'
+        if audit.exists():
+            (backup / 'audit.jsonl').write_bytes(audit.read_bytes())
+        try:
+            repo._write_document(document)
+            JsonlEventRepository(root, context, 'audit.jsonl').append({
+                'schema_version': 1, 'type': 'imported_blocks_converted_to_rentals',
+                'actor_id': context.actor_id, 'timestamp': timestamp.isoformat(),
+                'source': SOURCE, 'booking_ids': changed, 'backup': str(backup)})
+        except Exception:
+            repo._write_document(previous)
+            raise
+        return {**report, 'applied': True, 'backup': str(backup)}
+
+
+def correct_xpander_year(root, apply=False, expected_bookings=None, now=None):
+    """Owner-confirmed correction of one imported rental, not a schedule reimport."""
+    root = Path(root).resolve()
+    context = TenantContext.for_actor(TENANT, 'AR-owner-date-correction', {'platform_admin'})
+    repo = JsonCollectionRepository(root, context, 'bookings.json', Booking)
+    timestamp = now or utc_now()
+    old_dates = ('2026-01-31', '2026-02-22')
+    new_dates = ('2027-01-31', '2027-02-22')
+    with TenantProvisioner(root)._locked(), repo.storage.exclusive(repo.path):
+        original = repo.path.read_bytes()
+        previous = repo._read_document()
+        document = json.loads(json.dumps(previous))
+        candidates = [item for item in document['items']
+                      if item.get('legacy', {}).get('schedule_replacement') == SOURCE
+                      and item['legacy'].get('registration_number') == '2600'
+                      and (item.get('pricing', {}).get('start_date'), item.get('pricing', {}).get('end_date'))
+                      in (old_dates, new_dates)]
+        if len(candidates) != 1:
+            raise ValueError('No unique imported Xpander period; stop')
+        item = candidates[0]
+        context.require_record_tenant(item.get('tenant_id'))
+        if item.get('entry_type') != 'rental' or item.get('status') != 'confirmed' or item.get('archived_at'):
+            raise ValueError('Rental changed; stop')
+        corrected = item['pricing']['start_date'] == new_dates[0]
+        report = {'applied': False, 'already_corrected': corrected, 'booking_id': item['id'],
+                  'bookings_sha256': sha(original), 'old_dates': old_dates, 'new_dates': new_dates}
+        if corrected:
+            return report
+        before = Booking.parse_obj(item)
+        zone = ZoneInfo('Asia/Bangkok')
+        if (before.start_at.astimezone(zone).date().isoformat(), before.end_at.astimezone(zone).date().isoformat()) != old_dates:
+            raise ValueError('Stored timestamps differ from expected dates; stop')
+        start = before.start_at.astimezone(zone).replace(year=2027).astimezone(timezone.utc)
+        end = before.end_at.astimezone(zone).replace(year=2027).astimezone(timezone.utc)
+        for other in document['items']:
+            record = Booking.parse_obj(other)
+            if record.id != before.id and record.asset_id == before.asset_id and not record.archived_at and record.status != BookingStatus.CANCELLED:
+                if record.start_at < end and record.end_at > start:
+                    raise ValueError('Corrected dates overlap another rental; stop')
+        item.update(start_at=start.isoformat(), end_at=end.isoformat(), updated_at=timestamp.isoformat())
+        item['pricing'].update(start_date=new_dates[0], end_date=new_dates[1], days=(end - start).days)
+        # Preserve the source snapshot literally and record the owner's later correction separately.
+        item['legacy']['owner_date_correction'] = {'old_dates': old_dates, 'new_dates': new_dates,
+                                                  'confirmed_at': timestamp.isoformat()}
+        item['operator_details']['note'] = item['operator_details'].get('note', '') + ' Owner confirmed year correction: 31 Jan–22 Feb 2027 (not 2026).'
+        Booking.parse_obj(item)
+        if not apply:
+            return report
+        if expected_bookings != sha(original):
+            raise ValueError('Approval hash missing or schedule changed; repeat dry run')
+        parent = root / 'backups' / TENANT
+        if not parent.resolve().is_relative_to(root):
+            raise ValueError('Invalid backup path')
+        parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        backup = Path(tempfile.mkdtemp(prefix='xpander-year-', dir=parent))
+        (backup / 'bookings.json').write_bytes(original)
+        audit = repo.path.parent / 'audit.jsonl'
+        if audit.exists():
+            (backup / 'audit.jsonl').write_bytes(audit.read_bytes())
+        try:
+            repo._write_document(document)
+            JsonlEventRepository(root, context, 'audit.jsonl').append({
+                'schema_version': 1, 'type': 'owner_booking_year_corrected', 'actor_id': context.actor_id,
+                'timestamp': timestamp.isoformat(), 'booking_id': item['id'],
+                'old_dates': old_dates, 'new_dates': new_dates, 'backup': str(backup)})
+        except Exception:
+            repo._write_document(previous)
+            raise
+        return {**report, 'applied': True, 'backup': str(backup)}
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, required=True)
