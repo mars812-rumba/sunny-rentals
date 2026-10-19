@@ -246,8 +246,10 @@ test('calendar view buttons separate timetable from delivery calendar and remove
  }
  const source = readFileSync(resolve('src/components/platform/ParkBookingCalendar.tsx'), 'utf8');
  assert.match(source, /useState\('timetable'\)/);
- assert.match(source, /<TabsContent value="timetable"[\s\S]*<SchedulerCalendar[\s\S]*initialScrollDate=\{initialScrollDate\}/);
- assert.match(source, /<TabsContent value="deliveries"[\s\S]*<MonthCalendarView/);
+ assert.match(source, /const timetable = useMemo\(\(\) => <SchedulerCalendar[\s\S]*initialScrollDate=\{initialScrollDate\}/);
+ assert.match(source, /const deliveries = useMemo\(\(\) => <MonthCalendarView/);
+ assert.match(source, /<TabsContent value="timetable" forceMount[\s\S]*\{timetable\}/);
+ assert.match(source, /<TabsContent value="deliveries" forceMount[\s\S]*\{deliveries\}/);
  assert.doesNotMatch(source, /<TabsContent value="list"/);
 });
 
@@ -560,13 +562,13 @@ test('timetable and deliveries keep shared month and asset filter in separate pa
  const timetable = source.match(/<TabsContent value="timetable"[\s\S]*?<\/TabsContent>/)?.[0];
  const deliveries = source.match(/<TabsContent value="deliveries"[\s\S]*?<\/TabsContent>/)?.[0];
  assert.ok(timetable); assert.ok(deliveries);
- assert.match(timetable, /<SchedulerCalendar/); assert.doesNotMatch(timetable, /<MonthCalendarView/);
+ assert.match(timetable, /\{timetable\}/); assert.doesNotMatch(timetable, /\{deliveries\}/);
  assert.match(timetable, /<ParkCalendarLegend view="timetable"/);
- assert.match(deliveries, /<MonthCalendarView/); assert.doesNotMatch(deliveries, /<SchedulerCalendar/);
+ assert.match(deliveries, /\{deliveries\}/); assert.doesNotMatch(deliveries, /\{timetable\}/);
  assert.match(deliveries, /<ParkCalendarLegend view="deliveries"/);
- assert.match(deliveries, /currentDate=\{date\}/);
- assert.match(timetable, /startDate=\{date\}/);
- assert.match(timetable, /cars=\{cars\.filter\(car => !assetId \|\| car\.id === assetId\)\}/);
+ assert.match(source, /<MonthCalendarView currentDate=\{date\}/);
+ assert.match(source, /<SchedulerCalendar[^\n]*startDate=\{date\}/);
+ assert.match(source, /cars=\{cars\.filter\(car => !assetId \|\| car\.id === assetId\)\}/);
  assert.match(source, /timetableFocusDay\(month, today\)/);
 });
 

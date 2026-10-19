@@ -50,7 +50,7 @@ test('plate belongs to basic editing, not the characteristics editor or public s
   const editor = details.slice(details.indexOf('export function VehicleDetailsEditor('));
   assert.doesNotMatch(editor, /<VehicleLicensePlateField|license_plate/);
   const workspace = readFileSync('src/components/platform/PlatformTenantWorkspace.tsx', 'utf8');
-  assert.match(workspace, /<VehicleBasicFields data=\{form\}/);
+  assert.match(workspace, /<VehicleBasicDraftFields initialData=\{form\}/);
   const basic = readFileSync('src/components/platform/VehicleBasicFields.tsx', 'utf8');
   assert.match(basic, /<VehicleLicensePlateField id=\{id\} value=\{data.license_plate/);
   assert.match(workspace, /license_plate: asset.license_plate \|\| ''/);

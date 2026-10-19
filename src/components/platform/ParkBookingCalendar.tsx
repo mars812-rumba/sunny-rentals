@@ -1,7 +1,7 @@
 import { parkText } from '@/lib/park-locale';
 import { parkText as pt } from '@/lib/park-locale';
 import { useParkLocale } from '@/contexts/park-locale';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { Ref } from 'react';
 import { addDays, addMonths, format, startOfMonth } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -32,6 +32,7 @@ import { subscribeParkCalendar } from '@/lib/park-calendar-updates';
 import { parkToday, dateLabel } from '@/lib/park-rental';
 import { timetableFocusDay } from '@/lib/scheduler-scroll';
 import { parkBookingColors } from '@/lib/park-booking-colors';
+import { retainCalendarSnapshot, startParkCalendarPolling } from '@/lib/park-calendar-refresh';
 
 const statuses: Record<string, string> = { requested: 'Ожидает подтверждения', confirmed: 'Подтверждено', cancelled: 'Отменено', in_progress: 'В аренде', completed: 'Завершено' };
 
@@ -43,7 +44,13 @@ export function ParkCalendarMonthSelect({ id, month, onChange }: { id: string; m
   </select>;
 }
 
-export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0, timezone = 'Asia/Bangkok' }: { tenantId: string; admin?: boolean; fleetRevision?: number; timezone?: string }) {
+type ParkCalendarProps = { tenantId: string; admin?: boolean; fleetRevision?: number; timezone?: string; refreshEnabled?: boolean };
+export const ParkBookingCalendar = memo(function ParkBookingCalendar(props: ParkCalendarProps) {
+  // Reset all snapshots and requests when switching tenant or access mode.
+  return <ParkBookingCalendarContent key={`${props.tenantId}:${!!props.admin}`} {...props} />;
+});
+
+function ParkBookingCalendarContent({ tenantId, admin = false, fleetRevision = 0, timezone = 'Asia/Bangkok', refreshEnabled = true }: ParkCalendarProps) {
   const { pt, dateLocale } = useParkLocale();
   const id = useId();
   const [bookings, setBookings] = useState<ParkBooking[]>([]);
@@ -52,6 +59,7 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
   const [month, setMonth] = useState(() => today.slice(0, 7));
   const [assetId, setAssetId] = useState('');
   const [view, setView] = useState('timetable');
+  const [deliveriesVisited, setDeliveriesVisited] = useState(false);
   const [selection, setSelection] = useState<{ bookingId?: string; day?: string } | null>(null);
   const [draft, setDraft] = useState<{ day?: string; endDay?: string; assetId?: string } | null>(null);
   const [success, setSuccess] = useState('');
@@ -60,23 +68,34 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
   const draftTrigger = useRef<HTMLElement | null>(null);
   const wasDraft = useRef(false);
   useEffect(() => { if (wasDraft.current && !draft) { const trigger = draftTrigger.current; (trigger?.isConnected ? trigger : createButton.current)?.focus({ preventScroll: true }); } wasDraft.current = !!draft; }, [draft]);
-  const openDraft = (value: { day?: string; endDay?: string; assetId?: string }) => {
+  const openDraft = useCallback((value: { day?: string; endDay?: string; assetId?: string }) => {
     draftTrigger.current = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : createButton.current;
     setSelection(null); setSuccess(''); setDraft(value);
-  };
+  }, []);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [reload, setReload] = useState(0);
+  const loaded = useRef(false);
+  const inFlight = useRef<AbortController | null>(null);
   useEffect(() => subscribeParkCalendar(tenantId, () => setReload(value => value + 1)), [tenantId]);
   useEffect(() => {
+    if (!refreshEnabled || busy || draft || selection || cancelTarget) return;
+    return startParkCalendarPolling(() => { if (!inFlight.current) setReload(value => value + 1); });
+  }, [refreshEnabled, busy, draft, selection, cancelTarget]);
+  useEffect(() => {
     const controller = new AbortController();
-    setLoading(true); setError(''); setSelection(null);
+    inFlight.current = controller;
+    setLoading(!loaded.current); setError('');
     Promise.all([fetchParkCalendar(tenantId, admin, controller.signal), admin ? listPlatformAssets(tenantId) : fetchOwnerFleet(tenantId, controller.signal).then(result => result.assets)])
-      .then(([items, fleet]) => { if (!controller.signal.aborted) { setBookings(items); setAssets(fleet); } })
+      .then(([items, fleet]) => { if (!controller.signal.aborted) {
+        loaded.current = true;
+        setBookings(previous => retainCalendarSnapshot(previous, items));
+        setAssets(previous => retainCalendarSnapshot(previous, fleet));
+      } })
       .catch((failure) => { if (!controller.signal.aborted) { setBookings([]); setError(failure instanceof Error ? failure.message : parkText("Не удалось загрузить календарь.")); } })
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
-    return () => controller.abort();
+      .finally(() => { if (inFlight.current === controller) inFlight.current = null; if (!controller.signal.aborted) setLoading(false); });
+    return () => { controller.abort(); if (inFlight.current === controller) inFlight.current = null; };
   }, [tenantId, admin, reload, fleetRevision]);
   const action = async (booking: ParkBooking, status: 'confirmed' | 'cancelled') => {
     setBusy(true); setError('');
@@ -95,6 +114,22 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
   const date = useMemo(() => startOfMonth(new Date(`${month}-01T00:00:00`)), [month]);
   const focusDay = timetableFocusDay(month, today);
   const initialScrollDate = useMemo(() => new Date(`${focusDay}T00:00:00`), [focusDay]);
+  const cellsDisabled = loading || busy || !!draft;
+  // Stable element identities let React skip rebuilding these heavy views when
+  // just the tab, selection dialog or an unrelated parent field changes.
+  const timetable = useMemo(() => <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly pageScroll
+    dayCellsDisabled={cellsDisabled}
+    onDayCellClick={(carId, clickedDate) => {
+      if (cellsDisabled) return;
+      const day = format(clickedDate, 'yyyy-MM-dd');
+      const existing = timetableCellBooking(active, carId, day);
+      if (existing) setSelection({ bookingId: existing.id });
+      else if (assets.some(asset => asset.id === carId)) openDraft({ day, endDay: format(addDays(clickedDate, 1), 'yyyy-MM-dd'), assetId: carId });
+    }}
+    renderCarPhoto={car => <ParkCalendarPhoto key={`${tenantId}:${car.id}:${photos.get(car.id) || ''}`} tenantId={tenantId} reference={photos.get(car.id)} admin={admin} />} />,
+  [cars, assetId, active, date, initialScrollDate, cellsDisabled, assets, openDraft, tenantId, photos, admin]);
+  const deliveries = useMemo(() => <MonthCalendarView currentDate={date} bookings={monthBookings} logisticsData={active.map(calendarLogistics)} onDateChange={value => setMonth(format(value, 'yyyy-MM'))} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onDayClick={value => setSelection({ day: format(value, 'yyyy-MM-dd') })} showOccupancy handoversOnly />,
+  [date, monthBookings, active]);
   const selected = selection?.bookingId ? filtered.filter(item => item.id === selection.bookingId) : selection?.day ? filtered.filter(item => item.status !== 'cancelled' && item.entry_type !== 'block' && (item.pricing.start_date === selection.day || item.pricing.end_date === selection.day)) : [];
   const details = (items: ParkBooking[]) => <ul className="mt-2 divide-y divide-slate-200">{items.map((booking) => booking.entry_type !== 'block' ? <ParkRequestItem key={booking.id} booking={booking} tenantId={tenantId} admin={admin} photoReference={photos.get(booking.asset_id)} detailed busy={busy || loading || !!draft} onAction={(item, status) => { if (status === 'cancelled') setCancelTarget(item); else void action(item, status); }} /> : <li key={booking.id} className="py-4">
     <h3 className="break-words font-semibold">{booking.pricing.asset_name || booking.asset_id}</h3><p className="mt-1">{dateLabel(booking.pricing.start_date)} — {dateLabel(booking.pricing.end_date)} · {pt(statuses[booking.status] || booking.status)}</p>
@@ -119,30 +154,21 @@ export function ParkBookingCalendar({ tenantId, admin = false, fleetRevision = 0
       setBookings(items => [...items.filter(item => item.id !== booking.id), booking]); setMonth(booking.pricing.start_date.slice(0, 7)); setDraft(null);
       setSuccess(booking.entry_type === 'block' ? pt("Блокировка занятости") : booking.status === 'requested' ? pt("Предбронь создана. Даты заняты до подтверждения или отмены.") : pt("Подтверждённая бронь создана и видна во всех видах календаря."));
     }} />}
-    {loading ? <p role="status" className="mt-4">{pt("Загружаем заявки…")}</p> : !error && <Tabs value={view} onValueChange={setView} className="mt-3">
+    {loading ? <p role="status" className="mt-4">{pt("Загружаем заявки…")}</p> : !error && <Tabs value={view} onValueChange={value => { setView(value); if (value === 'deliveries') setDeliveriesVisited(true); }} className="mt-3">
       <ParkCalendarViewButtons />
-      <TabsContent value="timetable" className="mt-3 min-w-0">
+      <TabsContent value="timetable" forceMount hidden={view !== 'timetable'} className="mt-3 min-w-0 data-[state=inactive]:hidden">
         <ParkCalendarLegend view="timetable" />
         <section aria-labelledby={`${id}-gantt-title`} className="-mx-4 min-w-0 sm:mx-0">
           <h3 id={`${id}-gantt-title`} className="sr-only">{pt('Таймтейбл')}</h3>
-          <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly pageScroll
-            dayCellsDisabled={loading || busy || !!draft}
-            onDayCellClick={(carId, clickedDate) => {
-              if (loading || busy || draft) return;
-              const day = format(clickedDate, 'yyyy-MM-dd');
-              const existing = timetableCellBooking(active, carId, day);
-              if (existing) setSelection({ bookingId: existing.id });
-              else if (assets.some(asset => asset.id === carId)) openDraft({ day, endDay: format(addDays(clickedDate, 1), 'yyyy-MM-dd'), assetId: carId });
-            }}
-            renderCarPhoto={car => <ParkCalendarPhoto key={`${tenantId}:${car.id}:${photos.get(car.id) || ''}`} tenantId={tenantId} reference={photos.get(car.id)} admin={admin} />} />
+          {timetable}
         </section>
       </TabsContent>
-      <TabsContent value="deliveries" className="mt-5 min-w-0">
+      {deliveriesVisited && <TabsContent value="deliveries" forceMount hidden={view !== 'deliveries'} className="mt-5 min-w-0 data-[state=inactive]:hidden">
         <h3 className="mb-2 text-lg font-semibold">{pt("Календарь доставок")}</h3>
         <p className="mb-3 text-sm leading-6 text-slate-600">{format(date, 'LLLL yyyy', { locale: dateLocale })} {pt(" · Нажмите день или заявку.")}</p>
         <ParkCalendarLegend view="deliveries" />
-        <MonthCalendarView currentDate={date} bookings={monthBookings} logisticsData={active.map(calendarLogistics)} onDateChange={value => setMonth(format(value, 'yyyy-MM'))} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onDayClick={value => setSelection({ day: format(value, 'yyyy-MM-dd') })} showOccupancy handoversOnly />
-      </TabsContent>
+        {deliveries}
+      </TabsContent>}
     </Tabs>}
 <Dialog open={!!selection} onOpenChange={open => { if (!open) setSelection(null); }}><DialogContent aria-describedby={undefined} closeLabel={pt("Закрыть заявку")} closeButtonClassName="right-2 top-2 flex size-11 items-center justify-center" onCloseAutoFocus={event => { if (draft) event.preventDefault(); }} ><DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 text-balance"><ClipboardList aria-hidden="true" className="size-5 shrink-0 text-blue-700" />{selection?.day ? pt("События {0}", [dateLabel(selection.day)]) : pt("Заявка парка")}</DialogTitle></DialogHeader>{selected.length ? details(selected) : <p>{pt("На этот день событий нет.")}</p>}{selection?.day && <Button disabled={!!draft || loading || busy || !assets.length} onClick={() => { setDraft({ day: selection.day, assetId }); setSelection(null); setSuccess(''); }}><Plus aria-hidden="true" />{pt("Добавить запись на этот день")}</Button>}{error && <p role="alert" className="text-sm text-rose-800">{pt(error)}</p>}</DialogContent></Dialog>
     <AlertDialog open={!!cancelTarget} onOpenChange={open => { if (!open && !busy) setCancelTarget(null); }}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{cancelTarget?.entry_type === 'block' ? pt("Снять блокировку?") : pt("Отменить заявку?")}</AlertDialogTitle><AlertDialogDescription>{pt("Период на ")}{cancelTarget?.pricing.asset_name} {pt(" освободится для других клиентов. Автоматическое сообщение клиенту не отправляется.")}</AlertDialogDescription></AlertDialogHeader>{error && <p role="alert" className="text-sm text-rose-800">{pt(error)}</p>}<AlertDialogFooter><AlertDialogCancel disabled={busy}>{pt("Оставить без изменений")}</AlertDialogCancel><AlertDialogAction disabled={busy} className="bg-red-700 text-white hover:bg-red-800" onClick={event => { event.preventDefault(); if (cancelTarget) void action(cancelTarget, 'cancelled').then(ok => { if (ok) setCancelTarget(null); }); }}>{busy ? pt("Отменяем…") : pt("Подтвердить отмену")}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>

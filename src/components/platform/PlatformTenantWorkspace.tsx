@@ -1,13 +1,13 @@
 import { parkText as pt } from '@/lib/park-locale';
 import { useParkLocale } from '@/contexts/park-locale';
-import { FormEvent, useEffect, useId, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useId, useRef, useState } from "react";
 import { ArrowLeft, CarFront, CalendarDays, CheckCircle2, Eye, EyeOff, ImageIcon, Loader2, Plus, RefreshCw, Store, WalletCards, Banknote, Save, X, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ParkWorkspaceNavigation, type ParkWorkspaceSection } from './ParkWorkspaceNavigation';
-import { VehicleBasicFields } from './VehicleBasicFields';
+import { VehicleBasicDraftFields } from './VehicleBasicFields';
 import { FleetVehicleIdentity } from './FleetVehicleIdentity';
 import { PlatformParkTelegramPanel } from './PlatformParkTelegramPanel';
 import { PlatformParkWebAccessPanel } from './PlatformParkWebAccessPanel';
@@ -94,7 +94,14 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
   const nameInput = useRef<HTMLInputElement>(null);
   const editingId = editing === "new" ? "new" : editing?.id;
   useEffect(() => { if (editingId) nameInput.current?.focus(); }, [editingId]);
-  const [form, setForm] = useState<PlatformAssetInput>(blank(tenant.primary_asset_type));
+  const [form, setFormState] = useState<PlatformAssetInput>(blank(tenant.primary_asset_type));
+  const formDraft = useRef(form);
+  const onDraftChange = useCallback((data: PlatformAssetInput) => { formDraft.current = data; }, []);
+  const setForm = (update: PlatformAssetInput | ((current: PlatformAssetInput) => PlatformAssetInput)) => {
+    const data = typeof update === 'function' ? update(formDraft.current) : update;
+    formDraft.current = data;
+    setFormState(data);
+  };
   const [archiveTarget, setArchiveTarget] = useState<PlatformAsset | null>(null);
   const [archiveError, setArchiveError] = useState("");
   const Heading = owner ? 'h2' : 'h1';
@@ -149,7 +156,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
     setBusy(true);
     setEditorError("");
     try {
-      const asset = await (owner ? saveOwnerAsset : savePlatformAsset)(tenant.tenant_id, fleetBasicInput(form), editing === "new" ? undefined : editing.id);
+      const asset = await (owner ? saveOwnerAsset : savePlatformAsset)(tenant.tenant_id, fleetBasicInput(formDraft.current), editing === "new" ? undefined : editing.id);
       replaceAsset(asset);
       setEditing(asset);
       toast.success(pt("Техника сохранена. Можно добавить фотографии."));
@@ -220,7 +227,6 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
     setSection(value);
     if (value === 'calendar') setCalendarVisited(true);
     if (value === 'requests') setRequestsVisited(true);
-    setCalendarRevision(current => current + 1);
     requestAnimationFrame(() => {
       screenStart.current?.focus({ preventScroll: true });
       screenStart.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
@@ -295,7 +301,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
           <form onSubmit={save} className="mt-5">
             <fieldset disabled={busy} className="min-w-0">
               <legend className="sr-only">{pt('Данные автомобиля')}</legend>
-              <VehicleBasicFields data={form} onChange={setForm} nameInput={nameInput} />
+              <VehicleBasicDraftFields initialData={form} onDraftChange={onDraftChange} nameInput={nameInput} />
             </fieldset>
             <p className="mt-4 text-sm text-slate-600">{pt("Цены и депозит настраиваются только через «Действия → Цены» в карточке. После создания техники настройте тарифы перед приёмом заявок.")}</p>
             <div className="park-sheet-actions mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className="min-h-11 rounded-lg bg-emerald-700 text-white hover:bg-emerald-800">{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />} {pt(" Сохранить технику")}</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}><X aria-hidden="true" />{pt("Закрыть редактор")}</Button></div>
@@ -310,7 +316,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
       </section>
         </div>
         {calendarVisited && <div hidden={section !== 'calendar'} className={`mt-6 min-w-0 ${section !== 'calendar' ? 'hidden' : ''}`}>
-          <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} fleetRevision={calendarRevision} timezone={tenant.timezone} />
+          <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} fleetRevision={calendarRevision} timezone={tenant.timezone} refreshEnabled={section === 'calendar' && !editing && !detailEditor} />
         </div>}
         {requestsVisited && <div hidden={section !== 'requests'} className={`mt-6 min-w-0 ${section !== 'requests' ? 'hidden' : ''}`}>
           <ParkRequestsPanel key={`requests-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} assets={assets} revision={calendarRevision} onCreated={() => setCalendarRevision(value => value + 1)} />

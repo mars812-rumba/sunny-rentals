@@ -1,4 +1,4 @@
-import { useId, type Ref, type ReactNode } from 'react';
+import { useEffect, useId, useState, type Ref, type ReactNode } from 'react';
 import { CalendarDays, CarFront, Eye, Factory, IdCard, Palette, Settings2, Type, type LucideIcon } from 'lucide-react';
 import type { AssetType, PlatformAssetInput } from '@/api/platform-admin';
 import { useParkLocale } from '@/contexts/park-locale';
@@ -8,6 +8,13 @@ export const vehicleAssetTypeLabels: Record<AssetType, string> = {
   car: 'Автомобиль', scooter: 'Электросамокат', motorcycle: 'Мотоцикл / скутер',
   bicycle: 'Велосипед', snowmobile: 'Снегоход', other: 'Другая техника',
 };
+
+/** Keystrokes stay inside the editor, not the fleet/calendar workspace. */
+export function VehicleBasicDraftFields({ initialData, onDraftChange, nameInput }: { initialData: PlatformAssetInput; onDraftChange: (data: PlatformAssetInput) => void; nameInput?: Ref<HTMLInputElement> }) {
+  const [draft, setDraft] = useState(initialData);
+  useEffect(() => setDraft(initialData), [initialData]);
+  return <VehicleBasicFields data={draft} nameInput={nameInput} onChange={data => { setDraft(data); onDraftChange(data); }} />;
+}
 
 function FieldLabel({ htmlFor, icon: Icon, children }: { htmlFor: string; icon: LucideIcon; children: ReactNode }) {
   return <label htmlFor={htmlFor} className="flex items-center gap-2 text-sm font-medium text-slate-900"><Icon aria-hidden="true" className="size-4 shrink-0 text-slate-600" />{children}</label>;
