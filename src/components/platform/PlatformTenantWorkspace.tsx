@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ParkWorkspaceNavigation, type ParkWorkspaceSection } from './ParkWorkspaceNavigation';
-import { VehicleBasicFields, vehicleAssetTypeLabels as TYPES } from './VehicleBasicFields';
+import { VehicleBasicFields } from './VehicleBasicFields';
+import { FleetVehicleIdentity } from './FleetVehicleIdentity';
 import { PlatformParkTelegramPanel } from './PlatformParkTelegramPanel';
 import { PlatformParkWebAccessPanel } from './PlatformParkWebAccessPanel';
 import { ParkBookingCalendar } from './ParkBookingCalendar';
@@ -280,8 +281,7 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredAssets.map((asset) => <VehicleCardFrame key={asset.id} assetId={asset.id} media={<div className="relative">{asset.photos.main ? <PrivateImage owner={owner} tenantId={tenant.tenant_id} reference={asset.photos.main} alt={asset.name} className="aspect-[16/10] w-full object-cover" /> : <div className="grid aspect-[16/10] place-items-center bg-slate-100"><CarFront className="text-slate-500" aria-hidden="true" /></div>}<FleetPhotoActions name={asset.name} busy={busy} onEdit={() => edit(asset)} onArchive={() => { setArchiveError(''); setArchiveTarget(asset); }} /></div>}>
               <CardContent className="flex flex-1 flex-col gap-4 p-4">
-              <div className="min-w-0 flex-1"><h3 className="break-words text-lg font-semibold leading-snug">{asset.name}</h3><p className="mt-2 flex items-center gap-2 text-sm text-slate-600"><CarFront aria-hidden="true" className="h-4 w-4 shrink-0" />{pt(TYPES[asset.asset_type])}</p><p className="mt-3 flex items-center gap-2 text-base font-semibold tabular-nums text-blue-700"><Banknote aria-hidden="true" className="h-4 w-4 shrink-0" />{activeVehicleGrid(asset) ? pt("от ") : ''}{minimumRate(asset).toLocaleString(intlLocale)} {tenant.currency}{pt("/день")}</p><p className="mt-2 flex items-center gap-2 text-sm tabular-nums text-slate-600"><WalletCards aria-hidden="true" className="h-4 w-4 shrink-0" />{pt("Депозит: ")}{asset.deposit_policy.amount || 0} {tenant.currency}</p></div>
-              {asset.license_plate && <p className="break-words text-sm font-medium text-slate-700">{pt('Госномер: {0}', [asset.license_plate])}</p>}
+              <div className="min-w-0 flex-1"><FleetVehicleIdentity asset={asset} /><p className="mt-3 flex items-center gap-2 text-base font-semibold tabular-nums text-blue-700"><Banknote aria-hidden="true" className="h-4 w-4 shrink-0" />{activeVehicleGrid(asset) ? pt("от ") : ''}{minimumRate(asset).toLocaleString(intlLocale)} {tenant.currency}{pt("/день")}</p><p className="mt-2 flex items-center gap-2 text-sm tabular-nums text-slate-600"><WalletCards aria-hidden="true" className="h-4 w-4 shrink-0" />{pt("Депозит: ")}{asset.deposit_policy.amount || 0} {tenant.currency}</p></div>
               <VehicleSpecSummary specs={asset.specs} photoCount={asset.photos.gallery?.length || 0} />
               {activeVehicleGrid(asset) && <p className="text-sm text-slate-600">{vehiclePricingMode(asset) === 'duration' ? pt("Тарифы по сроку") : pt("Сезонная сетка")} {pt(" · 4 диапазона аренды")}</p>}
               <FleetCardActions name={asset.name} visible={asset.public} busy={busy} onDetails={(section, trigger) => { detailTrigger.current = trigger; setDetailEditor({ asset, section }); }} onVisibility={() => void visibility(asset)} />

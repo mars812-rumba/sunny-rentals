@@ -11,6 +11,7 @@ const bundle = await build({ stdin: { contents: `
   export { VehicleSpecSummary } from './src/components/platform/VehicleDetailsEditor';
   export { VehicleLicensePlateField, VehicleBasicFields } from './src/components/platform/VehicleBasicFields';
   export { ParkWorkspaceNavigation } from './src/components/platform/ParkWorkspaceNavigation';
+  export { FleetVehicleIdentity } from './src/components/platform/FleetVehicleIdentity';
   export { ParkLocaleProvider } from './src/contexts/ParkLocaleContext';
   export { saveOwnerAsset } from './src/api/park-owner-fleet';
   export { fleetBasicInput } from './src/lib/fleet-asset';
@@ -71,6 +72,25 @@ test('basic input preserves intentional clearing but omits plate on visibility-o
   const base = { name: 'Toyota', asset_type: 'car', brand: '', model: '', year: null, color: '', public: true };
   assert.ok(!Object.hasOwn(ui.fleetBasicInput(base), 'license_plate'));
   assert.equal(ui.fleetBasicInput({ ...base, license_plate: '' }).license_plate, '');
+});
+
+test('private fleet card shows one escaped plate with the vehicle type directly below its name', () => {
+  for (const language of ['ru', 'en']) {
+    const html = render(ui.FleetVehicleIdentity, { asset: { name: 'Toyota Veloz', asset_type: 'car', license_plate: 'กจ 2490 พังงา <script>' } }, language);
+    assert.match(html, /<h3[^>]*>Toyota Veloz<\/h3>/);
+    assert.match(html, /lucide-car-front/);
+    assert.match(html, /flex-wrap/);
+    assert.match(html, /break-words/);
+    assert.ok(html.indexOf('</h3>') < html.indexOf('กจ 2490'));
+    assert.equal((html.match(/กจ 2490/g) || []).length, 1);
+    assert.ok(html.includes(language === 'ru' ? 'Госномер: ' : 'Plate: '));
+    assert.match(html, /&lt;script&gt;/);
+    assert.doesNotMatch(html, /<script>/);
+    for (const license_plate of [undefined, null, '', '   ']) {
+      const empty = render(ui.FleetVehicleIdentity, { asset: { name: 'Toyota', asset_type: 'car', license_plate } }, language);
+      assert.doesNotMatch(empty, /Госномер:|Plate:|·/);
+    }
+  }
 });
 
 test('basic vehicle editor groups all fields with linked icon labels in RU and EN', () => {
