@@ -29,6 +29,8 @@ except ImportError:
 
 # Import our new modules
 from user_tracker import UserTracker
+from lead_registry import register_bot_contact
+from outreach_delivery import OutreachDeliveryError, TELEGRAM_DESCRIPTIONS
 from admin_commands import AdminCommands
 import random
 
@@ -1166,6 +1168,24 @@ def handle_start(message):
 
     # === ОБЫЧНЫЙ ПОЛЬЗОВАТЕЛЬ - чистый чат ===
 
+    source = 'telegram_web'
+    message_text = message.text or ''
+    if ' ' in message_text:
+        source = message_text.split(' ', 1)[1]
+
+    # Любой вошедший в бота остаётся в активной базе или в архиве CRM.
+    try:
+        data_directory = Path(__file__).resolve().parent / "data"
+        register_bot_contact(
+            data_directory / "user_data.json",
+            data_directory / "archive.json",
+            user_id=user_id,
+            username=username,
+            source=source,
+        )
+    except Exception as error:
+        print(f"❌ Не удалось сохранить вход пользователя {user_id}: {error}")
+
     # Удаляем команду /start
     try:
         bot.delete_message(chat_id, message.message_id)
@@ -1173,11 +1193,6 @@ def handle_start(message):
         pass
 
     # Existing bookings do not prevent another vehicle/date selection.
-
-    # Трекаем вход
-    source = 'telegram_web'
-    if ' ' in message.text:
-        source = message.text.split(' ', 1)[1]
 
     webapp_url = URL_WEBAPP
     if source.startswith(("sr1_", "sr2_")) and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", source):
@@ -2489,9 +2504,14 @@ async def internal_send_message(request: Request):
         
         return JSONResponse(content={"status": "ok", "message": "Message sent successfully"})
         
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"❌ Error in internal_send_message: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        failure = OutreachDeliveryError.from_exception(e)
+        print(f"❌ Error in internal_send_message: {failure.reason}")
+        return JSONResponse(status_code=failure.error_code if failure.error_code in {400, 401, 403, 429} else 503,
+                            content={"status": "error", **failure.as_event(),
+                                     "description": TELEGRAM_DESCRIPTIONS.get(failure.reason, "")})
     
 # === ДУБЛИРУЮЩИЙ ОБРАБОТЧИК - ЗАКОММЕНТИРОВАН (дублировал фото на порт 8000)
 # @bot.message_handler(content_types=['photo'])

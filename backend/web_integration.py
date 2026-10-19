@@ -50,6 +50,7 @@ from customer_outreach_campaign import (
     load_recipients as load_outreach_recipients,
     select_recipient_batch,
 )
+from outreach_delivery import ERROR_LABELS, OutreachDeliveryError, failure_from_response
 from claude_dialog import (
     build_pricing_context,
     find_offered_car_main_photo,
@@ -2615,12 +2616,19 @@ def _outreach_status_payload() -> Dict[str, Any]:
     activated = sum(
         1 for user_id in recipients if campaign_state.get(user_id, {}).get("claude_active")
     )
+    excluded = sum(1 for user_id in recipients
+                   if not campaign_state.get(user_id, {}).get("delivered")
+                   and campaign_state.get(user_id, {}).get("excluded"))
+    retry_after = max([0] + [max(0, int(state.get("retry_at", 0) - time.time()) + 1)
+                            for state in campaign_state.values() if state.get("retry_at", 0) > time.time()])
     return {
         "campaign_id": OUTREACH_CAMPAIGN_ID,
         "audience": len(recipients),
         "delivered": delivered,
         "claude_active": activated,
-        "remaining": max(0, len(recipients) - delivered),
+        "remaining": max(0, len(recipients) - delivered - excluded),
+        "excluded": excluded,
+        "retry_after": retry_after,
         "default_count": 20,
         "max_batch": OUTREACH_BATCH_MAX,
         "message": OUTREACH_GREETING,
@@ -2658,7 +2666,15 @@ def _deliver_outreach_greeting(user_id: int) -> bool:
         timeout=15,
         headers={"Content-Type": "application/json"},
     )
-    return response.status_code == 200
+    if response.status_code != 200:
+        raise failure_from_response(response)
+    try:
+        payload = response.json()
+    except ValueError:
+        payload = {}
+    if not isinstance(payload, dict) or payload.get("status") != "ok":
+        raise OutreachDeliveryError(description="Missing delivery confirmation")
+    return True
 
 
 @app.get(API_PREFIX + "/crm/outreach/status")
@@ -2675,12 +2691,17 @@ def send_outreach_batch(request: OutreachSendRequest, _: str = Depends(admin_req
     try:
         recipients = load_outreach_recipients(DATA)
         campaign_state = load_campaign_state(OUTREACH_LOG_JSONL)
+        if any(state.get("retry_at", 0) > time.time() for state in campaign_state.values()):
+            raise HTTPException(status_code=429, detail="Действует лимит Telegram. Повторите рассылку позже.")
         batch = select_recipient_batch(recipients, campaign_state, request.count)
         delivered_count = 0
         activated_count = 0
         activation_retried = 0
         failed_count = 0
         errors = []
+        error_counts = {}
+        attempted_count = 0
+        permanent_failed = 0
 
         for user_id, state in campaign_state.items():
             if user_id not in recipients or not state.get("delivered") or state.get("claude_active"):
@@ -2705,14 +2726,18 @@ def send_outreach_batch(request: OutreachSendRequest, _: str = Depends(admin_req
                     log_dialog_event(user_id, "claude_resumed", {"by": "outreach_campaign_retry"})
                 else:
                     failed_count += 1
+                    retry_event.update({"error_reason": "activation_failed", "error": ERROR_LABELS["activation_failed"]})
+                    error_counts["activation_failed"] = error_counts.get("activation_failed", 0) + 1
             except Exception as error:
                 failed_count += 1
-                retry_event["error"] = str(error)
-                errors.append({"user_id": user_id, "error": str(error)})
+                retry_event.update({"error_reason": "activation_failed", "error": ERROR_LABELS["activation_failed"]})
+                error_counts["activation_failed"] = error_counts.get("activation_failed", 0) + 1
+                errors.append({"user_id": user_id, "error": ERROR_LABELS["activation_failed"]})
             finally:
                 append_outreach_event(OUTREACH_LOG_JSONL, retry_event)
 
         for user_id, source_record in batch:
+            attempted_count += 1
             event = {
                 "campaign_id": OUTREACH_CAMPAIGN_ID,
                 "timestamp": datetime.now(UTC).isoformat(),
@@ -2749,13 +2774,27 @@ def send_outreach_batch(request: OutreachSendRequest, _: str = Depends(admin_req
                     log_dialog_event(user_id, "claude_resumed", {"by": "outreach_campaign"})
                 else:
                     failed_count += 1
-                    errors.append({"user_id": user_id, "error": "Claude status was not saved"})
+                    event.update({"error_reason": "activation_failed", "error": ERROR_LABELS["activation_failed"]})
+                    error_counts["activation_failed"] = error_counts.get("activation_failed", 0) + 1
+                    errors.append({"user_id": user_id, "error": ERROR_LABELS["activation_failed"]})
+            except OutreachDeliveryError as error:
+                failed_count += 1
+                event.update(error.as_event())
+                if error.retry_after:
+                    event["retry_at"] = time.time() + error.retry_after
+                permanent_failed += int(error.permanent)
+                error_counts[error.reason] = error_counts.get(error.reason, 0) + 1
+                errors.append({"user_id": user_id, **error.as_event()})
             except Exception as error:
                 failed_count += 1
-                event["error"] = str(error)
-                errors.append({"user_id": user_id, "error": str(error)})
+                reason = "activation_failed" if event["delivered"] else "delivery_unavailable"
+                event.update({"error": ERROR_LABELS[reason], "error_reason": reason})
+                error_counts[reason] = error_counts.get(reason, 0) + 1
+                errors.append({"user_id": user_id, "error": ERROR_LABELS[reason]})
             finally:
                 append_outreach_event(OUTREACH_LOG_JSONL, event)
+            if event.get("error_reason") in {"rate_limited", "bot_unauthorized", "delivery_unavailable"}:
+                break
             time.sleep(0.2)
 
         campaign_payload = _outreach_status_payload()
@@ -2764,10 +2803,15 @@ def send_outreach_batch(request: OutreachSendRequest, _: str = Depends(admin_req
             "status": "ok",
             "requested": request.count,
             "selected": len(batch),
+            "attempted": attempted_count,
             "delivered": delivered_count,
             "claude_active": activated_count,
             "activation_retried": activation_retried,
             "failed": failed_count,
+            "permanent_failed": permanent_failed,
+            "error_counts": error_counts,
+            "error_summary": [{"reason": reason, "message": ERROR_LABELS[reason], "count": count}
+                              for reason, count in error_counts.items()],
             "errors": errors[:10],
             "campaign": campaign_payload,
         }

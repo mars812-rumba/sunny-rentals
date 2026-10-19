@@ -96,6 +96,8 @@ interface OutreachStatus {
   max_batch: number;
   message: string;
   running: boolean;
+  excluded?: number;
+  retry_after?: number;
 }
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   'new': { label: 'NEW', color: '#64748b', bg: 'bg-slate-100' },
@@ -2399,6 +2401,10 @@ const handleUpdateNote = async () => {
                   </p>
                 </div>
 
+                {!!outreachStatus?.excluded && (
+                  <p className="text-sm text-slate-700">Исключено из рассылки: <strong>{outreachStatus.excluded}</strong>. Бот заблокирован или чат недоступен. Клиенты сохранены в CRM.</p>
+                )}
+
                 {outreachStatus?.message && (
                   <div className="rounded-xl bg-slate-50 px-3.5 py-3">
                     <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">Текст сообщения</div>
@@ -2407,12 +2413,24 @@ const handleUpdateNote = async () => {
                 )}
 
                 {outreachResult && (
-                  <div className="flex items-start gap-2 rounded-xl bg-emerald-50 px-3.5 py-3 text-emerald-900" role="status" aria-live="polite">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0" />
-                    <p className="text-sm">
+                  <div className={`flex items-start gap-2 rounded-xl px-3.5 py-3 ${outreachResult.failed > 0 ? 'bg-amber-50 text-amber-950' : 'bg-emerald-50 text-emerald-900'}`} role="status" aria-live="polite">
+                    {outreachResult.failed > 0 ? <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> : <Check className="mt-0.5 h-4 w-4 shrink-0" />}
+                    <div className="min-w-0 text-sm">
+                      <p>
                       Доставлено: <strong>{outreachResult.delivered}</strong>. Claude включён: <strong>{outreachResult.claude_active}</strong>.
                       {outreachResult.failed > 0 && <> Ошибок: <strong>{outreachResult.failed}</strong>.</>}
-                    </p>
+                      </p>
+                      {outreachResult.error_summary?.length > 0 && (
+                        <ul className="mt-2 list-inside list-disc space-y-1">
+                          {outreachResult.error_summary.map((item: { reason: string; message: string; count: number }) => (
+                            <li key={item.reason}>{item.message}: <strong>{item.count}</strong>.</li>
+                          ))}
+                        </ul>
+                      )}
+                      {outreachResult.permanent_failed > 0 && <p className="mt-2">Недоступные получатели исключены из следующих партий, но остаются в CRM.</p>}
+                      {outreachResult.attempted < outreachResult.selected && <p className="mt-2">Партия остановлена после {outreachResult.attempted} попыток. Неотправленные сообщения остались в очереди.</p>}
+                      {outreachStatus?.retry_after ? <p className="mt-2">Повторите не раньше чем через {outreachStatus.retry_after} с — действует лимит Telegram.</p> : null}
+                    </div>
                   </div>
                 )}
 

@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable
 
 import requests
+from outreach_delivery import OutreachDeliveryError, PERMANENT_REASONS, failure_from_response
 
 
 CAMPAIGN_ID = "sunny-reengagement-2026-08-09"
@@ -69,9 +70,9 @@ def load_recipients(data_dir: Path) -> Dict[int, Dict[str, Any]]:
     return recipients
 
 
-def load_campaign_state(log_path: Path) -> Dict[int, Dict[str, bool]]:
+def load_campaign_state(log_path: Path) -> Dict[int, Dict[str, Any]]:
     """Fold the append-only log into delivery and activation state per user."""
-    state: Dict[int, Dict[str, bool]] = {}
+    state: Dict[int, Dict[str, Any]] = {}
     if not log_path.exists():
         return state
     for line in log_path.read_text(encoding="utf-8").splitlines():
@@ -79,12 +80,24 @@ def load_campaign_state(log_path: Path) -> Dict[int, Dict[str, bool]]:
             event = json.loads(line)
         except json.JSONDecodeError:
             continue
+        if not isinstance(event, dict):
+            continue
         user_id = normalize_user_id(event.get("user_id"))
         if user_id is None:
             continue
         current = state.setdefault(user_id, {"delivered": False, "claude_active": False})
         current["delivered"] = current["delivered"] or bool(event.get("delivered"))
         current["claude_active"] = current["claude_active"] or bool(event.get("claude_active"))
+        if event.get("permanent_failure") and event.get("error_reason") in PERMANENT_REASONS:
+            current["excluded"] = True
+            current["error_reason"] = event["error_reason"]
+        if event.get("error") and not current["delivered"]:
+            current["last_error"] = True
+        if event.get("error_reason") == "rate_limited" and event.get("retry_at"):
+            try:
+                current["retry_at"] = float(event["retry_at"])
+            except (ValueError, TypeError):
+                pass
     return state
 
 
@@ -105,7 +118,7 @@ def append_event(log_path: Path, event: Dict[str, Any]) -> None:
 
 def select_recipient_batch(
     recipients: Dict[int, Dict[str, Any]],
-    campaign_state: Dict[int, Dict[str, bool]],
+    campaign_state: Dict[int, Dict[str, Any]],
     limit: int,
 ) -> list[tuple[int, Dict[str, Any]]]:
     """Select newest recipients that have not received the greeting yet."""
@@ -113,8 +126,12 @@ def select_recipient_batch(
         (user_id, record)
         for user_id, record in recipients.items()
         if not campaign_state.get(user_id, {}).get("delivered")
+        and not campaign_state.get(user_id, {}).get("excluded")
     ]
-    pending.sort(key=lambda item: _record_timestamp(item[1]), reverse=True)
+    # Fresh recipients first: old generic failures must not monopolize every batch.
+    # They are NOT classified as permanent without a real Telegram response.
+    pending.sort(key=lambda item: (bool(campaign_state.get(item[0], {}).get("last_error")),
+                                   -_record_timestamp(item[1])))
     return pending[: max(0, int(limit))]
 
 
@@ -138,7 +155,8 @@ def send_one(session: requests.Session, api_base: str, user_id: int, message: st
         json={"user_id": user_id, "text": message, "role": "manager", "timestamp": timestamp},
         timeout=20,
     )
-    send_response.raise_for_status()
+    if send_response.status_code != 200:
+        raise failure_from_response(send_response)
     send_payload = send_response.json()
     delivered = bool(send_payload.get("sent_via_bot")) and send_payload.get("status") in {
         "ok",
@@ -149,7 +167,12 @@ def send_one(session: requests.Session, api_base: str, user_id: int, message: st
 
     # Resume does not start a second qualification message. It only makes
     # Claude answer the client's next Telegram message.
-    return {"delivered": True, "send_result": send_payload, **activate_claude(session, api_base, user_id)}
+    try:
+        return {"delivered": True, "send_result": send_payload, **activate_claude(session, api_base, user_id)}
+    except Exception:
+        # Telegram already accepted the greeting; activation failure must not resend it.
+        return {"delivered": True, "claude_active": False, "error_reason": "activation_failed",
+                "error": "Сообщение отправлено, но Claude не включён"}
 
 
 def require_service(session: requests.Session, base_url: str, name: str) -> None:
@@ -170,6 +193,8 @@ def run_campaign(
     limit: int | None = None,
 ) -> Dict[str, int]:
     campaign_state = load_campaign_state(log_path)
+    if any(status.get("retry_at", 0) > time.time() for status in campaign_state.values()):
+        raise RuntimeError("Лимит Telegram: повторите рассылку позже")
     stats = {"audience": len(recipients), "skipped": 0, "delivered": 0, "failed": 0}
     session = requests.Session()
 
@@ -206,10 +231,17 @@ def run_campaign(
                 stats["delivered"] += 1
             else:
                 stats["failed"] += 1
+        except OutreachDeliveryError as error:
+            event.update(error.as_event())
+            if error.retry_after:
+                event["retry_at"] = time.time() + error.retry_after
+            stats["failed"] += 1
         except Exception as error:  # one inaccessible chat must not stop the campaign
             event.update({"delivered": False, "claude_active": False, "error": str(error)})
             stats["failed"] += 1
         append_event(log_path, event)
+        if event.get("error_reason") in {"rate_limited", "bot_unauthorized", "delivery_unavailable"}:
+            break
         time.sleep(max(0.0, delay_seconds))
 
     return stats
