@@ -1,19 +1,20 @@
 import { parkText as pt } from '@/lib/park-locale';
 import { useParkLocale } from '@/contexts/park-locale';
 import { FormEvent, useEffect, useId, useRef, useState } from "react";
-import { ArrowLeft, CarFront, CalendarDays, CheckCircle2, ClipboardList, Eye, EyeOff, ImageIcon, Loader2, Plus, RefreshCw, Store, WalletCards, Banknote, Save, X, Globe } from "lucide-react";
+import { ArrowLeft, CarFront, CalendarDays, CheckCircle2, Eye, EyeOff, ImageIcon, Loader2, Plus, RefreshCw, Store, WalletCards, Banknote, Save, X, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { ParkWorkspaceNavigation, type ParkWorkspaceSection } from './ParkWorkspaceNavigation';
+import { VehicleBasicFields, vehicleAssetTypeLabels as TYPES } from './VehicleBasicFields';
 import { PlatformParkTelegramPanel } from './PlatformParkTelegramPanel';
 import { PlatformParkWebAccessPanel } from './PlatformParkWebAccessPanel';
 import { ParkBookingCalendar } from './ParkBookingCalendar';
 import { ParkRequestsPanel } from './ParkRequestsPanel';
 import { ParkTrialStatus } from './ParkTrialStatus';
 import { PlatformTenantActions } from './PlatformTenantActions';
-import { VehicleDetailsEditor, VehicleSpecSummary, VehicleLicensePlateField } from './VehicleDetailsEditor';
+import { VehicleDetailsEditor, VehicleSpecSummary } from './VehicleDetailsEditor';
 import { ParkDateField } from './ParkDateField';
 import { DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ParkFormSheet, ParkFormSheetContent } from './ParkFormSheet';
@@ -33,15 +34,10 @@ import {
   createStorefrontPreview,
 } from "@/api/platform-admin";
 
-const TYPES: Record<AssetType, string> = {
-  car: "Автомобиль", scooter: "Электросамокат", motorcycle: "Мотоцикл / скутер",
-  bicycle: "Велосипед", snowmobile: "Снегоход", other: "Другая техника",
-};
 const blank = (type: AssetType): PlatformAssetInput => ({ name: "", asset_type: type, brand: "", model: "", year: null, color: "", license_plate: "", daily_rate: 0, deposit: 0, public: false });
 const minimumRate = minimumVehicleRate;
 const message = (error: unknown) => error instanceof Error ? error.message : pt("Не удалось сохранить. Повторите попытку.");
 const primaryButton = "min-h-11 rounded-lg bg-blue-700 text-white hover:bg-blue-800";
-const workspaceTab = "min-h-11 flex-col gap-1 rounded-lg px-2 py-2 text-xs text-slate-600 sm:flex-row sm:gap-2 sm:px-4 sm:text-sm data-[state=active]:bg-blue-700 data-[state=active]:text-white data-[state=active]:shadow-none hover:bg-blue-50 focus-visible:ring-blue-700";
 
 function validateImage(file: File) {
   if (!file.size || file.size > 8 * 1024 * 1024) throw new Error(pt("{0}: размер должен быть не больше 8 МБ", [file.name]));
@@ -73,7 +69,8 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
 }) {
   const { pt, intlLocale } = useParkLocale();
   const [assets, setAssets] = useState<PlatformAsset[]>([]);
-  const [section, setSection] = useState('calendar');
+  const [section, setSection] = useState<ParkWorkspaceSection>('calendar');
+  const screenStart = useRef<HTMLDivElement>(null);
   const [calendarVisited, setCalendarVisited] = useState(true);
   const [requestsVisited, setRequestsVisited] = useState(false);
   const [calendarRevision, setCalendarRevision] = useState(0);
@@ -217,7 +214,19 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
     finally { setBusy(false); }
   };
 
-  return <div className={`${owner ? 'rounded-xl' : 'min-h-screen'} bg-slate-50 px-4 py-6 text-slate-950 selection:bg-blue-200 md:px-8 [&_button:not([data-compact-event])]:min-h-11 [&_input]:min-h-11`}>
+  const selectScreen = (value: ParkWorkspaceSection) => {
+    if (value === section) return;
+    setSection(value);
+    if (value === 'calendar') setCalendarVisited(true);
+    if (value === 'requests') setRequestsVisited(true);
+    setCalendarRevision(current => current + 1);
+    requestAnimationFrame(() => {
+      screenStart.current?.focus({ preventScroll: true });
+      screenStart.current?.scrollIntoView({ block: 'start', behavior: 'instant' });
+    });
+  };
+
+  return <div className={`${owner ? 'rounded-xl' : 'min-h-screen'} bg-slate-50 px-4 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom))] text-slate-950 selection:bg-blue-200 md:px-8 md:pb-6 [&_button:not([data-compact-event])]:min-h-11 [&_input]:min-h-11`}>
     <div className="mx-auto max-w-6xl">
       {!owner && <Button variant="ghost" onClick={onBack} disabled={busy}><ArrowLeft aria-hidden="true" /> {pt(" Все прокаты")}</Button>}
       <header className="flex items-start gap-3 sm:gap-4">
@@ -253,13 +262,10 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
       </section>}
       </details>}
 
-      <Tabs value={section} onValueChange={(value) => { setSection(value); if (value === 'calendar') setCalendarVisited(true); if (value === 'requests') setRequestsVisited(true); setCalendarRevision(current => current + 1); }} activationMode="manual" className="mt-6 min-w-0">
-        <TabsList aria-label={pt("Управление парком")} className="mx-auto grid h-auto w-full max-w-xl grid-cols-3 gap-1 rounded-xl bg-slate-200/70 p-1">
-          <TabsTrigger value="calendar" className={workspaceTab}><CalendarDays aria-hidden="true" className="h-4 w-4" />{pt("Календарь")}</TabsTrigger>
-          <TabsTrigger value="requests" className={workspaceTab}><ClipboardList aria-hidden="true" className="h-4 w-4" />{pt("Заявки")}</TabsTrigger>
-          <TabsTrigger value="fleet" className={workspaceTab}><CarFront aria-hidden="true" className="h-4 w-4" />{pt("Автопарк")}</TabsTrigger>
-        </TabsList>
-        <TabsContent value="fleet" forceMount hidden={section !== 'fleet'} className="mt-6 data-[state=inactive]:hidden">
+      <div className="mt-6 min-w-0">
+        <ParkWorkspaceNavigation section={section} onSelect={selectScreen} />
+        <div ref={screenStart} tabIndex={-1} className="scroll-mt-24 outline-none" aria-label={pt(section === 'calendar' ? 'Календарь' : section === 'requests' ? 'Заявки' : 'Автопарк')}>
+        <div hidden={section !== 'fleet'} className={`mt-6 ${section !== 'fleet' ? 'hidden' : ''}`}>
       <section aria-labelledby="fleet-title">
         <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 id="fleet-title" className="text-xl font-semibold">{pt("Техника парка")}</h2><p className="mt-1 text-sm text-slate-600">{loading || loadFailed ? pt("Количество уточняется") : pt("{0} единиц", [assets.length])} {pt(" · для первого демо подготовьте 5")}</p></div><Button className={primaryButton} onClick={() => edit("new")} disabled={busy || loading || loadFailed}><Plus aria-hidden="true" /> {pt(" Добавить технику")}</Button></div>
         <fieldset className="mt-5 min-w-0"><legend className="mb-3 flex items-center gap-2 text-sm font-medium"><CalendarDays aria-hidden="true" className="size-4" />{pt("Свободная техника на даты")}</legend><div className="flex flex-wrap items-end gap-3">
@@ -287,13 +293,9 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
         {editing && <ParkFormSheet open busy={busy} onOpenChange={open => { if (!open) setEditing(null); }}><ParkFormSheetContent header={<><DialogTitle className="break-words">{editing === "new" ? pt("Новая техника") : pt("Редактирование: {0}", [editing.name])}</DialogTitle><DialogDescription className="mt-2">{pt('Название для клиента')}</DialogDescription></>}><section>
           {editorError && <p role="alert" className="mt-3 text-sm text-rose-800">{pt(editorError)}</p>}
           <form onSubmit={save} className="mt-5">
-            <fieldset disabled={busy} className="grid gap-5 sm:grid-cols-2">
-              <div className="sm:col-span-2"><Label htmlFor="asset-name">{pt("Название для клиента")}</Label><Input ref={nameInput} id="asset-name" required maxLength={160} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={pt("Toyota Yaris 2024, белый")} className="mt-2" /></div>
-              <div><Label htmlFor="asset-kind">{pt("Тип транспорта")}</Label><select id="asset-kind" className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm focus:outline-cyan-600" value={form.asset_type} onChange={(e) => setForm({ ...form, asset_type: e.target.value as AssetType })}>{Object.entries(TYPES).map(([value, label]) => <option key={value} value={value}>{pt(label)}</option>)}</select></div>
-              <div><Label htmlFor="asset-year">{pt("Год выпуска")}</Label><Input id="asset-year" type="number" min={1950} max={2100} value={form.year ?? ""} onChange={(e) => setForm({ ...form, year: e.target.value ? Number(e.target.value) : null })} className="mt-2" /></div>
-              {([ ["brand", "Марка"], ["model", "Модель"], ["color", "Цвет"] ] as const).map(([field, label]) => <div key={field}><Label htmlFor={`asset-${field}`}>{pt(label)}</Label><Input id={`asset-${field}`} maxLength={80} value={form[field]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} className="mt-2" /></div>)}
-              <VehicleLicensePlateField id="asset" value={form.license_plate || ''} onChange={license_plate => setForm({ ...form, license_plate })} />
-              <div className="sm:col-span-2"><label className="flex items-center gap-3 text-sm font-medium"><input type="checkbox" checked={Boolean(form.public)} onChange={(event) => setForm({ ...form, public: event.target.checked })} className="h-4 w-4 accent-blue-700 focus-visible:outline focus-visible:outline-2" />{pt("Показывать на витрине")}</label><p className="mt-2 text-sm text-slate-600">{pt("После публикации парка машина, её цены и фотографии станут доступны по публичной ссылке.")}</p></div>
+            <fieldset disabled={busy} className="min-w-0">
+              <legend className="sr-only">{pt('Данные автомобиля')}</legend>
+              <VehicleBasicFields data={form} onChange={setForm} nameInput={nameInput} />
             </fieldset>
             <p className="mt-4 text-sm text-slate-600">{pt("Цены и депозит настраиваются только через «Действия → Цены» в карточке. После создания техники настройте тарифы перед приёмом заявок.")}</p>
             <div className="park-sheet-actions mt-5 flex flex-wrap gap-3"><Button type="submit" disabled={busy} className="min-h-11 rounded-lg bg-emerald-700 text-white hover:bg-emerald-800">{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />} {pt(" Сохранить технику")}</Button><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}><X aria-hidden="true" />{pt("Закрыть редактор")}</Button></div>
@@ -306,14 +308,15 @@ export function PlatformTenantWorkspace({ tenant, onBack, onTenantChanged, onArc
           </div>}
         </section></ParkFormSheetContent></ParkFormSheet>}
       </section>
-        </TabsContent>
-        {calendarVisited && <TabsContent value="calendar" forceMount hidden={section !== 'calendar'} className="mt-6 min-w-0 data-[state=inactive]:hidden">
+        </div>
+        {calendarVisited && <div hidden={section !== 'calendar'} className={`mt-6 min-w-0 ${section !== 'calendar' ? 'hidden' : ''}`}>
           <ParkBookingCalendar key={`calendar-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} fleetRevision={calendarRevision} timezone={tenant.timezone} />
-        </TabsContent>}
-        {requestsVisited && <TabsContent value="requests" forceMount hidden={section !== 'requests'} className="mt-6 min-w-0 data-[state=inactive]:hidden">
+        </div>}
+        {requestsVisited && <div hidden={section !== 'requests'} className={`mt-6 min-w-0 ${section !== 'requests' ? 'hidden' : ''}`}>
           <ParkRequestsPanel key={`requests-${tenant.tenant_id}`} tenantId={tenant.tenant_id} admin={!owner} assets={assets} revision={calendarRevision} onCreated={() => setCalendarRevision(value => value + 1)} />
-        </TabsContent>}
-      </Tabs>
+        </div>}
+        </div>
+      </div>
     </div>
     <AlertDialog open={Boolean(archiveTarget)} onOpenChange={(open) => { if (!open && !busy) setArchiveTarget(null); }}>
       <AlertDialogContent><AlertDialogHeader><AlertDialogTitle className="break-words">{pt("Перенести ")}{archiveTarget?.name} {pt(" в архив?")}</AlertDialogTitle><AlertDialogDescription>{pt("Техника исчезнет из активного списка. Её данные и фотографии сохранятся.")}</AlertDialogDescription></AlertDialogHeader>{archiveError && <p role="alert" className="text-sm text-rose-800">{pt(archiveError)}</p>}<AlertDialogFooter><AlertDialogCancel disabled={busy}>{pt("Отмена")}</AlertDialogCancel><AlertDialogAction className={primaryButton} disabled={busy} onClick={(event) => { event.preventDefault(); void archive(); }}>{busy ? <Loader2 className="animate-spin" aria-hidden="true" /> : null}{busy ? pt("Переносим…") : pt("В архив")}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>

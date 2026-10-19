@@ -1,5 +1,8 @@
 // Only interface copy. Customer and vehicle data are never passed through this catalogue.
 export const parkEnglish: Record<string, string> = {
+  'Название и модель': 'Name and model',
+  'Данные автомобиля': 'Vehicle details',
+  'Видимость на витрине': 'Storefront visibility',
   'Госномер': 'Registration plate',
   'Госномер: {0}': 'Plate: {0}',
   'Номер и регион с таблички, включая тайские буквы. Видно только владельцу и администратору. До 80 символов.': 'Plate number and region, including Thai letters. Only visible to the owner and administrator. Up to 80 characters.',

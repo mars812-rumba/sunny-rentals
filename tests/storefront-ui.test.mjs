@@ -145,22 +145,22 @@ test('owner workspace does not render platform management controls', () => {
   assert.equal((html.match(/type="date"/g) || []).length, 2);
   assert.match(html, /Сбросить/);
   assert.doesNotMatch(html, /id="asset-rate"|id="asset-deposit"/);
-  assert.match(html, /role="tablist"[^>]+aria-label="Управление парком"/);
-  assert.equal((html.match(/role="tab"/g) || []).length, 3);
-  assert.match(html, /aria-selected="false"[^>]*>[\s\S]*?Автопарк<\/button>/);
-  assert.match(html, /aria-selected="true"[^>]*>[\s\S]*?Календарь<\/button>/);
-  assert.match(html, /data-\[state=active\]:bg-blue-700/);
+  assert.match(html, /<nav aria-label="Управление парком"/);
+  assert.doesNotMatch(html, /role="tablist"|role="tab"/);
+  assert.match(html, /aria-\[current=page\]:text-blue-700/);
   assert.match(html, /lucide-car-front/);
   assert.match(html, /lucide-calendar-days/);
   assert.match(html, /lucide-clipboard-list/);
-  assert.match(html, /aria-selected="false"[^>]*>[\s\S]*?Заявки<\/button>/);
-  const tablist = html.match(/role="tablist"[\s\S]*?<\/div>/)[0];
+  const tablist = html.match(/<nav aria-label="Управление парком"[\s\S]*?<\/nav>/)[0];
+  assert.equal((tablist.match(/<button/g) || []).length, 3);
+  assert.equal((tablist.match(/aria-current="page"/g) || []).length, 1);
+  assert.match(tablist.match(/<button[^>]+aria-current="page"[\s\S]*?<\/button>/)[0], /Календарь/);
   assert.ok(tablist.indexOf('Календарь') < tablist.indexOf('Заявки'));
   assert.ok(tablist.indexOf('Заявки') < tablist.indexOf('Автопарк'));
   assert.match(tablist, /mx-auto/);
   assert.match(tablist, /max-w-xl/);
   assert.match(html, /Загружаем заявки/);
-  assert.match(html, /role="tabpanel"/);
+  assert.match(html, /Календарь заявок парка/);
   assert.doesNotMatch(html, /Добавить бронь \/ блокировку/);
   assert.doesNotMatch(html, /Все прокаты|Подготовить превью|Логотип проката|Webhook|<h1/);
 });
@@ -174,20 +174,20 @@ test('owner can open the separate client storefront from the park header', () =>
   assert.match(html, /aria-label="Логотип Park A"/);
   assert.ok(html.indexOf('aria-label="Логотип Park A"') < html.indexOf('<h2'));
   assert.ok(html.indexOf('<h2') < html.indexOf('>Витрина</button>'));
-  assert.ok(html.indexOf('>Витрина</button>') < html.indexOf('role="tablist"'));
+  assert.ok(html.indexOf('>Витрина</button>') < html.indexOf('<nav aria-label="Управление парком"'));
   assert.doesNotMatch(html, /Подберите транспорт|Выберите транспорт|Клиентский каталог/);
 });
 
-test('superadmin uses the same three working tabs with separate collapsed park setup', () => {
+test('superadmin uses the same three working screens with separate collapsed park setup', () => {
   const html = renderToStaticMarkup(e(ui.PlatformTenantWorkspace, {
     tenant: { tenant_id: 'park-a', slug: 'park-a', name: 'Очень длинное название проката для проверки переноса', status: 'draft', currency: 'THB', timezone: 'Asia/Bangkok', primary_asset_type: 'car' },
     onBack() {}, onTenantChanged() {},
   }));
-  assert.equal((html.match(/role="tab"/g) || []).length, 3);
-  const tablist = html.match(/role="tablist"[\s\S]*?<\/div>/)[0];
+  const tablist = html.match(/<nav aria-label="Управление парком"[\s\S]*?<\/nav>/)[0];
+  assert.equal((tablist.match(/<button/g) || []).length, 3);
   assert.ok(tablist.indexOf('Календарь') < tablist.indexOf('Заявки'));
   assert.ok(tablist.indexOf('Заявки') < tablist.indexOf('Автопарк'));
-  assert.match(html, /aria-selected="true"[^>]*>[\s\S]*?Календарь<\/button>/);
+  assert.match(tablist.match(/<button[^>]+aria-current="page"[\s\S]*?<\/button>/)[0], /Календарь/);
   assert.match(html, /Настройки подключения и оформления<\/summary>/);
   assert.match(html, /<details class="mt-5">/);
   assert.match(html, /Подготовить превью витрины/);
