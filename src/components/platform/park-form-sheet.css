@@ -7,6 +7,7 @@
   border-radius: 1rem 1rem 0 0;
 }
 .park-form-sheet[data-state="open"] { animation: park-sheet-in 200ms ease-out; }
+.park-form-sheet.park-vehicle-schedule-sheet { max-height: 80dvh; }
 .park-form-sheet[data-state="closed"] { animation: park-sheet-out 200ms ease-out; }
 .park-form-sheet-overlay[data-state="open"] { animation: park-sheet-fade-in 200ms ease-out; }
 .park-form-sheet-overlay[data-state="closed"] { animation: park-sheet-fade-out 200ms ease-out; }

@@ -1,5 +1,12 @@
 // Only interface copy. Customer and vehicle data are never passed through this catalogue.
 export const parkEnglish: Record<string, string> = {
+  'Открыть автомобиль: {0}': 'Open vehicle: {0}',
+  'Фото {0} из {1}': 'Photo {0} of {1}',
+  'Брони автомобиля': 'Vehicle bookings',
+  'У этого автомобиля пока нет броней.': 'No bookings for this vehicle yet.',
+  'Бронь №{0}': 'Booking #{0}',
+  'Запрошена отмена': 'Cancellation requested',
+  'Черновик': 'Draft',
   'Название и модель': 'Name and model',
   'Данные автомобиля': 'Vehicle details',
   'Видимость на витрине': 'Storefront visibility',

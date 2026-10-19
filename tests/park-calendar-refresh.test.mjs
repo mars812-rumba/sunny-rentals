@@ -60,7 +60,7 @@ test('heavy views retain lazy-mounted DOM; memo dependencies do not include view
   }
   assert.match(source, /deliveriesVisited && <TabsContent/);
   assert.match(source, /key=\{`\$\{props.tenantId\}:\$\{!!props.admin\}`\}/);
-  assert.match(source, /if \(!refreshEnabled \|\| busy \|\| draft \|\| selection \|\| cancelTarget\) return/);
+  assert.match(source, /if \(!refreshEnabled \|\| busy \|\| draft \|\| selection \|\| cancelTarget \|\| vehicleId\) return/);
   assert.match(source, /if \(!inFlight.current\) setReload/);
   assert.match(source, /setLoading\(!loaded.current\)/);
 });

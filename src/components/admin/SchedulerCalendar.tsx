@@ -37,6 +37,7 @@ interface SchedulerCalendarProps {
   readOnly?: boolean;
   exclusiveEnd?: boolean;
   renderCarPhoto?: (car: Car) => React.ReactNode;
+  onCarClick?: (carId: string) => void;
   initialScrollDate?: Date;
   scrollResetKey?: number;
   onDayCellClick?: (carId: string, day: Date) => void;
@@ -47,7 +48,6 @@ interface SchedulerCalendarProps {
 const DAY_WIDTH = 24;
 const HEADER_HEIGHT = 32;
 const SIDEBAR_WIDTH = 60;
-const TOTAL_DAYS = 97;
 
 // 🆕 Динамическая высота строк
 const getRowHeight = (isCompact: boolean) => isCompact ? 24 : 40;
@@ -63,6 +63,7 @@ export function SchedulerCalendar({
   cars,
   bookings,
   startDate,
+  daysToShow = 97,
   onBookingClick,
   onCreateBooking,
   carOwnersMap = {},
@@ -70,6 +71,7 @@ export function SchedulerCalendar({
   readOnly = false,
   exclusiveEnd = false,
   renderCarPhoto,
+  onCarClick,
   initialScrollDate,
   scrollResetKey = 0,
   onDayCellClick,
@@ -100,6 +102,7 @@ export function SchedulerCalendar({
     return observeTimetableViewport(sentinel);
   }, [pageScroll]);
 
+  // Keep the legacy editable scheduler's existing 97-day window unchanged.
   const {
     dates,
     bookingsByCarId,
@@ -111,7 +114,7 @@ export function SchedulerCalendar({
     handleCellTouchMove,
     handleCellTouchEnd,
     isInSelection
-  } = useCalendarGrid(startDate, bookings, onCreateBooking, exclusiveEnd);
+  } = useCalendarGrid(startDate, bookings, onCreateBooking, exclusiveEnd, readOnly ? daysToShow : 97);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -145,7 +148,7 @@ export function SchedulerCalendar({
     }
   };
 
-  const totalWidth = TOTAL_DAYS * DAY_WIDTH;
+  const totalWidth = dates.length * DAY_WIDTH;
 
   const formatBookingBadge = (booking: Booking) => {
     const fd = booking.form_data;
@@ -292,6 +295,7 @@ export function SchedulerCalendar({
                   setSelectedCarInfo({ car, owner: ownerBadge || null });
                 }}
               >
+                {readOnly && onCarClick && <button type="button" onClick={event => { event.currentTarget.focus({ preventScroll: true }); onCarClick(car.id); }} aria-label={pt('Открыть автомобиль: {0}', [car.name])} className="absolute inset-0 z-10 cursor-pointer rounded focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-700" />}
                 {readOnly && <div className={pageScroll ? 'h-7 w-16 shrink-0 overflow-hidden rounded bg-slate-100' : 'h-7 w-20 shrink-0 overflow-hidden rounded bg-slate-100'}>
                   {renderCarPhoto ? renderCarPhoto(car) : <div className="grid h-full w-full place-items-center"><CarFront aria-hidden="true" className="h-4 w-4 text-slate-500" /></div>}
                 </div>}

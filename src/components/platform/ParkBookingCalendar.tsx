@@ -27,10 +27,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { timetableCellBooking, calendarBooking, calendarBookingWithAsset, calendarCars, calendarLogistics, calendarThumbnail } from '@/utils/park-calendar';
 import { ParkManualBookingForm } from './ParkManualBookingForm';
 import { ParkCalendarPhoto } from './ParkCalendarPhoto';
+import { ParkVehicleScheduleSheet, scheduleVehicle } from './ParkVehicleScheduleSheet';
 import { ParkRequestItem } from './ParkRequestsPanel';
 import { subscribeParkCalendar } from '@/lib/park-calendar-updates';
 import { parkToday, dateLabel } from '@/lib/park-rental';
-import { timetableFocusDay } from '@/lib/scheduler-scroll';
+import { parkTimetableDays, timetableFocusDay } from '@/lib/scheduler-scroll';
 import { parkBookingColors } from '@/lib/park-booking-colors';
 import { retainCalendarSnapshot, startParkCalendarPolling } from '@/lib/park-calendar-refresh';
 
@@ -61,6 +62,8 @@ function ParkBookingCalendarContent({ tenantId, admin = false, fleetRevision = 0
   const [view, setView] = useState('timetable');
   const [deliveriesVisited, setDeliveriesVisited] = useState(false);
   const [selection, setSelection] = useState<{ bookingId?: string; day?: string } | null>(null);
+  const [vehicleId, setVehicleId] = useState<string | null>(null);
+  const openVehicle = useCallback((carId: string) => setVehicleId(carId), []);
   const [draft, setDraft] = useState<{ day?: string; endDay?: string; assetId?: string } | null>(null);
   const [success, setSuccess] = useState('');
   const [cancelTarget, setCancelTarget] = useState<ParkBooking | null>(null);
@@ -80,9 +83,9 @@ function ParkBookingCalendarContent({ tenantId, admin = false, fleetRevision = 0
   const inFlight = useRef<AbortController | null>(null);
   useEffect(() => subscribeParkCalendar(tenantId, () => setReload(value => value + 1)), [tenantId]);
   useEffect(() => {
-    if (!refreshEnabled || busy || draft || selection || cancelTarget) return;
+    if (!refreshEnabled || busy || draft || selection || cancelTarget || vehicleId) return;
     return startParkCalendarPolling(() => { if (!inFlight.current) setReload(value => value + 1); });
-  }, [refreshEnabled, busy, draft, selection, cancelTarget]);
+  }, [refreshEnabled, busy, draft, selection, cancelTarget, vehicleId]);
   useEffect(() => {
     const controller = new AbortController();
     inFlight.current = controller;
@@ -117,7 +120,7 @@ function ParkBookingCalendarContent({ tenantId, admin = false, fleetRevision = 0
   const cellsDisabled = loading || busy || !!draft;
   // Stable element identities let React skip rebuilding these heavy views when
   // just the tab, selection dialog or an unrelated parent field changes.
-  const timetable = useMemo(() => <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} daysToShow={97} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly pageScroll
+  const timetable = useMemo(() => <SchedulerCalendar cars={cars.filter(car => !assetId || car.id === assetId)} bookings={active.map(calendarBooking)} startDate={date} initialScrollDate={initialScrollDate} daysToShow={parkTimetableDays(date)} onDateChange={() => {}} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onCreateBooking={() => {}} readOnly pageScroll
     dayCellsDisabled={cellsDisabled}
     onDayCellClick={(carId, clickedDate) => {
       if (cellsDisabled) return;
@@ -126,11 +129,13 @@ function ParkBookingCalendarContent({ tenantId, admin = false, fleetRevision = 0
       if (existing) setSelection({ bookingId: existing.id });
       else if (assets.some(asset => asset.id === carId)) openDraft({ day, endDay: format(addDays(clickedDate, 1), 'yyyy-MM-dd'), assetId: carId });
     }}
+    onCarClick={openVehicle}
     renderCarPhoto={car => <ParkCalendarPhoto key={`${tenantId}:${car.id}:${photos.get(car.id) || ''}`} tenantId={tenantId} reference={photos.get(car.id)} admin={admin} />} />,
-  [cars, assetId, active, date, initialScrollDate, cellsDisabled, assets, openDraft, tenantId, photos, admin]);
+  [cars, assetId, active, date, initialScrollDate, cellsDisabled, assets, openDraft, openVehicle, tenantId, photos, admin]);
   const deliveries = useMemo(() => <MonthCalendarView currentDate={date} bookings={monthBookings} logisticsData={active.map(calendarLogistics)} onDateChange={value => setMonth(format(value, 'yyyy-MM'))} onBookingClick={booking => setSelection({ bookingId: booking.booking_id })} onDayClick={value => setSelection({ day: format(value, 'yyyy-MM-dd') })} showOccupancy handoversOnly />,
   [date, monthBookings, active]);
   const selected = selection?.bookingId ? filtered.filter(item => item.id === selection.bookingId) : selection?.day ? filtered.filter(item => item.status !== 'cancelled' && item.entry_type !== 'block' && (item.pricing.start_date === selection.day || item.pricing.end_date === selection.day)) : [];
+  const selectedVehicle = vehicleId ? scheduleVehicle(assets, bookings, vehicleId, tenantId) : undefined;
   const details = (items: ParkBooking[]) => <ul className="mt-2 divide-y divide-slate-200">{items.map((booking) => booking.entry_type !== 'block' ? <ParkRequestItem key={booking.id} booking={booking} tenantId={tenantId} admin={admin} photoReference={photos.get(booking.asset_id)} detailed busy={busy || loading || !!draft} onAction={(item, status) => { if (status === 'cancelled') setCancelTarget(item); else void action(item, status); }} /> : <li key={booking.id} className="py-4">
     <h3 className="break-words font-semibold">{booking.pricing.asset_name || booking.asset_id}</h3><p className="mt-1">{dateLabel(booking.pricing.start_date)} — {dateLabel(booking.pricing.end_date)} · {pt(statuses[booking.status] || booking.status)}</p>
     <p className="mt-1 text-sm font-medium">{booking.entry_type === 'block' ? pt("Блокировка занятости") : booking.source?.endsWith('_manual') ? pt("Ручная аренда") : pt("Заявка из Telegram")}</p>
@@ -150,6 +155,7 @@ function ParkBookingCalendarContent({ tenantId, admin = false, fleetRevision = 0
     {error && <p role="alert" className="mt-3 text-sm text-rose-800">{pt(error)}</p>}
     {!loading && !assets.length && !error && <p className="mt-3 text-sm text-slate-600">{pt("Чтобы создать запись, сначала добавьте машину в автопарк.")}</p>}
     {success && <p role="status" className="mt-3 text-sm text-emerald-800">{pt(success)}</p>}
+    {!error && selectedVehicle && <ParkVehicleScheduleSheet asset={selectedVehicle} bookings={bookings} tenantId={tenantId} admin={admin} onClose={() => setVehicleId(null)} />}
     {draft && <ParkManualBookingForm tenantId={tenantId} assets={assets} admin={admin} initialDay={draft.day} initialEndDay={draft.endDay} initialAssetId={draft.assetId} onClose={() => setDraft(null)} onSaved={booking => {
       setBookings(items => [...items.filter(item => item.id !== booking.id), booking]); setMonth(booking.pricing.start_date.slice(0, 7)); setDraft(null);
       setSuccess(booking.entry_type === 'block' ? pt("Блокировка занятости") : booking.status === 'requested' ? pt("Предбронь создана. Даты заняты до подтверждения или отмены.") : pt("Подтверждённая бронь создана и видна во всех видах календаря."));

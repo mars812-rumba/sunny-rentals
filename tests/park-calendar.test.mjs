@@ -11,15 +11,16 @@ const bundle = await build({ stdin: { contents: `export * from './src/utils/park
  export * from './src/lib/calendar-booking-lanes';
  export * from './src/lib/calendar-model-label';
  export { SchedulerCalendar } from './src/components/admin/SchedulerCalendar';
+ export { ParkVehicleScheduleDetails, vehicleSchedule, scheduleVehicle } from './src/components/platform/ParkVehicleScheduleSheet';
  export { MonthCalendarView } from './src/components/admin/MonthCalendarView';
  export { ParkTrialStatus } from './src/components/platform/ParkTrialStatus';
  export { ParkManualBookingFields as ParkManualBookingForm } from './src/components/platform/ParkManualBookingForm';
  export { ParkQuoteSummary, ParkContactFields } from './src/components/platform/ParkBookingForm';
  export { ParkRequestItem } from './src/components/platform/ParkRequestsPanel';
  export { ParkCalendarPhoto } from './src/components/platform/ParkCalendarPhoto';
- export { ParkCalendarViewButtons, ParkCalendarActions, ParkCalendarLegend } from './src/components/platform/ParkBookingCalendar';
+ export { ParkCalendarViewButtons, ParkCalendarActions, ParkCalendarLegend, ParkCalendarMonthSelect } from './src/components/platform/ParkBookingCalendar';
  export { Tabs, TabsContent } from './src/components/ui/tabs';
- export { schedulerInitialOffset, timetableFocusDay } from './src/lib/scheduler-scroll';
+ export { schedulerInitialOffset, timetableFocusDay, parkTimetableDays } from './src/lib/scheduler-scroll';
  export { parkToday } from './src/lib/park-rental';
  export { ParkPickupFields, ParkPickupSummary } from './src/components/platform/ParkPickupFields';
  export { validParkPickup, validParkReturn } from './src/lib/park-pickup';
@@ -34,6 +35,63 @@ const ui = compiled.exports;
 const booking = { id: 'booking-a', asset_id: 'asset-a', status: 'requested', start_at: '2026-08-01T17:00:00Z', end_at: '2026-08-03T17:00:00Z', currency: 'THB',
  pricing: { asset_name: 'Toyota', start_date: '2026-08-02', end_date: '2026-08-04', days: 2, daily_rate: '800', total_rental: '1600', timezone: 'Asia/Bangkok' }, deposit: { amount: '5000' } };
 const e = React.createElement;
+
+test('vehicle schedule is scoped, chronological, read-only and includes return times after New Year', () => {
+ const historical = ui.scheduleVehicle([], [booking], booking.asset_id, 'park-a');
+ assert.equal(historical.name, 'Toyota'); assert.equal(historical.tenant_id, 'park-a');
+ assert.deepEqual(historical.photos, {});
+ assert.equal(ui.scheduleVehicle([], [booking], 'unknown', 'park-a'), undefined);
+ const jan = { ...booking, id: 'jan', status: 'confirmed', booking_number: '123456', start_at: '2027-01-31T02:00:00Z', end_at: '2027-02-22T03:30:00Z', pricing: { ...booking.pricing, start_date: '2027-01-31', end_date: '2027-02-22', pickup: { time: '09:00', return_time: '10:30' } } };
+ const items = [jan, { ...booking, status: 'completed' }, { ...jan, id: 'other', asset_id: 'other' }, { ...jan, id: 'cancelled', status: 'cancelled' }, { ...jan, id: 'rejected', status: 'rejected' }];
+ const original = items.slice();
+ assert.deepEqual(ui.vehicleSchedule(items, 'asset-a').map(x => x.id), ['booking-a', 'jan']);
+ assert.deepEqual(items, original);
+ const asset = { id: 'asset-a', name: 'Toyota', license_plate: '2600', photos: { main: 'main.webp', gallery: ['main.webp', 'other.webp'] } };
+ const html = renderToStaticMarkup(e(ui.ParkVehicleScheduleDetails, { asset, bookings: items, tenantId: 'park-a', admin: false }));
+ assert.match(html, /Бронь №123456/); assert.match(html, /31 января 2027/); assert.match(html, /22 февраля 2027/);
+ assert.match(html, /09:00/); assert.match(html, /10:30/);
+ assert.match(html, /Фото 2 из 2/); assert.doesNotMatch(html, /Фото 3 из/);
+ assert.doesNotMatch(html, /Отменить|Подтвердить заявку|other.*Бронь/);
+ const empty = renderToStaticMarkup(e(ui.ParkVehicleScheduleDetails, { asset: { ...asset, photos: {} }, bookings: [], tenantId: 'park-a', admin: false }));
+ assert.match(empty, /Фото пока нет/); assert.match(empty, /пока нет броней/);
+});
+
+test('read-only vehicle sidebar exposes a native named button and uses the existing accessible sheet', () => {
+ const html = renderToStaticMarkup(e(ui.SchedulerCalendar, { cars: ui.calendarCars([], [booking]), bookings: [], startDate: new Date('2026-10-01T00:00:00'), daysToShow: 97, readOnly: true, onCarClick() {}, onDateChange() {}, onBookingClick() {}, onCreateBooking() {} }));
+ assert.match(html, /<button type="button" aria-label="Открыть автомобиль: Toyota"/);
+ const source = readFileSync('src/components/platform/ParkVehicleScheduleSheet.tsx', 'utf8');
+ assert.match(source, /<ParkFormSheet open onOpenChange=/);
+ assert.match(source, /<DialogTitle/);
+ assert.match(source, /asset.license_plate/);
+ assert.match(source, /closeButtonClassName="flex"/);
+ const calendar = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ assert.match(calendar, /onCarClick=\{openVehicle\}/);
+ assert.match(calendar, /openVehicle = useCallback\(\(carId: string\) => setVehicleId\(carId\), \[\]\)/);
+});
+
+test('park horizon includes April, leap February and year transitions without truncating bookings', () => {
+ for (const [start, last] of [['2026-10-01', '2027-04-30'], ['2027-08-01', '2028-02-29'], ['2026-12-01', '2027-06-30']]) {
+  const date = new Date(`${start}T00:00:00`);
+  const days = ui.parkTimetableDays(date);
+  const end = new Date(date); end.setDate(end.getDate() - 7 + days - 1);
+  assert.equal([end.getFullYear(), String(end.getMonth() + 1).padStart(2, '0'), String(end.getDate()).padStart(2, '0')].join('-'), last);
+ }
+ const april = { ...booking, id: 'april-rental', status: 'confirmed', pricing: { ...booking.pricing, start_date: '2027-04-20', end_date: '2027-05-03' }, start_at: '2027-04-20T02:00:00Z', end_at: '2027-05-03T02:00:00Z' };
+ const date = new Date('2026-10-01T00:00:00');
+ const days = ui.parkTimetableDays(date);
+ const props = { cars: ui.calendarCars([], [april]), bookings: [ui.calendarBooking(april)], startDate: date, readOnly: true, pageScroll: true, exclusiveEnd: true, onDateChange() {}, onBookingClick() {}, onCreateBooking() {} };
+ const html = renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, daysToShow: days }));
+ assert.match(html, /20\.04-03\.05/);
+ assert.ok(html.includes(`width:${days * 24 + 72}px`), 'header width includes all days and the vehicle sidebar');
+ assert.ok(html.includes('width:258px'), 'April rental clips at April 30, not its May return');
+ assert.doesNotMatch(renderToStaticMarkup(e(ui.SchedulerCalendar, { ...props, daysToShow: 97 })), /20\.04-03\.05/);
+ const source = readFileSync('src/components/platform/ParkBookingCalendar.tsx', 'utf8');
+ assert.match(source, /daysToShow=\{parkTimetableDays\(date\)\}/);
+ const select = renderToStaticMarkup(e(ui.ParkCalendarMonthSelect, { id: 'month', month: '2026-10', onChange() {} }));
+ assert.match(select, /value="2027-04"/);
+ const monthHtml = renderToStaticMarkup(e(ui.MonthCalendarView, { currentDate: new Date('2027-04-01T00:00:00'), bookings: [ui.calendarBooking(april)], logisticsData: [ui.calendarLogistics(april)], onDateChange() {}, onBookingClick() {}, onDayClick() {}, showOccupancy: true, handoversOnly: true }));
+ assert.match(monthHtml, /Toyota/);
+});
 
 test('manual booking footer keeps submit and cancel together, wrapping only the submit label', () => {
  const source = readFileSync('src/components/platform/ParkManualBookingForm.tsx', 'utf8');
