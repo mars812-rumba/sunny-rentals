@@ -64,12 +64,21 @@ class VehicleDetailsInput(StrictDetails):
     pricing_mode: Optional[Literal['flat', 'duration', 'seasonal']] = None
     daily_rate: Optional[float] = Field(default=None, ge=0.01, le=100000000)
     specs: Optional[VehicleSpecs] = None
+    license_plate: Optional[str] = Field(default=None, max_length=80)
     description: Optional[str] = Field(default=None, max_length=5000)
+
+    @validator('license_plate')
+    def clean_license_plate(cls, value):
+        if value is None:
+            return None
+        return ' '.join(value.split()) or None
 
     @root_validator(skip_on_failure=True)
     def one_section(cls, values):
         section = values.get('section')
         mode = values.get('pricing_mode')
+        if section != 'specs' and values.get('license_plate') is not None:
+            raise ValueError('Госномер изменяется только в разделе характеристик')
         if section != 'pricing' and (mode is not None or values.get('daily_rate') is not None):
             raise ValueError('Режим и цена изменяются только в разделе тарифов')
         if mode in ('duration', 'seasonal') and values.get('pricing') is None:

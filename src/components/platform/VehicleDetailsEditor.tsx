@@ -22,9 +22,19 @@ const titles = { pricing: 'Тарифы', specs: 'Характеристики',
 const icons = { pricing: WalletCards, specs: Wrench, description: FileText };
 const defaultGrid = (rate: number): TariffGrid => ({ low_season: { price_1_6: rate, price_7_14: rate, price_15_29: rate, price_30: rate }, high_season: { price_1_6: rate, price_7_14: rate, price_15_29: rate, price_30: rate }, high_start: '11-01', high_end: '03-31' });
 
-export function VehicleSpecSummary({ specs, detailed = false, photoCount }: { specs: VehicleSpecs; detailed?: boolean; photoCount?: number }) {
+export function VehicleLicensePlateField({ id, value, onChange }: { id: string; value: string; onChange: (value: string) => void }) {
+  const { pt } = useParkLocale();
+  return <div>
+    <label htmlFor={`${id}-license-plate`} className="text-sm font-medium">{pt('Госномер')}</label>
+    <Input id={`${id}-license-plate`} maxLength={80} value={value} onChange={event => onChange(event.target.value)} aria-describedby={`${id}-license-plate-hint`} autoComplete="off" spellCheck={false} className="mt-2 min-h-12 text-base" />
+    <p id={`${id}-license-plate-hint`} className="mt-2 text-sm leading-6 text-slate-600">{pt('Номер и регион с таблички, включая тайские буквы. Видно только владельцу и администратору. До 80 символов.')}</p>
+  </div>;
+}
+
+export function VehicleSpecSummary({ specs, detailed = false, photoCount, licensePlate }: { specs: VehicleSpecs; detailed?: boolean; photoCount?: number; licensePlate?: string | null }) {
   const { pt, intlLocale } = useParkLocale();
   const entries = [
+    [CarFront, licensePlate && pt('Госномер: {0}', [licensePlate]), 'bg-slate-100 text-slate-900', 'text-slate-600'],
     [Fuel, specs.fuel && pt(specs.fuel), 'bg-slate-100 text-slate-900', 'text-slate-600'],
     [Settings2, specs.transmission && pt(specs.transmission), 'bg-slate-100 text-slate-900', 'text-slate-600'],
     [Zap, specs.power && pt("Мощность: {0}", [specs.power]), 'bg-slate-100 text-slate-900', 'text-slate-600'],
@@ -86,6 +96,7 @@ export function VehicleDetailsEditor({ asset, section, currency, owner, onSaved,
   });
   const [features, setFeatures] = useState((asset.specs.features || []).join('\n'));
   const [description, setDescription] = useState(asset.description || '');
+  const [licensePlate, setLicensePlate] = useState(asset.license_plate || '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const Icon = icons[section];
@@ -96,7 +107,7 @@ export function VehicleDetailsEditor({ asset, section, currency, owner, onSaved,
     const pricingGrid = mode === 'duration' ? { ...grid, high_season: Object.fromEntries(tariffPeriods.map(([key]) => [key, grid.high_season[key] || grid.low_season[key]])) as TariffGrid['high_season'] } : grid;
     const hasCompleteGrid = [...Object.values(grid.low_season), ...Object.values(grid.high_season)].every(rate => Number.isFinite(rate) && rate >= 0.01);
     const data: VehicleDetailsInput = section === 'pricing' ? { section, pricing: mode === 'flat' ? hasCompleteGrid ? grid : null : pricingGrid, pricing_mode: mode, ...(mode === 'flat' ? { daily_rate: Number(dailyRate) } : {}), deposit: Number(deposit) }
-      : section === 'specs' ? { section, specs: { ...specs, features: options } } : { section, description };
+      : section === 'specs' ? { section, specs: { ...specs, features: options }, license_plate: licensePlate } : { section, description };
     setBusy(true);
     try { const saved = await (owner ? saveOwnerAssetDetails : savePlatformAssetDetails)(asset.tenant_id, asset.id, data); onSaved(saved); onClose(); }
     catch (failure) { setError(failure instanceof Error ? failure.message : pt("Не удалось сохранить. Повторите попытку.")); }
@@ -112,7 +123,10 @@ export function VehicleDetailsEditor({ asset, section, currency, owner, onSaved,
           <div><label htmlFor={`${id}-deposit`} className="flex items-center gap-2 text-sm font-medium"><WalletCards aria-hidden="true" className="size-4" />{pt("Возвратный депозит, ")}{currency}</label><Input id={`${id}-deposit`} type="number" required min="0" max="100000000" step="0.01" value={deposit} onChange={event => setDeposit(event.target.value)} className="mt-2 min-h-11 text-base tabular-nums" /></div>
           <p className="text-sm text-slate-600">{pt('Новые цены — только для новых заявок.')}</p>
         </>}
-        {section === 'specs' && <VehicleSpecsFields id={id} specs={specs} onChange={setSpecs} features={features} onFeaturesChange={setFeatures} />}
+        {section === 'specs' && <>
+          <VehicleLicensePlateField id={id} value={licensePlate} onChange={setLicensePlate} />
+          <VehicleSpecsFields id={id} specs={specs} onChange={setSpecs} features={features} onFeaturesChange={setFeatures} />
+        </>}
         {section === 'description' && <div><label htmlFor={`${id}-description`} className="font-medium">{pt("Публичное описание автомобиля")}</label><Textarea id={`${id}-description`} maxLength={5000} rows={8} value={description} onChange={event => setDescription(event.target.value)} aria-describedby={`${id}-description-hint`} className="mt-2 text-base leading-6" /><p id={`${id}-description-hint`} className="mt-2 text-sm leading-6 text-slate-600">{pt("Особенности, комплектация, нестандартные условия. Этот текст увидят клиенты — не добавляйте внутренние заметки или чужие контакты. До 5000 символов.")}</p></div>}
       </fieldset>
       {error && <p role="alert" className="text-sm leading-6 text-red-800">{pt(error)}</p>}

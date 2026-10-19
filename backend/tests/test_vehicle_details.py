@@ -160,6 +160,50 @@ class VehicleDetailsApiTests(unittest.TestCase):
         self.assertEqual(self.assets.assets.path.read_bytes(), before)
         self.assertEqual(self.details({'section': 'specs', 'specs': {'fuel': 'invalid'}}).status_code, 422)
 
+    def test_private_license_plate_owner_admin_round_trip_and_clear(self):
+        plate = 'ขต 1517 ภูเก็ต'
+        result = self.details({'section': 'specs', 'specs': {'fuel': 'Дизель'}, 'license_plate': '  ขต   1517 ภูเก็ต  '})
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(result.json()['asset']['license_plate'], plate)
+        self.assertEqual(self.assets.assets.get(self.asset.id).license_plate, plate)
+        # Old clients and other editor sections must not erase the private field.
+        self.details({'section': 'specs', 'specs': {'seats': 7}})
+        self.details({'section': 'description', 'description': 'Public description'})
+        self.assets.save(AssetInput(name='Updated Toyota'), self.asset.id)
+        saved = self.assets.assets.get(self.asset.id)
+        self.assertEqual(saved.license_plate, plate)
+        self.assertEqual(saved.photos['main'], 'existing-photo')
+        public = self.client.get('/api/storefront/park-a')
+        self.assertEqual(public.status_code, 200, public.text)
+        self.assertNotIn('license_plate', public.text)
+        self.assertNotIn(plate, public.text)
+        path = f'/api/platform/tenants/park-a/assets/{self.asset.id}/details'
+        result = self.client.put(path, json={'section': 'specs', 'specs': {}, 'license_plate': '5ขต 7503 กรุงเทพ'}, headers=self.admin_headers)
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(result.json()['asset']['license_plate'], '5ขต 7503 กรุงเทพ')
+        cleared = self.details({'section': 'specs', 'specs': {}, 'license_plate': ''})
+        self.assertEqual(cleared.status_code, 200, cleared.text)
+        self.assertIsNone(self.assets.assets.get(self.asset.id).license_plate)
+
+    def test_invalid_or_unauthorized_license_plate_does_not_write(self):
+        before = self.assets.assets.path.read_bytes()
+        for data in ({'section': 'specs', 'specs': {}, 'license_plate': 'x' * 81},
+                     {'section': 'description', 'description': 'Text', 'license_plate': 'ABC 123'}):
+            self.assertEqual(self.details(data).status_code, 422)
+        data = {'section': 'specs', 'specs': {}, 'license_plate': 'ขต 1517'}
+        self.assertEqual(self.details(data, init_data=self.token(uid=43)).status_code, 403)
+        self.assertEqual(self.details(data, tenant_id='park-b').status_code, 403)
+        result = self.client.put(f'/api/platform/tenants/park-b/assets/{self.asset.id}/details', json=data, headers=self.admin_headers)
+        self.assertEqual(result.status_code, 404)
+        self.assertEqual(self.assets.assets.path.read_bytes(), before)
+
+    def test_license_plate_audit_failure_rolls_back(self):
+        before = self.assets.assets.path.read_bytes()
+        with patch.object(self.assets, '_event', side_effect=OSError('audit unavailable')):
+            with self.assertRaises(OSError):
+                self.assets.save_details(self.asset.id, VehicleDetailsInput(section='specs', specs={}, license_plate='ขต 1517'))
+        self.assertEqual(self.assets.assets.path.read_bytes(), before)
+
     def test_audit_failure_rolls_back_detail_patch(self):
         before = self.assets.assets.path.read_bytes()
         with patch.object(self.assets, '_event', side_effect=OSError('audit unavailable')):

@@ -176,6 +176,7 @@ export interface PlatformAsset {
   public: boolean;
   photos: { main?: string; thumbnail?: string; gallery?: string[] };
   description?: string;
+  license_plate?: string | null;
   specs: VehicleSpecs & { brand?: string; model?: string; year?: number; color?: string };
   pricing: { daily_rate?: number; currency?: string; tariff_grid?: TariffGrid | null; pricing_mode?: PricingMode };
   deposit_policy: { amount?: number };
@@ -188,7 +189,7 @@ export interface VehicleSpecs {
   fuel?: string; transmission?: string; power?: string; engine?: string; drive?: string; body_type?: string;
   seats?: number | null; doors?: number | null; mileage?: number | null; air_conditioning?: boolean | null; features?: string[];
 }
-export type VehicleDetailsInput = { section: 'pricing'; pricing: TariffGrid | null; deposit?: number; pricing_mode?: PricingMode; daily_rate?: number } | { section: 'specs'; specs: VehicleSpecs } | { section: 'description'; description: string };
+export type VehicleDetailsInput = { section: 'pricing'; pricing: TariffGrid | null; deposit?: number; pricing_mode?: PricingMode; daily_rate?: number } | { section: 'specs'; specs: VehicleSpecs; license_plate?: string | null } | { section: 'description'; description: string };
 
 export async function savePlatformAssetDetails(tenantId: string, assetId: string, data: VehicleDetailsInput): Promise<PlatformAsset> {
   return (await platformFetch<{ asset: PlatformAsset }>(`${tenantPath(tenantId)}/assets/${encodeURIComponent(assetId)}/details`, { method: 'PUT', body: JSON.stringify(data) })).asset;

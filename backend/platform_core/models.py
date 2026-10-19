@@ -143,6 +143,8 @@ class RentalAsset(TenantRecord):
     asset_type: AssetType = AssetType.CAR
     name: str = Field(min_length=1)
     internal_number: Optional[str] = None
+    # Private registration identifier, separate from public vehicle specs.
+    license_plate: Optional[str] = Field(default=None, max_length=80)
     status: AssetStatus = AssetStatus.DRAFT
     public: bool = False
     photos: Dict[str, Any] = Field(default_factory=dict)

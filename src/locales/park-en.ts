@@ -1,5 +1,8 @@
 // Only interface copy. Customer and vehicle data are never passed through this catalogue.
 export const parkEnglish: Record<string, string> = {
+  'Госномер': 'Registration plate',
+  'Госномер: {0}': 'Plate: {0}',
+  'Номер и регион с таблички, включая тайские буквы. Видно только владельцу и администратору. До 80 символов.': 'Plate number and region, including Thai letters. Only visible to the owner and administrator. Up to 80 characters.',
   "Расчёт в карточке автомобиля": "Price available in vehicle details",
   "Аренда за {0} суток · разные сезоны": "Rental for {0} days · mixed seasons",
   "Аренда без доставки. Цена повторно проверяется при отправке.": "Rental excludes delivery. Price is rechecked when submitting.",

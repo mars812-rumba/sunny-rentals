@@ -78,6 +78,18 @@ class TenantAssetAdmin:
             if context.actor_id != self.context.actor_id:
                 raise PermissionError('Owner identity changed')
 
+    @classmethod
+    def for_web_owner(cls, auth, token, tenant_id):
+        instance = cls.__new__(cls)
+        context = auth.authenticate(token, tenant_id)
+        context.require_role('owner')
+        instance.provisioner = auth.provisioner
+        instance.tenant = auth.tenant(tenant_id)
+        instance.admin = instance.context = context
+        instance._owner_auth = lambda: (None, auth.authenticate(token, tenant_id))
+        instance._init_storage(auth.provisioner.root)
+        return instance
+
     def _init_storage(self, root):
         self.assets = JsonCollectionRepository(root, self.context, "assets.json", RentalAsset)
         self.audit = JsonlEventRepository(root, self.context, "audit.jsonl")
@@ -173,6 +185,8 @@ class TenantAssetAdmin:
                     asset.deposit_policy = {**asset.deposit_policy, 'amount': data.deposit, 'currency': self.tenant.currency}
             elif data.section == 'specs':
                 asset.specs = {**asset.specs, **json.loads(data.specs.json())}
+                if 'license_plate' in data.__fields_set__:
+                    asset.license_plate = data.license_plate
             else:
                 asset.description = data.description.strip()
             asset.updated_at = utc_now()
