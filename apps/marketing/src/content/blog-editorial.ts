@@ -1,5 +1,6 @@
 import { winterGuideEditorial, winterGuideSlug } from "@/content/winter-guide";
 import { carOrTaxiEnglish } from "@/content/car-or-taxi-guide";
+import { phuketDrivingEnglish } from "@/content/phuket-driving-guide";
 
 interface EditorialTranslation {
   image?: string;
@@ -17,6 +18,7 @@ interface BlogEditorial {
 }
 
 export const blogEditorial: Record<string, BlogEditorial> = {
+  "phuket-driving-itineraries": { en: phuketDrivingEnglish },
   "car-or-taxi-phuket": {
     image: "/images/articles/car-or-taxi-phuket-vs.webp",
     ru: {

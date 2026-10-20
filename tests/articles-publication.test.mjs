@@ -22,6 +22,28 @@ compiled._compile(bundled.outputFiles[0].text, compiled.filename);
 const ui = compiled.exports;
 const slug = 'choose-car-rental-phuket-reviews';
 
+test('approved driving itinerary has a complete English page, localized links and reciprocal metadata', () => {
+  const guideSlug = 'phuket-driving-itineraries';
+  const post = ui.getPublishedBlogPost(guideSlug, 'en');
+  assert.ok(post);
+  assert.deepEqual(post.availableLocales, ['ru', 'en']);
+  assert.doesNotMatch(post.content, /[а-яё]/i);
+  assert.equal((post.content.match(/^## /gm) || []).length, 5);
+  for (const text of ['Karon Viewpoint', 'Nai Harn', 'Promthep Cape', 'Thalang Road', 'Soi Rommani', 'Dibuk Road', '20–30 minutes', 'two to three hours', 'red flag', 'height and weight']) assert.ok(post.content.includes(text), text);
+  for (const [, path] of post.content.matchAll(/\]\((\/[^)]+)\)/g)) assert.ok(path.startsWith('/en/'));
+  assert.equal(post.image, '/images/articles/car-or-taxi-phuket.webp');
+  const html = renderToStaticMarkup(React.createElement(ui.ArticleReading, { post }));
+  assert.match(html, /href="\/articles\/phuket-driving-itineraries\/?"/);
+  assert.match(html, /href="\/en\/articles\/phuket-driving-itineraries\/?"/);
+  for (const [, anchor] of html.matchAll(/href="#([^"]+)"/g)) assert.ok(html.includes(`id="${anchor}"`));
+  assert.ok(renderToStaticMarkup(React.createElement(ui.ArticlesIndex, { locale: 'en' })).includes(post.title));
+  const meta = ui.articleMetadata(post);
+  assert.equal(meta.alternates.canonical, '/en/articles/phuket-driving-itineraries/');
+  assert.equal(meta.alternates.languages.ru, '/articles/phuket-driving-itineraries/');
+  assert.equal(meta.openGraph.url, 'https://sunny-rentals.online/en/articles/phuket-driving-itineraries/');
+  assert.equal(ui.sitemap().filter(entry => entry.url === meta.openGraph.url).length, 1);
+});
+
 for (const locale of ['ru', 'en']) {
   test(`shared public footer ${locale}: one layout footer with localized vertical navigation`, () => {
     const post = ui.getPublishedBlogPost(slug, locale);

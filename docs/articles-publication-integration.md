@@ -1,5 +1,29 @@
 # Articles publication and visual reading surface
 
+## Driving itineraries: approved-Russian English adaptation — 20 October 2026
+
+`phuket-driving-guide.ts` provides a complete English adaptation of the approved
+`phuket-driving-itineraries` article (published Russian revision `2de72ed960dc`).
+Russian public JSON SHA-256 remains
+`56cfad393ac61c3167894187ca181cea70b8bea09102ebacd7814ae0afc65b09`.
+All five sections, the three-row route table, suggested visit durations, parking
+and weather caveats, red-flag warning and child-seat confirmation are preserved.
+No new prices, opening hours, drive-time guarantees or destination claims added.
+Existing cover reused with English alt/caption; no new image generation needed.
+
+The editorial overlay supplies `/en/articles/phuket-driving-itineraries/`, the
+English index/sitemap entry and reciprocal RU/EN alternates through existing
+metadata code. Russian article and scheduler state are unchanged.
+17 publication tests passed, including a new translation/metadata regression.
+Private production-component SSR Chromium checks passed at 390px and 1440px:
+images loaded, contents links resolved/clicked, one H1, no page-wide overflow or
+page errors. Evidence: `.local/seo-editorial/phuket-driving-en-review/`.
+Playwright was installed only in `/tmp/sunny-driving-en-browser-venv`, not the
+project/service environment. This is not a Next hydration or live social-card
+check; full export/live checks remain for the owner's separate release.
+The existing exported-article checker now also requires the new English page.
+No deploy, commit/push, scheduler edit or service restart performed.
+
 ## Direction contract
 
 THESIS: one discoverable article collection, not two disconnected lists. Mode: Read.
