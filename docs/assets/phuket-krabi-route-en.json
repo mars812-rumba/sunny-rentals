@@ -1,0 +1,9 @@
+{
+  "slug": "phuket-krabi-route-en",
+  "tool": "built-in image_gen",
+  "illustrative": true,
+  "use_case": "text-localization",
+  "prompt": "Use case: text-localization. Edit this exact map, preserving geography, route, every colour, transparency, illustration, line placement, proportions and layout. Change ONLY the three Russian labels to English labels: 'ПХУКЕТ' becomes 'PHUKET'; 'ПХАНГ-НГА' becomes 'PHANG NGA'; 'КРАБИ' becomes 'KRABI'. Same dark green bold lettering, same positions, legible wide 16:9 article cover. No additional text or objects. Retain genuinely transparent outer background. No keys, no phone, no tabletop. Keep the orange route on land around north of the bay, never across open water.",
+  "notes": "Schematic route illustration, not navigation data. Transparent outer background. No keys, phone, props or scenic backdrop.",
+  "source": "Russian generated map; labels localized only"
+}

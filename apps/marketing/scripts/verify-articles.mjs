@@ -44,4 +44,11 @@ assert.match(driving, /Karon Viewpoint/);
 assert.match(driving, /Promthep Cape/);
 assert.ok(driving.includes('rel="canonical" href="https://sunny-rentals.online/en/articles/phuket-driving-itineraries/"'));
 assert.ok(readFileSync(resolve(out, 'en/articles/index.html'), 'utf8').includes('/en/articles/phuket-driving-itineraries/'));
-console.log(`Published-article export verified: ${slugs.length} RU guides, compatibility pages, English reviews, winter, taxi and driving guides, indices and images.`);
+for (const locale of ['ru', 'en']) {
+  const prefix = locale === 'en' ? 'en/' : '';
+  const krabi = readFileSync(resolve(out, `${prefix}articles/phuket-krabi-by-car/index.html`), 'utf8');
+  assert.match(krabi, new RegExp(`phuket-krabi-route-${locale}\\.webp`));
+  assert.ok(krabi.includes(`rel="canonical" href="https://sunny-rentals.online/${prefix}articles/phuket-krabi-by-car/"`));
+  assert.ok(readFileSync(resolve(out, `${prefix}articles/index.html`), 'utf8').includes(`/${prefix}articles/phuket-krabi-by-car/`));
+}
+console.log(`Published-article export verified: ${slugs.length} RU guides, compatibility pages, translated guides including Krabi, indices and images.`);

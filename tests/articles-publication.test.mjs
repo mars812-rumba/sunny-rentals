@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import Module, { createRequire } from 'node:module';
 import { resolve, join } from 'node:path';
 import { readFileSync, existsSync, mkdtempSync, writeFileSync } from 'node:fs';
@@ -21,6 +22,35 @@ compiled.paths = Module._nodeModulePaths(app);
 compiled._compile(bundled.outputFiles[0].text, compiled.filename);
 const ui = compiled.exports;
 const slug = 'choose-car-rental-phuket-reviews';
+
+for (const locale of ['ru', 'en']) {
+  test(`Krabi ${locale}: approved bilingual article, localized transparent map and real alternates`, async () => {
+    const post = ui.getPublishedBlogPost('phuket-krabi-by-car', locale);
+    assert.ok(post); assert.deepEqual(post.availableLocales, ['ru', 'en']);
+    assert.equal((post.content.match(/^## /gm) || []).length, 7);
+    assert.equal(post.image, `/images/articles/phuket-krabi-route-${locale}.webp`);
+    for (const [, path] of post.content.matchAll(/\]\((\/[^)]+)\)/g)) assert.ok(locale === 'en' ? path.startsWith('/en/') : !path.startsWith('/en/'));
+    if (locale === 'en') {
+      assert.doesNotMatch(post.content, /[а-яё]/i);
+      assert.match(post.content, /Samet Nangshe/); assert.match(post.content, /identified second party/);
+      assert.match(post.content, /without prior approval/); assert.match(post.content, /limitations and exclusions/);
+    } else {
+      assert.match(post.content, /Самет Нангше/); assert.match(post.content, /без предварительного согласования/);
+      assert.equal(createHash('sha256').update(post.content).digest('hex'), '8891dedbfd4c96ee1bf0d782f36295e76ec521068e7e7e57c1be89890720e355');
+    }
+    const html = renderToStaticMarkup(React.createElement(ui.ArticleReading, { post }));
+    for (const prefix of ['', '/en']) assert.match(html, new RegExp(`href="${prefix}/articles/phuket-krabi-by-car/?"`));
+    const meta = ui.articleMetadata(post);
+    assert.equal(meta.alternates.canonical, `${locale === 'en' ? '/en' : ''}/articles/phuket-krabi-by-car/`);
+    assert.ok(ui.sitemap().some(entry => entry.url === meta.openGraph.url));
+    assert.ok(renderToStaticMarkup(React.createElement(ui.ArticlesIndex, { locale })).includes(post.title));
+    const file = readFileSync('public' + post.image);
+    assert.deepEqual(file, readFileSync(resolve(app, 'public' + post.image)));
+    const info = await requireApp('sharp')(file).metadata();
+    assert.equal(info.width, 1600); assert.equal(info.height, 900); assert.equal(info.hasAlpha, true);
+    assert.ok(file.length < 250 * 1024); assert.ok(info.exif.toString().includes('built-in image_gen'));
+  });
+}
 
 test('approved driving itinerary has a complete English page, localized links and reciprocal metadata', () => {
   const guideSlug = 'phuket-driving-itineraries';

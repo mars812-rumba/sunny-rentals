@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "generation_mode": "prepared-assets-only",
+  "default": {
+    "path": "/images/articles/car-or-taxi-phuket.webp",
+    "alt": "Карта, автомобильный ключ и телефон для планирования поездок на фоне побережья",
+    "caption": "К статье «{title}»",
+    "provenance": "docs/assets/car-or-taxi-phuket-cover.json"
+  },
+  "topics": {
+    "phuket-krabi-by-car": {
+      "path": "/images/articles/phuket-krabi-route-ru.webp",
+      "alt": "Схема автомобильного маршрута Пхукет — Пханг-Нга — Краби",
+      "caption": "Схема маршрута Пхукет — Краби, не навигационная карта",
+      "provenance": "docs/assets/phuket-krabi-route-ru.json"
+    },
+    "car-or-taxi-phuket": {
+      "path": "/images/articles/car-or-taxi-phuket-vs.webp",
+      "alt": "Сравнение такси и самостоятельной аренды автомобиля на Пхукете",
+      "caption": "К статье «{title}»",
+      "provenance": "docs/assets/car-or-taxi-phuket-vs-cover.json"
+    }
+  }
+}

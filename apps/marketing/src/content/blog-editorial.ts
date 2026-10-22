@@ -1,6 +1,7 @@
 import { winterGuideEditorial, winterGuideSlug } from "@/content/winter-guide";
 import { carOrTaxiEnglish } from "@/content/car-or-taxi-guide";
 import { phuketDrivingEnglish } from "@/content/phuket-driving-guide";
+import { krabiEnglish } from "@/content/krabi-guide";
 
 interface EditorialTranslation {
   image?: string;
@@ -18,6 +19,14 @@ interface BlogEditorial {
 }
 
 export const blogEditorial: Record<string, BlogEditorial> = {
+  "phuket-krabi-by-car": {
+    image: "/images/articles/phuket-krabi-route-ru.webp",
+    ru: {
+      imageAlt: "Схема сухопутного маршрута Пхукет — Пханг-Нга — Краби вокруг залива",
+      imageCaption: "Схема маршрута Пхукет — Краби, не навигационная карта",
+    },
+    en: krabiEnglish,
+  },
   "phuket-driving-itineraries": { en: phuketDrivingEnglish },
   "car-or-taxi-phuket": {
     image: "/images/articles/car-or-taxi-phuket-vs.webp",

@@ -1,0 +1,9 @@
+{
+  "slug": "phuket-krabi-route-ru",
+  "tool": "built-in image_gen",
+  "illustrative": true,
+  "use_case": "infographic-diagram",
+  "prompt": "Use case: infographic-diagram. Create a clean standalone schematic regional map for a travel article cover, wide 16:9, no tabletop, no keys, no phone, no paper props, no photographs, no scene/background outside the map; transparent outer background. North up. Geographical composition: Phuket is an elongated island at lower LEFT, connected at its NORTH tip by a short bridge to mainland Phang Nga above; Phang Nga Bay is the open bay in the centre; Krabi is on mainland to the RIGHT/EAST of the bay. A single clear orange driving route goes from Phuket NORTH across the bridge, then around the NORTH of Phang Nga Bay through the mainland and curves EAST then SOUTH to Krabi on the right. Absolutely no driving route directly across water. Minimal accurate schematic coastline, pale warm sand land, quiet pale blue bay, forest-green text, crisp elegant map illustration, sparse labels, generous margins, readable at phone cover size. Exact Russian labels only: 'ПХУКЕТ' on Phuket island, 'ПХАНГ-НГА' on northern mainland, 'КРАБИ' in large legible letters at destination. Small solid start/end dots; no extra invented highways, road numbers, distances, durations, legend, cars, logos, compass, or other text. Make map itself dominate the entire image with no decorative backdrop.",
+  "notes": "Schematic route illustration, not navigation data. Transparent outer background. No keys, phone, props or scenic backdrop.",
+  "source": "Generated for approved Krabi guide"
+}
