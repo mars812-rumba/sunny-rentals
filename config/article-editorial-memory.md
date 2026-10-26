@@ -6,6 +6,13 @@ project preferences and portable editorial lessons.
 
 - Project: write as our team, not a third-party reviewer of Sunny. Use «мы передаём
   машину…» only when the handover terms are confirmed.
+- Project, owner confirmation 22 October 2026: travel within Phuket, Krabi and
+  Phang Nga needs no prior approval and insurance is valid there. The territory
+  questions blocking the Krabi guide are answered. Do not extend this to other
+  provinces, ferries or promises of insurance without exclusions/excess.
+- Project, owner confirmation 26 October 2026: Sunny cars may not travel to
+  Bangkok. The Bangkok article was cancelled in favour of an insurance explainer;
+  do not promote that route or a Bangkok handover as a Sunny service.
 - General: do not invent employees, personal experience or customer reviews to sound
   human; use concrete, helpful explanations instead.
 - Project: do not introduce replacement/substitute-car promises. Distinguish booking

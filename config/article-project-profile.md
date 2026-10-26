@@ -18,6 +18,23 @@ photos and seasonal rates: supplied public inventory. A file read is not confirm
 of availability, freshness from the supplier or the final price for specific dates.
 Never expose supplier contacts, bookings or private tenant data.
 
+Owner-confirmed travel territory, 22 October 2026: Sunny rental cars may be driven
+within Phuket, Krabi and Phang Nga without prior approval; insurance remains valid
+in these three provinces. This answers the pending owner questions for
+`phuket-krabi-by-car`; do not leave its article empty or ask the same territory
+questions again. Attribute this company-specific rule to the owner's confirmation,
+not competitors. It does not establish unrestricted travel elsewhere, ferry
+permission, full/no-excess cover or removal of the normal policy exclusions.
+Other provinces and routes still need separate confirmation.
+
+Owner confirmation, 26 October 2026: Sunny cars are NOT permitted to travel to
+Bangkok. Do not suggest a Bangkok–Phuket trip using Sunny's rental fleet, advertise
+a Bangkok handover or imply this restriction can be waived by asking. The owner
+cancelled the Bangkok article and chose an educational car-insurance article next.
+That article must distinguish verified general insurance categories from Sunny's
+specific offer, link to the existing `/insurance/` terms page rather than duplicate
+it, and avoid inventing policy classes, add-ons or coverage Sunny does not offer.
+
 Begin with supplied Wordstat evidence, then relevant RU/EN competitors and primary
 sources. Suggestions and competitor headings are candidate questions, not frequency
 statistics. Disclose unavailable sources in research_notes. Preserve Wordstat period,
