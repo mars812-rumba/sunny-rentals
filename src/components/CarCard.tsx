@@ -9,10 +9,12 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { carPromoBadges, selectRandomCarPromoBadges } from '../../shared/car-promo-badges';
+import { appRentalDailyPrice } from '@/lib/app-rental-pricing';
 
 interface CarCardProps {
   car: any;
   rentalDays: number;
+  startDate?: Date | null;
   onBooking: (car: any) => void;
   isSubmitting: boolean;
 }
@@ -127,52 +129,11 @@ const getBadgeColorClasses = (color: string) => {
   return colorMap[color] || colorMap.blue;
 };
 
-const CarCard = ({ car, rentalDays, onBooking, isSubmitting }: CarCardProps) => {
+const CarCard = ({ car, rentalDays, startDate, onBooking, isSubmitting }: CarCardProps) => {
   const { t } = useLanguage();
   
   
-  const getSeason = (date: Date) => {
-    console.log('CarCard.tsx getSeason date:', date);
-    if (!date || isNaN(date.getTime())) {
-      console.log('CarCard.tsx getSeason date is invalid, using new Date()');
-      date = new Date();
-    }
-    const month = date.getMonth() + 1; // 1-12
-    // Высокий сезон: ноябрь-март (11, 12, 1, 2, 3)
-    if (month >= 11 || month <= 3) {
-      return 'high_season';
-    }
-    // Низкий сезон: апрель-октябрь (4-10)
-    return 'low_season';
-  };
-
-  const getPriceForPeriod = (pricing: any, days: number) => {
-    console.log('CarCard.tsx getPriceForPeriod days:', days);
-    const today = new Date();
-    console.log('CarCard.tsx getPriceForPeriod today:', today);
-    const season = getSeason(today);
-    
-    const seasonalPricing = pricing[season] || pricing.low_season;
-
-    if (!seasonalPricing) {
-      const fallbackSeason = Object.keys(pricing).find(k => k.includes('season'));
-      if (fallbackSeason) {
-        const fallbackPricing = pricing[fallbackSeason];
-        if (days >= 30) return fallbackPricing.price_30 || 0;
-        if (days >= 15) return fallbackPricing.price_15_29 || 0;
-        if (days >= 7) return fallbackPricing.price_7_14 || 0;
-        return fallbackPricing.price_1_6 || 0;
-      }
-      return 0;
-    }
-
-    if (days >= 30) return seasonalPricing.price_30;
-    if (days >= 15) return seasonalPricing.price_15_29;
-    if (days >= 7) return seasonalPricing.price_7_14;
-    return seasonalPricing.price_1_6;
-  };
-
-  const dailyPrice = getPriceForPeriod(car.pricing, rentalDays > 0 ? rentalDays : 1);
+  const dailyPrice = appRentalDailyPrice(car.pricing, rentalDays > 0 ? rentalDays : 1, startDate);
   const totalPrice = dailyPrice * rentalDays;
 
   const imageGallery = car.photos?.gallery && car.photos.gallery.length > 0 

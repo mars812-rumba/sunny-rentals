@@ -11,21 +11,9 @@ import { ru } from 'date-fns/locale';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { submitBooking } from '@/api/api';
+import { appRentalSeason as determineSeason, appRentalDailyPrice as getPriceForPeriod } from '@/lib/app-rental-pricing';
 
 // --- Helper functions ---
-const determineSeason = (startDate: Date) => {
-  const month = startDate.getMonth() + 1;
-  return month >= 11 || month <= 4 ? 'high_season' : 'low_season';
-};
-
-const getPriceForPeriod = (pricing: any, days: number, startDate?: Date) => {
-  const season = startDate ? determineSeason(startDate) : 'low_season';
-  if (days >= 30) return pricing[season].price_30;
-  if (days >= 15) return pricing[season].price_15_29;
-  if (days >= 7) return pricing[season].price_7_14;
-  return pricing[season].price_1_6;
-};
-
 const getDeliveryPrice = (location: string) => {
   return location === 'airport' ? 0 : 500;
 };

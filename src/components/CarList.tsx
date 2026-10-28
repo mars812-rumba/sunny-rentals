@@ -22,7 +22,7 @@ export const CarList = React.forwardRef<HTMLDivElement, CarListProps>(({ cars, f
   return (
     <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {cars.map((car) => (
-        <CarCard key={car.id} car={car} rentalDays={rentalDays} onBooking={onBooking} isSubmitting={isSubmitting} />
+        <CarCard key={car.id} car={car} rentalDays={rentalDays} startDate={filters.startDate} onBooking={onBooking} isSubmitting={isSubmitting} />
       ))}
     </div>
   );

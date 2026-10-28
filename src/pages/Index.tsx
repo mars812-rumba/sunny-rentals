@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { parseISO, addDays } from 'date-fns';
+import { parseISO, addDays, format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import FilterForm from '@/components/FilterForm';
 import SendBookForm from '@/components/SendBookForm';
@@ -11,6 +11,7 @@ import HeroBanner from '@/components/HeroBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCars } from '@/contexts/CarsContext';
 import { isValid } from 'date-fns';
+import { appRentalDays, appRentalSeason as determineSeason, appRentalDailyPrice as getPriceForPeriod } from '@/lib/app-rental-pricing';
 import { trackLeadEvent } from '@/api/api';
 import {
   parseTelegramHandoffPayload,
@@ -22,28 +23,16 @@ interface RentalFilters {
   endDate: Date | null;
   pickupLocation: string;
   returnLocation: string;
+  pickupTime: string;
+  returnTime: string;
   days: number;
 }
 
+const toPhuketDateTimeIso = (date: Date, time: string) => (
+  `${format(date, 'yyyy-MM-dd')}T${time}:00+07:00`
+);
+
 // --- Pricing helpers ---
-const determineSeason = (date: Date) => {
-  const month = date.getMonth(); // 0-11 (0=январь, 11=декабрь)
-  // Low season: Апрель (3) - Октябрь (9)
-  if (month >= 3 && month <= 9) {
-    return 'low_season';
-  }
-  // High season: Ноябрь (10), Декабрь (11), Январь (0), Февраль (1), Март (2)
-  return 'high_season';
-};
-
-const getPriceForPeriod = (pricing, days, startDate: Date) => {
-  const season = determineSeason(startDate);
-  if (days >= 30) return pricing[season].price_30;
-  if (days >= 15) return pricing[season].price_15_29;
-  if (days >= 7) return pricing[season].price_7_14;
-  return pricing[season].price_1_6;
-};
-
 const getDeliveryPrice = (location) => {
   return location === 'airport' ? 0 : 500;
 };
@@ -60,6 +49,8 @@ const Index = () => {
     endDate: null,
     pickupLocation: '',
     returnLocation: '',
+    pickupTime: '13:00',
+    returnTime: '13:00',
     days: 0
   });
   const carListRef = useRef<HTMLDivElement>(null);
@@ -87,7 +78,7 @@ const Index = () => {
   };
 
   const handleFiltersChange = useCallback((newFilters: any) => {
-    setFilters(newFilters);
+    setFilters({ ...newFilters, days: appRentalDays(newFilters.startDate, newFilters.endDate, newFilters.pickupTime, newFilters.returnTime) });
     setShowResults(true);
     setHasTrackedFilters(false); // Сбрасываем флаг при изменении фильтров
   }, []);
@@ -118,14 +109,14 @@ const Index = () => {
     let hasParams = false;
 
     if (handoff) {
-      const days = Math.floor(
-        (handoff.endDate.getTime() - handoff.startDate.getTime()) / (1000 * 60 * 60 * 24)
-      ) + 1;
+      const days = appRentalDays(handoff.startDate, handoff.endDate, handoff.pickupTime, handoff.returnTime);
       newFilters = {
         startDate: handoff.startDate,
         endDate: handoff.endDate,
         pickupLocation: handoff.pickupLocation,
         returnLocation: handoff.returnLocation,
+        pickupTime: handoff.pickupTime,
+        returnTime: handoff.returnTime,
         days,
       };
       categoryToSet = handoff.category;
@@ -236,6 +227,13 @@ const Index = () => {
       toast({ title: t('toast_fill_filters'), variant: "destructive" });
       return;
     }
+    if (
+      format(filters.startDate, 'yyyy-MM-dd') === format(filters.endDate, 'yyyy-MM-dd') &&
+      filters.returnTime <= filters.pickupTime
+    ) {
+      toast({ title: t('time_order_error'), variant: "destructive" });
+      return;
+    }
     setSelectedCar(car);
     setIsSendBookFormOpen(true);
     setIsBookingSubmitted(false);
@@ -274,9 +272,11 @@ const handleBookingSubmit = async (contact: { value: string, type: string }) => 
           color: selectedCar.color 
         },
         dates: { 
-          start: filters.startDate.toISOString(), 
-          end: filters.endDate.toISOString(), 
-          days: filters.days 
+          start: toPhuketDateTimeIso(filters.startDate, filters.pickupTime),
+          end: toPhuketDateTimeIso(filters.endDate, filters.returnTime),
+          days: filters.days,
+          pickupTime: filters.pickupTime,
+          returnTime: filters.returnTime,
         },
         locations: { 
           pickup: filters.pickupLocation, 
@@ -444,6 +444,8 @@ if (filters.startDate && filters.endDate &&
     trackLeadEvent('filters_used', {
       startDate: filters.startDate.toISOString(),
       endDate: filters.endDate.toISOString(),
+      pickupTime: filters.pickupTime,
+      returnTime: filters.returnTime,
       
     });
     setHasTrackedFilters(true);
@@ -469,7 +471,9 @@ if (filters.startDate && filters.endDate &&
         days: filters.days,
         category: selectedCategory,
         pickupLocation: filters.pickupLocation,
-        returnLocation: filters.returnLocation
+        returnLocation: filters.returnLocation,
+        pickupTime: filters.pickupTime,
+        returnTime: filters.returnTime,
       }).then(() => {
         console.log('✅ filters_used tracked');
       }).catch(err => {

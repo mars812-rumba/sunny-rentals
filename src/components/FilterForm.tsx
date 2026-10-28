@@ -14,6 +14,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import { appRentalDays } from '@/lib/app-rental-pricing';
 
 // Category icons
 import bikeIco from '@/assets/classes/bike_ico.png.webp';
@@ -162,7 +163,7 @@ const FilterForm = ({
         
         if (!isValid(from) || !isValid(to)) return 0;
         
-        return Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        return appRentalDays(from, to, pickupTime, returnTime);
       } catch {
         return 0;
       }
