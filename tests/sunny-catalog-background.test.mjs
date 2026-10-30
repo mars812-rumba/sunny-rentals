@@ -49,3 +49,14 @@ test('theme is attached only to public Sunny catalogue, not global body or tenan
   const form = readFileSync('src/components/FilterForm.tsx', 'utf8');
   assert.match(form, /cn\('sunny-rental-form', isMobile/);
 });
+
+test('all four form dropdowns opt into portal-safe surfaces without removing focus or disabled semantics', () => {
+  const form = readFileSync('src/components/FilterForm.tsx', 'utf8');
+  assert.equal((form.match(/<SelectContent className="sunny-catalog-select">/g) || []).length, 4);
+  assert.match(css, /-webkit-tap-highlight-color: transparent/);
+  assert.match(css, /\.sunny-catalog-select\s*\{\s*background-color: #ffffff/);
+  assert.match(css, /\[data-radix-select-viewport\]\s*\{\s*background-color: inherit/);
+  assert.match(css, /\[data-highlighted\]/);
+  assert.match(css, /min-height: 44px/);
+  assert.doesNotMatch(css, /outline:\s*(?:none|0)|pointer-events:\s*none|opacity:\s*1\s*!important/);
+});

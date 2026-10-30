@@ -249,7 +249,7 @@ const FilterForm = ({
                   <SelectValue placeholder={t('pickup_location')} />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="sunny-catalog-select">
                 {locations.map(loc => (
                   <SelectItem key={loc.value} value={loc.value}>
                     {loc.label} ({loc.price > 0 ? `+${loc.price}฿` : t('free')})
@@ -281,7 +281,7 @@ const FilterForm = ({
                         <SelectValue placeholder={t('return_location')} />
                       </div>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="sunny-catalog-select">
                       {locations.map(loc => (
                         <SelectItem key={loc.value} value={loc.value}>
                           {loc.label} ({loc.price > 0 ? `+${loc.price}฿` : t('free')})
@@ -337,7 +337,7 @@ const FilterForm = ({
                       <SelectValue />
                     </div>
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="sunny-catalog-select">
                     {timeOptions.map((time) => <SelectItem key={time} value={time}>{time}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -357,7 +357,7 @@ const FilterForm = ({
                       <SelectValue />
                     </div>
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="sunny-catalog-select">
                     {timeOptions.map((time) => <SelectItem key={time} value={time}>{time}</SelectItem>)}
                   </SelectContent>
                 </Select>

@@ -45,6 +45,36 @@
   box-shadow: var(--sunny-catalog-depth);
 }
 
+/* Android WebView's tap highlight can paint an entire selectable container.
+   Keep keyboard focus styles; suppress only the transient touch paint. */
+.sunny-rental-form,
+.sunny-catalog-select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Radix portals render under body, outside .sunny-catalog. Use an explicit
+   content class instead of relying on the page's inherited theme/background. */
+.sunny-catalog-select {
+  background-color: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  color-scheme: light;
+}
+
+.sunny-catalog-select [data-radix-select-viewport] {
+  background-color: inherit;
+}
+
+.sunny-catalog-select [role="option"] {
+  min-height: 44px;
+}
+
+.sunny-catalog-select [role="option"][data-highlighted],
+.sunny-catalog-select [role="option"][data-state="checked"] {
+  background-color: #e0f2fe;
+  color: #0c4a6e;
+}
+
 @media (min-width: 768px) {
   .sunny-catalog {
     background-image:
