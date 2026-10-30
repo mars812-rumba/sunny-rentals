@@ -26,6 +26,7 @@ test('Sunny hero uses the existing uncropped logo instead of a photo background'
   assert.match(html, /width="184" height="184"/);
   assert.doesNotMatch(html, /background-image|bg-black\/50|h-64/);
   assert.match(html, /bg-white pt-12 pb-14 sm:pb-24/);
+  assert.match(html, /sunny-catalog-logo/);
 });
 
 test('subtitle is car-only and Sunny benefit badges leave no empty container', () => {

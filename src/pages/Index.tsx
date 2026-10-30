@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
 import CarList from '@/components/CarList';
 import HeroBanner from '@/components/HeroBanner';
+import '@/components/sunny-catalog.css';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCars } from '@/contexts/CarsContext';
 import { visibleCatalogCategories, reconcileCatalogCategory } from '@/lib/catalog-categories';
@@ -556,9 +557,7 @@ if (visibleCategoryIds.length === 0) {
 }
 
   return (
-    <div className={isMobile 
-      ? "min-h-screen bg-gradient-to-br from-orange-100/30 via-amber-50/25 to-yellow-50/30" 
-      : "min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50"}>
+    <div className="sunny-catalog min-h-dvh pb-8">
       <HeroBanner />
 
       <div className="relative">

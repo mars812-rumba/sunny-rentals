@@ -14,7 +14,7 @@ const HeroBanner = ({ park }: { park?: { name: string; minimumPrice: string | nu
 
   return (
     <div
-      className={`relative overflow-hidden ${park ? 'min-h-72 bg-cover bg-center py-6' : 'bg-white pt-12 pb-14 sm:pb-24'}`}
+      className={`relative overflow-hidden ${park ? 'min-h-72 bg-cover bg-center py-6' : 'sunny-catalog-hero bg-white pt-12 pb-14 sm:pb-24'}`}
       style={park ? { backgroundImage: `url(${isMobile ? heroMob : heroBg})` } : undefined}
     >
       {/* Dark overlay */}
@@ -33,8 +33,10 @@ const HeroBanner = ({ park }: { park?: { name: string; minimumPrice: string | nu
       <div className={`relative flex flex-col justify-center px-4 ${park ? 'mx-auto max-w-6xl text-white sm:px-6 lg:px-8' : 'text-slate-900'}`}>
         {/* Main title */}
         {park?.logo}
-        {!park && <img src={sunnyLogo} alt="Sunny Rentals" width={184} height={184}
-          className="mx-auto mb-3 h-24 w-24 object-contain" />}
+        {!park && <div className="sunny-catalog-logo mx-auto mb-3">
+          <img src={sunnyLogo} alt="Sunny Rentals" width={184} height={184}
+            className="h-24 w-24 object-contain" />
+        </div>}
         <h1 className={`text-3xl font-bold mb-2 break-words ${park ? 'text-left drop-shadow-lg' : 'text-center'}`}>
           {park ? park.name : language === 'ru'
             ? 'Аренда на Пхукете'

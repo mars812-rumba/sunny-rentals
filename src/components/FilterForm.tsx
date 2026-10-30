@@ -225,10 +225,10 @@ const FilterForm = ({
 
   return (
     <div className="space-y-4">
-      <div className={isMobile 
+      <div className={cn('sunny-rental-form', isMobile
         ? "bg-gradient-to-b from-white via-white to-gray-50/50 rounded-2xl p-4 shadow-lg"
         : "bg-white rounded-3xl p-8 shadow-2xl border border-gray-200"
-      }>
+      )}>
         <div className={isMobile ? "space-y-4" : "space-y-6"}>
           <div>
             <p className={isMobile 
