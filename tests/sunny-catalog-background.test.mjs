@@ -4,15 +4,41 @@ import { readFileSync } from 'node:fs';
 import { transformSync } from 'esbuild';
 
 const css = readFileSync('src/components/sunny-catalog.css', 'utf8');
-test('catalogue has scoped sea/sun colours and lightweight static depth', () => {
+test('logo sits directly on the gradient without a white plate or box shadow', () => {
+  const logo = css.match(/\.sunny-catalog \.sunny-catalog-logo\s*\{([^}]+)\}/)[1];
+  assert.match(logo, /background: transparent/);
+  assert.match(logo, /box-shadow: none/);
+  assert.doesNotMatch(logo, /border-radius/);
+});
+
+test('catalogue has scoped navy gradient and lightweight static depth', () => {
   assert.match(css, /--sunny-catalog-sea:/);
-  assert.match(css, /--sunny-catalog-sand:/);
+  assert.match(css, /--sunny-catalog-ground: #081729/);
   assert.match(css, /radial-gradient/);
   assert.match(css, /\.sunny-catalog \.sunny-rental-form/);
   assert.match(css, /\.sunny-catalog \.sunny-catalog-hero\s*\{\s*background: transparent/);
   assert.match(css, /box-shadow: var\(--sunny-catalog-depth\)/);
   assert.doesNotMatch(css, /backdrop-filter|filter:|animation:|url\(|position:\s*fixed/);
   assert.equal(transformSync(css, { loader: 'css', minify: true }).warnings.length, 0);
+});
+
+test('hero and results text have AA contrast against all dark gradient stops', () => {
+  function token(name) {
+    return css.match(new RegExp(`--sunny-catalog-${name}: (#[0-9a-f]{6})`))[1];
+  }
+  function luminance(hex) {
+    const rgb = hex.slice(1).match(/../g).map(value => parseInt(value, 16) / 255)
+      .map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+    return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
+  }
+  for (const text of ['on-dark', 'muted-on-dark']) {
+    for (const background of ['sea', 'sky', 'accent', 'ground']) {
+      assert.ok((luminance(token(text)) + 0.05) / (luminance(token(background)) + 0.05) >= 4.5,
+        `${text} against ${background}`);
+    }
+  }
+  assert.match(css, /\.sunny-catalog \.sunny-catalog-results-title/);
+  assert.match(css, /--sunny-catalog-surface: #ffffff/);
 });
 
 test('theme is attached only to public Sunny catalogue, not global body or tenant routes', () => {

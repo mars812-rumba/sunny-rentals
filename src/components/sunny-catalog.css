@@ -1,15 +1,17 @@
 /* Scoped to the legacy Sunny catalogue; park and admin surfaces are unchanged. */
 .sunny-catalog {
-  --sunny-catalog-sea: #e0f2f1;
-  --sunny-catalog-sky: #e7f2fb;
-  --sunny-catalog-sand: #fff1cf;
-  --sunny-catalog-ground: #edf5f7;
+  --sunny-catalog-sea: #20558a;
+  --sunny-catalog-sky: #102c52;
+  --sunny-catalog-accent: #173f70;
+  --sunny-catalog-ground: #081729;
+  --sunny-catalog-on-dark: #f1f5f9;
+  --sunny-catalog-muted-on-dark: #cbd5e1;
   --sunny-catalog-surface: #ffffff;
-  --sunny-catalog-depth: 0 16px 40px -12px rgb(27 65 85 / 20%),
-    0 4px 12px -4px rgb(27 65 85 / 8%);
+  --sunny-catalog-depth: 0 16px 40px -12px rgb(0 8 24 / 40%),
+    0 4px 12px -4px rgb(0 8 24 / 20%);
   background-color: var(--sunny-catalog-ground);
   background-image:
-    radial-gradient(ellipse 75% 32rem at 100% 0%, var(--sunny-catalog-sand), transparent 80%),
+    radial-gradient(ellipse 75% 32rem at 100% 0%, var(--sunny-catalog-accent), transparent 80%),
     radial-gradient(ellipse 95% 36rem at 0% 12rem, var(--sunny-catalog-sea), transparent 85%),
     linear-gradient(165deg, var(--sunny-catalog-sky), var(--sunny-catalog-ground) 75%);
   color: #0f172a;
@@ -19,11 +21,21 @@
   background: transparent;
 }
 
+.sunny-catalog .sunny-catalog-hero h1,
+.sunny-catalog .sunny-catalog-hero span,
+.sunny-catalog .sunny-catalog-results-title {
+  color: var(--sunny-catalog-on-dark);
+}
+
+.sunny-catalog .sunny-catalog-hero p,
+.sunny-catalog .sunny-catalog-hero span:last-child {
+  color: var(--sunny-catalog-muted-on-dark);
+}
+
 .sunny-catalog .sunny-catalog-logo {
   padding: 8px;
-  border-radius: 28px;
-  background: var(--sunny-catalog-surface);
-  box-shadow: 0 10px 24px -8px rgb(27 65 85 / 24%);
+  background: transparent;
+  box-shadow: none;
 }
 
 .sunny-catalog .sunny-rental-form {
@@ -36,7 +48,7 @@
 @media (min-width: 768px) {
   .sunny-catalog {
     background-image:
-      radial-gradient(ellipse 50% 40rem at 100% 0%, var(--sunny-catalog-sand), transparent 80%),
+      radial-gradient(ellipse 50% 40rem at 100% 0%, var(--sunny-catalog-accent), transparent 80%),
       radial-gradient(ellipse 65% 48rem at 0% 16rem, var(--sunny-catalog-sea), transparent 85%),
       linear-gradient(165deg, var(--sunny-catalog-sky), var(--sunny-catalog-ground) 75%);
   }
