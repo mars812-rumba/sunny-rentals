@@ -28,12 +28,13 @@ test('Sunny hero uses the existing uncropped logo instead of a photo background'
   assert.match(html, /bg-white pt-12 pb-14 sm:pb-24/);
 });
 
-test('subtitle is car-only, title and existing benefits are preserved', () => {
+test('subtitle is car-only and Sunny benefit badges leave no empty container', () => {
   const html = render({});
   assert.match(html, /Аренда на Пхукете/);
   assert.match(html, /Sunny Rentals — большой выбор проверенных авто/);
   assert.doesNotMatch(html, /байк/);
-  for (const text of ['От 600฿', 'Оплата', 'на месте', 'Аренда', 'в 2 клика']) assert.ok(html.includes(text));
+  for (const text of ['От 600฿', 'Оплата', 'на месте', 'в 2 клика']) assert.ok(!html.includes(text));
+  assert.doesNotMatch(html, /grid-cols-3|mb-6/);
 });
 
 test('optional tenant hero keeps its own branding and existing backdrop', () => {
@@ -42,4 +43,6 @@ test('optional tenant hero keeps its own branding and existing backdrop', () => 
   assert.match(html, /Park logo/);
   assert.match(html, /background-image/);
   assert.doesNotMatch(html, /alt="Sunny Rentals"/);
+  assert.match(html, /grid-cols-3/);
+  assert.match(html, /От 900฿/);
 });

@@ -5,6 +5,7 @@ import heroMob from '@/assets/hero_mob.jpg.webp';
 import sunnyLogo from '@/assets/logo.png.webp';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 import { CircleDollarSign, CreditCard, MousePointerClick, Star, Users } from 'lucide-react';
 
 const HeroBanner = ({ park }: { park?: { name: string; minimumPrice: string | null; logo?: React.ReactNode } }) => {
@@ -41,14 +42,14 @@ const HeroBanner = ({ park }: { park?: { name: string; minimumPrice: string | nu
         </h1>
        
         {/* Subtitle */}
-        <p className={`mb-6 ${park ? 'text-lg text-left drop-shadow-md opacity-90' : 'mx-auto max-w-md text-center text-base text-slate-600'}`}>
+        <p className={cn('text-pretty', park ? 'mb-6 text-lg text-left drop-shadow-md opacity-90' : 'mx-auto max-w-md text-center text-base text-slate-600')}>
           {park ? 'Выберите транспорт и даты вашей поездки' : language === 'ru'
             ? 'Sunny Rentals — большой выбор проверенных авто'
             : 'Sunny Rentals - wide selection of verified cars'}
         </p>
 
-        {/* Feature cards - HORIZONTAL LAYOUT */}
-        <div className={`grid grid-cols-3 gap-2 max-w-2xl ${park ? 'w-full' : 'mx-auto'}`}>
+        {/* Tenant-specific details remain unchanged; Sunny no longer shows badges. */}
+        {park && <div className="grid grid-cols-3 gap-2 max-w-2xl w-full">
           {/* Card 1 */}
           <div className={`${park ? 'bg-white/20 backdrop-blur-sm' : 'bg-slate-100 text-slate-800'} rounded-lg p-2 flex flex-row items-center gap-2`}>
             <CircleDollarSign className="w-6 h-6 flex-shrink-0" />
@@ -87,7 +88,7 @@ const HeroBanner = ({ park }: { park?: { name: string; minimumPrice: string | nu
               </div>
             </div>
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );
