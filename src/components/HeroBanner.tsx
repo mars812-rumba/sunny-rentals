@@ -2,6 +2,7 @@
 import React from 'react';
 import heroBg from '@/assets/hero_bg.jpg.webp';
 import heroMob from '@/assets/hero_mob.jpg.webp';
+import sunnyLogo from '@/assets/logo.png.webp';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { CircleDollarSign, CreditCard, MousePointerClick, Star, Users } from 'lucide-react';
@@ -12,42 +13,44 @@ const HeroBanner = ({ park }: { park?: { name: string; minimumPrice: string | nu
 
   return (
     <div
-      className={`relative overflow-hidden bg-cover bg-center ${park ? 'min-h-72 py-6' : 'h-64'}`}
-      style={{ backgroundImage: `url(${isMobile ? heroMob : heroBg})` }}
+      className={`relative overflow-hidden ${park ? 'min-h-72 bg-cover bg-center py-6' : 'bg-white pt-12 pb-14 sm:pb-24'}`}
+      style={park ? { backgroundImage: `url(${isMobile ? heroMob : heroBg})` } : undefined}
     >
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/50"></div>
+      {park && <div className="absolute inset-0 bg-black/50" />}
      
       {/* Top badges */}
 {!park && <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
   {/* Rating badge - left */}
   <div className="flex items-center gap-1.5">
     <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 drop-shadow-lg" />
-    <span className="text-white font-semibold text-sm drop-shadow-lg">4.8</span>
-    <span className="text-white/90 text-xs drop-shadow-lg">(100+ reviews) </span>
+    <span className="text-slate-900 font-semibold text-sm">4.8</span>
+    <span className="text-slate-600 text-xs">(100+ reviews) </span>
   </div>
 </div>}
       {/* Main content */}
-      <div className={`relative h-full flex flex-col justify-center px-4 text-white ${park ? 'mx-auto max-w-6xl sm:px-6 lg:px-8' : ''}`}>
+      <div className={`relative flex flex-col justify-center px-4 ${park ? 'mx-auto max-w-6xl text-white sm:px-6 lg:px-8' : 'text-slate-900'}`}>
         {/* Main title */}
         {park?.logo}
-        <h1 className={`text-3xl font-bold mb-2 drop-shadow-lg break-words ${park ? 'text-left' : 'text-center'}`}>
+        {!park && <img src={sunnyLogo} alt="Sunny Rentals" width={184} height={184}
+          className="mx-auto mb-3 h-24 w-24 object-contain" />}
+        <h1 className={`text-3xl font-bold mb-2 break-words ${park ? 'text-left drop-shadow-lg' : 'text-center'}`}>
           {park ? park.name : language === 'ru'
             ? 'Аренда на Пхукете'
             : 'Car Rental in Phuket'}
         </h1>
        
         {/* Subtitle */}
-        <p className={`text-lg mb-6 drop-shadow-md opacity-90 ${park ? 'text-left' : 'text-center'}`}>
+        <p className={`mb-6 ${park ? 'text-lg text-left drop-shadow-md opacity-90' : 'mx-auto max-w-md text-center text-base text-slate-600'}`}>
           {park ? 'Выберите транспорт и даты вашей поездки' : language === 'ru'
-            ? 'Sunny Rentals - большой выбор проверенных авто и байков'
+            ? 'Sunny Rentals — большой выбор проверенных авто'
             : 'Sunny Rentals - wide selection of verified cars'}
         </p>
 
         {/* Feature cards - HORIZONTAL LAYOUT */}
         <div className={`grid grid-cols-3 gap-2 max-w-2xl ${park ? 'w-full' : 'mx-auto'}`}>
           {/* Card 1 */}
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 flex flex-row items-center gap-2">
+          <div className={`${park ? 'bg-white/20 backdrop-blur-sm' : 'bg-slate-100 text-slate-800'} rounded-lg p-2 flex flex-row items-center gap-2`}>
             <CircleDollarSign className="w-6 h-6 flex-shrink-0" />
             <div className="flex flex-col text-left">
               <div className="text-xs font-semibold leading-tight">
@@ -60,7 +63,7 @@ const HeroBanner = ({ park }: { park?: { name: string; minimumPrice: string | nu
           </div>
 
           {/* Card 2 */}
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 flex flex-row items-center gap-2">
+          <div className={`${park ? 'bg-white/20 backdrop-blur-sm' : 'bg-slate-100 text-slate-800'} rounded-lg p-2 flex flex-row items-center gap-2`}>
             <CreditCard className="w-6 h-6 flex-shrink-0" />
             <div className="flex flex-col text-left">
               <div className="text-xs font-semibold leading-tight">
@@ -73,7 +76,7 @@ const HeroBanner = ({ park }: { park?: { name: string; minimumPrice: string | nu
           </div>
 
           {/* Card 3 */}
-          <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 flex flex-row items-center gap-2">
+          <div className={`${park ? 'bg-white/20 backdrop-blur-sm' : 'bg-slate-100 text-slate-800'} rounded-lg p-2 flex flex-row items-center gap-2`}>
             <MousePointerClick className="w-6 h-6 flex-shrink-0" />
             <div className="flex flex-col text-left">
               <div className="text-xs font-semibold leading-tight">
