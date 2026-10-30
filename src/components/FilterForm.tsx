@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { appRentalDays } from '@/lib/app-rental-pricing';
+import { catalogCategoryOrder } from '@/lib/catalog-categories';
 
 // Category icons
 import bikeIco from '@/assets/classes/bike_ico.png.webp';
@@ -26,6 +27,7 @@ import seat7Ico from '@/assets/classes/7seat_ico.png.webp';
 interface FilterFormProps {
   onFiltersChange: (filters: any) => void;
   selectedCategory: string;
+  visibleCategoryIds?: readonly string[];
   onCategoryChange: (category: string) => void;
   onCompletionChange?: (isComplete: boolean) => void;
   initialFilters?: {
@@ -41,6 +43,7 @@ interface FilterFormProps {
 const FilterForm = ({ 
   onFiltersChange, 
   selectedCategory, 
+  visibleCategoryIds = catalogCategoryOrder,
   onCategoryChange, 
   onCompletionChange,
   initialFilters,
@@ -53,7 +56,7 @@ const FilterForm = ({
     { id: 'compact', name: t('category_compact'), image: compactIco },
     { id: '7s', name: t('category_7s'), image: seat7Ico },
     { id: 'bikes', name: t('category_bikes'), image: bikeIco },
-  ];
+  ].filter(category => visibleCategoryIds.includes(category.id));
 
   const carCategories = allCategories.filter(c => c.id !== 'bikes');
   const bikeCategory = allCategories.find(c => c.id === 'bikes');
@@ -376,12 +379,14 @@ const FilterForm = ({
             
             {isMobile ? (
               <div className="space-y-2">
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.max(1, carCategories.length)}, minmax(0, 1fr))` }}>
                   {carCategories.map((category) => {
                     const isSelected = selectedCategory === category.id;
                     return (
                       <button
                         key={category.id}
+                        type="button"
+                        aria-pressed={isSelected}
                         onClick={() => onCategoryChange(category.id)}
                         className={cn(
                           'rounded-xl text-center transition-all duration-200 border-2 h-full transform active:scale-95 flex-shrink-0',
@@ -393,7 +398,7 @@ const FilterForm = ({
                       >
                         <img 
                           src={category.image} 
-                          alt={category.name}
+                          alt=""
                           className="mx-auto mb-1 h-8 w-auto object-contain"
                         />
                         <div className="text-xs font-semibold">{category.name}</div>
@@ -406,6 +411,8 @@ const FilterForm = ({
                   return (
                     <button
                       key={bikeCategory.id}
+                      type="button"
+                      aria-pressed={isSelected}
                       onClick={() => onCategoryChange(bikeCategory.id)}
                       className={cn(
                         'rounded-xl w-full text-center transition-all duration-200 border-2 h-full transform active:scale-95 flex items-center justify-center',
@@ -417,7 +424,7 @@ const FilterForm = ({
                     >
                       <img 
                         src={bikeCategory.image} 
-                        alt={bikeCategory.name}
+                        alt=""
                         className="mr-2 h-8 w-auto object-contain"
                       />
                       <div className="text-sm font-semibold">Скутеры и мотоциклы</div>
@@ -426,12 +433,14 @@ const FilterForm = ({
                 })()}
               </div>
             ) : (
-              <div className="grid grid-cols-5 gap-4">
+              <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.max(1, allCategories.length)}, minmax(0, 1fr))` }}>
                 {allCategories.map((category) => {
                   const isSelected = selectedCategory === category.id;
                   return (
                     <button
                       key={category.id}
+                      type="button"
+                      aria-pressed={isSelected}
                       onClick={() => onCategoryChange(category.id)}
                       className={cn(
                         'rounded-xl text-center transition-all duration-200 border-2 h-full transform active:scale-95',
@@ -443,7 +452,7 @@ const FilterForm = ({
                     >
                       <img 
                         src={category.image} 
-                        alt={category.name}
+                        alt=""
                         className="mx-auto mb-1 h-10 w-auto object-contain"
                       />
                       <div className="text-sm font-bold">{category.name}</div>

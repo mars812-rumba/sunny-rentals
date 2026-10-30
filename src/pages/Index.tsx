@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { parseISO, addDays, format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import FilterForm from '@/components/FilterForm';
@@ -10,6 +10,7 @@ import CarList from '@/components/CarList';
 import HeroBanner from '@/components/HeroBanner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCars } from '@/contexts/CarsContext';
+import { visibleCatalogCategories, reconcileCatalogCategory } from '@/lib/catalog-categories';
 import { isValid } from 'date-fns';
 import { appRentalDays, appRentalSeason as determineSeason, appRentalDailyPrice as getPriceForPeriod } from '@/lib/app-rental-pricing';
 import { trackLeadEvent } from '@/api/api';
@@ -43,6 +44,12 @@ const Index = () => {
   const { cars, loading: carsLoading } = useCars();
   
   const [selectedCategory, setSelectedCategory] = useState('');
+  const visibleCategoryIds = useMemo(() => visibleCatalogCategories(cars || []), [cars]);
+  useEffect(() => {
+    if (!carsLoading && selectedCategory && !visibleCategoryIds.includes(selectedCategory)) {
+      setSelectedCategory(current => reconcileCatalogCategory(current, visibleCategoryIds));
+    }
+  }, [carsLoading, visibleCategoryIds, selectedCategory]);
   const [showResults, setShowResults] = useState(false);
   const [filters, setFilters] = useState<RentalFilters>({
     startDate: null,
@@ -177,7 +184,7 @@ const Index = () => {
   const getFilteredCars = () => {
     // ✅ ФИКС: Проверка на cars
     if (!selectedCategory || !cars) return [];
-    return cars.filter((car: any) => car.class === selectedCategory);
+    return cars.filter((car: any) => car.available !== false && car.class === selectedCategory);
   };
 
   const carsToDisplay = getFilteredCars();
@@ -542,9 +549,9 @@ if (filters.startDate && filters.endDate &&
     );
   }
   // ✅ ДОБАВЬ ЭТО
-if (!cars || cars.length === 0) {
+if (visibleCategoryIds.length === 0) {
   return <div className="flex items-center justify-center h-screen">
-    <div>Загрузка автомобилей...</div>
+    <p role="status">{t('catalog_empty')}</p>
   </div>;
 }
 
@@ -560,6 +567,7 @@ if (!cars || cars.length === 0) {
             <FilterForm
               onFiltersChange={handleFiltersChange}
               selectedCategory={selectedCategory}
+              visibleCategoryIds={visibleCategoryIds}
               onCategoryChange={handleCategoryChange}
               initialFilters={filters}
             />
