@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { useCarVisibility } from '@/hooks/useCarVisibility';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -492,9 +493,6 @@ export default function CarsPage() {
 
 
 // Убираем проверку ADMIN_KEY из URL параметров
-// const isAdmin = searchParams.get("key") === ADMIN_KEY; 
-// Теперь isAdmin определяется наличием токена
-const isAdmin = !!localStorage.getItem('authToken');
 
 useEffect(() => {
   fetchCars();
@@ -659,16 +657,14 @@ const fetchCars = async () => {
       setLoading(true);
     }
     
-    const endpoint = isAdmin ? `/api/admin/cars` : `/api/cars`;
-    const headers = isAdmin 
-      ? { "Authorization": `Bearer ${getAuthToken()}` }
-      : {};
+    const endpoint = `/api/admin/cars`;
+    const headers = { "Authorization": `Bearer ${getAuthToken()}` };
       
     const res = await fetch(`${API_URL}${endpoint}`, { headers });
     if (!res.ok) throw new Error("Не удалось загрузить машины");
     const data = await res.json();
     
-    const carsList = isAdmin ? Object.values(data.cars || {}) : (data.cars || []);
+    const carsList = Object.values(data.cars || {});
     setCars(carsList);
   } catch (err: any) {
     setError(err.message);
@@ -774,24 +770,10 @@ const handleDelete = async (id: string) => {
   }
 };
 
-const handleToggleAvailability = async (car: any) => {
-  try {
-    const updatedCar = { ...car, available: !car.available };
-    await fetch(`${API_URL}/api/admin/cars/${car.id}`, {
-      method: "PUT",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${getAuthToken()}`
-      },
-      body: JSON.stringify(updatedCar),
-    });
-
-    setCars(prev => prev.map(c => c.id === car.id ? updatedCar : c));
-    refetchGlobalCars();
-  } catch (error) {
-    console.error("Error toggling availability:", error);
-  }
-};
+const visibility = useCarVisibility({ apiUrl: API_URL, adminKey: import.meta.env.VITE_ADMIN_KEY || 'sunny2025',
+  onSaved: saved => setCars(prev => prev.map(car => car.id === saved.id ? { ...car, ...saved } : car)),
+  refresh: refetchGlobalCars,
+});
 
 const handleBulkPriceUpdate = async (updateData: any) => {
   try {
@@ -872,6 +854,7 @@ const handleBulkPriceUpdate = async (updateData: any) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {visibility.error && <p role="alert" className="p-3 text-sm text-red-800">{visibility.error}</p>}
       {/* ✅ Компактный Sticky Header */}
       <div className="sticky top-0 z-50 bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto p-3">
@@ -1168,8 +1151,11 @@ const handleBulkPriceUpdate = async (updateData: any) => {
                       Депозит: {deposit}฿
                     </div>
                     <Switch
-                      checked={car.available}
-                      onCheckedChange={() => handleToggleAvailability(car)}
+                      checked={car.available !== false}
+                      disabled={visibility.pending[car.id]}
+                      aria-label={`Показывать ${car.name || car.id} в витрине`}
+                      aria-busy={!!visibility.pending[car.id]}
+                      onCheckedChange={checked => visibility.toggle(car.id, checked)}
                       className="data-[state=checked]:bg-green-500 scale-[0.65]"
                     />
                   </div>

@@ -19,6 +19,7 @@ import { ru } from "date-fns/locale";
 import CarForm from "@/components/admin/CarForm";
 import { useCars } from "@/contexts/CarsContext";
 import logo from '@/assets/logo.png.webp';
+import { useCarVisibility } from '@/hooks/useCarVisibility';
 
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -522,7 +523,6 @@ export default function CarsPage({ userId }: CarsPageProps) {
   const [endDate, setEndDate] = useState<Date | undefined>(addDays(new Date(), 7));
 
   const { refetchCars: refetchGlobalCars } = useCars();
-  const isAdmin = searchParams.get("key") === ADMIN_KEY;
 
   useEffect(() => {
     fetchCars();
@@ -605,11 +605,11 @@ export default function CarsPage({ userId }: CarsPageProps) {
   const fetchCars = async () => {
     try {
       if (cars.length === 0) setLoading(true);
-      const endpoint = isAdmin ? `/api/admin/cars?key=${ADMIN_KEY}` : `/api/cars`;
+      const endpoint = `/api/admin/cars?key=${ADMIN_KEY}`;
       const res = await fetch(`${API_URL}${endpoint}`);
       if (!res.ok) throw new Error("Не удалось загрузить машины");
       const data = await res.json();
-      const carsList = isAdmin ? Object.values(data.cars || {}) : (data.cars || []);
+      const carsList = Object.values(data.cars || {});
       setCars(carsList);
     } catch (err) { setError(err.message); } finally { setLoading(false); }
   };
@@ -659,16 +659,10 @@ export default function CarsPage({ userId }: CarsPageProps) {
     } catch (error) { console.error("Error deleting car:", error); }
   };
 
-  const handleToggleAvailability = async (car) => {
-    try {
-      const updatedCar = { ...car, available: !car.available };
-      await fetch(`${API_URL}/api/admin/cars/${car.id}?key=${ADMIN_KEY}`, {
-        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedCar)
-      });
-      setCars(prev => prev.map(c => c.id === car.id ? updatedCar : c));
-      refetchGlobalCars();
-    } catch (error) { console.error("Error toggling availability:", error); }
-  };
+  const visibility = useCarVisibility({ apiUrl: API_URL, adminKey: ADMIN_KEY,
+    onSaved: saved => setCars(prev => prev.map(car => car.id === saved.id ? { ...car, ...saved } : car)),
+    refresh: refetchGlobalCars,
+  });
 
   const handleBulkPriceUpdate = async (updateData) => {
     try {
@@ -737,6 +731,7 @@ export default function CarsPage({ userId }: CarsPageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {visibility.error && <p role="alert" className="p-3 text-sm text-red-800">{visibility.error}</p>}
       {/* Sticky Header — не трогаем */}
       <div className="sticky top-0 z-50 bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto p-3">
@@ -882,7 +877,10 @@ export default function CarsPage({ userId }: CarsPageProps) {
                   </div>
                   <div className="pt-2 border-t flex items-center justify-between">
                     <div className="text-xs text-muted-foreground">Депозит: {deposit}฿</div>
-                    <Switch checked={car.available} onCheckedChange={() => handleToggleAvailability(car)} className="data-[state=checked]:bg-green-500 scale-[0.65]" />
+                    <Switch checked={car.available !== false} disabled={visibility.pending[car.id]}
+                      aria-label={`Показывать ${car.name || car.id} в витрине`}
+                      aria-busy={!!visibility.pending[car.id]}
+                      onCheckedChange={checked => visibility.toggle(car.id, checked)} className="data-[state=checked]:bg-green-500 scale-[0.65]" />
                   </div>
                 </CardContent>
               </Card>

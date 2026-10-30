@@ -1,5 +1,7 @@
 import inventoryCatalog from "../../../../backend/data/web_cars.json";
 import { webpImagePath } from "../../../../shared/webp-image";
+import { displayColour, displayIdentity, displaySpec, verifiedVehicleDetails } from "@/content/vehicle-display";
+import { insuranceExcess, policyCopy, rentalPolicy } from "@/content/rental-policy";
 
 import type {
   InventoryCar,
@@ -69,7 +71,7 @@ export const vehicleCategories: Array<{
     id: "7s",
     name: "Автомобили на 7+ мест",
     shortName: "7+ мест",
-    description: "Просторные варианты для семьи, компании и большого багажа.",
+    description: "Для семьи или компании; багаж проверяется при нужном положении сидений.",
   },
   {
     id: "bikes",
@@ -635,30 +637,6 @@ const vehicleCategoryIds = new Set<VehicleCategory>([
   "bikes",
 ]);
 
-const colorNamesEnToRu: Record<string, string> = {
-  black: "Чёрный",
-  blackv: "Чёрный",
-  blue: "Синий",
-  gray: "Серый",
-  grey: "Серый",
-  green: "Зелёный",
-  red: "Красный",
-  silver: "Серебристый",
-  white: "Белый",
-  yellow: "Жёлтый",
-  bege: "Бежевый",
-  beige: "Бежевый",
-  "dark gray": "Тёмно-серый",
-};
-
-const colorNamesRuToEn: Record<string, string> = {
-  белый: "White",
-  серый: "Gray",
-  синий: "Blue",
-  черный: "Black",
-  чёрный: "Black",
-};
-
 const categoryUseCases: Record<VehicleCategory, { ru: string; en: string }> = {
   compact: {
     ru: "Подходит для ежедневных поездок и городских маршрутов по Пхукету.",
@@ -685,7 +663,7 @@ const categoryUseCases: Record<VehicleCategory, { ru: string; en: string }> = {
 const publicImagePath = (path: string) =>
   webpImagePath(path.startsWith("/") ? path : `/images_web/${path}`);
 
-const PRODUCT_OWNER_TERMS_SOURCE = "product-owner-confirmation:2026-08-03";
+const PRODUCT_OWNER_TERMS_SOURCE = rentalPolicy.source;
 
 type VerifiedBadge = NonNullable<VerifiedCarTerms["badges"]>[number];
 
@@ -693,7 +671,6 @@ function selectVerifiedBadges(inventoryId: string, category: VehicleCategory) {
   const appliesToCars = category !== "bikes";
   const pool: VerifiedBadge[] = [
     { labelRu: "Аэропорт 0 ฿", labelEn: "Airport 0 ฿", source: PRODUCT_OWNER_TERMS_SOURCE, color: "blue" },
-    { labelRu: "Хит", labelEn: "Popular", source: PRODUCT_OWNER_TERMS_SOURCE, color: "orange" },
     { labelRu: "Полный бак", labelEn: "Full tank", source: PRODUCT_OWNER_TERMS_SOURCE, color: "green" },
     { labelRu: "Реальные фото", labelEn: "Real photos", source: PRODUCT_OWNER_TERMS_SOURCE, color: "white" },
     { labelRu: "Цена по сроку", labelEn: "Rate by rental term", source: PRODUCT_OWNER_TERMS_SOURCE, color: "blue" },
@@ -729,13 +706,7 @@ function selectVerifiedBadges(inventoryId: string, category: VehicleCategory) {
 }
 
 function getInsuranceExcessThb(inventory: InventoryCar, category: VehicleCategory) {
-  const identity = `${inventory.brand ?? ""} ${inventory.model ?? ""} ${inventory.name ?? ""}`.toLowerCase();
-
-  if (/\bbmw\b|\bford\s+(?:ranger|raptor)\b/.test(identity)) return 30_000;
-  if (/\bfortuner\b|\bmux\b|\bmu-x\b|\blegender\b/.test(identity)) return 20_000;
-  if (category === "suv" || category === "7s") return 10_000;
-  if (category === "compact" || category === "sedan") return 5_000;
-  return undefined;
+  return insuranceExcess(`${inventory.brand ?? ""} ${inventory.model ?? ""} ${inventory.name ?? ""}`, category);
 }
 
 function getVerifiedTerms(inventory: InventoryCar, category: VehicleCategory) {
@@ -746,23 +717,23 @@ function getVerifiedTerms(inventory: InventoryCar, category: VehicleCategory) {
     insurance: childSeatAvailable
       ? {
           class: "1" as const,
-          summary: "Страховка класса 1 действует при ДТП с участием двух сторон.",
-          summaryEn: "Class 1 insurance applies to two-party road accidents.",
+          summary: policyCopy("ru").insurance,
+          summaryEn: policyCopy("en").insurance,
           requirements: ["Для страхового случая обязательно наличие второй стороны ДТП."],
           requirementsEn: ["A second party to the road accident is required for an insurance claim."],
-          exclusions: ["Царапины и повреждения, полученные на парковке без второй стороны."],
-          exclusionsEn: ["Scratches and parking damage without an identified second party."],
+          exclusions: ["По опубликованным условиям Sunny парковочные повреждения без установленной второй стороны не покрываются."],
+          exclusionsEn: ["Sunny’s published terms exclude parking damage without an identified second party."],
           excessThb,
         }
       : undefined,
-    childSeat: childSeatAvailable ? { available: true, priceThb: 0 } : undefined,
+    childSeat: childSeatAvailable ? { available: true, priceThb: rentalPolicy.childSeat.price } : undefined,
     handover: {
-      fullTank: true,
-      cleanVehicle: category !== "bikes",
+      fullTank: rentalPolicy.handover.fullTank,
+      cleanVehicle: category !== "bikes" && rentalPolicy.handover.cleanCar,
     },
     delivery: [
-      { zone: "airport" as const, priceThb: 0 },
-      { zone: "city" as const, priceThb: 500 },
+      { zone: "airport" as const, priceThb: rentalPolicy.delivery.airport },
+      { zone: "city" as const, priceThb: rentalPolicy.delivery.city },
     ],
     badges: selectVerifiedBadges(inventory.id ?? "vehicle", category),
   };
@@ -786,18 +757,7 @@ function parseInventoryYear(inventory: InventoryCar): number | null {
 }
 
 function getInventoryColors(color?: string, inventoryId = "") {
-  const inferredColor = inventoryId
-    .toLowerCase()
-    .split(/[^a-z]+/)
-    .find((part) => part in colorNamesEnToRu);
-  const source = color?.trim() || inferredColor;
-  if (!source) return { ru: "Цвет не указан", en: "Color not specified" };
-
-  const normalized = source.toLowerCase();
-  return {
-    ru: colorNamesEnToRu[normalized] ?? source,
-    en: colorNamesRuToEn[normalized] ?? source,
-  };
+  return displayColour(color, inventoryId);
 }
 
 function getGenericContent(
@@ -805,7 +765,8 @@ function getGenericContent(
   category: VehicleCategory,
   year: number | null,
 ) {
-  const name = [inventory.brand, inventory.model, year].filter(Boolean).join(" ");
+  const identity = displayIdentity(inventory.brand ?? "", inventory.model ?? "", category);
+  const name = [identity.brand, identity.model, year].filter(Boolean).join(" ");
   return {
     summary: `${name} из актуального каталога Sunny Rentals. Тариф рассчитывается по сезону и сроку аренды.`,
     summaryEn: `${name} from the current Sunny Rentals catalogue. The rate is calculated by season and rental length.`,
@@ -840,11 +801,13 @@ function adaptInventoryCar(
 
   const category = inventoryCategory as VehicleCategory;
   const colors = getInventoryColors(inventory.color, inventory.id);
+  const identity = displayIdentity(inventory.brand, inventory.model, category);
   const content = getGenericContent(inventory, category, year);
   const gallery = [inventory.photos.main, ...(inventory.photos.gallery ?? [])]
     .filter((path, index, paths) => Boolean(path) && paths.indexOf(path) === index)
     .map(publicImagePath);
   const specs = inventory.specs ?? {};
+  const verifiedDetails = verifiedVehicleDetails(inventory.public_details);
   const priceValues = [
     ...Object.values(inventory.pricing.low_season),
     ...Object.values(inventory.pricing.high_season),
@@ -856,8 +819,8 @@ function adaptInventoryCar(
     published: true,
     indexable: true,
     category,
-    brand: inventory.brand,
-    model: inventory.model,
+    brand: identity.brand,
+    model: identity.model,
     year,
     color: colors.ru,
     colorEn: colors.en,
@@ -873,12 +836,15 @@ function adaptInventoryCar(
     fromPrice: Math.min(...priceValues),
     deposit: inventory.pricing.deposit,
     pricing: inventory.pricing,
+    seats: verifiedDetails?.seats && Number.isInteger(verifiedDetails.seats) && verifiedDetails.seats > 0
+      ? `${verifiedDetails.seats} мест` : undefined,
+    verifiedDetails,
     transmission: specs.transmission ?? "—",
     engine: specs.engine ?? "—",
     fuel: specs.fuel ?? "—",
-    summary: definition?.summary ?? content.summary,
+    summary: content.summary,
     summaryEn: content.summaryEn,
-    bestFor: definition?.bestFor ?? content.bestFor,
+    bestFor: content.bestFor,
     bestForEn: content.bestForEn,
     inventoryUpdatedAt: inventory.updated_at,
     terms: getVerifiedTerms(inventory, category),
@@ -886,6 +852,7 @@ function adaptInventoryCar(
 }
 
 const adaptedMarketingCars = Object.values(inventoryCars).flatMap((inventory) => {
+  if (inventory.available === false) return [];
   const definition = inventory.id
     ? marketingDefinitionsByInventoryId.get(inventory.id)
     : undefined;
@@ -948,89 +915,6 @@ const englishCategoryCopy: Record<
   },
 };
 
-const englishCarCopy: Record<string, { summary: string; bestFor: string }> = {
-  "toyota-yaris": {
-    summary: "An economical city car with easy-to-judge dimensions and effortless parking.",
-    bestFor: "Couples, small families and everyday trips around the island.",
-  },
-  "suzuki-swift": {
-    summary: "A compact hatchback with lively handling and low fuel consumption.",
-    bestFor: "City routes, beaches and Phuket’s narrower streets.",
-  },
-  "honda-jazz": {
-    summary: "Compact outside yet surprisingly spacious inside, with a flexible cabin.",
-    bestFor: "Couples, families with a child and travellers carrying luggage.",
-  },
-  "toyota-vios": {
-    summary: "A practical car with a roomy boot and an easy, predictable drive.",
-    bestFor: "Daily rental and regular trips between different parts of the island.",
-  },
-  "toyota-ativ": {
-    summary: "A modern sedan with a smooth ride, reversing camera and spacious cabin.",
-    bestFor: "Comfortable Phuket journeys and airport transfers with luggage.",
-  },
-  "honda-civic": {
-    summary: "A dynamic sedan with distinctive styling and confident performance.",
-    bestFor: "Drivers who value comfort, style and an engaging drive.",
-  },
-  "honda-city": {
-    summary: "A fresh city sedan with a comfortable cabin and efficient engine.",
-    bestFor: "Longer rentals and active everyday driving.",
-  },
-  "toyota-camry": {
-    summary: "A large, comfortable sedan for relaxed journeys over any distance.",
-    bestFor: "Business travel, families and guests who want extra comfort.",
-  },
-  "toyota-yaris-cross": {
-    summary: "A compact crossover with a high driving position and modern equipment.",
-    bestFor: "Families, active routes and trips with beach equipment.",
-  },
-  "toyota-corolla-cross": {
-    summary: "A spacious hybrid crossover with a smooth ride and efficient drivetrain.",
-    bestFor: "Long island routes and relaxed family holidays.",
-  },
-  "mazda-cx-30": {
-    summary: "A stylish crossover with precise handling and a high-quality interior.",
-    bestFor: "Couples and small families who care about design and comfort.",
-  },
-  "honda-hr-v": {
-    summary: "A modern hybrid SUV with a high seating position and flexible interior.",
-    bestFor: "Active holidays, luggage and comfortable full-day routes.",
-  },
-  "toyota-veloz": {
-    summary: "A seven-seat vehicle with three rows and easy access to the cabin.",
-    bestFor: "Families, groups of friends and journeys with plenty of luggage.",
-  },
-  "mitsubishi-xpander": {
-    summary: "A practical seven-seat MPV with a spacious cabin and comfortable ride.",
-    bestFor: "Larger families exploring Phuket together in one vehicle.",
-  },
-  "h1-12-seats": {
-    summary: "A roomy passenger vehicle for a large group and all their luggage.",
-    bestFor: "Group transfers and shared trips without needing a second car.",
-  },
-  "toyota-alphard": {
-    summary: "A premium minivan with a spacious cabin and a high level of comfort.",
-    bestFor: "VIP transfers, larger families and special journeys.",
-  },
-  "honda-adv-350": {
-    summary: "A versatile maxi scooter with a comfortable riding position and ample power.",
-    bestFor: "Longer routes, two-up riding and active island exploration.",
-  },
-  "yamaha-tmax": {
-    summary: "A powerful premium maxi scooter for fast and comfortable journeys.",
-    bestFor: "Experienced riders and longer-distance routes.",
-  },
-  "honda-forza-350": {
-    summary: "A comfortable touring maxi scooter with a top box for personal items.",
-    bestFor: "Two-up rides, beach routes and full-day trips.",
-  },
-  "yamaha-nmax-155": {
-    summary: "A light, economical scooter with a comfortable seat and useful top box.",
-    bestFor: "Everyday travel, beaches and busy parts of Phuket.",
-  },
-};
-
 const englishSpecs: Record<string, string> = {
   "5 мест": "5 seats",
   "7 мест": "7 seats",
@@ -1064,14 +948,13 @@ export function getLocalizedCategory(category: VehicleCategory, locale: "ru" | "
 export function getLocalizedCar(car: MarketingCar, locale: "ru" | "en") {
   if (locale === "ru") return car;
 
-  const copy = englishCarCopy[car.slug];
-  return {
+    return {
     ...car,
-    seats: car.seats ? englishSpecs[car.seats] ?? car.seats : undefined,
-    transmission: englishSpecs[car.transmission] ?? car.transmission,
-    engine: englishSpecs[car.engine] ?? car.engine,
-    fuel: englishSpecs[car.fuel] ?? car.fuel,
-    summary: copy?.summary ?? car.summaryEn,
-    bestFor: copy?.bestFor ?? car.bestForEn,
+    seats: car.verifiedDetails?.seats ? `${car.verifiedDetails.seats} seats` : undefined,
+    transmission: englishSpecs[car.transmission] ?? displaySpec(car.transmission, locale),
+    engine: englishSpecs[car.engine] ?? displaySpec(car.engine, locale),
+    fuel: englishSpecs[car.fuel] ?? displaySpec(car.fuel, locale),
+    summary: car.summaryEn,
+    bestFor: car.bestForEn,
   };
 }

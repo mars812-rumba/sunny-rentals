@@ -100,9 +100,26 @@ export interface MarketingCar {
   /** Separate editorial date is not available in the current inventory. */
   contentUpdatedAt?: string;
   terms: VerifiedCarTerms;
+  /** Explicit, sourced physical details; never inferred from model name or photo. */
+  verifiedDetails?: VerifiedVehicleDetails;
+}
+
+export interface VerifiedVehicleDetails {
+  source: string;
+  verifiedAt: string;
+  seats?: number;
+  bodyStyle?: { ru: string; en: string };
+  equipment?: Array<{ ru: string; en: string }>;
+  childSeatCompatible?: boolean;
+  luggage?: {
+    photos: string[];
+    configuration: { ru: string; en: string };
+    note?: { ru: string; en: string };
+  };
 }
 
 export interface InventoryCar {
+  available?: boolean | null;
   id?: string;
   name?: string;
   brand?: string;
@@ -123,6 +140,8 @@ export interface InventoryCar {
     transmission?: string;
   };
   updated_at?: string;
+  /** Populate only after the operator confirms the concrete vehicle. */
+  public_details?: VerifiedVehicleDetails;
 }
 
 export const unsupportedPublicCarFields = [

@@ -34,7 +34,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import UploadFile, File, Form
 from fastapi.responses import FileResponse
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, StrictBool, validator
 from urllib.parse import parse_qsl, unquote
 from booking_time import normalize_booking_dates, validate_time_value
 from booking_notifications import build_booking_claude_context, select_active_booking
@@ -51,6 +51,7 @@ from customer_outreach_campaign import (
     select_recipient_batch,
 )
 from outreach_delivery import ERROR_LABELS, OutreachDeliveryError, failure_from_response
+from outreach_message import load_message as load_outreach_message, save_message as save_outreach_message
 from claude_dialog import (
     build_pricing_context,
     find_offered_car_main_photo,
@@ -143,6 +144,7 @@ CHAT_LOGS_JSONL = DATA / "chat_logs.jsonl"
 ARCHIVE_JSON = DATA / "archive.json"
 CAR_OWNERS_JSON = DATA / "car_owners.json"
 OUTREACH_LOG_JSONL = DATA / "campaigns" / f"{OUTREACH_CAMPAIGN_ID}.jsonl"
+OUTREACH_MESSAGE_JSON = DATA / "campaigns" / f"{OUTREACH_CAMPAIGN_ID}-message.json"
 OUTREACH_BATCH_MAX = 100
 _outreach_campaign_lock = threading.Lock()
 
@@ -351,6 +353,9 @@ class Car(BaseModel):
     quick_id: Optional[str] = None
     rating: float = 4.5
 
+class CarVisibilityUpdate(BaseModel):
+    available: StrictBool
+
 class BookingCreate(BaseModel):
     car_id: str
     start_date: date
@@ -531,6 +536,10 @@ class SendMessageRequest(BaseModel):
 
 class OutreachSendRequest(BaseModel):
     count: int = Field(default=20, ge=1, le=OUTREACH_BATCH_MAX)
+    message: Optional[str] = Field(default=None, max_length=4096)
+
+class OutreachMessageRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=4096)
     
 class MediaUploadRequest(BaseModel):
     user_id: Union[int, str]
@@ -2019,7 +2028,8 @@ def login(login_request: LoginRequest):
 @app.get(API_PREFIX + "/cars")
 def get_cars(category: Optional[str] = None):
     raw = load_json(CARS_JSON)
-    cars = as_cars_list(raw)
+    # Missing/null legacy flags remain visible; explicit false hides the car.
+    cars = [car for car in as_cars_list(raw) if car.get("available") is not False]
     if category:
         cars = [c for c in cars if (c.get("class") or c.get("category") or "").lower() == category.lower()]
     
@@ -2051,7 +2061,7 @@ def get_available_cars(
     if category:
         cars = [c for c in cars if (c.get("class") or c.get("category") or "").lower() == category.lower()]
 
-    available = [c for c in cars if (c.get('available') is True or c.get('available') is None) and is_available(c, sd, ed, ext_bookings)]
+    available = [c for c in cars if c.get('available') is not False and is_available(c, sd, ed, ext_bookings)]
     return {
         "available_cars": [c.get("id") or c.get("name") for c in available],
         "available": available,
@@ -2631,7 +2641,7 @@ def _outreach_status_payload() -> Dict[str, Any]:
         "retry_after": retry_after,
         "default_count": 20,
         "max_batch": OUTREACH_BATCH_MAX,
-        "message": OUTREACH_GREETING,
+        "message": load_outreach_message(OUTREACH_MESSAGE_JSON, OUTREACH_GREETING),
         "running": _outreach_campaign_lock.locked(),
     }
 
@@ -2658,11 +2668,11 @@ def _ensure_outreach_user_in_crm(user_id: int, source_record: Dict[str, Any]) ->
     save_json(USER_DATA_JSON, users_data)
 
 
-def _deliver_outreach_greeting(user_id: int) -> bool:
+def _deliver_outreach_greeting(user_id: int, message: str = OUTREACH_GREETING) -> bool:
     bot_url = os.getenv("TG_WEBHOOK_URL", "http://localhost:5001").rstrip("/")
     response = requests.post(
         f"{bot_url}/internal/send_message",
-        json={"user_id": user_id, "text": OUTREACH_GREETING},
+        json={"user_id": user_id, "text": message},
         timeout=15,
         headers={"Content-Type": "application/json"},
     )
@@ -2682,6 +2692,20 @@ def get_outreach_status(_: str = Depends(admin_required)):
     return {"status": "ok", **_outreach_status_payload()}
 
 
+@app.put(API_PREFIX + "/crm/outreach/message")
+def update_outreach_message(request: OutreachMessageRequest, _: str = Depends(admin_required)):
+    if not _outreach_campaign_lock.acquire(blocking=False):
+        raise HTTPException(status_code=409, detail="Дождитесь завершения рассылки")
+    try:
+        try:
+            save_outreach_message(OUTREACH_MESSAGE_JSON, request.message)
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error))
+        return {"status": "ok", "message": request.message}
+    finally:
+        _outreach_campaign_lock.release()
+
+
 @app.post(API_PREFIX + "/crm/outreach/send")
 def send_outreach_batch(request: OutreachSendRequest, _: str = Depends(admin_required)):
     """Send one resumable campaign batch and enable Claude without a second greeting."""
@@ -2689,6 +2713,9 @@ def send_outreach_batch(request: OutreachSendRequest, _: str = Depends(admin_req
         raise HTTPException(status_code=409, detail="Рассылка уже выполняется")
 
     try:
+        message = load_outreach_message(OUTREACH_MESSAGE_JSON, OUTREACH_GREETING)
+        if getattr(request, "message", None) is not None and request.message != message:
+            raise HTTPException(status_code=409, detail="Текст изменился. Обновите окно рассылки перед отправкой.")
         recipients = load_outreach_recipients(DATA)
         campaign_state = load_campaign_state(OUTREACH_LOG_JSONL)
         if any(state.get("retry_at", 0) > time.time() for state in campaign_state.values()):
@@ -2747,7 +2774,7 @@ def send_outreach_batch(request: OutreachSendRequest, _: str = Depends(admin_req
                 "claude_active": False,
             }
             try:
-                if not _deliver_outreach_greeting(user_id):
+                if not _deliver_outreach_greeting(user_id, message):
                     raise RuntimeError("Telegram bot rejected the message")
 
                 event["delivered"] = True
@@ -2759,7 +2786,7 @@ def send_outreach_batch(request: OutreachSendRequest, _: str = Depends(admin_req
                     "timestamp": event["timestamp"],
                     "user_id": user_id,
                     "role": "manager",
-                    "content": OUTREACH_GREETING,
+                    "content": message,
                     "source": "outreach_campaign",
                     "campaign_id": OUTREACH_CAMPAIGN_ID,
                 }
@@ -5543,6 +5570,21 @@ def admin_create_car(car: Car):
         data["cars"][car.id] = car_dict
         save_json(CARS_JSON, data)
     return car
+
+@app.patch(API_PREFIX + "/admin/cars/{car_id}/visibility")
+def admin_update_car_visibility(car_id: str, request: CarVisibilityUpdate, _: str = Depends(admin_required)):
+    # Read under the write lock, and patch only this field: a stale card must
+    # never overwrite prices, photos, owner data or other concurrent edits.
+    with _lock:
+        data = load_json(CARS_JSON)
+        car = data.get("cars", {}).get(car_id)
+        if car is None:
+            raise HTTPException(status_code=404, detail="Car not found")
+        car["available"] = request.available
+        car["updated_at"] = datetime.utcnow().isoformat()
+        save_json(CARS_JSON, data)
+        return {"id": car_id, "available": car["available"], "updated_at": car["updated_at"]}
+
 
 @app.put(API_PREFIX + "/admin/cars/{car_id}")
 def admin_update_car(car_id: str, car: Car):
