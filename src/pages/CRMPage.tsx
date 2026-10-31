@@ -159,6 +159,11 @@ const CRMPage: React.FC = () => {
   const [outreachLoading, setOutreachLoading] = useState(false);
   const [outreachError, setOutreachError] = useState('');
   const [outreachResult, setOutreachResult] = useState<any>(null);
+  const [outreachEditing, setOutreachEditing] = useState(false);
+  const [outreachMessage, setOutreachMessage] = useState('');
+  const [outreachSaving, setOutreachSaving] = useState(false);
+  const [outreachMessageNotice, setOutreachMessageNotice] = useState('');
+  const outreachMessageInvalid = !outreachMessage.trim() || outreachMessage.length > 4096;
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
@@ -187,6 +192,7 @@ const CRMPage: React.FC = () => {
         throw new Error(data.detail || data.message || 'Не удалось загрузить аудиторию');
       }
       setOutreachStatus(data);
+      setOutreachMessage(data.message);
       setOutreachCount(Math.min(data.default_count || 20, data.remaining || 20));
     } catch (error) {
       setOutreachError(error instanceof Error ? error.message : 'Не удалось загрузить аудиторию');
@@ -196,15 +202,42 @@ const CRMPage: React.FC = () => {
   };
 
   const openOutreachDialog = () => {
+    setOutreachStatus(null);
+    setOutreachEditing(false);
+    setOutreachMessageNotice('');
     setOutreachOpen(true);
     setOutreachResult(null);
     void loadOutreachStatus();
   };
 
+  const saveOutreachMessage = async () => {
+    if (outreachMessageInvalid || outreachSaving || outreachLoading) return;
+    setOutreachSaving(true);
+    setOutreachError('');
+    try {
+      const response = await fetch(`/api/crm/outreach/message?key=${encodeURIComponent(OUTREACH_ADMIN_KEY)}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: outreachMessage }),
+      });
+      const data = await response.json();
+      if (!response.ok || data.status !== 'ok') {
+        throw new Error(typeof data.detail === 'string' ? data.detail : 'Не удалось сохранить текст. Попробуйте ещё раз.');
+      }
+      setOutreachStatus(current => current ? { ...current, message: data.message } : current);
+      setOutreachMessage(data.message);
+      setOutreachEditing(false);
+      setOutreachMessageNotice('Текст сохранён. Рассылка ещё не запущена.');
+    } catch (error) {
+      setOutreachError(error instanceof Error ? error.message : 'Не удалось сохранить текст');
+    } finally {
+      setOutreachSaving(false);
+    }
+  };
+
   const handleOutreachSend = async () => {
     const maxAllowed = Math.min(outreachStatus?.max_batch || 100, outreachStatus?.remaining || 0);
     const count = Math.min(maxAllowed, Math.max(1, Math.trunc(outreachCount)));
-    if (!count || outreachLoading) return;
+    if (!count || outreachLoading || outreachEditing || outreachSaving || !outreachStatus) return;
 
     setOutreachLoading(true);
     setOutreachError('');
@@ -213,7 +246,7 @@ const CRMPage: React.FC = () => {
       const response = await fetch(`/api/crm/outreach/send?key=${encodeURIComponent(OUTREACH_ADMIN_KEY)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ count }),
+        body: JSON.stringify({ count, message: outreachStatus.message }),
       });
       const data = await response.json();
       if (!response.ok || data.status !== 'ok') {
@@ -359,36 +392,27 @@ const CRMPage: React.FC = () => {
     setLoading(true);
     setLoadError('');
     try {
-      // Загружаем всех пользователей для подсчёта непрочитанных во вкладках
-      const allUsersRes = await fetch(`/api/crm/users?period=${period}`, { signal: controller.signal });
-      const allUsersData = await allUsersRes.json();
-      if (controller.signal.aborted) return;
-      if (allUsersData.status === 'ok') {
-        // Преобразуем dialog в dialog_status для совместимости
-        const processedAllUsers = allUsersData.users.map(normalizeCrmLead);
-        setAllUsers(processedAllUsers); // Все пользователи для индикаторов
-      }
-      
-      // Загружаем только текущую вкладку для отображения
-      // Для confirmed используем status=confirmed (не has_confirmed_booking)
-      const statusParam = activeStatus === 'confirmed' ? 'status=confirmed' : `status=${activeStatus}`;
-      const queryParams = [statusParam, `period=${period}`].filter(Boolean).join('&');
-
-      const [uRes, sRes] = await Promise.all([
-        fetch(`/api/crm/users?${queryParams}`, { signal: controller.signal }),
-        fetch(`/api/crm/stats?period=${period}`, { signal: controller.signal })
+      // One shared snapshot for tabs and unread indicators; no second users request.
+      // Statistics start immediately, not after the complete users round trip.
+      const [allUsersData, statsData] = await Promise.all([
+        fetch(`/api/crm/users?period=${encodeURIComponent(period)}`, { signal: controller.signal })
+          .then(async response => {
+            const data = await response.json();
+            if (!response.ok || data.status !== 'ok' || !Array.isArray(data.users)) {
+              throw new Error(data.message || data.detail || 'Сервер не вернул список лидов');
+            }
+            return data;
+          }),
+        fetch(`/api/crm/stats?period=${encodeURIComponent(period)}`, { signal: controller.signal })
+          .then(async response => response.ok ? response.json() : null)
+          // Optional counters must not hide a successfully loaded lead list.
+          .catch(() => null)
       ]);
-      const uData = await uRes.json();
-      const sData = await sRes.json();
       if (controller.signal.aborted) return;
-      if (uRes.ok && uData.status === 'ok') {
-        // Преобразуем dialog в dialog_status для совместимости
-        const processedUsers = uData.users.map(normalizeCrmLead);
-        setUsers(processedUsers);
-      } else {
-        throw new Error(uData.message || uData.detail || 'Сервер не вернул список лидов');
-      }
-      if (sData.status === 'ok') setStats(sData.stats);
+      const processedAllUsers: User[] = allUsersData.users.map(normalizeCrmLead);
+      setAllUsers(processedAllUsers);
+      setUsers(processedAllUsers.filter(user => user.status === activeStatus));
+      if (statsData?.status === 'ok') setStats(statsData.stats);
     } catch (e) {
       if (controller.signal.aborted) return;
       console.error("Ошибка загрузки:", e);
@@ -2344,8 +2368,8 @@ const handleUpdateNote = async () => {
   </DialogContent>
 </Dialog>
 
-      <Dialog open={outreachOpen} onOpenChange={setOutreachOpen}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-md rounded-2xl border-0 p-0 overflow-hidden shadow-2xl">
+      <Dialog open={outreachOpen} onOpenChange={open => { if (!outreachSaving && !outreachLoading) setOutreachOpen(open); }}>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-md max-h-[85dvh] overflow-y-auto rounded-2xl border-0 p-0 shadow-2xl">
           <DialogHeader className="px-5 pt-5 pb-4 text-left bg-slate-950 text-white">
             <DialogTitle className="flex items-center gap-2 text-base font-bold">
               <Send className="h-4 w-4 text-amber-400" />
@@ -2407,10 +2431,35 @@ const handleUpdateNote = async () => {
 
                 {outreachStatus?.message && (
                   <div className="rounded-xl bg-slate-50 px-3.5 py-3">
-                    <div className="mb-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">Текст сообщения</div>
-                    <p className="text-sm leading-relaxed text-slate-700">{outreachStatus.message}</p>
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <label htmlFor={outreachEditing ? 'outreach-message' : undefined} className="text-sm font-semibold text-slate-800">Текст сообщения</label>
+                      {!outreachEditing && <Button type="button" variant="ghost" size="sm"
+                        disabled={outreachLoading || outreachSaving || outreachStatus.running}
+                        onClick={() => { setOutreachMessage(outreachStatus.message); setOutreachEditing(true); setOutreachMessageNotice(''); setOutreachError(''); }}>
+                        <Pencil aria-hidden="true" className="mr-1 h-4 w-4" />Изменить
+                      </Button>}
+                    </div>
+                    {outreachEditing ? <>
+                      <Textarea id="outreach-message" value={outreachMessage} autoFocus rows={5}
+                        disabled={outreachSaving} maxLength={4096}
+                        onChange={event => setOutreachMessage(event.target.value)}
+                        aria-invalid={outreachMessageInvalid} aria-describedby="outreach-message-help"
+                        className="min-h-32 text-base" />
+                      <p id="outreach-message-help" className="mt-2 text-sm text-slate-600">
+                        {outreachMessage.length} / 4096. {!outreachMessage.trim() ? 'Введите текст сообщения.' : 'Сначала сохраните изменения, затем отправьте рассылку.'}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button type="button" disabled={outreachSaving || outreachMessageInvalid} onClick={saveOutreachMessage}>
+                          {outreachSaving ? 'Сохраняю…' : 'Сохранить'}
+                        </Button>
+                        <Button type="button" variant="outline" disabled={outreachSaving} onClick={() => {
+                          setOutreachMessage(outreachStatus.message); setOutreachEditing(false); setOutreachError('');
+                        }}>Отмена</Button>
+                      </div>
+                    </> : <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-700">{outreachStatus.message}</p>}
                   </div>
                 )}
+                {outreachMessageNotice && <p role="status" className="text-sm text-slate-700">{outreachMessageNotice}</p>}
 
                 {outreachResult && (
                   <div className={`flex items-start gap-2 rounded-xl px-3.5 py-3 ${outreachResult.failed > 0 ? 'bg-amber-50 text-amber-950' : 'bg-emerald-50 text-emerald-900'}`} role="status" aria-live="polite">
@@ -2444,6 +2493,7 @@ const handleUpdateNote = async () => {
                 <Button
                   onClick={handleOutreachSend}
                   disabled={
+                    outreachEditing || outreachSaving ||
                     outreachLoading ||
                     !outreachStatus ||
                     outreachStatus.running ||
