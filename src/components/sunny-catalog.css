@@ -61,6 +61,14 @@
   color-scheme: light;
 }
 
+.sunny-catalog-select[role="listbox"][data-state] {
+  /* Avoid shadow/zoom compositing artefacts in Android Telegram WebView.
+     Radix's outer fixed-position wrapper still handles placement/scrolling. */
+  box-shadow: none;
+  animation: none;
+  transform: none;
+}
+
 .sunny-catalog-select [data-radix-select-viewport] {
   background-color: inherit;
 }

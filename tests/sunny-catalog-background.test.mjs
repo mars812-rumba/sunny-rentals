@@ -18,7 +18,7 @@ test('catalogue has scoped navy gradient and lightweight static depth', () => {
   assert.match(css, /\.sunny-catalog \.sunny-rental-form/);
   assert.match(css, /\.sunny-catalog \.sunny-catalog-hero\s*\{\s*background: transparent/);
   assert.match(css, /box-shadow: var\(--sunny-catalog-depth\)/);
-  assert.doesNotMatch(css, /backdrop-filter|filter:|animation:|url\(|position:\s*fixed/);
+  assert.doesNotMatch(css, /backdrop-filter|filter:|animation:\s*(?!none\b)\S|url\(|position:\s*fixed/);
   assert.equal(transformSync(css, { loader: 'css', minify: true }).warnings.length, 0);
 });
 
@@ -58,5 +58,9 @@ test('all four form dropdowns opt into portal-safe surfaces without removing foc
   assert.match(css, /\[data-radix-select-viewport\]\s*\{\s*background-color: inherit/);
   assert.match(css, /\[data-highlighted\]/);
   assert.match(css, /min-height: 44px/);
+  const dropdown = css.match(/\.sunny-catalog-select\[role="listbox"\]\[data-state\]\s*\{([\s\S]*?)\}/)[1];
+  assert.match(dropdown, /box-shadow: none/);
+  assert.match(dropdown, /animation: none/);
+  assert.match(dropdown, /transform: none/);
   assert.doesNotMatch(css, /outline:\s*(?:none|0)|pointer-events:\s*none|opacity:\s*1\s*!important/);
 });
