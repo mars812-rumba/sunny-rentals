@@ -1,5 +1,6 @@
 import { webpImagePath } from "../../../shared/webp-image";
-import React, { useState, useEffect, useMemo } from 'react';
+import { vehicleImageSrcSet } from '../../../shared/responsive-vehicle-image';
+import React, { useState, useEffect } from 'react';
 import { Star, Fuel, Settings, Users, ArrowRight, Zap, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,9 +21,6 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const ImageCarousel = ({ photos, carName, t, carId }: { photos: string[], carName: string, t: (key: string) => string, carId: string }) => {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  
-  // Генерируем timestamp ОДИН РАЗ при монтировании компонента
-  const imageTimestamp = useMemo(() => Date.now(), [carId]);
   
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -63,20 +61,23 @@ const ImageCarousel = ({ photos, carName, t, carId }: { photos: string[], carNam
       <div className="embla__viewport h-full" ref={emblaRef}>
         <div className="embla__container h-full">
           {photos.map((photo, index) => {
-            const imageUrl = `${API_URL}/images_web/${webpImagePath(photo)}?v=${imageTimestamp}`;
+            const imageUrl = `${API_URL}/images_web/${webpImagePath(photo)}`;
             
             return (
               <div className="embla__slide" key={index}>
                 <img
                   src={imageUrl}
+                  srcSet={vehicleImageSrcSet(`/images_web/${webpImagePath(photo)}`, API_URL)}
+                  sizes="(min-width: 1024px) 380px, (min-width: 768px) 48vw, calc(100vw - 2rem)"
+                  loading="lazy"
+                  decoding="async"
                   alt={`${carName} photo ${index + 1}`}
                   className="embla__slide__img"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    // Пробуем без параметров
-                    if (target.src.includes('?v=')) {
-                      target.src = `${API_URL}/images_web/${webpImagePath(photo)}`;
-                    }
+                    if (!target.hasAttribute('srcset')) return;
+                    target.removeAttribute('srcset');
+                    target.src = imageUrl;
                   }}
                 />
               </div>

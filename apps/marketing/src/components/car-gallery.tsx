@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { vehicleImageSrcSet } from '@/lib/responsive-image';
 
 export function CarGallery({
   images,
@@ -12,7 +13,7 @@ export function CarGallery({
 }: {
   images: string[];
   alt: string;
-  year: number;
+  year: number | null;
   previousLabel: string;
   nextLabel: string;
   photoLabel: string;
@@ -60,6 +61,9 @@ export function CarGallery({
             <span className="car-gallery__slide" key={image}>
               <img
                 src={image}
+                srcSet={vehicleImageSrcSet(image)}
+                sizes="(max-width: 700px) calc(100vw - 2rem), (max-width: 1100px) 90vw, 760px"
+                decoding="async"
                 alt={`${alt} — ${photoLabel.toLowerCase()} ${index + 1}`}
                 loading={index === 0 ? "eager" : "lazy"}
                 fetchPriority={index === 0 ? "high" : "auto"}
@@ -70,7 +74,7 @@ export function CarGallery({
         </span>
       </div>
 
-      <span className="car-card__year">{year}</span>
+      {year ? <span className="car-card__year">{year}</span> : null}
 
       {hasGallery ? (
         <>
