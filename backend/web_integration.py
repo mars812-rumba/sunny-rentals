@@ -2954,6 +2954,29 @@ def get_fast_dialog_map():
             statuses[uid]["has_new_messages"] = False
     return statuses
 
+def build_crm_booking_index(bookings: List[Dict]) -> Dict[str, Dict]:
+    """Request-local snapshot: one read/scan, no stale cross-process cache."""
+    indexed = {}
+    for booking in bookings:
+        user_id = booking.get("user_id")
+        if user_id is None:
+            continue
+        entry = indexed.setdefault(str(user_id), {
+            "has_active_booking": False, "has_confirmed_booking": False,
+            "last_booking": None,
+        })
+        status = booking.get("status")
+        if status in ("pre_booking", "confirmed"):
+            entry["has_active_booking"] = True
+        if status == "confirmed":
+            entry["has_confirmed_booking"] = True
+        previous = entry["last_booking"]
+        # Keep the first record for equal dates, like the existing stable sort.
+        if previous is None or booking.get("created_at", "") > previous.get("created_at", ""):
+            entry["last_booking"] = booking
+    return indexed
+
+
 @app.get(API_PREFIX + "/crm/users")
 def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking: bool = None):
     """
@@ -2963,6 +2986,7 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
     """
     try:
         users_data = load_json(USER_DATA_JSON)
+        booking_index = build_crm_booking_index(load_bookings())
         # Получаем карту состояний ОДИН раз
         fast_map = get_fast_dialog_map()
 
@@ -2994,7 +3018,8 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
                 continue
 
             # Фильтр: пользователи с подтверждённой бронью
-            if has_confirmed_booking and not check_user_has_confirmed_booking(u_id):
+            booking_data = booking_index.get(u_id, {})
+            if has_confirmed_booking and not booking_data.get("has_confirmed_booking", False):
                 continue
 
             if not u_at: continue
@@ -3013,10 +3038,10 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
                     user_copy["has_new_messages"] = False
 
                 # Добавляем флаг наличия active брони (pre_booking или confirmed)
-                user_copy["has_active_booking"] = check_user_has_active_booking(u_id)
+                user_copy["has_active_booking"] = booking_data.get("has_active_booking", False)
                 
                 # Добавляем последнюю бронь пользователя
-                user_copy["last_booking"] = get_user_last_booking(u_id)
+                user_copy["last_booking"] = booking_data.get("last_booking")
 
                 filtered.append(user_copy)
 
@@ -3030,6 +3055,10 @@ def get_crm_users(status: str = None, period: str = "all", has_confirmed_booking
 def get_crm_stats(period: str = Query("all")):
     try:
         users_data = load_json(USER_DATA_JSON)
+        users_by_id = {}
+        for user in users_data:
+            # Preserve next(...) semantics when legacy records share a user_id.
+            users_by_id.setdefault(str(user.get("user_id")), user)
         now = datetime.now(UTC)
         
         # Определяем точку отсчета для фильтра
@@ -3070,7 +3099,7 @@ def get_crm_stats(period: str = Query("all")):
                     # Если последнее сообщение от user - значит непрочитанное
                     if ev.get("role") == "user":
                         # Ищем статус пользователя в user_data
-                        user_record = next((u for u in users_data if str(u.get("user_id")) == uid), None)
+                        user_record = users_by_id.get(uid)
                         if user_record:
                             user_status = user_record.get("status")
                             # Маппинг старых статусов
